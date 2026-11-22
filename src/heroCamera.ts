@@ -18,3 +18,5 @@ export function heroSettledCamera(width: number, height: number) {
   camera.position.copy(target).add(new Vector3().setFromSpherical(s)); camera.lookAt(target); camera.updateMatrixWorld(true);
   return camera;
 }
+/** Where the hero pose really sits (heroSettledCamera; any aspect): camera flights that end at hero land here, so OrbitControls' polar clamp has nothing left to lift on the next frame. */
+export const HERO_SETTLED_POSITION:[number,number,number]=heroSettledCamera(16,9).position.toArray() as [number,number,number];

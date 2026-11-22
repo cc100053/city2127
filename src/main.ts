@@ -359,12 +359,12 @@ try {
         if(visit&&(shot==='nw:focal'||shot==='nw:focal-low'))residentDemo!.start(now+shotTimeline(displayMs).changeEnd,layout.bands.nw,prevNw);
         return changes;
       }
-      headlineCamera?.cancel();narration?.cancel();concept?.hide();
+      headlineCamera?.returnHome(now);narration?.cancel();concept?.hide();
       if(view.rotation)journey!.setRotationLanterns(view.recentProposals);else journey!.setLanterns(view.recentProposals);
       lots?.setQ02(view.rotation?.shown.Q02,now,true);lots?.setQ03(view.rotation?.shown.Q03,now,true);lots?.setQ06(view.rotation?.shown.Q06,now,true);lots?.setQ08(view.rotation?.shown.Q08,now,true);
       return cityChanges!.applyExhibitionLayout(layout,kind==='city-state-updated'?'city-state-snapshot':kind,now,view.slotSeeds);
     }
-    headlineCamera?.cancel();narration?.cancel();concept?.hide();journey!.cancel();lots?.setQ02(undefined,now,true);lots?.setQ03(undefined,now,true);lots?.setQ06(undefined,now,true);lots?.setQ08(undefined,now,true);
+    headlineCamera?.returnHome(now);narration?.cancel();concept?.hide();journey!.cancel();lots?.setQ02(undefined,now,true);lots?.setQ03(undefined,now,true);lots?.setQ06(undefined,now,true);lots?.setQ08(undefined,now,true);
     world.blendTo(scoresToWorldState(view.scores),now);
     if(kind==='city-state-updated')cityChanges!.applyIncrementalUpdate(view,now);
     else cityChanges!.restoreFromSnapshot(view,now);
