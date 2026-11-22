@@ -3,7 +3,7 @@
 - Owner: Codex
 - Branch: `codex/fuji-facade-pilot`
 - Base: `2ab01ea77125fbd8c54e5c8dc9f1ec79a3d97ac8`
-- Status: 已選 R1 為外觀基準。R7 闊翼嘅兩組雙層窗及轉角樣板待 owner 驗收（2026-11-22）
+- Status: 已選 R1 為外觀基準。R8 闊翼嘅兩組雙層窗及轉角樣板待 owner 驗收（2026-11-22）
 - R1 已驗證實作：`19432b6360eecbf58181ec69d6a3235a0bf82280`
 - 遠端分支：`origin/codex/fuji-facade-pilot`
 
@@ -117,3 +117,21 @@ Owner 覺得第一張目標圖嘅改動難以辨認，之後選定開放構思�
 日景近鏡可辨斜肋、深窗套同退入玻璃，夜景由原有室內光分出兩個大開口。城市主鏡嘅橫樑遮住部分窗框上沿，窗套深度主要由近鏡交代。呢次係開發畫面覆核，展覽機效能同 owner 樣板驗收待做。下一步由 owner 審閱同鏡對照，再決定兩翼其餘樓層嘅延伸。
 
 [日景同鏡](../../artifacts/fuji-civic-facade/r7/comparison-day.jpg) · [夜景同鏡](../../artifacts/fuji-civic-facade/r7/comparison-night.jpg) · [城市主鏡日景](../../artifacts/fuji-civic-facade/r7/hero-day.jpg) · [城市主鏡夜景](../../artifacts/fuji-civic-facade/r7/hero-night.jpg)。
+
+## R8 轉角陶板折面
+
+2026-11-22 喺專用工作樹 `/private/tmp/city2127-fuji-polish` 接續。Fetch 後工作樹乾淨，本機及遠端驗收分支同為 `cd8408d80dfed30a827ae5ef2aa4baf708c0c1af`（0／0），R7 實作 `c9792c7b` 可由遠端追溯。當時 `origin/main` 為 `43137115d73d9dc8504a4fc6d5cbc08ce981e63e`，驗收分支及 main 分別有 17／11 個獨有提交。以 R7 同鏡為基準，沿用 [owner 已選 Gemini 概念](../../artifacts/fuji-civic-facade/r7/gemini-target.jpg)。
+
+- 同一樣板嘅陶板框改成兩道折面，由外周向前收至凸唇，再斜入玻璃。凸唇到玻璃外面由 2.61 加到 3.46 civic-local m（世界約 3.52 → 4.67 m）。共用斜肋由上至下嘅水平偏移由 4.35 加到 5.80 m，側面收口嘅外輪廓喺下端向轉角收 2.35 m。窗頂同窗台沿同一條 45° 斜接跨過兩面。
+- 比較 R7／R8 GLB 三角形嘅位置、法線同 UV，差異只喺樣板嘅 140 個陶板三角形。玻璃、其餘材料批次同樓層接線沿用 R7。Three.js 保持全棟 933,900 面、11 批同原整棟包圍盒。驗證亦覆核兩段扶梯、住民路線同泊位淨空。
+- Blender 5.2.2 Game QA 通過，唯一提示係 4.195 m 嘅外殼下沿高於原點，符合幕牆依附樓板。已看材質及線框檢查圖。用 `gltf` preset、`--no-anim` 匯出再重匯入，五種材質、39,428 個三角面、2,765,436 bytes，無紋理或擴展。Three.js 本地包圍盒 X=−67.04–59.04、Y=4.20–120.51、Z=−5.81–32.74 m。
+
+實作提交 `352f07fe45ba05f35016f5d11fab41af23ea1044`。Odaiba 真 GLB 幾何回歸、根目錄 `npm test`、`npm run build` 同 `git diff --check` 通過。用桌面開發 Mac（macOS 27.2.1／Chrome 157.0.8103.79 headless）及固定擷取流程，喺乾淨實作提交上以 R7 同鏡 12:00／21:00、`reviewTime=20`、3200×1800、DPR 1 擷取兩張近鏡同兩張城市主鏡，各張零頁面錯誤。原圖、sidecar 同 Blender QA 記錄喺 `~/city2127-evidence/fuji-civic-facade/r8/`。
+
+日景近鏡見到闊斜面、窗台斜接同連續轉角玻璃。夜景近鏡分到兩組開口，較窄嗰組仍較暗。城市原鏡位喺銀球左邊睇到橫樑以下嘅斜肋、兩組開口下半同窗台；橫樑繼續遮住部分窗套上沿。展覽機效能同 owner 驗收待做。下一步由 owner 審閱樣板。
+
+Chrome 喺日夜主鏡實際載入 R8 GLB（HTTP 200），模擬 404 時城市用程序幕牆回退。兩條路徑零頁面錯誤。
+
+開發 Mac Apple M6／headless Chrome 以 1920×1080、DPR 1，同一份城市程式分別載入 R7 同 R8 GLB。固定主鏡每個條件量一次 6 秒 rAF，R7 → R8 日景 59.8 → 60.0 FPS、夜景 60.0 → 60.0 FPS。記錄在 `r8/qa/chrome-glb.json`。
+
+[近鏡日景](../../artifacts/fuji-civic-facade/r8/comparison-day.jpg) · [近鏡夜景](../../artifacts/fuji-civic-facade/r8/comparison-night.jpg) · [城市主鏡日景](../../artifacts/fuji-civic-facade/r8/hero-comparison-day.jpg) · [城市主鏡夜景](../../artifacts/fuji-civic-facade/r8/hero-comparison-night.jpg)。
