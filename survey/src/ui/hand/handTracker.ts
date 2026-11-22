@@ -12,6 +12,8 @@ export type HandFrame = { t: number; landmarks: Landmark[][]; width: number; hei
 export type TrackerOptions = {
   path?: TrackerPath;
   preferGpu?: boolean;
+  /** Hands the landmarker tracks: 1 (default, cheapest) or 2 (sticky largest-hand choice in HandPointer). */
+  numHands?: number;
   /** Drive frames from requestVideoFrameCallback when the browser has it (else a currentTime check per rAF). */
   useVfc?: boolean;
   /** Main-thread fallback only: render frames that must pass after an inference before the next one while a hand is seen. */
@@ -41,6 +43,8 @@ export class HandTracker {
   private main?: HandLandmarker;
   private mainDelegate: Delegate = 'CPU';
   private inFlight?: { id: number; sentAt: number };
+  /** A camera frame arrived while the worker was busy: send the current frame as soon as it returns. */
+  private pending = false;
   private nextId = 1;
   private running = false;
   private vfcId = 0;
@@ -56,7 +60,7 @@ export class HandTracker {
 
   constructor(video: HTMLVideoElement, options: TrackerOptions) {
     this.video = video;
-    this.opts = { path: 'auto', preferGpu: true, useVfc: true, mainGapFrames: 3, ...options };
+    this.opts = { path: 'auto', preferGpu: true, useVfc: true, mainGapFrames: 3, numHands: 1, ...options };
     this.useVfc = this.opts.useVfc && 'requestVideoFrameCallback' in HTMLVideoElement.prototype;
   }
 
@@ -77,7 +81,7 @@ export class HandTracker {
 
   start() {
     if (this.running) return;
-    this.running = true; this.inFlight = undefined; this.lastVideoTime = -1; this.firstSentAt = 0;
+    this.running = true; this.inFlight = undefined; this.pending = false; this.lastVideoTime = -1; this.firstSentAt = 0;
     this.vfcCalls = 0; this.startedAt = performance.now();
     this.rafId = requestAnimationFrame(this.onRaf);
     if (this.useVfc) this.vfcId = this.video.requestVideoFrameCallback(this.onVideoFrame);
@@ -116,11 +120,11 @@ export class HandTracker {
         else if (msg.type === 'error') {
           if (!ready) { clearTimeout(timer); reject(new Error(msg.message)); return; }
           if (msg.fatal) { this.workerFailed(msg.message); return; }
-          if (msg.id === this.inFlight?.id) this.inFlight = undefined;
+          if (msg.id === this.inFlight?.id) { this.inFlight = undefined; this.sendPending(); }
           this.opts.onError?.(msg.message);
         }
       };
-      worker.postMessage({ type: 'init', preferGpu: this.opts.preferGpu } satisfies WorkerIn);
+      worker.postMessage({ type: 'init', preferGpu: this.opts.preferGpu, numHands: this.opts.numHands } satisfies WorkerIn);
     });
   }
 
@@ -130,12 +134,20 @@ export class HandTracker {
     push(this.inferMs, msg.inferMs);
     this.inFlight = undefined; this.results++;
     this.opts.onResult({ t: msg.t, landmarks: msg.landmarks, width: msg.width, height: msg.height });
+    this.sendPending();
+  }
+
+  /** Latest-frame resend: a frame skipped while busy is replaced by the video's current frame right away. */
+  private sendPending() {
+    if (!this.pending || !this.running || !this.worker || this.video.readyState < 2) return;
+    this.pending = false;
+    this.sendToWorker(performance.now());
   }
 
   private sendToWorker(now: number) {
     if (this.inFlight) {
       if (now - this.inFlight.sentAt > STALL_MS) { this.workerFailed(`worker stalled > ${STALL_MS} ms`); return; }
-      this.framesDropped++; return;
+      this.framesDropped++; this.pending = true; return;
     }
     if (!this.firstSentAt) this.firstSentAt = now;
     else if (this.results === 0 && now - this.firstSentAt > FIRST_RESULT_MS) { this.workerFailed(`no worker result within ${FIRST_RESULT_MS / 1000} s`); return; }
@@ -165,7 +177,7 @@ export class HandTracker {
     if (this.switching) return;
     this.switching = true; this.mode = 'starting';
     try {
-      const made = await createHandLandmarker(this.opts.preferGpu, false);
+      const made = await createHandLandmarker(this.opts.preferGpu, false, this.opts.numHands);
       this.main = made.landmarker; this.mainDelegate = made.delegate;
       this.mode = made.delegate === 'GPU' ? 'main-gpu' : 'main-cpu';
       if (made.gpuError) this.fallbackReason = [this.fallbackReason, `main GPU→CPU: ${made.gpuError}`].filter(Boolean).join('; ');
@@ -186,7 +198,7 @@ export class HandTracker {
       this.opts.onError?.(`main detect: ${String(error).slice(0, 100)}`);
       if (this.mainDelegate === 'GPU' && !this.switching) {
         this.main?.close(); this.main = undefined; this.switching = true; this.mode = 'starting';
-        createHandLandmarker(false, false).then(made => { this.main = made.landmarker; this.mainDelegate = 'CPU'; this.mode = 'main-cpu'; this.fallbackReason = [this.fallbackReason, 'main GPU→CPU at runtime'].filter(Boolean).join('; '); })
+        createHandLandmarker(false, false, this.opts.numHands).then(made => { this.main = made.landmarker; this.mainDelegate = 'CPU'; this.mode = 'main-cpu'; this.fallbackReason = [this.fallbackReason, 'main GPU→CPU at runtime'].filter(Boolean).join('; '); })
           .catch(e => { this.mode = 'failed'; this.opts.onError?.(`main cpu: ${String(e)}`); })
           .finally(() => { this.switching = false; });
       }

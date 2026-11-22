@@ -54,6 +54,16 @@ assert.equal(pr.at(53)?.x, 53, '20 ms ahead at 1 px/ms');
 assert.equal(pr.at(500)?.x, 73, 'capped at 40 ms ahead');
 assert.equal(pr.at(10)?.x, 33, 'never behind the last sample');
 
+// Adaptive cap: 1.2x the measured interval, capped at 80 ms; 33 ms default before any measurement.
+const auto = new Predictor('auto');
+assert.ok(Math.abs(auto.cap - 39.6) < 1e-9);
+for (let t = 0; t <= 660; t += 66) auto.push(t, { x: t, y: 0 });
+assert.ok(Math.abs(auto.cap - 79.2) < 1e-6, `15 Hz updates: cap ${auto.cap}`);
+assert.ok(Math.abs(auto.at(660 + 66)!.x - 726) < 1e-6, 'keeps moving until the next 15 Hz update');
+const slow = new Predictor('auto');
+for (let t = 0; t <= 1000; t += 100) slow.push(t, { x: 0, y: 0 });
+assert.equal(slow.cap, 80, 'capped at 80 ms');
+
 // HandPointer: no hand -> no cursor; lost fires once; pinch freezes the cursor at the earlier point.
 const hp = new HandPointer({ predictMs: 0, beta: 0, minCutoff: 1000 });
 const open = (x: number) => { const h = Array.from({ length: 21 }, () => ({ x, y: 0.5 })); h[0] = { x, y: 0.7 }; h[9] = { x, y: 0.5 }; h[4] = { x: x + 0.1, y: 0.5 }; h[8] = { x, y: 0.5 }; return h; };

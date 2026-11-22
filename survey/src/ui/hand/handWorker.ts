@@ -1,10 +1,10 @@
-// Module Web Worker: runs HandLandmarker off the main thread so ~25 ms inference never blocks a render frame.
+// Module Web Worker: runs HandLandmarker (VIDEO mode, 1 or 2 hands) off the main thread so ~25 ms inference never blocks a render frame.
 // Protocol (see handTracker.ts): init -> ready; frame (transferred ImageBitmap) -> result | error.
 import type { HandLandmarker } from '@mediapipe/tasks-vision';
 import { createHandLandmarker, type Delegate } from './landmarker.ts';
 
 export type WorkerIn =
-  | { type: 'init'; preferGpu: boolean }
+  | { type: 'init'; preferGpu: boolean; numHands: number }
   | { type: 'frame'; id: number; t: number; bitmap: ImageBitmap };
 export type WorkerOut =
   | { type: 'ready'; delegate: Delegate; gpuError?: string; offscreen: boolean }
@@ -13,13 +13,14 @@ export type WorkerOut =
   | { type: 'error'; id?: number; message: string; fatal: boolean };
 
 const post = (message: WorkerOut) => (self as unknown as Worker).postMessage(message);
-let landmarker: HandLandmarker | undefined, delegate: Delegate = 'CPU', lastT = -1;
+let landmarker: HandLandmarker | undefined, delegate: Delegate = 'CPU', lastT = -1, numHands = 1;
 
 self.onmessage = async (event: MessageEvent<WorkerIn>) => {
   const msg = event.data;
   if (msg.type === 'init') {
     try {
-      const made = await createHandLandmarker(msg.preferGpu, true);
+      numHands = msg.numHands;
+      const made = await createHandLandmarker(msg.preferGpu, true, numHands);
       landmarker = made.landmarker; delegate = made.delegate;
       post({ type: 'ready', delegate, offscreen: typeof OffscreenCanvas !== 'undefined', ...(made.gpuError ? { gpuError: made.gpuError } : {}) });
     } catch (error) { post({ type: 'error', message: `init: ${String(error)}`, fatal: true }); }
@@ -40,7 +41,7 @@ self.onmessage = async (event: MessageEvent<WorkerIn>) => {
       try { landmarker.close(); } catch { /* already broken */ }
       landmarker = undefined;
       try {
-        landmarker = (await createHandLandmarker(false, true)).landmarker; delegate = 'CPU';
+        landmarker = (await createHandLandmarker(false, true, numHands)).landmarker; delegate = 'CPU';
         post({ type: 'delegate', delegate, reason });
       } catch (e) { post({ type: 'error', message: `cpu rebuild: ${String(e)}`, fatal: true }); return; }
     }

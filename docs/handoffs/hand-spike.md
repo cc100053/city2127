@@ -40,6 +40,12 @@
 - `npm test`、`npm run build`、`git diff --check` 通過；各模式的 10 秒統計行皆寫入 jsonl。
 - 未驗證：真實手部（游標外推、捏合、主執行緒節流在有手時的效果）與 iPad Safari 上的 worker GPU。
 
+### M1b（iPad 實測後修正）
+
+- iPad M1（worker-gpu、numHands 2）：描畫穩定 60 fps，但有手時往返約 37 ms，超過相機幀距 33 ms；同時最多一幀在途使更新率降為約 15 Hz（丟幀約 55%），預測上限 40 ms 小於 66 ms 更新間隔，游標停頓後跳動。
+- 修正：(1) 最新幀重送：worker 忙碌時到達的幀標記為待送，結果返回後立即送出當前影格；(2) `?hands=1|2`，預設 1（追蹤中略過手掌偵測），2 保留黏性最大手；(3) 預測上限預設自適應為實測更新間隔的 1.2 倍、最多 80 ms（`?predict=<ms>` 改為固定值）。HUD 與 jsonl 新增 `hands`、`predictCapMs`、`updateMs`，`build: "m1b"`。
+- headless Chromium（假相機 20 fps、無手）：預設 worker-gpu 手 1 p50 10.2 ms、`?hands=2` 10.8 ms、`?delegate=cpu` worker-cpu 18.1 ms、`?mode=main` main-gpu 10.8 ms，描畫皆約 60 fps。重送路徑在此環境未觸發（推論快於幀距），需 iPad 驗證。
+
 ## 下一步
 
 M1：rex 在 iPad Air 插電、持續操作 15 分鐘，比較 `?mode=worker` 與 `?mode=main` 的描畫 fps。M0 原步驟：在 iPad Air 上安裝 mkcert `rootCA.pem` 描述檔並啟用完全信任，開啟 `https://<Mac LAN IP>:8443/hand-spike`，記錄 GPU/CPU 數據與長時間穩定性。憑證綁定建立時的 LAN IP（192.168.0.215），IP 變更需重新產生。

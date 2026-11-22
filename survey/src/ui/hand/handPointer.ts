@@ -133,30 +133,44 @@ export class SelectGate {
 }
 
 /**
- * Display-rate cursor: landmark updates arrive at camera rate (~30 Hz) and some tens of ms late, so the render
- * loop extrapolates the last filtered sample along its velocity, at most `maxAheadMs` past the sample time.
+ * Display-rate cursor: landmark updates arrive at 15-30 Hz and some tens of ms late, so the render loop
+ * extrapolates the last filtered sample along its velocity. The look-ahead cap is fixed when a number is given;
+ * 'auto' adapts it to 1.2x the measured update interval (EMA), at most `autoMaxMs`, so the cursor keeps moving
+ * until the next update instead of stopping and jumping.
  */
 export class Predictor {
   private last?: { t: number; p: Point };
   private v: Point = { x: 0, y: 0 };
-  private readonly maxAheadMs: number;
-  constructor(maxAheadMs = 40) { this.maxAheadMs = maxAheadMs; }
+  private interval?: number;
+  private readonly fixed?: number;
+  private readonly autoMaxMs: number;
+  constructor(maxAheadMs: number | 'auto' = 'auto', autoMaxMs = 80) {
+    if (maxAheadMs !== 'auto') this.fixed = maxAheadMs;
+    this.autoMaxMs = autoMaxMs;
+  }
+  /** Current look-ahead cap in ms. */
+  get cap(): number { return this.fixed ?? Math.min(this.autoMaxMs, 1.2 * (this.interval ?? 33)); }
+  /** Measured update interval in ms (EMA), undefined before two close updates. */
+  get updateInterval(): number | undefined { return this.interval; }
   clear() { this.last = undefined; this.v = { x: 0, y: 0 }; }
   push(t: number, p: Point) {
     if (this.last && t > this.last.t) {
       const dt = t - this.last.t;
-      this.v = dt < 200 ? { x: (p.x - this.last.p.x) / dt, y: (p.y - this.last.p.y) / dt } : { x: 0, y: 0 };
+      if (dt < 200) {
+        this.v = { x: (p.x - this.last.p.x) / dt, y: (p.y - this.last.p.y) / dt };
+        this.interval = this.interval === undefined ? dt : this.interval + 0.1 * (dt - this.interval);
+      } else this.v = { x: 0, y: 0 };
     } else if (!this.last) this.v = { x: 0, y: 0 };
     this.last = { t, p };
   }
   at(now: number): Point | undefined {
     if (!this.last) return undefined;
-    const ahead = Math.min(this.maxAheadMs, Math.max(0, now - this.last.t));
+    const ahead = Math.min(this.cap, Math.max(0, now - this.last.t));
     return { x: this.last.p.x + this.v.x * ahead, y: this.last.p.y + this.v.y * ahead };
   }
 }
 
-export type PointerOptions = { minCutoff?: number; beta?: number; predictMs?: number; pinchLookbackMs?: number; zone?: number };
+export type PointerOptions = { minCutoff?: number; beta?: number; predictMs?: number | 'auto'; pinchLookbackMs?: number; zone?: number };
 export type PointerUpdate = {
   /** The controlling hand's landmarks, undefined when no hand is seen. */
   landmarks?: Landmark[];
@@ -175,7 +189,7 @@ export class HandPointer {
   private readonly fx: OneEuro;
   private readonly fy: OneEuro;
   private readonly history = new History();
-  private readonly predictor: Predictor;
+  readonly predictor: Predictor;
   readonly pinch = new Pinch();
   private readonly lookback: number;
   private readonly zone: number;
@@ -185,7 +199,7 @@ export class HandPointer {
   constructor(options: PointerOptions = {}) {
     this.fx = new OneEuro(options.minCutoff ?? 1.0, options.beta ?? 0.01);
     this.fy = new OneEuro(options.minCutoff ?? 1.0, options.beta ?? 0.01);
-    this.predictor = new Predictor(options.predictMs ?? 40);
+    this.predictor = new Predictor(options.predictMs ?? 'auto');
     this.lookback = options.pinchLookbackMs ?? 100;
     this.zone = options.zone ?? 0.6;
   }

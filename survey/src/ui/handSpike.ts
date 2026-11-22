@@ -6,6 +6,7 @@ import { HandTracker, type HandFrame } from './hand/handTracker.ts';
 
 const params = new URLSearchParams(location.search);
 const num = (key: string, fallback: number) => { const v = Number(params.get(key)); return params.has(key) && Number.isFinite(v) ? v : fallback; };
+const HANDS = num('hands', 1) >= 2 ? 2 : 1;
 const DWELL_MS = num('dwell', 1000), COOLDOWN_MS = 600, LOG_EVERY_MS = 10_000;
 // MediaPipe's 21-point hand topology (same pairs as HandLandmarker.HAND_CONNECTIONS).
 const HAND_CONNECTIONS = [[0, 1], [1, 2], [2, 3], [3, 4], [0, 5], [5, 6], [6, 7], [7, 8], [5, 9], [9, 10], [10, 11], [11, 12], [9, 13], [13, 14], [14, 15], [15, 16], [13, 17], [0, 17], [17, 18], [18, 19], [19, 20]];
@@ -106,10 +107,11 @@ const tracker = new HandTracker(video, {
   preferGpu: params.get('delegate') !== 'cpu',
   useVfc: params.get('vfc') !== '0',
   mainGapFrames: num('maingap', 3),
+  numHands: HANDS,
   onResult: onHandFrame,
   onError: recordError,
 });
-const pointer = new HandPointer({ minCutoff: num('mincutoff', 1.0), beta: num('beta', 0.01), predictMs: num('predict', 40) });
+const pointer = new HandPointer({ minCutoff: num('mincutoff', 1.0), beta: num('beta', 0.01), predictMs: params.has('predict') ? num('predict', 40) : 'auto' });
 const gate = new SelectGate(DWELL_MS, COOLDOWN_MS);
 let rects: DOMRect[] = [];
 const measure = () => { rects = cards.map(c => c.getBoundingClientRect()); };
@@ -171,6 +173,7 @@ function stats(now: number) {
     uptimeS: Math.round((now - startedAt) / 1000), inferFps: r1(inferFps), renderFps: r1(renderFps),
     inferP50: r1(percentile(tracker.inferMs, 0.5)), inferP95: r1(percentile(tracker.inferMs, 0.95)),
     rttP50: r1(percentile(tracker.roundTripMs, 0.5)), rttP95: r1(percentile(tracker.roundTripMs, 0.95)),
+    hands: HANDS, predictCapMs: r1(pointer.predictor.cap), updateMs: r1(pointer.predictor.updateInterval ?? NaN),
     mode: tracker.mode, delegate: tracker.mode.endsWith('gpu') ? 'GPU' : tracker.mode.endsWith('cpu') ? 'CPU' : '-',
     fallbackReason: tracker.fallbackReason || undefined, pump: tracker.useVfc ? 'vfc' : 'raf',
     framesSent: tracker.framesSent, framesDropped: tracker.framesDropped,
@@ -184,11 +187,12 @@ function drawHud(now: number) {
   const up = `${Math.floor(s.uptimeS / 3600)}h${String(Math.floor(s.uptimeS / 60) % 60).padStart(2, '0')}m${String(s.uptimeS % 60).padStart(2, '0')}s`;
   const f = (v: number) => Number.isFinite(v) ? v.toFixed(1) : '-';
   hud.textContent = [
-    `モード     ${s.mode} (${s.pump})`,
+    `モード     ${s.mode} (${s.pump}) 手 ${s.hands}`,
     `推論 fps   ${f(s.inferFps)}`, `描画 fps   ${f(s.renderFps)}`,
     `推論 ms    p50 ${f(s.inferP50)} / p95 ${f(s.inferP95)}`,
     `往復 ms    p50 ${f(s.rttP50)} / p95 ${f(s.rttP95)}`,
     `フレーム   送信 ${s.framesSent} / 破棄 ${s.framesDropped}`,
+    `予測       上限 ${f(s.predictCapMs)} ms / 更新間隔 ${f(s.updateMs)} ms`,
     `カメラ     ${s.camera}`, `稼働       ${up}`,
     `手の喪失   ${s.handLost}  ピンチ比 ${Number.isFinite(lastPinchRatio) ? lastPinchRatio.toFixed(2) : '-'}`,
     `選択       滞留 ${selects.dwell} / ピンチ ${selects.pinch} / タッチ ${selects.touch}`,
@@ -215,7 +219,7 @@ function drawSkeleton() {
 // ---- stats log --------------------------------------------------------------------------------------------
 let sentUserAgent = false, logFailures = 0;
 setInterval(() => {
-  const body = { kind: 'hand-spike', build: 'm1', ...stats(performance.now()), logFailures, ...(sentUserAgent ? {} : { userAgent: navigator.userAgent }) };
+  const body = { kind: 'hand-spike', build: 'm1b', ...stats(performance.now()), logFailures, ...(sentUserAgent ? {} : { userAgent: navigator.userAgent }) };
   fetch('/api/dev/hand-spike-log', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) })
     .then(r => { if (r.ok) sentUserAgent = true; else logFailures++; })
     .catch(() => { logFailures++; });
