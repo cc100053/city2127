@@ -3,7 +3,7 @@
 - Owner: Codex
 - Branch: `codex/fuji-facade-pilot`
 - Base: `2ab01ea77125fbd8c54e5c8dc9f1ec79a3d97ac8`
-- Status: 已選 R1 為外觀基準。方案 A 的 R4 公共接駁體塊候選待驗收（2026-11-22）
+- Status: 已選 R1 為外觀基準。R5 上層出口與拱腳收邊候選待 owner 驗收（2026-11-22）
 - R1 已驗證實作：`19432b6360eecbf58181ec69d6a3235a0bf82280`
 - 遠端分支：`origin/codex/fuji-facade-pilot`
 
@@ -64,3 +64,21 @@ Apple M6／Chrome 157.0.8103.79 headless（ANGLE Metal），主鏡 1920×1080／
 已驗證實作為 `83dffbfad29bfd0beefb26a45d9fefe18dbbc235`。根目錄 `npm test`、`npm run build`、`git diff --check` 通過。桌面開發 Mac Chrome headless，3200×1800、DPR 1，固定 `reviewTime=20`，四張最終擷取零頁面錯誤。夜間主鏡一般幀同 R3 都是 1,414 次 draw call，提交三角面由 20,587,780 增至 20,592,028。原圖及 sidecar 在 `~/city2127-evidence/fuji-civic-facade/r4-final/`，擷取時 runtime 程式碼與已驗證提交一致。
 
 正面鏡可讀出入口、繞行弧線及扶梯兩端，拱橋柱遮住扶梯中段。西南鏡補看扶梯穿出平台及夜間前庭接駁。此輪驗收公共接駁的體塊和畫面，展覽機效能未測。[同鏡日景](../../artifacts/fuji-civic-facade/r4/south-day.jpg) · [同鏡夜景](../../artifacts/fuji-civic-facade/r4/south-night.jpg) · [R3／R4 夜景對照](../../artifacts/fuji-civic-facade/r4/r4-comparison.jpg) · [城市主鏡](../../artifacts/fuji-civic-facade/r4/hero-night.jpg)
+
+## R5 上層扶梯出口與拱腳收邊
+
+2026-11-22 從專用工作樹 `/private/tmp/city2127-fuji-polish` 接續。Fetch 後乾淨的本機分支與遠端驗收分支都在 `58b626e8e57ceeca89d3f0cd936f8348245b67d4`，差異 0／0。當時 `origin/main` 是 `2ab01ea7`，驗收分支超前 9 個提交。發布前再 fetch，`origin/main` 已升至船體露台整合 `b229404f`，R5 沿用原 R4 驗收分支作比較基準。Owner 的標記在 [R4 南面夜景](../../artifacts/fuji-civic-facade/r4/south-night.jpg)。
+
+- 原斜扶梯由 R4 底端出發，穿過原有公共平台開口，喺主橫樑底先接世界 Y=74.925 m 的平轉乘台。第二段由海側向上，64 級踏面接到 Y=87.75 m 的平落地台，再經約 5.94 m 闊嘅欄邊開口行入原有上層公共步道。乘客由公共平台到上層出口一直可見，行過兩個平面時有步態。
+- 富士地台沿拱腳基座留出約 1.5 m 的設計退讓，鄰近外圍級邊及大堂展板局部收短。拱橋仍用原柱位及原基座。R4 入口梯、海側步廊及低位接駁，R1 幕牆、橫樑、球體和球頂泊位照原位。
+- 真 GLB 及程序回退的大樓分別為 936,952／955,348 個三角面，各 10 個材質批次，較 R4 各少 2,984 個三角面。兩版本用同一乘客路線及世界包圍盒。
+
+實作與擷取基準為 `e63c34338c535835245e773cc0c8130345596a60`。Odaiba 測試以實際三角網格檢查上段路線中央及左右各 0.55 m，沿路每最多 0.18 m 取樣，核對踏面與 2.3 m 頭頂空間。雙向射線確認轉乘台、扶梯同出口冇薄欄板或樑擋路。拱腳自基座中心以 0.5 m 網格抽查至半徑 13.55 m，範圍內冇富士大堂地台；原柱腳仍落地。既有入口、低位平台、公共平台、步廊及泊位航線的測試通過。
+
+根目錄 `npm test`、`npm run build`、`git diff --check` 通過。完整測試用桌面環境重跑，讓 survey pipeline 開本機 HTTP／WebSocket。
+
+桌面 Mac（macOS 27.2.1、Chrome 157.0.8103.79 headless）以 3200×1800、DPR 1、`reviewTime=20` 擷取五張圖，零頁面錯誤。南面兩張沿用 R4 日夜的完整 URL 與構圖。原圖及 sidecar 在 `~/city2127-evidence/fuji-civic-facade/r5-final/`，均從乾淨嘅實作提交擷取。展覽機效能未測。
+
+[扶梯頂日景](../../artifacts/fuji-civic-facade/r5/upper-day.jpg) · [扶梯頂夜景](../../artifacts/fuji-civic-facade/r5/upper-night.jpg) · [拱腳近鏡](../../artifacts/fuji-civic-facade/r5/arch-foot-day.jpg) · [南面同鏡日景](../../artifacts/fuji-civic-facade/r5/south-day.jpg) · [南面同鏡夜景](../../artifacts/fuji-civic-facade/r5/south-night.jpg)。
+
+下一步由 owner 驗收上層出口、拱腳收邊同南面日夜對照。
