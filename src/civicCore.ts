@@ -312,6 +312,9 @@ export function civicCore(facade?: T.Group) {
         continue;
       }
       const h=y===43 ? 19.3 : 17.3,studio=y===43 || y===83 || y===102;
+      // Pilot endpoints match six front bays and three inner return bays in build_facade.py.
+      const facadePilot = facadeReady && x === 40 && y === 83;
+      const pilotSeaEnd = 46.12, pilotReturnEnd = 10.52;
       // The acoustic block is set back 5 m from each flank, leaving a glazed studio gallery where live production shows from outside.
       box(root,[width-10,h,23],[x,y+1.2+h/2,46],stone);
       // Deep ceramic reveals articulate the sealed acoustic rooms without glazing their sound enclosure.
@@ -335,11 +338,15 @@ export function civicCore(facade?: T.Group) {
           for(let z=0;z<33;z+=10)box(root,[.22,h,.3],[x+side*(width/2-.4),y+1.2+h/2,z],trim);
         }
         if(y===3)continue; // the ground floor flanks meet the public foyer
-        // Proud ceramic band with a lit soffit and planter at the mezzanine line, so the flanks stack as terraced floors.
-        box(root,[1.5,1.05,36],[x+side*(width/2+.25),y+9.2,15],trim);
-        box(root,[.25,.2,35],[x+side*(width/2+.8),y+8.6,15],publicLight);
-        box(root,[1,.5,34],[x+side*(width/2+.35),y+9.95,15],leaf);
+        // The decorative flank planter stops at the pilot's return jamb; the interior mezzanine stays continuous.
+        const pilotReturn = facadePilot && side === -1;
+        const planterCut = pilotReturn ? pilotReturnEnd + 3 : 0;
+        const planterCenter = 15 + planterCut / 2;
+        box(root,[1.5,1.05,36-planterCut],[x+side*(width/2+.25),y+9.2,planterCenter],trim);
+        box(root,[.25,.2,35-planterCut],[x+side*(width/2+.8),y+8.6,planterCenter],publicLight);
+        box(root,[1,.5,34-planterCut],[x+side*(width/2+.35),y+9.95,planterCenter],leaf);
         for(let z=-1;z<32;z+=2.8) {
+          if(pilotReturn && z < pilotReturnEnd + 1) continue;
           const shrub=new T.Mesh(crown,leaf),s=.5+Math.abs(Math.sin(z*2.3+y+side))*.35;
           shrub.position.set(x+side*(width/2+.35),y+10.3+s*.4,z);shrub.scale.set(s*.8,s,s*1.1);root.add(shrub);
         }
@@ -444,8 +451,10 @@ export function civicCore(facade?: T.Group) {
         box(root,[width-1,.8,2.6],[x,y+.9,-3.8],stone);
         box(root,[width-1,.95,.22],[x,y+1.75,-5],trim);
         box(root,[width-2,.08,2.1],[x,y+.47,-3.8],publicLight);
-        box(root,[width-2,.6,1.5],[x,y+1.6,-3.9],leaf);
+        const planterCut = facadePilot ? pilotSeaEnd - (x - width / 2 + 1) : 0;
+        box(root,[width-2-planterCut,.6,1.5],[x+planterCut/2,y+1.6,-3.9],leaf);
         for(let dx=-width/2+2;dx<width/2-1;dx+=2.6) {
+          if(facadePilot && x + dx < pilotSeaEnd + 1) continue;
           const shrub=new T.Mesh(crown,leaf),s=.55+Math.abs(Math.sin(dx*3.1+y))*.35;
           shrub.position.set(x+dx,y+2+s*.4,-3.9);shrub.scale.set(s*1.2,s,s*.9);root.add(shrub);
         }

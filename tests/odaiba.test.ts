@@ -108,6 +108,32 @@ for (const placement of layout.buildings) {
 assert.equal(triangles, 339919, 'All eight complete GLBs retain reviewed geometry');
 const facadeBytes = readFileSync(new URL('../asset/models/fuji-civic-facade/fuji-civic-facade.glb', import.meta.url));
 const { scene: facade } = await new GLTFLoader().parseAsync(facadeBytes.buffer.slice(facadeBytes.byteOffset, facadeBytes.byteOffset + facadeBytes.byteLength), '');
+// Read the installed pilot from the GLB before civicCore remaps and bakes its materials.
+facade.updateMatrixWorld(true);
+const towardWing = new Vector3(0, 0, 1);
+const alongReturn = new Vector3(1, 0, 0);
+const facadeHit = (origin: Vector3, direction: Vector3) =>
+  new Raycaster(origin, direction, 0, 8).intersectObject(facade, true)[0];
+for (const [x, y] of [[35.1, 87], [31.8, 98]]) {
+  const rib = facadeHit(new Vector3(x, y, -7), towardWing);
+  assert.ok(rib?.object.name === 'Facade_ceramic' && rib.point.z < -4.8,
+    'The two-storey ceramic pier is proud of the curtain wall and leans across the paired openings');
+}
+for (const y of [87, 98]) {
+  for (const x of [22.18, 43]) {
+    const seaGlass = facadeHit(new Vector3(x, y, -7), towardWing);
+    assert.ok(seaGlass?.object.name === 'Facade_clear' && Math.abs(seaGlass.point.z + 2.35) < .02,
+      'Both sea-facing window groups retain deeply recessed glazing on both storeys');
+  }
+  const returnGlass = facadeHit(new Vector3(17, y, -2.1), alongReturn);
+  const joint = facadeHit(new Vector3(19.64, y, -4.62), new Vector3(1, 0, 1).normalize());
+  assert.ok(returnGlass?.object.name === 'Facade_clear' && Math.abs(returnGlass.point.x - 21.91) < .02 &&
+    joint?.object.name === 'Facade_graphite' && joint.point.distanceTo(new Vector3(21.895, y, -2.365)) < .025,
+    'Clear panes wrap both faces of the same slim dark corner joint');
+}
+const opaquePanel = facadeHit(new Vector3(39, 98, -7), towardWing);
+assert.ok(opaquePanel?.object.name === 'Facade_ceramic' && Math.abs(opaquePanel.point.z + 2.38) < .02,
+  'The solid ceramic panel stays at the rear glazing plane');
 const core = civicCore(facade);
 const fallback = civicCore();
 assert.equal(core.userData.facade, 'blender');
@@ -121,6 +147,7 @@ assert.ok(coreTriangles <= 1_000_000, `Fuji civic core stays within the pilot tr
 city.add(core);
 landmarks.push(core);
 const coreBounds=new Box3().setFromObject(core);
+assert.deepEqual(coreBounds, new Box3().setFromObject(fallback), 'The projecting facade fits within the existing civic silhouette bounds');
 assert.ok(coreBounds.min.y>=-7 && coreBounds.max.y<195, 'Civic chassis (polish2: 1.35× frame) stays below the sphere approach tier'); // the district loop at 164–176 m runs ~350 m out
 assert.ok(core.children.length<=11, 'Static civic chassis batches by shared material, including matte landing stone');
 assert.ok(core.children.every(object=>object instanceof Mesh && !Array.isArray(object.material)), 'No per-member draws');
