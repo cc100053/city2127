@@ -313,6 +313,12 @@ function hull(batch: Batch, trees: Plant[], shrubs: Shrub[]) {
     for (const [dy, dd, bh, bw] of [[h / 2, 0, .7, w + 1.4], [-h / 2, 0, .7, w + 1.4], [0, w / 2 + .35, h, .7], [0, -w / 2 - .35, h, .7]])
       put(batch, megaSeam, new T.BoxGeometry(.9, bh, bw), at(u + sgn * .3, c + dd, y + dy));
   }
+  const entrance = 53; // Existing plaza walk lands here.
+  const publicTerraces = new Map([
+    [0, { start: entrance - 18, end: entrance + 18 }],
+    [3, { start: -39, end: 9 }],
+    [6, { start: 31, end: 67 }],
+  ]);
   for (let k = 0; k < steps; k++) {
     const y0 = k * step, f = front(k, 0), u0 = left(k);
     slab(k, y0, 1.2, 1.6, megaSeam); // glowing lip at the foot of each face
@@ -324,9 +330,9 @@ function hull(batch: Batch, trees: Plant[], shrubs: Shrub[]) {
       const column = new T.BoxGeometry(.9, 5.4, .9);
       for (let u = u0 + 3; u < L2 - 1; u += 6) put(batch, megaRib, column, at(u, dAt(k, u, 0) - .6, y0 + 3.9));
       // Main door where the plaza walk lands (u 53): a deep canopy with a lit front edge over the forecourt.
-      const door = 53, dd = dAt(k, door, 0);
-      put(batch, megaShell, new T.BoxGeometry(18, .5, 7), at(door, dd - 4.7, y0 + 6.9));
-      put(batch, megaSeam, new T.BoxGeometry(18.2, .3, .3), at(door, dd - 8.2, y0 + 6.75));
+      const dd = dAt(k, entrance, 0);
+      put(batch, megaShell, new T.BoxGeometry(18, .5, 7), at(entrance, dd - 4.7, y0 + 6.9));
+      put(batch, megaSeam, new T.BoxGeometry(18.2, .3, .3), at(entrance, dd - 8.2, y0 + 6.75));
     } else slab(k, y0 + 1.2, g0 - 1.2, 1.2, megaShell);
     slab(k, y0 + g0 - .5, .35, 1.5, megaSeam); // cool seam line along the top of the white slab
     slab(k, y0 + g0, step - g0, -.8, megaGlass); // glass set 0.8 m back under the slab
@@ -339,17 +345,80 @@ function hull(batch: Batch, trees: Plant[], shrubs: Shrub[]) {
       for (let d = d0 + 6; d < depth - 2; d += 8) if (!inPortal(sgn, d, k)) put(batch, megaRib, new T.BoxGeometry(1.1, step - 1, .8), at(u + sgn * 2.6, d, y0 + step / 2));
       if (!inPortal(sgn, d0 + 1, k)) put(batch, megaSeam, new T.BoxGeometry(.6, step, .6), at(u + sgn * 2.6, d0 + 1, y0 + step / 2));
     }
-    // planter deck behind the lip: low hedge bands, a tree about every 13 m
-    for (const [off, w, mat, h] of [[.75, 1.5, megaShell, .5], [3.6, 2.4, megaPlant, .6], [6.6, 2, megaPlant, .6]] as const) for (let i = 0; i < f.length - 1; i++) // white deck edge, then low hedges
-      bar(batch, mat, world(f[i][0], f[i][1] + off, y0 + step + h / 2), world(f[i + 1][0], f[i + 1][1] + off, y0 + step + h / 2), w, h);
-    // P5: shrub band spilling over the deck edge, then tree clusters at irregular 30-45 m gaps
-    for (const [off, gap, r] of [[1.1, 4.2, 3], [5.2, 7, 2.6]] as const)
-      for (let u = u0 + 2, i = 0; u < L2 - 2; u += gap, i++) { const p = world(u, dAt(k, u, 0) + off, y0 + step + .5); shrubs.push([p.x, p.y, p.z, r + hash(k * 99 + i + off) * .7, 1.4 + hash(k * 99 + i + 4) * .5]); }
-    for (let u = u0 + 8 + hash(k) * 12, c = 0; u < L2 - 8; u += 24 + hash(k * 7 + c) * 16, c++)
-      for (let j = 0, n = 4 + Math.floor(hash(k * 13 + c) * 3); j < n; j++) {
-        const uj = u + (hash(k * 31 + c * 5 + j) - .5) * 9, p = world(uj, dAt(k, uj, 0) + 4 + hash(k * 17 + c * 3 + j) * 3.5, y0 + step + .5);
-        trees.push({ position: [p.x, -p.z, p.y], scale: .5 + hash(k * 3 + c * 11 + j) * .3, type: j === 1 ? 'columnar' : 'broadleaf' }); // polish2: rim-scale trees, so the terraces read
+    const terrace = publicTerraces.get(k);
+    const deckY = y0 + step;
+    const deckPoint = (u: number, inset: number, rise: number) => world(u, dAt(k, u, 0) + inset, deckY + rise);
+    const clearOfTerrace = (u: number, radius: number) => !terrace || u + radius <= terrace.start || u - radius >= terrace.end;
+    for (let i = 0; i < f.length - 1; i++) {
+      const a = f[i][0], b = f[i + 1][0];
+      bar(batch, megaShell, deckPoint(a, .75, .25), deckPoint(b, .75, .25), 1.5, .5);
+      // Each planter follows the main curve and terminates at the actual edge of the opening.
+      const spans = terrace ? [[a, Math.min(b, terrace.start)], [Math.max(a, terrace.end), b]] : [[a, b]];
+      for (const [start, end] of spans) if (end > start) {
+        for (const [inset, width] of [[3.6, 2.4], [6.6, 2]]) {
+          bar(batch, megaPlant, deckPoint(start, inset, .3), deckPoint(end, inset, .3), width, .6);
+        }
       }
+    }
+    // Keep crowns out of the public floor, including their overhang past the trunk.
+    for (const [off, gap, r] of [[1.1, 4.2, 3], [5.2, 7, 2.6]] as const) {
+      for (let u = u0 + 2, i = 0; u < L2 - 2; u += gap, i++) {
+        const radius = r + hash(k * 99 + i + off) * .7;
+        if (!clearOfTerrace(u, radius * 1.2)) continue;
+        const p = deckPoint(u, off, .5);
+        shrubs.push([p.x, p.y, p.z, radius, 1.4 + hash(k * 99 + i + 4) * .5]);
+      }
+    }
+    for (let u = u0 + 8 + hash(k) * 12, c = 0; u < L2 - 8; u += 24 + hash(k * 7 + c) * 16, c++) {
+      for (let j = 0, n = 4 + Math.floor(hash(k * 13 + c) * 3); j < n; j++) {
+        const uj = u + (hash(k * 31 + c * 5 + j) - .5) * 9;
+        const scale = .5 + hash(k * 3 + c * 11 + j) * .3;
+        if (!clearOfTerrace(uj, 5.5 * scale)) continue;
+        const p = deckPoint(uj, 4 + hash(k * 17 + c * 3 + j) * 3.5, .5);
+        trees.push({ position: [p.x, -p.z, p.y], scale, type: j === 1 ? 'columnar' : 'broadleaf' });
+      }
+    }
+    if (terrace) {
+      const { start, end } = terrace;
+      const edge = [start, ...f.map(([u]) => u).filter(u => u > start && u < end), end];
+      const paving = new T.Shape();
+      paving.moveTo(start, -dAt(k, start, 0) - 1.5);
+      for (const u of edge.slice(1)) paving.lineTo(u, -dAt(k, u, 0) - 1.5);
+      for (let i = edge.length - 1; i >= 0; i--) paving.lineTo(edge[i], -dAt(k, edge[i], 0) - 7.25);
+      put(batch, megaRib, new T.ExtrudeGeometry(paving, { depth: .18, bevelEnabled: false }).rotateX(-Math.PI / 2),
+        root.clone().multiply(new T.Matrix4().makeTranslation(0, deckY, 0)));
+
+      // Dark guardrail follows the pale hull kerb and leaves the bays open to the view.
+      for (let i = 1; i < edge.length; i++) {
+        for (const rise of [.76, 1.17]) {
+          bar(batch, megaJoint, deckPoint(edge[i - 1], .78, rise), deckPoint(edge[i], .78, rise), .12, .11);
+        }
+      }
+      for (let i = 0, n = Math.ceil((end - start) / 2.4); i <= n; i++) {
+        const u = T.MathUtils.lerp(start, end, i / n);
+        put(batch, megaJoint, new T.BoxGeometry(.15, .73, .15), at(u, dAt(k, u, 0) + .78, deckY + .845));
+      }
+
+      // Broad shade panels keep the middle garden readable from the city camera.
+      if (k === 3) {
+        const a = start + 4, b = start + 24;
+        for (const u of [a, b]) for (const inset of [2.1, 7.2]) {
+          put(batch, megaRib, new T.BoxGeometry(.45, 3.8, .45), at(u, dAt(k, u, 0) + inset, deckY + 1.95));
+        }
+        for (const inset of [2.1, 7.2]) {
+          bar(batch, megaRib, deckPoint(a, inset, 3.85), deckPoint(b, inset, 3.85), .5, .5);
+        }
+        for (const off of [3, 10, 17]) {
+          bar(batch, megaShell, deckPoint(a + off, 1.7, 4.18), deckPoint(a + off, 7.6, 4.18), 6.1, .42);
+        }
+      }
+      if (k === 6) {
+        // A built-in seat wall at the back leaves the seaward edge open.
+        for (const [inset, height] of [[5.8, .32], [6.55, .68]]) {
+          bar(batch, megaShell, deckPoint(start + 7, inset, .18 + height / 2), deckPoint(end - 7, inset, .18 + height / 2), .72, height);
+        }
+      }
+    }
     if (k === 2) { // service rail along this lip with two static pods
       const fl = front(k, 2);
       for (let i = 0; i < fl.length - 1; i++) bar(batch, megaRib, world(fl[i][0], fl[i][1] - .8, y0 + 6), world(fl[i + 1][0], fl[i + 1][1] - .8, y0 + 6), .7, .5);

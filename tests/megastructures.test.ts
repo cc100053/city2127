@@ -23,6 +23,26 @@ const within = (v: number, want: number, what: string) => assert.ok(v >= want * 
 within(RING.centreY + RING.outer, 195, 'ring top'); within(ARCH.apex, 170, 'arch apex'); within(HULL.steps * HULL.step, 120, 'hull top');
 assert.ok(shell.max.y >= HULL.steps * HULL.step * .9 && shell.max.y <= 200, `shell top ${shell.max.y}`);
 within(RING.outer * 2, 210, 'ring diameter'); within(Math.hypot(ARCH.b[0] - ARCH.a[0], ARCH.b[1] - ARCH.a[1]), 240, 'arch span'); within(HULL.length, 190, 'hull length');
+// The three openings have continuous paved floors and retain planted terraces beside them.
+{
+  const axis = new Vector3(0, 1, 0), origin = new Vector3(HULL.x, 0, HULL.z);
+  const floorHit = (tier: number, u: number, inset: number) => {
+    const depth = tier * HULL.recede - 8 * (1 - (u / (HULL.length / 2)) ** 2) + inset;
+    const start = new Vector3(u, (tier + 1) * HULL.step + 3, depth).applyAxisAngle(axis, HULL.yaw).add(origin);
+    return new Raycaster(start, new Vector3(0, -1, 0), 0, 3.1).intersectObject(group)[0];
+  };
+  for (const [tier, start, end] of [[0, 35, 71], [3, -39, 9], [6, 31, 67]]) {
+    const deck = (tier + 1) * HULL.step;
+    for (let u = start + 2; u <= end - 2; u += 2) for (const inset of [3.6, 4.9, tier === 6 ? 2.4 : 6.6]) {
+      const hit = floorHit(tier, u, inset);
+      assert.ok(hit && Math.abs(hit.point.y - deck - .18) < .01, `terrace ${tier}: paving clear at ${u}, ${inset}`);
+    }
+    for (const u of [start - 4, end + 4]) {
+      const hit = floorHit(tier, u, 3.6);
+      assert.ok(hit && hit.point.y >= deck + .59, `terrace ${tier}: planting beside the opening at ${u}`);
+    }
+  }
+}
 // Ground contacts (plinth, arch feet, hull footprint) keep 14 m clear of every Meter site and of the civic core base.
 const contacts = groundContacts(), all = [contacts.ring, ...contacts.archFeet, contacts.hull];
 for (const site of Object.values(changeSites)) {
