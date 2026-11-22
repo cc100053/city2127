@@ -3,7 +3,7 @@
 - Owner: Codex
 - Branch: `codex/fuji-facade-pilot`
 - Base: `2ab01ea77125fbd8c54e5c8dc9f1ec79a3d97ac8`
-- Status: 已選 R1 為外觀基準。R6 轉乘台與上層出口導向候選待 owner 驗收（2026-11-22）
+- Status: 已選 R1 為外觀基準。R7 闊翼嘅兩組雙層窗及轉角樣板待 owner 驗收（2026-11-22）
 - R1 已驗證實作：`19432b6360eecbf58181ec69d6a3235a0bf82280`
 - 遠端分支：`origin/codex/fuji-facade-pilot`
 
@@ -100,3 +100,20 @@ Apple M6／Chrome 157.0.8103.79 headless（ANGLE Metal），主鏡 1920×1080／
 行人視角以 1.64 m 眼高、沿同一條乘客路線側移 0.55 m，由第一段末端行到上層步道。日夜各約 23 秒，1440×810、DPR 1，固定住民時間 `reviewTime=28`，第二段上行加快供看片。逐段以 2 秒畫面核對 1.1–3.1 s 嘅落梯轉彎、7.1–9.1 s 嘅第二段入口、16.6–18.6 s 嘅上層落地台及欄邊開口。最後一段可跟住地面導線穿過開口，片中途人短暫遮住出口箭頭尖。[日景行人幀](../../artifacts/fuji-civic-facade/r6/walker-day.jpg) · [夜景行人幀](../../artifacts/fuji-civic-facade/r6/walker-night.jpg)
 
 兩段錄影嘅 Fuji GLB 回應 200，零頁面錯誤。原圖與 sidecar 在 `~/city2127-evidence/fuji-civic-facade/r6-final/`，短片、sidecar 與錄製腳本在 `~/city2127-evidence/fuji-civic-facade/r6-route/`。短片擷取時工作樹有交接和證據更新，runtime 與實作提交一致。兩秒檢查為開發畫面覆核，owner 驗收和展覽機測試待做。下一步由 owner 審閱驗收分支嘅 R6 日夜對照和短片。
+
+## R7 兩翼外牆樣板
+
+2026-11-22 由專用工作樹 `/private/tmp/city2127-fuji-polish` 接續。Fetch 後乾淨嘅本機同遠端驗收分支都係 `a97f386b124bd52d03b702ceccf25e787033bc81`，差異 0／0。`origin/main` 係 `5759a37c35d0d213df2be7c44cc65b814f81e720`，同驗收分支分別有 7／15 個獨有提交。以 R6 作同鏡比較，R1 仍係整體外觀基準。
+
+Owner 覺得第一張目標圖嘅改動難以辨認，之後選定開放構思版嘅斜肋、深框同轉角玻璃。[已選 Gemini 目標日景](../../artifacts/fuji-civic-facade/r7/gemini-target.jpg)。目標圖畫多嘅扶梯同改動嘅球面反光沿用 R6 實景處理。原始 Gemini JPEG、R6 原圖及提示詞在 `~/city2127-evidence/fuji-civic-facade/r7/`。
+
+- 只做主鏡中銀球左側闊翼 civic-local Y=83 嘅雙層窗帶。海側六個原窗格收成兩組開口，內側頭三格接到同一套窗框。兩組窗由斜向陶板肋分隔，斜切窗套露出實體側面。其中一組以兩片垂直玻璃接過轉角，中間用窄深色接縫。另一組加一塊退入嘅實心陶板。窗框最前面同玻璃外面相距 2.61 civic-local m，放置後約 3.52 m。
+- 沿用 `fuji_ceramic`、`fuji_graphite`、`fuji_clear`、`fuji_warm` 同 `fuji_studio` 五個角色。海側底邊保留原托板，局部收短裝飾花槽嘅種植範圍。內側裝飾花槽止於新窗框，室內夾層及主樓板繼續用原幾何。兩翼其餘窗牆、主柱樑、銀球及泊位、扶梯、白拱同公共路線沿用 R6。呢組幕牆按富士嘅樓層、玻璃轉角同投影方向塑形，屬大樓專用外殼。
+- Blender 5.2.2 以原生成腳本重建，用 `gltf` preset、`--no-anim` 匯出。Game QA 無幾何錯誤。唯一提示係幕牆最低點 4.195 m，符合依附樓板嘅外殼。多角度材質同線框已目視。重匯入共 39,428 個三角面，陶板／深灰／玻璃／暖光／直播光分別為 13,856／17,952／4,800／2,556／264。GLB 約 2.64 MiB，五種材質，無紋理，物件縮放 1，Three.js 本地包圍盒約 X=−67.04–59.04、Y=4.20–120.51、Z=−4.96–32.74 m。
+- 載入 GLB 時，Three.js 全棟由 R6 嘅 937,096 降至 933,900 個三角面，維持 11 個材質批次。程序回退仍係 955,492 面、11 批。兩者世界包圍盒同住民／扶梯路線一致。Odaiba 測試用真 GLB 射線核對斜肋、前後層次、陶板同兩層轉角玻璃，並覆核原樓層、扶梯淨空同泊位接近路徑。
+
+實作提交係 `c9792c7ba2e19d51f69027f47ab791346b59b90b`。根目錄 `npm test`、`npm run build`、`git diff --check` 同 Odaiba 幾何回歸通過。桌面開發 Mac（macOS 27.2.1／Chrome 157.0.8103.79 headless）以 R6 同鏡、固定 12:00／21:00、`reviewTime=20`、3200×1800 同 DPR 1 擷取日夜近鏡及城市主鏡，共四張零頁面錯誤。擷取時 sidecar 記錄工作樹有改動，擷取前樣板資產、程式及回歸測試嘅 binary diff 雜湊同實作提交一致。另用 1600×900 夜景確認 GLB 回應 200，模擬 404 時原程序幕牆回退，兩次都冇頁面錯誤。原圖、sidecar、材質／線框檢查圖同檢查紀錄喺 `~/city2127-evidence/fuji-civic-facade/r7/`。
+
+日景近鏡可辨斜肋、深窗套同退入玻璃，夜景由原有室內光分出兩個大開口。城市主鏡嘅橫樑遮住部分窗框上沿，窗套深度主要由近鏡交代。呢次係開發畫面覆核，展覽機效能同 owner 樣板驗收待做。下一步由 owner 審閱同鏡對照，再決定兩翼其餘樓層嘅延伸。
+
+[日景同鏡](../../artifacts/fuji-civic-facade/r7/comparison-day.jpg) · [夜景同鏡](../../artifacts/fuji-civic-facade/r7/comparison-night.jpg) · [城市主鏡日景](../../artifacts/fuji-civic-facade/r7/hero-day.jpg) · [城市主鏡夜景](../../artifacts/fuji-civic-facade/r7/hero-night.jpg)。
