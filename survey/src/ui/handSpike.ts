@@ -174,7 +174,8 @@ function onResult(result: HandLandmarkerResult, now: number) {
 // ---- loops ------------------------------------------------------------------------------------------------
 let running = false, rafId = 0, vfcId = 0, detecting = false;
 // New camera frames drive inference: requestVideoFrameCallback where available (Safari 15.4+), else a currentTime check per render frame.
-const useVfc = 'requestVideoFrameCallback' in HTMLVideoElement.prototype && params.get('vfc') !== '0';
+let useVfc = 'requestVideoFrameCallback' in HTMLVideoElement.prototype && params.get('vfc') !== '0';
+let totalInfer = 0, runningSince = 0;
 function detect() {
   if (!landmarker || detecting || video.readyState < 2) return;
   const t0 = performance.now();
@@ -182,7 +183,7 @@ function detect() {
     const result = landmarker.detectForVideo(video, t0);
     const ms = performance.now() - t0;
     inferMs.push(ms); if (inferMs.length > 300) inferMs.shift();
-    inferCount++;
+    inferCount++; totalInfer++;
     onResult(result, t0);
   } catch (error) {
     if (delegate === 'GPU') { detecting = true; void fallBackToCpu(String(error)).finally(() => { detecting = false; }); }
@@ -199,6 +200,10 @@ function frame() {
   rafId = requestAnimationFrame(frame);
   const now = performance.now();
   renderCount++;
+  // Watchdog: if Safari never fires requestVideoFrameCallback for the hidden video, fall back to the rAF path.
+  if (useVfc && totalInfer === 0 && landmarker && now - runningSince > 2000 && video.currentTime > 0) {
+    useVfc = false; video.cancelVideoFrameCallback(vfcId); recordError('no video-frame callbacks in 2 s, switched to rAF');
+  }
   if (!useVfc && video.currentTime !== lastVideoTime) { lastVideoTime = video.currentTime; detect(); }
   // Selection gate and visuals run every render frame.
   const hovered = cursor ? cardAt(cursor) : -1;
@@ -285,7 +290,7 @@ async function start() {
     if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) throw new Error('insecure');
     await Promise.all([ensureLandmarker(), startCamera()]);
     measure();
-    lastVideoTime = -1; running = true; fpsWindowStart = performance.now(); inferCount = renderCount = 0;
+    lastVideoTime = -1; running = true; runningSince = performance.now(); totalInfer = 0; fpsWindowStart = performance.now(); inferCount = renderCount = 0;
     rafId = requestAnimationFrame(frame);
     if (useVfc) vfcId = video.requestVideoFrameCallback(onVideoFrame);
     void keepScreenAwake();
