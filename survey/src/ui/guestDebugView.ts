@@ -717,6 +717,14 @@ if (stationId) setInterval(async () => {
   }
 }, 2000);
 
+// Hand control (M2): `?hand` lazy-loads the camera hand layer, whose dwell/pinch clicks run through the handlers
+// above; touch keeps working, and without `?hand` nothing of it loads. `&dev-hand` is a DEV-ONLY synthetic-hand hook.
+if (new URLSearchParams(location.search).has('hand')) {
+  void import('./hand/handGuest.ts').then(({ mountHandGuest }) => mountHandGuest({
+    app, onActivity: resetIdleTimer, dev: new URLSearchParams(location.search).has('dev-hand'),
+  })).catch(error => console.error('Hand control:', error));
+}
+
 // DEV-ONLY: remove this import/adapter, or move the controls to Admin before exhibition.
 // The runner uses the same radio events, form submission, draft and idempotent submit path.
 if (new URLSearchParams(location.search).has('dev-auto')) {

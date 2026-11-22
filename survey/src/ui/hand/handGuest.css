@@ -1,0 +1,58 @@
+/* Hand mode (M2, /guest?hand): same graphite theme, larger targets, cursor, dwell ring and a corner hand indicator.
+   Scoped to .guest--hand / .hand-layer so the touch-only page is unchanged. */
+/* An iPad in landscape (~1180x746 CSS px) must show the whole screen without scrolling: tighter chrome, bigger targets. */
+body.guest-page--hand { padding: 6px 0; }
+#app.guest.guest--hand { width: min(1160px, calc(100% - 12px)); }
+.guest--hand .guest-masthead { min-height: 50px; padding-block: 8px; }
+.guest--hand .guest-screen { min-height: calc(100vh - 76px); padding: 16px 28px 18px; }
+.guest--hand .guest-progress-block { margin-bottom: 12px; }
+.guest--hand h1 { margin-bottom: 14px; }
+.guest--hand .guest-choices { padding-bottom: 14px; }
+.guest--hand .guest-actions { padding-top: 14px; }
+
+.guest--hand .guest-choices,
+.guest--hand .guest-choices[data-option-count='2'],
+.guest--hand .guest-choices[data-option-count='3'] { grid-template-columns: repeat(var(--hand-cols, 3), minmax(25%, 1fr)); gap: 2.4vw; }
+.guest--hand .guest-choices[data-option-count='2'] { --hand-cols: 2; }
+.guest--hand .guest-choices[data-option-count='4'] { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2vw; }
+.guest--hand .guest-choice,
+.guest--hand .guest-choices[data-option-count='4'] .guest-choice { min-height: 40vh; align-content: center; padding: 24px 22px; }
+.guest--hand .guest-choices[data-option-count='4'] .guest-choice { min-height: 22vh; }
+.guest--hand .guest-choice-title { font-size: 21px; }
+
+.guest--hand button { min-height: 72px; padding: 0 34px; font-size: 19px; }
+.guest--hand .guest-actions { gap: 18px; }
+
+.guest--hand .guest-review-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 4px 0 14px; }
+.guest--hand .guest-review-row { min-height: 104px; padding: 12px 18px; border: 1px solid var(--guest-line); border-radius: 6px; background: #2c3430; }
+.guest--hand .guest-review-row .guest-review-answer { line-height: 1.5; }
+.guest--hand .guest-review-row button { min-height: 56px; white-space: nowrap; }
+.guest--hand [data-auto-action='submit'] { min-width: 42%; min-height: 88px; font-size: 21px; }
+
+.guest--hand .is-hand-hover { outline: 3px solid var(--guest-cyan); outline-offset: 3px; }
+.guest--hand .guest-review-row.is-hand-hover { background: #323e36; }
+.guest--hand .guest-choice.is-hand-confirm { border-color: var(--guest-amber); }
+.guest--hand .guest-choice.is-hand-confirm::after {
+  content: ''; position: absolute; left: 0; bottom: 0; height: 4px; width: 100%;
+  background: var(--guest-amber); transform-origin: left; animation: hand-confirm .8s linear forwards;
+}
+@keyframes hand-confirm { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.guest--hand .is-hand-suggest { box-shadow: 0 0 0 6px #94c9c244; animation: hand-suggest 1.6s ease-in-out infinite; }
+@keyframes hand-suggest { 50% { box-shadow: 0 0 0 12px #94c9c222; } }
+
+.hand-layer { position: fixed; inset: 0; z-index: 50; pointer-events: none; }
+.hand-cursor, .hand-ring { position: absolute; left: 0; top: 0; opacity: 0; will-change: transform; }
+.hand-layer.has-hand .hand-cursor { opacity: 1; }
+.hand-cursor { width: 28px; height: 28px; margin: -14px 0 0 -14px; border-radius: 50%;
+  background: radial-gradient(circle, #fff 0 30%, #94c9c2 45%, #94c9c200 72%); box-shadow: 0 0 18px 6px #94c9c288; }
+.hand-cursor.is-pinched { background: radial-gradient(circle, #fff 0 30%, #dfbd85 45%, #dfbd8500 72%); box-shadow: 0 0 22px 8px #dfbd8599; }
+.hand-ring { width: 84px; height: 84px; margin: -42px 0 0 -42px; }
+.hand-ring circle { fill: none; stroke-width: 6; }
+.hand-ring-track { stroke: #ffffff1f; }
+.hand-ring-arc { stroke: #94c9c2; stroke-linecap: round; }
+.hand-prompt { position: absolute; top: 18px; left: 50%; transform: translateX(-50%); margin: 0; padding: 10px 22px;
+  color: var(--guest-ink, #f0eee6); font-size: 18px; border: 1px solid #59675f; border-radius: 6px; background: #222826e6; }
+.hand-status { position: absolute; left: 16px; bottom: 12px; margin: 0; color: #bac1bb; font-size: 13px; }
+.hand-skeleton { position: absolute; right: 150px; top: 10px; width: 64px; height: 48px; border: 1px solid #3d4841; border-radius: 6px; background: #1b211ecc; }
+.hand-layer.is-failed .hand-skeleton { display: none; }
+.hand-video { position: absolute; width: 2px; height: 2px; opacity: 0; }

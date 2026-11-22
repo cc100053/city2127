@@ -110,6 +110,10 @@ Fresh scratch SQLite、localhost port 8788、`/guest?dev-auto`。Root City は `
 - M1 起推論在 module worker 執行（`src/ui/hand/`：`handPointer.ts`、`handTracker.ts`、`handWorker.ts`、`landmarker.ts`），失敗時改用節流的主執行緒推論。
 - URL 參數：`?mode=worker|main`、`?delegate=cpu`、`?dwell=<ms>`、`?mincutoff=`、`?beta=`（One-Euro）、`?predict=<ms>`（固定游標外推上限；預設依更新間隔自適應）、`?hands=1|2`（預設 1）、`?maingap=<幀>`、`?vfc=0`。
 
+## 來賓頁手部操作（M2）
+
+`/guest?hand`（或 `/guest?station=A&hand`）延遲載入 `src/ui/hand/handGuest.ts`：食指尖游標，停留 1 秒或捏合即點擊按鈕、選項與確認列；手選選項後 0.8 秒自動前進；失敗時維持觸控。未加 `hand` 時頁面不變。需 HTTPS（見上節）。`&dev-hand` 為 DEV-ONLY 合成手部掛鉤；瀏覽器驗收 `npm run test:hand-browser`（需 `CITY2127_PLAYWRIGHT_PATH`，選用 `CITY2127_CHROME_PATH`、`HAND_SHOTS_DIR`）。詳見 [手部操作接入來賓頁](../docs/handoffs/hand-guest.md)。
+
 ## Legacy and historical records
 
 v1 の質問予約／trigger／加算 clamp／一人一問コードと tests は互換性のため保持します。`questions.mvp.json` を既定設定にするだけでは current v2 run は v1 に戻りません。現在の Guest は四問 UI、root との接続は実装済みです。
