@@ -50,6 +50,7 @@ body[data-time=night] footer,body[data-time=night] .intro{text-shadow:0 0 10px r
 .resident-panel .causal-context{font-size:15px;opacity:1;color:#e2f3fa;margin-bottom:8px!important}
 .resident-card-title{font-size:28px;line-height:1.38;font-weight:700;color:#7ff5df;text-shadow:0 0 16px rgba(80,240,210,.6),0 0 3px rgba(80,240,210,.5);word-break:auto-phrase;text-wrap:balance;margin-bottom:10px!important}
 .resident-card-copy{font-size:17px;line-height:1.85;color:#f2f9ff}
+.resident-share{font-size:14px;color:#d8f4ff;margin-top:10px!important}
 .resident-place{font-size:13px;color:#a9d6e2;margin-top:14px!important}
 .resident-place:before{content:'◢ ';color:#6feaff}
 .resident-panel .resident-strip{display:flex;align-items:center;gap:10px;margin-top:12px;padding:8px 10px;border:1px solid rgba(110,236,255,.4);background:rgba(110,236,255,.06);box-shadow:inset 0 0 12px rgba(110,236,255,.12);font-size:12px;letter-spacing:1px;color:#7ff5df}
@@ -72,8 +73,18 @@ body[data-time=night] footer,body[data-time=night] .intro{text-shadow:0 0 10px r
 .scale-lab table{border-collapse:collapse;font-size:11px;width:100%}.scale-lab td,.scale-lab th{padding:2px 3px;text-align:right;font-weight:400}.scale-lab th small{display:block;font-size:8px;opacity:.6}.scale-lab tr>th:first-child{text-align:left;font-weight:600}.lab-readout .lab-on{font-weight:700;background:#35413914}.lab-stats caption{font-size:9px;opacity:.6;text-align:left}
 
 .energy-review{z-index:20}.energy-review label{display:flex;align-items:center;gap:10px;margin-bottom:8px}.energy-review select{font:inherit;max-width:240px}
-.shot-panel .lab-transport span{flex:2}.shot-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}.shot-grid button{font:inherit;font-size:10px;padding:3px;border:1px solid #35413930;border-radius:4px;background:#fff9;cursor:pointer}
+.rotation-panel{width:380px}.rotation-row{display:grid;grid-template-columns:30px repeat(3,1fr);gap:3px;align-items:stretch}.rotation-row b{align-self:center;font-size:11px}.rotation-row button{font:inherit;font-size:10px;line-height:1.3;padding:3px 4px;text-align:left;border:1px solid #35413930;border-radius:4px;background:#fff9;cursor:pointer}.rotation-row button small{display:block;font-size:9px;opacity:.75;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.rotation-row button.is-shown{background:#2f5f6e;color:#fff;border-color:#2f5f6e}
 .causal-status.is-quiet{position:absolute;width:1px;height:1px;margin:0!important;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 /* 暮らしの声 #N over the close-up site (src/voiceLabel.ts); matches the resident card's glass. */
 .voice-label{position:fixed;left:0;top:0;z-index:4;pointer-events:none;display:flex;align-items:center;gap:8px;padding:7px 14px 7px 12px;border:1px solid #ffffffa0;border-radius:999px;background:#f9f8f0e6;color:#2f3d36;font:600 17px/1.2 system-ui,'Noto Sans JP',sans-serif;letter-spacing:.04em;white-space:nowrap;box-shadow:0 8px 30px #38432b26;backdrop-filter:blur(10px);will-change:transform,opacity}.voice-label::before{content:'';width:8px;height:8px;border-radius:50%;background:#5fd3c6;box-shadow:0 0 0 4px #5fd3c633}.voice-label::after{content:'';position:absolute;left:50%;top:100%;width:1px;height:18px;background:linear-gradient(#f9f8f0e6,#f9f8f000)}
 .voice-label[hidden]{display:none}
+/* Idle attract loop call to action (src/attractLoop.ts): bottom-centre, only while no guest is on the big screen. */
+.attract-cta{position:fixed;left:50%;bottom:64px;transform:translateX(-50%);z-index:4;pointer-events:none;min-width:560px;padding:26px 44px 22px;text-align:center;border:1px solid rgba(110,236,255,.35);border-radius:22px;background:rgba(10,22,30,.62);box-shadow:0 18px 60px rgba(8,18,26,.35),inset 0 0 24px rgba(110,236,255,.08);backdrop-filter:blur(14px);color:#f2f9ff;font-family:system-ui,'Noto Sans JP',sans-serif;will-change:opacity}
+.attract-cta[hidden],.attract-cta [hidden]{display:none}.attract-cta p{margin:0}
+.attract-cta-title{font-size:46px;line-height:1.25;font-weight:700;letter-spacing:.08em;color:#7ff5df;text-shadow:0 0 22px rgba(80,240,210,.55),0 0 3px rgba(80,240,210,.5)}
+.attract-cta-count{margin-top:10px!important;font-size:20px;letter-spacing:.04em}.attract-cta-hint{margin-top:8px!important;font-size:15px;letter-spacing:.06em;color:#a9d6e2}
+/* 声の灯 card (src/voicesReplay.ts): the call-to-action glass with the run's Meter curves. */
+.voices-card{min-width:600px;padding:20px 36px 18px}.voices-heading{font-size:15px;letter-spacing:.12em;color:#a9d6e2}.voices-counter{min-height:1.3em;margin-top:4px!important;font-size:30px;font-weight:700;letter-spacing:.06em;color:#7ff5df;text-shadow:0 0 16px rgba(80,240,210,.5);font-variant-numeric:tabular-nums}
+.voices-chart{display:block;width:520px;height:120px;margin:10px auto 6px;overflow:visible}.voices-zero{stroke:rgba(169,214,226,.35);stroke-dasharray:4 6}
+.voices-legend{display:flex;justify-content:center;gap:22px;font-size:14px;letter-spacing:.06em}.voices-legend span::before{content:'';display:inline-block;width:14px;height:3px;margin-right:7px;vertical-align:middle;border-radius:2px;background:var(--key)}
+.voices-lean{margin-top:10px!important;font-size:20px;font-weight:600;letter-spacing:.04em}

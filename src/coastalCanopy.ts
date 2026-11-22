@@ -1,5 +1,5 @@
 import * as T from 'three';
-import { changeSites, DISTRICT, HUB_LEGACY_LOT, SW_LEGACY_LOT, inDistrict, seaward } from './layout.ts';
+import { changeSites, DISTRICT, EVENT_SHELF_NEIGHBOR_COURT, HUB_LEGACY_LOT, SW_LEGACY_LOT, inDistrict, seaward } from './layout.ts';
 import { inWater, onStreetKit, routes } from './mobility.ts';
 import { onBayPlinth } from './automationBays.ts';
 import { recedeBeyondDistrict } from './bayContext.ts';
@@ -20,7 +20,7 @@ const drum=new T.CylinderGeometry(1,1,1,40),crown=leafyCrown(),lowCrown=leafyCro
 /** Reuse the surveyed planting locations; layered crowns replace the tiny blockout cones.
  * r8 pass 2: surveyed `waterfront` trees become palms (tall slim trunk, flat radiating crown — target v2's seaside palms), and with
  * `pits` every ground tree stands in a crisp white raised planter ring instead of loose on the lawn (2127 engineered edge, same volume). */
-export function plantCanopy(scene: T.Object3D, trees: { instances: { position: number[]; scale: number; type: string }[] }, pits=false) {
+export function plantCanopy(scene: T.Object3D, trees: { instances: { position: number[]; scale: number; type: string }[]; seedOffset?: number }, pits=false) {
   const inLot=(tree:{position:number[]},sites:{x:number;z:number;w:number;d:number;scale:number}[])=>sites.some(site=>Math.abs(tree.position[0]-site.x)<site.w*site.scale/2+9 && Math.abs(-tree.position[1]-site.z)<site.d*site.scale/2+9);
   // Each crown's pose depends on its index here, so the list is indexed against the NW lot as it was before the grown AUTO HUB plinth (R4); trees inside the real lot are then hidden in place, which leaves every other crown as it was.
   const positions=trees.instances.filter(tree=>inDistrict(tree.position[0],-tree.position[1]) && !seaward(tree.position[0],-tree.position[1]) && !(tree.position[2]<3 && (swale(tree.position[0],-tree.position[1])<-1.1 || corridor(tree.position[0],-tree.position[1])<.2)) && !inLot(tree,Object.values({...changeSites,nw:HUB_LEGACY_LOT,sw:SW_LEGACY_LOT})));
@@ -31,10 +31,11 @@ export function plantCanopy(scene: T.Object3D, trees: { instances: { position: n
   const planted=pits?positions.filter((tree,i)=>tree.position[2]<3 && !gone[i]):[];
   const rims=new T.InstancedMesh(drum,trim,planted.length),beds=new T.InstancedMesh(drum,leaf,planted.length);
   const dummy=new T.Object3D(),color=new T.Color();
-  positions.forEach((tree,i)=>{
+  positions.forEach((tree,index)=>{
+    const i=index+(trees.seedOffset??0);
     const [x,y,z]=tree.position,s=tree.scale,palm=tree.type==='waterfront',h=(tree.type==='columnar'?10:palm?9.5:7)*s;
-    if(gone[i]){dummy.position.set(x,z,-y);dummy.scale.setScalar(0);dummy.rotation.set(0,0,0);dummy.updateMatrix();trunks.setMatrixAt(i,dummy.matrix);for(let j=0;j<4;j++){foliage.setMatrixAt(i*4+j,dummy.matrix);foliage.setColorAt(i*4+j,color);}return;}
-    dummy.position.set(x,z+h*.35,-y);dummy.scale.set(palm?s*.55:s,h*.7,palm?s*.55:s);dummy.rotation.set(0,0,0);dummy.updateMatrix();trunks.setMatrixAt(i,dummy.matrix);
+    if(gone[index]){dummy.position.set(x,z,-y);dummy.scale.setScalar(0);dummy.rotation.set(0,0,0);dummy.updateMatrix();trunks.setMatrixAt(index,dummy.matrix);for(let j=0;j<4;j++){foliage.setMatrixAt(index*4+j,dummy.matrix);foliage.setColorAt(index*4+j,color);}return;}
+    dummy.position.set(x,z+h*.35,-y);dummy.scale.set(palm?s*.55:s,h*.7,palm?s*.55:s);dummy.rotation.set(0,0,0);dummy.updateMatrix();trunks.setMatrixAt(index,dummy.matrix);
     for(let j=0;j<4;j++){
       const a=j*(palm?Math.PI/2:2.4)+i;
       if(palm){
@@ -45,11 +46,11 @@ export function plantCanopy(scene: T.Object3D, trees: { instances: { position: n
         dummy.position.set(x+Math.cos(a)*1.9*s,z+h+(j%2)*1.2,-y+Math.sin(a)*1.9*s);
         dummy.scale.set(3.4*s,(tree.type==='columnar'?4.4:2.9)*s,3*s);dummy.rotation.set(.1*i,a,.15*j);
       }
-      dummy.updateMatrix();foliage.setMatrixAt(i*4+j,dummy.matrix);
+      dummy.updateMatrix();foliage.setMatrixAt(index*4+j,dummy.matrix);
       // P5: no pink — `cherry` and about one tree in eleven take the light spring green; other crowns pick deep / mid / olive by hash.
       if(palm)color.setHSL(.24+(j%2)*.01,.34,.3+(j%3)*.02);
       else{const [h,sa,l]=tree.type==='cherry' || i%11===5?[.27,.45,.44]:GREENS[(i*3+j+(i>>2))%3];color.setHSL(h+(i%5)*.004,sa,l+(i%7)*.01+(j%2)*.03);}
-      foliage.setColorAt(i*4+j,color);
+      foliage.setColorAt(index*4+j,color);
     }
   });
   planted.forEach((tree,i)=>{
@@ -66,17 +67,19 @@ export function plantCanopy(scene: T.Object3D, trees: { instances: { position: n
 /** P5: continuous low shrub bands — bumpy squashed crowns, one instance each. [x, y, z, radius, height] (y = base).
  * Calls on the same `scene` merge into one instanced mesh (one draw for every roof garden). */
 type Shrub=[number,number,number,number,number];
-const shrubPool=new WeakMap<T.Object3D,{mesh:T.InstancedMesh;list:Shrub[]}>();
-export function plantShrubs(scene:T.Object3D,add:Shrub[]){
+const shrubPool=new WeakMap<T.Object3D,{mesh:T.InstancedMesh;list:Shrub[];seedOffset:number}>();
+export function plantShrubs(scene:T.Object3D,add:Shrub[],seedOffset=0){
   if(!add.length)return;
   const old=shrubPool.get(scene),list=[...old?.list??[],...add];
   if(old){old.mesh.removeFromParent();old.mesh.material instanceof T.Material&&old.mesh.material.dispose();old.mesh.dispose();}
   const mesh=new T.InstancedMesh(lowCrown,new T.MeshStandardMaterial({color:'#ffffff',roughness:.92}),list.length),d=new T.Object3D(),c=new T.Color();
-  list.forEach(([x,y,z,r,h],i)=>{
-    d.position.set(x,y+h*.4,z);d.rotation.set(0,hash(i)*6.3,0);d.scale.set(r,h,r*(.85+hash(i+9)*.3));d.updateMatrix();mesh.setMatrixAt(i,d.matrix);
-    const [hh,sa,l]=i%7===3?[.27,.45,.42]:GREENS[i%3];c.setHSL(hh+hash(i+3)*.015,sa,l+hash(i+5)*.07);mesh.setColorAt(i,c);
+  const offset=old?.seedOffset??seedOffset;
+  list.forEach(([x,y,z,r,h],index)=>{
+    const i=index+offset;
+    d.position.set(x,y+h*.4,z);d.rotation.set(0,hash(i)*6.3,0);d.scale.set(r,h,r*(.85+hash(i+9)*.3));d.updateMatrix();mesh.setMatrixAt(index,d.matrix);
+    const [hh,sa,l]=i%7===3?[.27,.45,.42]:GREENS[i%3];c.setHSL(hh+hash(i+3)*.015,sa,l+hash(i+5)*.07);mesh.setColorAt(index,c);
   });
-  mesh.name='shrub-bands';mesh.receiveShadow=true;scene.add(mesh);shrubPool.set(scene,{mesh,list});
+  mesh.name='shrub-bands';mesh.receiveShadow=true;scene.add(mesh);shrubPool.set(scene,{mesh,list,seedOffset:offset});
 }
 
 /** r8 (user: 2127 form, same green volume): green gathers in dense clusters on engineered two-step terraces — a wide white-rimmed
@@ -139,7 +142,8 @@ export function plantRoofCanopy(scene: T.Object3D, model: T.Object3D, tower=fals
   return clusters;
 }
 
-/** Coastal groves gather along structure — building edges, guideway, promenades and the water corridor — on authored landscape only, leaving open lawns between; circulation and landmark pads remain open. */
+/** Returns the grove terraces [x, z, ground y, radius] (the ground mask keeps lawn round them).
+ * Coastal groves gather along structure — building edges, guideway, promenades and the water corridor — on authored landscape only, leaving open lawns between; circulation and landmark pads remain open. */
 /** `streets`: extra street centrelines groves keep clear of, as of the guideway (the ④ boulevard); `cleared`: ground the old district streets covered,
  * left open lawn (src/roadRepair.ts). */
 export function plantLandscapeCanopy(scene:T.Object3D,environment:T.Object3D,buildings:T.Object3D[],streets:T.Curve<T.Vector3>[]=[],cleared=(_x:number,_z:number)=>false) {
@@ -147,6 +151,7 @@ export function plantLandscapeCanopy(scene:T.Object3D,environment:T.Object3D,bui
   const pads=buildings.map(building=>new T.Box3().setFromObject(building));
   const paths=routes(),clearPaths=[paths.guideway,...paths.promenades,...streets].flatMap(path=>path.getSpacedPoints(400));
   const ray=new T.Raycaster(),down=new T.Vector3(0,-1,0),clusters:[number,number,number,number][]=[],hiddenAt:boolean[]=[];
+  const [courtX,courtZ,courtYaw]=EVENT_SHELF_NEIGHBOR_COURT,courtCos=Math.cos(courtYaw),courtSin=Math.sin(courtYaw);
   const landscapeAt=(x:number,z:number)=>{
     ray.set(new T.Vector3(x,300,z),down);
     const hit=ray.intersectObject(environment,true)[0];
@@ -170,7 +175,9 @@ export function plantLandscapeCanopy(scene:T.Object3D,environment:T.Object3D,bui
     // Denser grid (r8 pass 3): terraces may not overlap, or their coplanar lawn tiers would z-fight.
     if(clusters.some(([cx,cz,,cr])=>Math.hypot(cx-px,cz-pz)<(cr+R)*1.4))continue;
     clusters.push([px,pz,y,R]);
-    hiddenAt.push(Object.values(changeSites).some(near));
+    const dx=px-courtX,dz=pz-courtZ;
+    const courtGap=Math.hypot(Math.max(0,Math.abs(dx*courtCos-dz*courtSin)-20),Math.max(0,Math.abs(dx*courtSin+dz*courtCos)-20));
+    hiddenAt.push(Object.values(changeSites).some(near) || courtGap<reach+3);
   }
   plantClusters(scene,clusters,1,0,hiddenAt);
   // r8 pass 3: the waterfront promenades become planted allées in white planter rings (target v2's tree-lined shore walk) —
@@ -191,6 +198,7 @@ export function plantLandscapeCanopy(scene:T.Object3D,environment:T.Object3D,bui
     }
   }
   plantCanopy(scene,{instances:allee},true);
+  return clusters;
 }
 
 // Surveyed backdrop grove centres and their new grass plots, in metres.
@@ -202,10 +210,11 @@ const FARM_GROVE_MOVES = [
   [-90.03, 411.69, -71, 438],
 ] as const;
 
-/** The Odaiba backdrop beyond the district keeps its parks as one unshadowed batch of low crowns, receding with the ground it stands on.
+/** `cleared`: backdrop city fabric (src/urbanFill.ts) the groves keep off.
+ * The Odaiba backdrop beyond the district keeps its parks as one unshadowed batch of low crowns, receding with the ground it stands on.
  * r8 pass 2: the same crown count gathers into tight oval groves on white-rimmed plinths (44 m cells since r8 pass 3, eight crowns each) instead of
  * pairs dotted evenly every 26 m — open lawn between, every green mass framed by an engineered edge. */
-export function plantBackdropGrove(scene:T.Object3D,environment:T.Object3D) {
+export function plantBackdropGrove(scene:T.Object3D,environment:T.Object3D,cleared=(_x:number,_z:number)=>false) {
   environment.updateMatrixWorld(true);
   const bounds=new T.Box3().setFromObject(environment),ray=new T.Raycaster(),down=new T.Vector3(0,-1,0),matrices:T.Matrix4[]=[],plinths:T.Matrix4[]=[],lawns:T.Matrix4[]=[],centres:[number,number,number][]=[],dummy=new T.Object3D();
   const groundAt=(x:number,z:number)=>{
@@ -217,7 +226,7 @@ export function plantBackdropGrove(scene:T.Object3D,environment:T.Object3D) {
   // r9 pass 2: 36 m cells and a smaller open-lawn field, so the backdrop reads as dense parkland (target v2) rather than dotted groves.
   for(let x=bounds.min.x;x<bounds.max.x;x+=36)for(let z=bounds.min.z;z<bounds.max.z;z+=36){
     const px=x+Math.sin(z*1.7+x)*12,pz=z+Math.cos(x*1.3-z)*12;
-    if(inDistrict(px,pz) || seaward(px,pz) || Math.sin(px*.019+Math.sin(pz*.021)*2)+Math.cos(pz*.027)<-.8)continue;
+    if(inDistrict(px,pz) || seaward(px,pz) || cleared(px,pz) || Math.sin(px*.019+Math.sin(pz*.021)*2)+Math.cos(pz*.027)<-.8)continue;
     const y=groundAt(px,pz);
     if(y===null)continue;
     const yaw=Math.sin(px*.37+pz*.11)*3,R=11+(Math.sin(px*.7+pz)+1)*2,c=Math.cos(yaw),sn=Math.sin(yaw);
@@ -226,7 +235,7 @@ export function plantBackdropGrove(scene:T.Object3D,environment:T.Object3D) {
       // Ring of six on the rim tier, two taller at the heart.
       const f=j<6?.68:.22,a=j<6?j/6*Math.PI*2:j*Math.PI,lx=Math.cos(a)*f*R*1.3,lz=Math.sin(a)*f*R/1.3;
       const tx=px+lx*c+lz*sn,tz=pz-lx*sn+lz*c,ty=groundAt(tx,tz);
-      if(ty===null || inDistrict(tx,tz) || seaward(tx,tz))continue;
+      if(ty===null || inDistrict(tx,tz) || seaward(tx,tz) || cleared(tx,tz))continue;
       const s=(j<6?4.2:5.6)+(Math.sin(x*3.1+z+j)+1)*1.1;
       dummy.position.set(tx,ty+.6+s*.9,tz);dummy.scale.set(s,s*.85,s);dummy.rotation.set(0,a,0);dummy.updateMatrix();crowns.push(dummy.matrix.clone());
     }

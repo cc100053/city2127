@@ -1,5 +1,6 @@
 import { emptyEnergyConfiguration, energyConfiguration, sameEnergyConfiguration, ENERGY_CHOICE_PART, type EnergyState, type EnergyConfiguration, type EnergyActivity, type EnergyPart } from './energy.ts';
 import type { CityScores, ExhibitionState, ExhibitionVotes } from './citySurveyState.ts';
+import type { CrowdShare, RotationOutcome } from './rotation.ts';
 
 /**
  * The Three.js-facing contract. Its layout has the same shape as module-swap's CityLayoutState
@@ -51,6 +52,11 @@ export type ExhibitionCityChange = {
   before: Record<string, number | string>;
   after: Record<string, number | string>;
 };
+/** A rotation run's proposal: the one site it swapped (or the fallback site) and the crowd share of each answer. */
+/** `visit` (plan 3.4): nothing visibly changed, and this drawn question's site already shows the guest's answer with a model. */
+export type ProposalRotation = { outcome: RotationOutcome; shares: CrowdShare[]; visit?: string };
+/** The rotation city: which option each question's site shows and the proposal sequence that last swapped it (0: never). */
+export type RotationCity = { version: number; shown: Record<string, string>; changedAt: Record<string, number> };
 export type ProposalRecord = {
   id: string;
   stationId?: 'A' | 'B';
@@ -70,6 +76,8 @@ export type ProposalRecord = {
   beforeLayout: ExhibitionLayout;
   afterLayout: ExhibitionLayout;
   cityChanges: ExhibitionCityChange[];
+  /** Rotation runs only; their votes are neutral, so the Meter layout above never moves. */
+  rotation?: ProposalRotation;
 };
 export type ExhibitionCityView = {
   version: 2;
@@ -86,6 +94,8 @@ export type ExhibitionCityView = {
   layout: ExhibitionLayout;
   recentProposals: ProposalRecord[];
   latestProposal?: ProposalRecord;
+  /** Present when the server runs the rotation set and the run holds no four-axis proposals. */
+  rotation?: RotationCity;
 };
 export type CityView = LegacyCityView | ExhibitionCityView;
 

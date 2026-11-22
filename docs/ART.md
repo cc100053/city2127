@@ -1,5 +1,7 @@
 # Art rules — Odaiba runtime
 
+> **2026-11-21: the four-Meter version is retired; the nine-question rotation is the only product.** Meter colours and low/mixed/high wording below describe legacy code; for new work read "each question's A/B/C models".
+
 Current implementation rules, checked 2026-10-02. [CITY MASTER TASTE](ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md) is the visual/world authority (rewritten 2026-11-02 toward visible high technology; the palette rows below predate it, and its cool white-blue technology light is added as parts are rebuilt); this file documents materials, batching, lighting and choice semantics. [PROJECT](PROJECT.md) maps the source. Owner: cc100053; documentation: Codex.
 
 Shibuya art passes and Pic 2 are historical references; their remaining work is closed. They are not a second visual target. See the [archived rules](history/SHIBUYA_ART.md) and original [art handoff](handoffs/archive/art-direction.md) for dated evidence.

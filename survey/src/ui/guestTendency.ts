@@ -2,8 +2,10 @@
 // next to the side this guest chose. Directions only: option effect values stay on the server, and the scores
 // are the same public Meter the conflict table already shows.
 import type { ExhibitionState } from '../shared/citySurveyState.ts';
+import type { ProposalAnswerRecord, ProposalRotation } from '../shared/cityView.ts';
 import { SCORE_MAX, SCORE_MIN } from '../shared/citySurveyState.ts';
 import { ENERGY_CHOICES, type EnergyChoice } from '../shared/energy.ts';
+import { ALREADY_HERE, crowdShareText } from '../shared/rotation.ts';
 import { el } from './debugApi.ts';
 import { optionIcon } from './guestIcons.ts';
 
@@ -93,4 +95,21 @@ export function renderTendency(state: ExhibitionState, choices: ReadonlyMap<stri
     el('ul', { class: 'guest-lean-list' },
       ...AXIS_VIEWS.map(view => axisRow(view, state.scores[view.axis], choices.get(view.questionId))),
       ...(energy ? [energy] : [])));
+}
+
+/**
+ * Rotation runs (QUESTION_ROTATION_PLAN 3.3): for each answer, the share of this run's residents who chose the
+ * same option, own voice included. Neutral wording; below the threshold no number is shown.
+ */
+export function renderVoices(rotation: ProposalRotation, answers: readonly ProposalAnswerRecord[]) {
+  return el('section', { class: 'guest-tendency', 'aria-label': '住民の声' },
+    el('p', { class: 'guest-tendency-heading' }, '住民の声'),
+    // Plan 3.4: nothing visibly changed and the city visits a site already showing one of this guest's answers.
+    ...(rotation.visit ? [el('p', { class: 'guest-copy' }, ALREADY_HERE)] : []),
+    el('ul', { class: 'guest-lean-list' }, ...rotation.shares.map(share => {
+      const answer = answers.find(item => item.questionId === share.questionId);
+      return el('li', { class: 'guest-lean-row guest-lean-row--voice' },
+        el('p', { class: 'guest-lean-title' }, answer?.optionLabel ?? share.optionId),
+        el('p', { class: 'guest-lean-text' }, crowdShareText(share)));
+    })));
 }

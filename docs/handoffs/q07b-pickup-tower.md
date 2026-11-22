@@ -1,11 +1,12 @@
 # q07b-pickup-tower — Q07-B 回る本棚のような受け取り塔 (Blender model, Dream Loop)
 
 - Owner: repository owner (requester of this task)
-- Status: IN_PROGRESS — v4 (readable parcel route, 2026-11-22) committed locally for owner review; not placed, not pushed
+- Status: IN_REVIEW — v4 (readable parcel route, 2026-11-22) pushed for owner review as a pull request to `main`; model only, not placed in the city
 - Branch: `feat/q07b-pickup-tower` (created locally from `main`)
-- Base commit: `df59a7defc14552fadd3f91920498c58707fe532`
-- Last verified commit: NONE — checks ran on the uncommitted worktree on top of the base commit
-- Remote availability: NOT PUSHED (owner asked to review the local asset before any city integration or push)
+- Base commit: `df59a7defc14552fadd3f91920498c58707fe532`; `origin/main` `5087b7d8` merged in on 2026-11-22
+- Last verified commit: `8b6470c9` (v4 model checks); the merge commit was re-checked with `assetLibrary.test.ts` and `git diff --check`
+- Remote availability: PUSHED to `origin/feat/q07b-pickup-tower` (owner request, 2026-11-22). The `.blend` and `.glb` were downloaded from GitHub at the pushed commit; their sizes match the local files (1,978,764 and 4,530,228 bytes)
+- Merge note: `asset/models/LIBRARY.md` conflicted with `main`, because both sides added a row at the end of the folder table. Resolved by keeping `main`'s `q08c-housing-tower-2127` row and adding the `q07b-pickup-tower` row after it. Against `origin/main` the file differs by that one added line.
 
 ## Session Git state
 

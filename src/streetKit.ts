@@ -8,7 +8,8 @@ import { leaf, trim } from './cityRig.ts';
 import { glowTexture } from './glowTexture.ts';
 import { hash, plantCanopy } from './coastalCanopy.ts';
 import { routes, waterways } from './mobility.ts';
-import { BOULEVARD, changeSites, DRAWER_HOUSING, STREET_KIT, WATER } from './layout.ts';
+import { BOULEVARD, changeSites, civicAt, DRAWER_HOUSING, EVENT_SHELF_FRONTAGE, POD_TOWER, STREET_KIT, WATER } from './layout.ts';
+import { HULL, RING } from './megaFootprints.ts';
 
 /** Large pale ceramic panels: a 256 px tile with fine seams on two edges, repeated per panel in metres through the strip's uv. */
 function panelTexture() {
@@ -365,6 +366,118 @@ function drawerHousingAccess(avenue: Curve, environment: T.Object3D) {
   return root;
 }
 
+/** Fixed Q06 access from link ③ to the tower's two north hoods and east entrance. */
+function podTowerAccess(avenue: Curve, environment: T.Object3D) {
+  const { x, z, avenue: distance } = POD_TOWER;
+  const { p, n } = frame(avenue, distance, avenue.getLength());
+  const at = (dx: number, dz: number, y = .2) => new T.Vector3(x + dx, y, z + dz);
+  const mouth = p.addScaledVector(n, STREET_KIT.half - .55).setY(.237);
+  const drive = new T.CatmullRomCurve3([mouth, at(39, -3.5, .237), at(34, -13, .234),
+    at(29, -22, .2), at(22, -25, .18), at(14, -25, .18), at(-14, -25, .18)]);
+  const north = new T.LineCurve3(at(23, -17.65), at(-17, -17.65));
+  const east = new T.LineCurve3(at(21, -15.25), at(21, 6));
+  const pave = (c: Curve, a: number, b: number, lift = 0) => band(c, 0, c.getLength(), a, b, lift, 0, [2.4, 2.4]);
+  const length = drive.getLength();
+  environment.add(
+    mesh([band(drive, 0, length, -3.1, 3.1, 0, .25, [3, STREET_KIT.half])], avenueCeramic, 'pod-tower-drive', false),
+    mesh([pave(drive, 3.1, 5.7, .007), pave(north, -2.4, 2.4), pave(east, -2.12, 2)], footway, 'pod-tower-forecourt', false),
+  );
+  const guide = band(drive, 1.5, length - 1, -.075, .075, .012);
+  const glow = glowLine(drive, 1.5, length - 1, -.27, .27, .008);
+  const thresholds = [-7, 7].map(dx => new T.LineCurve3(at(dx, -15.45), at(dx, -18.6)));
+  thresholds.push(new T.LineCurve3(at(19, 3.5), at(21.7, 3.5)));
+  const root = new T.Group(); root.name = 'pod-tower-access';
+  root.add(mesh([guide, ...thresholds.map(c => pave(c, -.09, .09, .012))], seamLight, 'pod-tower-guides', false),
+    mesh([glow], lineGlow, 'pod-tower-line-glow', false));
+  return root;
+}
+
+/** Entrance polish (owner 2026-11-20): paved forecourts where the three megastructures meet the ground, so each entrance, walkway landing and
+ * street footway shares one floor instead of stopping on the lawn. Civic core: a half-round forecourt before the foyer steps (r 80 m, the court
+ * pool stays clear behind) and a 10 m promenade (no planters: a Meter pod's disc reaches its east edge at (7, −58)) from the foyer door (local angle 1.95) to avenue ①'s outside footway (12.5 m off its centreline).
+ * Ring: an apron on the plinth's west and plaza sides (the avenue passes its east corner, a Meter pavilion bay its plaza corner). Hull: a forecourt over the old self-assembling
+ * building's ground in front of the shopfront storey, joined to ①'s footway. Planters break up the hull's floor. */
+export const FORECOURTS = {
+  civic: { r: 80, door: 1.95, half: 5, reach: 107.3 },
+  // Ring-local [x0, x1, z0, z1] strips outside the plinth (x ±30, z ±25): west, and the plaza side short of the staffed-pavilion bay that stands
+  // across the plinth's +x/+z corner (automationBays index 4, its west edge at x ≈ 3 here). The −z side stays lawn: DECKS' forecourt walks use it.
+  // No planters here: the membrane housing site (45, −215) stands on the paving's west corner.
+  ring: [[-38, -30, -25, 40], [-30, -5, 25, 40]],
+  // Hull-local u, d (megastructures.ts `hull`): from u 50 east (11 m clear of the surveyed Hilton's east face, x −244, whose doorway walks the
+  // landmark checks still sample) to ①'s outside footway edge, 12.5 m off its centreline, whatever its angle.
+  hull: { u: 50, d: [-46, -3], kerb: 12.5 },
+} as const;
+function landmarkForecourts(avenue: Curve, environment: T.Object3D) {
+  const y = .2, tile: [number, number] = [2.4, 2.4], paving: T.BufferGeometry[] = [], beds: ReturnType<typeof planter>[] = [];
+  const line = (a: T.Vector3, b: T.Vector3) => new T.LineCurve3(a, b);
+  // The surveyed lawn rises up to ~1 m round the ring and hull, so their pads follow it: a 3 m grid, each vertex `y` over the landscape below.
+  const lawn: T.Object3D[] = [], ray = new T.Raycaster(), down = new T.Vector3(0, -1, 0);
+  environment.updateMatrixWorld(true);
+  environment.traverse(o => { if (o instanceof T.Mesh && !Array.isArray(o.material) && o.material.name === 'landscape') lawn.push(o); });
+  const lawnAt = (x: number, z: number) => { ray.set(new T.Vector3(x, 20, z), down); ray.far = 25; const h = ray.intersectObjects(lawn, false)[0]; return h && h.point.y < 3 ? Math.max(0, h.point.y) : 0; };
+  /** Paving over corner(a, b) for a, b in 0..1, draped on the lawn. */
+  const pad = (corner: (a: number, b: number) => T.Vector3, la: number, lb: number) => {
+    const na = Math.max(1, Math.ceil(la / 3)), nb = Math.max(1, Math.ceil(lb / 3)), pos: number[] = [], uv: number[] = [], idx: number[] = [];
+    for (let i = 0; i <= na; i++) for (let j = 0; j <= nb; j++) { const p = corner(i / na, j / nb); pos.push(p.x, lawnAt(p.x, p.z) + y, p.z); uv.push(p.x / tile[0], p.z / tile[1]); }
+    for (let i = 0; i < na; i++) for (let j = 0; j < nb; j++) { const k = i * (nb + 1) + j; idx.push(k, k + 1, k + nb + 1, k + 1, k + nb + 2, k + nb + 1); }
+    const g = new T.BufferGeometry(); g.setAttribute('position', new T.Float32BufferAttribute(pos, 3)); g.setAttribute('uv', new T.Float32BufferAttribute(uv, 2)); g.setIndex(idx);
+    g.computeVertexNormals(); if (g.attributes.normal.getY(0) < 0) { g.index!.array.reverse(); g.computeVertexNormals(); }
+    return g;
+  };
+  // Civic: one outline (half disc plus the promenade tongue), so no two paving layers overlap.
+  const { r, door, half, reach } = FORECOURTS.civic, C = civicAt([-8, 0, -2]), shape = new T.Shape(), d = Math.asin(half / r);
+  const at = (rr: number, t: number, a = door) => [Math.cos(a) * rr - Math.sin(a) * t, Math.sin(a) * rr + Math.cos(a) * t] as const;
+  shape.moveTo(0, -8);
+  for (let a = -.1; a <= Math.PI + .1 + 1e-6; a += .04) {
+    if (a > door - d && a - .04 <= door - d) for (const [rr, t] of [[r * Math.cos(d), -half], [reach, -half], [reach, half], [r * Math.cos(d), half]] as const) shape.lineTo(...at(rr, t));
+    if (Math.abs(a - door) > d) shape.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+  }
+  const disc = new T.ShapeGeometry(shape, 1).rotateX(-Math.PI / 2).translate(C[0], y, C[2]), uv = disc.attributes.uv, pos = disc.attributes.position;
+  for (let i = 0; i < uv.count; i++) uv.setXY(i, pos.getX(i) / tile[0], pos.getZ(i) / tile[1]);
+  paving.push(disc);
+  // Ring: its local x runs (cos yaw, −sin yaw), z (sin yaw, cos yaw).
+  const ring = (lx: number, lz: number) => new T.Vector3(RING.x + lx * Math.cos(RING.yaw) + lz * Math.sin(RING.yaw), 0, RING.z - lx * Math.sin(RING.yaw) + lz * Math.cos(RING.yaw));
+  for (const [x0, x1, z0, z1] of FORECOURTS.ring) paving.push(pad((a, b) => ring(x0 + (x1 - x0) * a, z0 + (z1 - z0) * b), x1 - x0, z1 - z0));
+  // Hull: u along its front base line, d back into it (megastructures.ts `hull`).
+  const hull = (u: number, dd: number) => new T.Vector3(HULL.x + u * Math.cos(HULL.yaw) + dd * Math.sin(HULL.yaw), 0, HULL.z - u * Math.sin(HULL.yaw) + dd * Math.cos(HULL.yaw));
+  const { u: u0, d: [d0, d1], kerb: edge } = FORECOURTS.hull, kerb = avenue.getSpacedPoints(Math.ceil(avenue.getLength()));
+  const toAvenue = (p: T.Vector3) => Math.min(...kerb.map(q => Math.hypot(q.x - p.x, q.z - p.z)));
+  const uEnd = (dd: number) => { let u: number = u0; while (u < 130 && toAvenue(hull(u + .25, dd)) > edge) u += .25; return u; }; // first reach of the footway
+  const ends = new Map<number, number>(), endAt = (b: number) => { if (!ends.has(b)) ends.set(b, uEnd(d0 + (d1 - d0) * b)); return ends.get(b)!; };
+  paving.push(pad((a, b) => hull(u0 + (endAt(b) - u0) * a, d0 + (d1 - d0) * b), endAt(.5) - u0, d1 - d0));
+  const front = line(hull(u0, -30), hull(94, -30));
+  for (const [s, o] of [[7, 0], [34, -6]] as const) { const f = frame(front, s, front.getLength()), c = f.p.clone().addScaledVector(f.n, o); beds.push(planter(f, o, 10, 2.4, 'broadleaf', lawnAt(c.x, c.z) + y)); }
+  environment.add(mesh(paving, footway, 'landmark-forecourts', false));
+  const root = new T.Group(); root.name = 'landmark-forecourts';
+  root.add(mesh(beds.map(b => b.wall), trim, 'landmark-forecourt-planters'), mesh(beds.map(b => b.soil), leaf, 'landmark-forecourt-beds'));
+  plantBeds(root, beds.map(b => b.bed));
+  return root;
+}
+
+/** Fixed shared spur from ④'s light crossing to the two track landings and the lobby walk. */
+function eventShelfAccess(boulevard: Curve, environment: T.Object3D) {
+  const { x, z } = changeSites.sw;
+  const { trackEnd, plinthEdge, tracks: [west, east] } = EVENT_SHELF_FRONTAGE;
+  const { p, n } = frame(boulevard, WATER.bridge, boulevard.getLength());
+  const at = (dx: number, dz: number, y: number) => new T.Vector3(x + dx, y, z + dz);
+  const drive = new T.CatmullRomCurve3([
+    p.clone().addScaledVector(n, -12.7).setY(.25), p.addScaledVector(n, -18).setY(.24),
+    at(-65, -29, .21), at(-48, -32, .17), at(-30, -34, .13), at(west - 5.1, trackEnd - 1.6, .11),
+  ]);
+  const apron = new T.LineCurve3(at(west - 5.3, trackEnd - 1.65, .10), at(east + 5.3, trackEnd - 1.65, .10));
+  const walk = new T.LineCurve3(at(0, trackEnd - .4, .111), at(0, plinthEdge + .2, .196));
+  const pave = (c: Curve, half: number) => band(c, 0, c.getLength(), -half, half, 0, .18, [2.4, 2.4]);
+  environment.add(
+    mesh([pave(drive, 1.8)], avenueCeramic, 'event-shelf-drive', false),
+    mesh([pave(apron, 1.75), pave(walk, 1.5)], footway, 'event-shelf-forecourt', false),
+  );
+  const length = drive.getLength();
+  return mesh([
+    band(drive, 1, length - .8, -.065, .065, .01),
+    ...[-1.25, 1.25].map(offset => band(walk, .5, walk.getLength() - .6, offset - .05, offset + .05, .008)),
+  ], seamLight, 'event-shelf-access-guides', false);
+}
+
 /** The kit along the street network: A on the U route (`STREET_KIT`), B on the ④ boulevard (`BOULEVARD`), and the stage 3 water (`waterGarden`). The ceramic, footways and terraces join
  * `environment` (it then stands on them); the planters, plants, rings, blades and lines come back for the scene. A's planters also keep 1.5 m
  * clear of every Yurikamome pier within the verges, found in the loaded environment. */
@@ -386,7 +499,7 @@ export function streetNetwork(environment: T.Object3D) {
   const piers = hits.map(ds => ds.sort((a, b) => a - b).reduce((out: Span[], d) => { const last = out.at(-1); if (last && d - 1.5 <= last[1]) last[1] = d + 1.5; else out.push([d - 1.5, d + 1.5]); return out; }, []));
   const root = new T.Group(); root.name = 'street-network';
   root.add(avenueStreet(u, K.from, L, [-K.half, K.half], { reach: K.inside, gaps: [...K.gaps.inside, ...piers[0]] }, { reach: K.outside, gaps: [...K.gaps.outside, ...piers[1]] }, K.crossings, () => 0),
-    boulevardStreet(boulevard, 0, boulevard.getLength(), BOULEVARD.crossings, () => 0, BOULEVARD.gaps), waterGarden(), automationHubAccess(u, environment), drawerHousingAccess(u, environment));
+    boulevardStreet(boulevard, 0, boulevard.getLength(), BOULEVARD.crossings, () => 0, BOULEVARD.gaps), waterGarden(), automationHubAccess(u, environment), drawerHousingAccess(u, environment), podTowerAccess(u, environment), landmarkForecourts(u, environment), eventShelfAccess(boulevard, environment));
   for (const name of ['street-ceramic', 'street-footway', 'boulevard-ceramic', 'boulevard-terraces']) environment.add(root.getObjectByName(name)!);
   return root;
 }

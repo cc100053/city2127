@@ -1,7 +1,7 @@
 import * as T from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { arc, bake, box, chrome, cream, glass, leaf, leafyCrown, publicLight, skyGlass, solar, stone, trail, trim, warm } from './cityRig.ts';
-import { changeSites, seaward } from './layout.ts';
+import { changeSites, EVENT_SHELF_NEIGHBOR_COURT, seaward } from './layout.ts';
 import { inHeroClear, inMega } from './megaFootprints.ts';
 import { automationBays, BAY_SCALE } from './automationBays.ts';
 import { automationBlue, METER_COLORS, quadFleet } from './automationKit.ts';
@@ -212,9 +212,10 @@ const HALO = .42;
  * Street network stage 2 (2026-11-04): courts 2, 5, 6 and 8 stood on the ④ boulevard's line and moved to the nearest site passing the same checks with their
  * square 15 m off its centreline (from -110, 230; -70, 180; -290, 290; 220, 0).
  * Court 6 moved from (-137, 286) to (-150, 290) for the SW event shelf lot at (-100, 297; 312 before R3) (2026-11-13; same scan checks, 54 m from the lot centre, squares 6 m apart).
+ * Court 3 moved east from (-110, 250) to clear Q08-C's track ends and arrival apron.
  * P7 ranks by estimated visible hero-frame pixels (`SCAN_COURTS=20` in tests/odaiba.test.ts lists candidates best first). */
 const COURT_SITES: readonly (readonly [number, number, number])[] = ([
-  [-220, -140, .4], [-410, 120, 1.1], [-110, 250, 2.3], [110, -320, .9], [170, -360, 3.6], [-150, 290, 1.7], [-385, 290, 5.1], [-460, 290, .2], [190, 0, 2.8], [-20, 210, 4.4],
+  [-220, -140, .4], [-410, 120, 1.1], EVENT_SHELF_NEIGHBOR_COURT, [110, -320, .9], [170, -360, 3.6], [-150, 290, 1.7], [-385, 290, 5.1], [-460, 290, .2], [190, 0, 2.8], [-20, 210, 4.4],
 ] as const).filter(([x, z]) => !inMega(x, z, 22)); // P1: nothing stands inside a megastructure footprint
 const COURT = 40;
 /** Garden crowns inside a private court [x, z, size], clear of the glass room and the entrance. */
@@ -1075,6 +1076,11 @@ export const towerFamily = (i: number) => ({ family: slotFamilies[i], instance: 
 const POD_SITES: readonly (readonly [number, number])[] = ([
   [-293, 147], [-253, -33], [-233, 47], [-218, -23], [-183, -43], [-168, -128], [-103, 17], [-53, 147], [-79, 137], [-23, 107], [7, -58], [27, 87], [77, 107], [87, 57], [97, -73], [107, -123], [107, 77], [117, 7], [137, -103], [182, 37], [217, -43], [217, 87], [237, -73], [237, 57], [247, -103], [252, 147],
 ] as const).filter(([x, z]) => !inMega(x, z, 14) && !inHeroClear(x, z));
+
+/** Ground every district Meter element may claim at some level, [x, z, radius] in metres: tower sites, the 40 m courts and the pods. Urban fill keeps off it. */
+export const METER_GROUND: readonly (readonly [number, number, number])[] = [
+  ...TOWER_SITES.map(([x, z]) => [x, z, 22] as const), ...COURT_SITES.map(([x, z]) => [x, z, 30] as const), ...POD_SITES.map(([x, z]) => [x, z, 12] as const),
+];
 
 /** Q4: one walkable vertical district or functions spread through the parks.
  * High raises slender glass towers with lit sky lobbies on open ground; low scatters low glass pavilion pods across the lawns.

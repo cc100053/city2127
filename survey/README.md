@@ -19,7 +19,7 @@ Guest／Monitor／Admin は同じ HTTP server の `dist` から配信します�
 | SURVEY_PORT | 8787 | HTTP／WebSocket port |
 | SURVEY_HOST | 127.0.0.1 | LAN Guest を使う場合のみ 0.0.0.0；Admin は loopback 限定 |
 | SURVEY_DB_PATH | data/survey.sqlite | cwd 基準の DB。削除せず既存データで再起動 |
-| SURVEY_QUESTIONS | src/survey/questions.exhibition.json | 四問の v2 JSON；起動時検証 |
+| SURVEY_QUESTIONS | src/survey/questions.exhibition.json | 四問の v2 JSON；起動時検証。`src/survey/questions.rotation.v1.json`（`kind: "rotation"`）で抽題輪換（9 問から 4 問、draft）。切り替え後は Admin で街をリセットして新しい run を始める |
 | SURVEY_STATIC_DIR | dist | build 済み Guest／Monitor／Admin |
 | SURVEY_DEV_AUTO | 未設定 | `1` の場合だけ localhost DEV-auto endpoint を有効化 |
 

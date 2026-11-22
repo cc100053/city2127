@@ -1,6 +1,6 @@
 ---
 name: place-building
-description: Bring an owner-supplied building image into city2127 — choose its Meter role and lot, generate any missing state targets, then build it in owner-judged rounds, one fresh session per round. Use when the owner shares a building image or description and asks which Meter fits, where it goes, to build it, or to run its next round.
+description: Bring an owner-supplied building image into city2127 — choose its rotation question/option and lot, generate any missing state targets, then build it in owner-judged rounds, one fresh session per round. Use when the owner shares a building image or description and asks which question/option it fits, where it goes, to build it, or to run its next round.
 ---
 
 # Place a building
@@ -21,7 +21,7 @@ Two kinds of session:
    - What is the massing: footprint in metres, floors × floor height, overhangs?
 
    Done when the owner has answered all four. On the shelf, four ±1 images went to waste when the owner later asked for ten floors and dropped ±1.
-2. **Fit table.** List the four Meters plus "fixed background", one line each, and name any existing landmark the building would duplicate (the shelf echoed housing U). Separate a **focal** role (headline on every ±1) from a **district slot** (changes only at ±2 or ±3 and shares its trigger rate with its siblings).
+2. **Fit table.** (Updated 2026-11-21: the four-Meter version is retired; the nine-question rotation is the only product. List the nine questions' A/B/C options that lack a model plus "fixed background" instead of Meters; ignore focal/district-slot and ±1/±2 wording below, which is history from the shelf round.) List the four Meters plus "fixed background", one line each, and name any existing landmark the building would duplicate (the shelf echoed housing U). Separate a **focal** role (headline on every ±1) from a **district slot** (changes only at ±2 or ±3 and shares its trigger rate with its siblings).
    - Quote every site in metres. `changeSites` `w`/`d` are local units × `scale`: COMMONS PLAZA is 12 × 10 × 4 = 48 × 40 m. Misreading it as 12 × 10 m skewed the case for a new flagship over a court upgrade.
 
    Done when the owner has picked the role.
@@ -43,7 +43,7 @@ Two kinds of session:
 
    Done when the owner has picked a target for every needed state.
 5. **Set up rounds.**
-   - Work on `feat/<task>` in the main checkout. Create a worktree `.claude/worktrees/<task>` from `origin/main` only if the owner told you to (AGENTS.md); if the main checkout holds unrelated work, ask.
+   - Work on `feat/<task>` in the main checkout; if it holds another session's work, create a worktree `../city2127-<task>` from `origin/main` (AGENTS.md) and remove it when the task is done.
    - Write the handoff from `docs/handoffs/TEMPLATE.md` with every decision: role, lot, facing, massing, mechanism, states, target paths and the owner's own words. Add a `Dev_QA.md` entry.
    - Write `artifacts/<task>/spec.md` as a target inventory (closeup-polish step 5 format), including the `## Library` table.
    - Write `## R1 brief` in the handoff.

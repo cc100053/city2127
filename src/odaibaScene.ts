@@ -8,18 +8,23 @@ import { placeOdaibaModel } from './odaibaPlacement';
 import layout from './odaiba-layout.json';
 import { civicCore, updateCivic } from './civicCore';
 import { floaters } from './floaters';
-import { bodyFootprints, carveContext, inRect, megastructures, updateMegastructures } from './megastructures';
+import { bodyFootprints, carveContext, inRect, loadMegastructures, updateMegastructures } from './megastructures';
 import { publishOccupants, publishRoofWalks } from './occupants';
 import trees from '../asset/models/odaiba-masterplan/tree_instances.json';
 import { facadeClimate, publishRoofGardens, towerGlow, towerNight } from './districtMeters';
 import { plantBackdropGrove, plantCanopy, plantLandscapeCanopy, plantRoofCanopy } from './coastalCanopy';
 import { contextFacades } from './contextFacades';
 import { bake } from './cityRig';
-import { DISTRICT, inDistrict, SEAWARD_GLSL } from './layout';
+import { CONCEPT_LOT, changeSites, DISTRICT, inDistrict, LOTS, PLAZA, promenades, SEAWARD_GLSL, URBAN_FILL } from './layout';
+import { HERO_CLEAR } from './megaFootprints';
+import { fillWorld, type FillCell } from './urbanFill';
 import { bayContext, recedeBeyondDistrict } from './bayContext';
-import { publishDoorways, publishEntrances, routes, waterGLSL } from './mobility';
+import { inWater, publishDoorways, publishEntrances, routes, waterGLSL } from './mobility';
 import { onFormerStreet, repairRoads } from './roadRepair';
 import { streetNetwork, updateStreetKit } from './streetKit';
+import { backdropFabric, buildUrbanFill, planUrbanFill } from './urbanFill';
+import { builtRoots, greenShare, groundGLSL, groundMaskTexture, paintGroundMask, paveUnderStructures } from './groundMask';
+import { METER_GROUND } from './districtMeters';
 
 // Literal paths bundle the district-detailed environment (scripts/crop-odaiba-district.py) and six retained landmarks; Fuji is now the procedural civic chassis, Telecom Center lies outside the district.
 const environmentUrl = new URL('../asset/models/odaiba-masterplan/odaiba_district_v01_environment.glb', import.meta.url).href;
@@ -114,6 +119,11 @@ function nightRooms(material: T.MeshStandardMaterial) {
   };
   material.customProgramCacheKey = () => 'night-rooms';
 }
+/** Landmark glazing: warm faint day glow, scattered lit rooms at night (`updateOdaiba`). */
+function glaze(material: T.MeshStandardMaterial) {
+  if (glazing.has(material)) return;
+  material.emissive.copy(warm); material.emissiveIntensity = dayGlow; material.roughness=.22;material.metalness=.38;nightRooms(material);glazing.add(material);
+}
 /** Retained landmark glazing glows warm, strongest at night; the civic chassis uses the shared city finishes. */
 export function updateOdaiba(night: number) {
   updateCivic(night);
@@ -146,7 +156,10 @@ function openBay(material: T.Material, bay = true) {
 export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
   const grass=new T.TextureLoader().load(new URL('../asset/textures/coastal-grass.png',import.meta.url).href);
   grass.colorSpace=T.SRGBColorSpace;grass.wrapS=grass.wrapT=T.RepeatWrapping;grass.anisotropy=8;
-  const environment = await addCityModel(scene, environmentUrl, [0, 0, 0]);
+  const [environment, structures] = await Promise.all([
+    addCityModel(scene, environmentUrl, [0, 0, 0]),
+    loadMegastructures(),
+  ]);
   environment.name = 'odaiba-environment';
   const receded = new Set<T.Material>();
   environment.traverse(object => {
@@ -162,15 +175,11 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
       // World metres keep the authored terrain patches at one consistent texture scale.
       material.onBeforeCompile=shader=>{
         shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nvarying vec2 grassUv;').replace('#include <worldpos_vertex>','#include <worldpos_vertex>\ngrassUv=(modelMatrix*vec4(transformed,1.)).xz/32.;');
-        // Inside the district the lawns carry meandering gravel walks along a field's contours. (Stage 3: the swale ponds and corridor channel
-        // that were drawn here are gone; the designed water is streetKit's waterGarden, cut out of the ground by openBay.)
-        shader.fragmentShader=shader.fragmentShader.replace('#include <common>','#include <common>\nvarying vec2 grassUv;').replace('#include <map_fragment>',`diffuseColor.rgb *= mix(texture2D(map,grassUv).rgb,texture2D(map,grassUv*.19).rgb,.35);
-          vec2 w=grassUv*32.;
-          float inside=step(${DISTRICT.minX.toFixed(1)},w.x)*step(w.x,${DISTRICT.maxX.toFixed(1)})*step(${DISTRICT.minZ.toFixed(1)},w.y)*step(w.y,${DISTRICT.maxZ.toFixed(1)});
-          // Q03-A: suppress the diagonal gravel trace between the two aprons.
-          float drawerWalkCut=step(-161.,w.x)*step(w.x,-58.)*step(abs(w.y-(52.+.35*(w.x+60.))),5.);
-          float walk=inside*(1.-drawerWalkCut)*(1.-smoothstep(.06,.1,abs(sin(w.x*.037+cos(w.y*.029)*1.6)+sin(w.y*.033+w.x*.011))));
-          diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.84,.81,.74),walk); // r8 pass 3: pale ivory walks, crisper engineered edge than tan gravel`);
+        // Road fix (owner 2026-11-20): the sine-field gravel walks drawn here are gone; they ran under buildings and flared into stars at
+        // their saddles. (Stage 3 had already removed the swale ponds; the designed water is streetKit's waterGarden, cut out by openBay.)
+        // Urban ground (owner 2026-11-21): paving and block streets by default, grass only where the ground mask is green (groundMask.ts).
+        shader.uniforms.groundMask={value:groundMaskTexture};
+        shader.fragmentShader=shader.fragmentShader.replace('#include <common>',`#include <common>\nvarying vec2 grassUv;\n${groundGLSL()}`).replace('#include <map_fragment>',`diffuseColor.rgb = groundFinish(grassUv*32., diffuseColor.rgb * mix(texture2D(map,grassUv).rgb,texture2D(map,grassUv*.19).rgb,.35), 1.);`);
       };
       material.customProgramCacheKey=()=>'coastal-grass';
     }
@@ -185,14 +194,23 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
   const revetment = environment.getObjectByName('COAST_REVETMENT');
   if (revetment instanceof T.Mesh) cutUnderPlatform(revetment.material);
   carveContext(environment);
-  scene.add(contextFacades(environment), bayContext(), megastructures(), floaters(), streetNetwork(environment), hydroTerrace(), bayFlower()); // after the recede wrap: the kit's ground keeps its own shading
-  plantCanopy(scene,trees,true);
-  plantBackdropGrove(scene,environment);
+  scene.add(contextFacades(environment), bayContext(), structures, floaters(), streetNetwork(environment), hydroTerrace(), bayFlower()); // after the recede wrap: the kit's ground keeps its own shading
+  // Urban fill (owner 2026-11-21): city blocks on open lawn, clear of landmarks (8 m round their surveyed bounds) and Meter ground.
+  const landmarkBounds = built.map(placement => placement.boundsBlender);
+  const fillCells = planUrbanFill([environment, ...scene.children], (x, z) =>
+    METER_GROUND.some(([mx, mz, r]) => Math.hypot(x - mx, z - mz) < r) ||
+    landmarkBounds.some(([[x0, y0], [x1, y1]]) => x > x0 - 8 && x < x1 + 8 && -z > y0 - 8 && -z < y1 + 8));
+  const fill = buildUrbanFill(fillCells);
+  scene.add(fill.root); glaze(fill.glass);
+  // Surveyed trees on a fill block stay in the list at zero scale (each crown's pose depends on its index); street trees join the same batch.
+  plantCanopy(scene,{instances:[...trees.instances.map(tree=>fill.covers(tree.position[0],-tree.position[1])?{...tree,scale:0}:tree),...fill.trees]},true);
+  const fabric = backdropFabric(environment); scene.add(fabric.root);
+  plantBackdropGrove(scene,environment,fabric.covers);
   // Sky gardens crown the tall context towers (the only CTX mesh above 30 m inside the district).
   // Each roof garden's terraces go to the district Meters (sails/forest) and take a few residents (stroll line, standing group).
   const roofGarden=(model:T.Object3D,tower?:boolean)=>{const terraces=plantRoofCanopy(scene,model,tower);publishRoofGardens(terraces);publishRoofWalks(model,terraces);};
   environment.traverse(object=>{if(object instanceof T.Mesh && object.name.startsWith('CTX_') && new T.Box3().setFromObject(object).max.y>30)roofGarden(object,true);});
-  scene.add(plazaDeck(scene, HOLOGRAMS.panels)); // P4: the Aqua City lot is the civic plaza deck
+  scene.add(plazaDeck(scene, HOLOGRAMS.panels, Boolean(structures.getObjectByName('ring-transfer-2127')))); // P4: the Aqua City lot is the civic plaza deck
   await Promise.all(built.map(async placement => {
     if(placement.id==='fuji-tv'){const core=civicCore();scene.add(core);publishOccupants(core.occupants);return;}
     const model = await addCityModel(scene, buildingUrls[placement.id], [0, 0, 0]);
@@ -205,7 +223,7 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
       if (!(object instanceof T.Mesh)) return;
       for (const material of [object.material].flat() as T.MeshStandardMaterial[])
         if (curtainWalls[material.name]) { if (!material.customProgramCacheKey().startsWith('curtain')) curtainWall(material, curtainWalls[material.name]); }
-        else if (/glass|glazing|window reflection/i.test(material.name) && !glazing.has(material)) { material.emissive.copy(warm); material.emissiveIntensity = dayGlow; material.roughness=.22;material.metalness=.38;nightRooms(material);glazing.add(material); }
+        else if (/glass|glazing|window reflection/i.test(material.name)) glaze(material);
         else if (roofRetrofit[material.name]) { const [color, roughness, metalness] = roofRetrofit[material.name]; material.color.set(color); material.roughness = roughness; material.metalness = metalness; }
     });
     // One draw per finish instead of one per surveyed part (30–50 per landmark); materials stay shared, so night glazing still applies.
@@ -213,6 +231,47 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
     const merged = bake(model); model.clear(); parts.forEach(geometry => geometry.dispose());
     merged.forEach(mesh => { mesh.name = placement.id; model.add(mesh); });
   }));
-  plantLandscapeCanopy(scene,environment,scene.children.filter(object=>object.name==='fuji-civic-chassis' || Object.hasOwn(buildingUrls,object.name) || object.name==='plaza-deck'),[routes().streets[1]],onFormerStreet);
+  const groves = plantLandscapeCanopy(scene,environment,scene.children.filter(object=>object.name==='fuji-civic-chassis' || Object.hasOwn(buildingUrls,object.name) || object.name==='plaza-deck'),[routes().streets[1]],(x,z)=>onFormerStreet(x,z)||fill.covers(x,z,6));
   publishEntrances(scene,environment);
+  paintDistrictGround(fillCells, groves);
+  Object.keys(buildingUrls).forEach(id => builtRoots.add(id));
+  paveUnderStructures(scene);
+  console.info(`[ground] district lawn share (land only) ${(greenShare((x, z) => inDistrict(x, z) && !inWater(x, z, 0)) * 100).toFixed(1)} %`);
+
+}
+
+/** Ground mask (owner 2026-11-21): lawn only in parks, grove terraces, promenade and water belts; everything else paves (groundMask.ts).
+ * Block streets stay off lots, landmarks, plazas, megastructure feet and the ground district elements stand on. */
+function paintDistrictGround(cells: FillCell[], groves: readonly (readonly number[])[]) {
+  paintGroundMask(g => {
+    // Beyond the district the shader paves the backdrop blocks itself (groundMask.ts `groundGLSL`); this mask is read inside it only.
+    const [ux, uz] = URBAN_FILL.axis, hu = URBAN_FILL.pitch[0] / 2 - URBAN_FILL.street / 2, hv = URBAN_FILL.pitch[1] / 2 - URBAN_FILL.street / 2;
+    for (const c of cells) {
+      const { x, z } = fillWorld(c.a, c.b);
+      if (c.kind === 'park' || c.kind === 'farm') g.rect('green', x, z, ux, uz, hu, hv);
+      else if (c.kind === 'court') g.rect('green', x, z, ux, uz, hu * .45, hv * .45); // courtyard garden
+      else if (c.kind === 'sports') g.rect('green', x, z, ux, uz, hu * .8, hv * .8);
+    }
+    // Grove lawns and the NE park are parks: streets reach their edge and stop with a kerb (they cross only the thin promenade and water
+    // belts and the planted medians, which the shader lets them run through).
+    for (const [x, z, , r] of groves) { g.circle('green', x, z, r * 2 + 6); g.circle('noStreet', x, z, r * 2 + 6); }
+    for (const path of promenades) g.band('green', path.map(([x, , z]) => ({ x, z })), 30);
+    const park = changeSites.ne; g.circle('green', park.x, park.z, 75); g.circle('noStreet', park.x, park.z, 75);
+    g.where('green', (x, z) => inWater(x, z, 14) && !inWater(x, z, 0));
+    g.where('noStreet', (x, z) => inWater(x, z, 14)); // no street runs into a pool: it stops at the lawn ring
+    for (const l of Object.values(LOTS)) if (!l.sea) g.rect('noStreet', l.x, l.z, 1, 0, l.size / 2 + 8, l.size / 2 + 8);
+    for (const s of Object.values(changeSites)) g.rect('noStreet', s.x, s.z, 1, 0, s.w * s.scale / 2 + 10, s.d * s.scale / 2 + 10);
+    g.rect('noStreet', CONCEPT_LOT.x, CONCEPT_LOT.z, 1, 0, CONCEPT_LOT.w / 2 + 8, CONCEPT_LOT.d / 2 + 8);
+    // Landmarks stop the streets by their real footprint (`paveUnderStructures`, built channel), not their axis-aligned survey box.
+    // Megastructures stop streets at their real feet (built channel); their FOOTPRINTS rects include the open ground under the spans.
+    for (const r of HERO_CLEAR) g.rect('noStreet', r.cx, r.cz, r.ux, r.uz, r.hu + 6, r.hv + 6);
+    g.rect('noStreet', PLAZA.x, PLAZA.z, Math.cos(PLAZA.yaw), -Math.sin(PLAZA.yaw), PLAZA.hu + 8, PLAZA.hv + 8);
+    for (const [x, z, r] of METER_GROUND) g.circle('noStreet', x, z, r);
+    // Linear parks: every third cross street (across the boulevard) carries a 20 m planted median, a green spine through
+    // the paving. Painted last and kept off lots, landmarks and plazas.
+    g.where('green', (x, z) => {
+      const dx = x - URBAN_FILL.origin[0], dz = z - URBAN_FILL.origin[1], a = dx * ux + dz * uz, k = a / (URBAN_FILL.pitch[0] * 3);
+      return inDistrict(x, z) && Math.abs(k - Math.round(k)) * URBAN_FILL.pitch[0] * 3 < 10;
+    }, 'noStreet');
+  });
 }

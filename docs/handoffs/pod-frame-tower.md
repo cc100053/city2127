@@ -1,7 +1,7 @@
 # pod-frame-tower — 混凝土格架蛋艙塔（僅模型）
 
 - Owner: cc100053
-- Status: ACCEPTED（業主 2026-11-18 接受 R4 並指示合併 main；模型仍為 library draft，未選址）
+- Status: ACCEPTED，已放置（業主 2026-11-18 接受 R4 並指示合併 main；2026-11-19 於 `feat/question-rotation` 放於住宅 U 舊址，作抽題輪換 Q06-B，見 [question-rotation](question-rotation.md)）
 - Branch: `feat/pod-frame-tower`（由 `origin/main` `5d66cfa8` 開出；R1 於 R2 session 開始時 commit）
 - Base commit: `13f83e1566988a10e8798ec027c97ba10012654e`（R1 工作時的 HEAD，`codex/nw-focal-connections`）
 - Last verified commit: 見 `## R4` 驗證（R4 commit 於 `c742193` 之上；R3 為 `c742193`，R2 為 `c713fc9`，R1 為 `9ed3e7f6`）
@@ -307,6 +307,13 @@ R1 與目標的差距（依 `target-vs-model.jpg` 分析），已轉成下文 R2
 - 合併結果的檢查：`npm ci`、`npm ci --prefix survey`、`npm test`、`npm run build` 全部通過（exit 0）；`git diff --check origin/main..HEAD` 乾淨。`survey/`、`module-swap/` 沒有改動，因此沒有執行該兩個 package 的檢查。
 - polish-ladder **Record** 及 change sheet：本建築未選址，亦未接入任何 change unit，因此不適用。
 
+## 放置（2026-11-19，`feat/question-rotation`）
+
+- 選址：hero 區內 58 × 46 m（含蛋艙包絡及前場）只有東南角一處 CLEAR，hero 看不見。業主問「應否先處理舊建築，清出空間或重排？」；查住宅 M／P／U 後，撤走住宅 U，舊址 `POD_TOWER` (−258, −75) 只剩一條步行路在西南艙尖旁，hero 約 10,000 px。業主原話：「好，拆住宅 U」。
+- 做法：`main.ts` 隱藏 `housing-background` 的 `housing-mobile`，以 `addCityModel` 載入 GLB（yaw 0，正面朝北），不透明網格合批，載入完成後才命名 `pod-frame-tower-2127`。所有 run 中為固定背景；抽題輪換 run 由 Q06 控制（B 顯示，A／C 淡出留草地）。
+- 業主判定（2026-11-19）：位置、朝向及東北近鏡「接受」。近鏡 `q06:tower` (−208, 50, −158) → (−258, 16, −75)。未加前場道路或接駁。
+- 證據：`~/city2127-evidence/question-rotation/q06-pod/lots/`（選址）、`r1/`（近鏡日／夜、hero、俯視；3200 × 1800 page error 0）。FPS 未量度（同時跑其他工作的截圖機報 hero 約 28 fps，不作基準）。
+
 ## Next expected step
 
-模型已合併入 main，仍為 library draft。選址、Meter 角色及放入城市須另開任務；如業主再要求修改，按上文「尚待處理」另開一輪。
+Q06-B 已接道路 ③。陶板支路旁的步道接北面兩個入口及東面入口，保留原 R4 塔及門罩。固定道路及平台在 Q06 A／C 空置時仍可見。日夜、俯視及入口實景見 [question-rotation](question-rotation.md)。

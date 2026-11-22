@@ -6,7 +6,7 @@ import { api, connectEvents, el, newAnswerId } from './debugApi.ts';
 import { DISPLAY_MS } from '../shared/displayTiming.ts';
 import { buildProposalRequest } from './guestFlow.ts';
 import { optionIcon } from './guestIcons.ts';
-import { renderTendency } from './guestTendency.ts';
+import { renderTendency, renderVoices } from './guestTendency.ts';
 
 const app = document.querySelector<HTMLElement>('#app')!;
 app.classList.add('guest');
@@ -582,7 +582,7 @@ function renderResult(focus = true) {
 function renderChosen(answers: ProposalData['proposal']['answers']) {
   return el('ul', { class: 'guest-chosen', 'aria-label': 'あなたが選んだ暮らし' }, ...answers.map(answer => {
     const icon = optionIcon(answer.optionId, 'guest-icon guest-icon--small');
-    return el('li', {}, ...(icon ? [icon] : []), choiceTitles[answer.optionId] ?? answer.optionId);
+    return el('li', {}, ...(icon ? [icon] : []), choiceTitles[answer.optionId] ?? answer.optionLabel);
   }));
 }
 
@@ -594,7 +594,8 @@ function renderHandoff() {
   screen = 'handoff';
   page('次の方へどうぞ。', residentIdentity(saved.proposal),
     el('p', { class: 'guest-lead' }, '街はこのまま次の方へ引き継がれます。'),
-    renderTendency(saved.state, new Map(saved.proposal.answers.map(answer => [answer.questionId, answer.optionId]))),
+    saved.proposal.rotation ? renderVoices(saved.proposal.rotation, saved.proposal.answers)
+      : renderTendency(saved.state, new Map(saved.proposal.answers.map(answer => [answer.questionId, answer.optionId]))),
     ...noticeNodes(),
     el('div', { class: 'guest-actions' },
       ...exploring ? [action('戻る', () => void explore(null), true)]

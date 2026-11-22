@@ -62,10 +62,18 @@ export const BOULEVARD = {
   crossings: [124, 311, 474],
   gaps: { median: [[230, 240], [244, 255]], terraces: [[252, 262]] },
 } as const;
+/** Q08-C ground-track ends and front edge of the lobby plinth, in metres from the SW lot origin. */
+export const EVENT_SHELF_FRONTAGE = { tracks: [-12, 12], trackEnd: -32, plinthEdge: -22 } as const;
+/** Inland sharing court moved east to clear the event shelf's ground tracks. */
+export const EVENT_SHELF_NEIGHBOR_COURT = [-90, 230, .608] as const;
 /** Stage 3 designed water (artifacts/street-kit-closeup-polish/network-stage3.md), replacing the landscape shader's ponds: a court pool under the
  * Fuji frame (stadium, outer size) and a canal on the old band north-west of ④ (④ d `from`–`to`, water `offset` ± `width`/2 m left of it),
  * both edged with a 1 m white coping 0.35 m over the water. ④'s light bridge at d 124 runs on over the canal. */
 export const WATER = { pool: { x: 22, z: 118, length: 70, width: 24 }, canal: { from: 4, to: 200, offset: 30, width: 8 }, coping: 1, bridge: BOULEVARD.crossings[0] } as const;
+/** Q06-B pod-frame tower (owner 2026-11-19): on the lot freed by retiring housing U (HOUSING_SITES.mobile) from the city background,
+ *  front (GLB −z) north toward the city. Its R4 envelope is about 56 × 38 m with the pods (frame 35 × 28 m), 36 m tall; SCAN_LOT
+ *  58,46 here finds only housing U itself and a walker route by the south-west pod tip. */
+export const POD_TOWER = { x: -258, z: -75, yaw: 0, avenue: 588 } as const;
 /** Fixed Q03-A building origin and its connection to the guideway avenue. */
 export const DRAWER_HOUSING = {
   x: -104, z: 81, avenue: 463,
@@ -83,7 +91,7 @@ export const STREET_KIT = {
   // the drop-off bays stand on ①'s plaza frontage, which has no planters). Outside: the ring foot, the deck's south member, the PARK lot's
   // margin, the arch foot, the AUTO HUB lot's margin, the backdrop grove plinth. (Stage 2 removed the side streets whose mouths had gaps.)
   gaps: { inside: [[186, 222], [466, 514], [520, 540], [568, 616], [890, 942], [972, 1011], [1044, 1083]],
-    outside: [[195, 216], [350, 362], [451, 477], [618, 636], [832, 862], [890, 942], [972, 1011], [1044, 1083], [1095, 1109]] },
+    outside: [[195, 216], [350, 362], [451, 477], [POD_TOWER.avenue - 8, POD_TOWER.avenue + 6], [618, 636], [832, 862], [890, 942], [972, 1011], [1044, 1083], [1095, 1109]] },
   crossings: [398, 545],
 } as const;
 // polish2 (2026-11-03): the Fuji frame tower is the hero centrepiece. civicCore builds in its original metres and the whole chassis is scaled
@@ -106,6 +114,30 @@ export const HYDRO_TERRACE = { x: -375, z: -170, yaw: Math.PI / 2, lot: 66 } as 
  *  shore station (local (−95, 56)) to due east of the flower, where its platform meets the park promenade; `r` is the flower's plan
  *  radius (petal tips), which boats keep `r` + 30 m clear of. */
 export const BAY_FLOWER = { x: -712, z: 300, yaw: 2.6088, r: 64 } as const;
+/** Question-rotation lots (QUESTION_ROTATION_PLAN 2.1), keyed by the rotation set's `lotId`: plan centre and plan extent `size` (the
+ *  journey's scan ring and lantern halo) in world metres; `sea` lots
+ *  stand on the bay, where SCAN_LOT (land only) does not apply. Q02's three lots (one per model) and Q03's and Q06's shared lots; Q01 and Q08
+ *  keep their Meter focal sites (NW, SW). The farm centre matches energyRuntime's FARM_CENTRE. */
+export const LOTS = {
+  'q02-west-sea': { x: HYDRO_TERRACE.x, z: HYDRO_TERRACE.z, size: HYDRO_TERRACE.lot, sea: true },
+  'q02-bay-flower': { x: BAY_FLOWER.x, z: BAY_FLOWER.z, size: 2 * BAY_FLOWER.r, sea: true },
+  // The farm GLB is 64.5 m square at its 2× city scale: about 129 m.
+  'q02-farm-south': { x: -152, z: 408, size: 129, sea: false },
+  // Q03's three options share the drawer housing lot: its R2 envelope X −128.6…−79.4, Z 67.3…92.8 plus the 6 m forecourt on its −Z front.
+  'drawer-housing': { x: DRAWER_HOUSING.x, z: 77, size: 50, sea: false },
+  // Q06's three options share the pod-frame tower lot: its R4 envelope with the pods is about 56 × 38 m.
+  'pod-tower': { x: POD_TOWER.x, z: POD_TOWER.z, size: 56, sea: false },
+} as const;
+/** Urban fill (owner 2026-11-21: too much bare lawn to read as a city): street blocks on a grid aligned with the ④ boulevard (`axis`, from its
+ *  east exit `origin`), `pitch` metres per block along/across it with `street` metres of paving between lots. A block is built only where its
+ *  whole cell is open landscape (src/urbanFill.ts checks ground, landmarks, Meter sites and lots). `zones`: world rects [minX, maxX, minZ, maxZ],
+ *  R1 (2026-11-21) filled the lawn south of the guideway; R2 the whole district. `backdrop`: the coarser low-detail fabric beyond it. */
+export const URBAN_FILL = { origin: [265, -27], axis: [.813, -.583], pitch: [44, 40], street: 8, zones: [[DISTRICT.minX, DISTRICT.maxX, DISTRICT.minZ, DISTRICT.maxZ]],
+  backdrop: { pitch: [64, 56], street: 12, radius: 1450 } } as const;
+/** Interim concept lot (owner 2026-11-20, until every rotation option has a model): a result that shows nothing new and has no site to visit
+ *  flies here and a lattice hologram names the guest's option (src/conceptHologram.ts). Lawn north of Aqua City near the retired housing M;
+ *  `SCAN_LOT=20,14,-135,-175` CLEAR (hero 1076 px). w × d × h is the hologram's envelope; `y` the lawn height. */
+export const CONCEPT_LOT = { x: -135, z: -175, y: 2, w: 20, d: 14, h: 18 } as const;
 // The ferry heads west for the Shinagawa channel, clear of the Rainbow Bridge anchorage and Daiba approach piers.
 export const ferryLane: readonly P3[] = [[-230,-.6,-290],[-420,-.6,-470],[-760,-.6,-560],[-1250,-.6,-520]];
 // Bay cruisers [x, z, heading]: centres of straight 300 m runs on open water in front of and beyond the district, clear of the shore and piers.
@@ -127,9 +159,6 @@ export const bayChannels: readonly (readonly P3[])[] = [
   [[1530,-1,860],[1370,-.6,880],[1200,-.6,910],[1060,-.6,940]],
   [[860,-3.5,1820],[700,-3.2,1860],[520,-2.4,1860],[380,-1.8,1830]],
 ];
-// Sweep: a lit transit skyway descending from the Grand Nikko ring (92 m) west past Hilton and out of the frame's lower right,
-// above the Yurikamome deck and clear of Nikko and Hilton footprints; a short white train shuttles on it (mobility).
-export const sweepway: readonly P3[] = [[-290,92,265],[-345,74,250],[-400,56,205],[-440,44,152],[-475,34,92],[-520,28,40],[-580,24,-10]];
 // Sky Ring (空の環, src/skyRing.ts): a 700 m truss ring whose deck top sits at `deck` m, a shared port above the regional air tier; the district
 // loop follows its plan below. Above the hero eye (~148 m) so it arcs across the sky; at the tier's own 160–170 m it read as a flat bar at eye level.
 export const SKY_RING = {x:-40,z:-40,rx:350,rz:350,deck:250} as const;
@@ -202,11 +231,18 @@ export const midDecks: readonly (readonly P3[])[] = [
   [[-86,40,18],[-130,40.5,26],[-180,41,34],[-220,40.5,40],[-250,40,44]],
 ];
 const deckTop = PLAZA.h + .6;
-/** Elevated white walkways (deck top y at the points): ring plinth to the plaza, plaza to the civic core's landing, plaza to the hull apron. Walkers use them. */
+/** A plaza-local point (metres) at deck height `y`, as a world [x, y, z]. Road fix 2 (owner 2026-11-20): the walks spread `plazaAt` before
+ * the height, giving [x, z, y], so they dived to −176 m and back and showed as stray curved stubs. */
+const deckAt = (lx: number, lz: number, y: number): P3 => { const [x, z] = plazaAt(lx, lz); return [x, y, z]; };
+/** Elevated white walkways (deck top y at the points): the ring's garden gate to the plaza, plaza to the civic core's forecourt, plaza to the hull's
+ * forecourt. Walkers use them. Entrance polish (owner 2026-11-20): the civic and hull walks ramp down onto paved forecourts (streetKit
+ * `landmarkForecourts`) instead of stopping in the air over the lawn; the ring walk lands through a lit gate onto the hoop's lowest garden. */
 export const plazaWalks: readonly (readonly P3[])[] = [
-  [[72,16,-183],[45,13,-178],[...plazaAt(-140,-6),9],[...plazaAt(-128,-5),deckTop],[...plazaAt(-100,2),deckTop],[...plazaAt(-80,8),deckTop],[...plazaAt(-56,8),deckTop]],
-  [[...plazaAt(-26,-34),deckTop],[...plazaAt(-16,-48),deckTop],[...plazaAt(-14,-60),11],[-34,15,-66],[-50,15.5,-48],[-46,12,-28],[-40,7.5,-14],[-36,3,-2]],
-  [[...plazaAt(56,-8),deckTop],[...plazaAt(68,-10),deckTop],[...plazaAt(92,-10),12],[-176,16,-42],[-200,16,-22],[-210,11,0],[-214,6,14],[-214,3,26]],
+  // Ring: docks at the hoop's garden gate 17 m up (megastructures.ts `ring`), level with the hoop's inner floor.
+  [[72,17,-183],[45,13,-178],deckAt(-140,-6,9),deckAt(-128,-5,deckTop),deckAt(-100,2,deckTop),deckAt(-80,8,deckTop)],
+  // Under the Yurikamome deck (14.2 m), not through it, without the hairpin; each starts clear of the deck's planters.
+  [deckAt(-16,-48,deckTop),deckAt(-14,-60,8),[-50,8.5,-48],[-46,8,-28],[-40,6,-14],[-34,3,-3],[-27,.45,3]],
+  [deckAt(68,-10,deckTop),deckAt(92,-10,12),[-176,16,-42],[-200,16,-22],[-209,11,0],[-211,6,14],[-213,3.1,23],[-216,.45,31]],
 ];
 // Planted mid-level decks (r6 pass 3, target v2's tree-lined middle layer; 5.2 m lawn bed down the middle). Raycast-checked against the
 // environment, landmarks and Fuji chassis: clear between their docked ends, and off every survey site's line of sight from the hero pose.

@@ -8,6 +8,7 @@ import { fail, type ServiceOutcome, type SurveyContext } from './context.ts';
 import { activeRun, CorruptStateError, createExhibitionRun, createRun, num, recentProposalEvents, replayExhibitionRun, writeExhibitionSnapshot, str, toAnswerEvent } from './runStore.ts';
 import { sessionCounts } from './sessionService.ts';
 import { currentState, viewOf } from './answerService.ts';
+import { rotationActive } from './rotationRun.ts';
 
 export const RESET_CONFIRMATION = 'RESET';
 export const FULL_RESET_CONFIRMATION = 'FULL RESET';
@@ -38,8 +39,12 @@ export function currentRun(ctx: SurveyContext): AdminCurrentRun {
     displayMode: readDisplayMode(ctx.db),
     lifecycle: readLifecycle(ctx.db),
     state,
-    questionVersion: run.algorithmVersion === 2 ? ctx.questions.version : ctx.legacyQuestions.version,
-    totalQuestions: run.algorithmVersion === 2 ? ctx.questions.questions.length : ctx.legacyQuestions.questions.length,
+    ...(run.algorithmVersion === 2 && rotationActive(ctx, run.id)
+      ? { questionVersion: ctx.rotation.version, totalQuestions: ctx.rotation.questions.length }
+      : {
+        questionVersion: run.algorithmVersion === 2 ? ctx.questions.version : ctx.legacyQuestions.version,
+        totalQuestions: run.algorithmVersion === 2 ? ctx.questions.questions.length : ctx.legacyQuestions.questions.length,
+      }),
     reservedSessions: counts.reserved, answeredSessions: counts.answered,
   };
 }

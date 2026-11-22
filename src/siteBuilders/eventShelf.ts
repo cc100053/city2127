@@ -1,6 +1,7 @@
 import * as T from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { nightLit } from '../cityRig.ts';
+import { EVENT_SHELF_FRONTAGE } from '../layout.ts';
 import { remapCityMaterials } from '../siteAssets/assetLoader.ts';
 import type { CityMaterialRole } from '../siteAssets/assetCatalog.ts';
 import { prefersReducedMotion, SITE_TRANSITION_SECONDS } from './siteRuntime.ts';
@@ -15,7 +16,8 @@ const MODULE_H = 3.2, HALL_H = 7.4;
 const FRONT_RAIL_Z = -(SHELF.rows * SHELF.cell / 2 + SHELF.col / 2 + .3 + .75 + SHELF.module / 2); // module centre while it hangs on the front guide rails
 const TRACK_Z = -17.6; // module centre on the ground tracks, in front of the plinth edge
 const TRACK_X = 12, HANG_X = 12, HANG_Y = 22; // showpiece column: arriving module on the right track, hung module above it
-const TRACK_END = -32, ENTRY_Z = TRACK_END - SHELF.module / 2 - .5; // the ground tracks end at z -32; a headline module drives in from just beyond that
+const { trackEnd: TRACK_END, plinthEdge: TRACK_START, tracks } = EVENT_SHELF_FRONTAGE;
+const ENTRY_Z = TRACK_END - SHELF.module / 2 - .5; // a headline module drives in from just beyond the ground tracks
 // Headline hoist phases in progress u (0 = on the left track outside, 1 = latched in its cell): drive in, hook up and lift, cross to the cell column, slide in, lock, then the spreader goes back up.
 const U_DRIVE = .18, U_LIFT = .56, U_CROSS0 = .5, U_CROSS = .62, U_SLIDE = .88, U_LOCK = .92, SPREADER_UP = .1, TROLLEY_HOME = .25;
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
@@ -287,9 +289,9 @@ export function createEventShelf(root: T.Group) {
     mesh.name = name; mesh.receiveShadow = true;
     props.add(mesh);
   };
-  const TRACK_START = -22, trackLen = TRACK_START - TRACK_END;
+  const trackLen = TRACK_START - TRACK_END;
   const railBoxes: [number, number, number, number, number, number][] = [], sleepers: [number, number, number, number, number, number][] = [], strips: [number, number, number, number, number, number][] = [];
-  for (const gx of [-12, 12]) {
+  for (const gx of tracks) {
     for (const dx of [-3.6, 3.6]) railBoxes.push([.3, .18, trackLen, gx + dx, .41, (TRACK_START + TRACK_END) / 2]);
     for (let z = TRACK_START; z >= TRACK_END; z -= 1.6) sleepers.push([8.1, .12, .34, gx, .26, z]);
     strips.push([9.6, .1, trackLen, gx, .05, (TRACK_START + TRACK_END) / 2]);

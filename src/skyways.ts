@@ -2,7 +2,7 @@ import * as T from 'three';
 import { arc, bake, box, skyGlass, leaf, leafyCrown, paint, stone, trail } from './cityRig.ts';
 import { megaSeam, megaShell } from './megastructures.ts';
 const trim = megaShell; // r1 (P3): white engineered members, one material family with the megastructures
-import { changeSites, gardenDecks, midDecks, sweepway } from './layout.ts';
+import { changeSites, gardenDecks, midDecks } from './layout.ts';
 import { routes } from './mobility.ts';
 import { inMega } from './megaFootprints.ts';
 import layout from './odaiba-layout.json' with { type: 'json' };
@@ -28,13 +28,12 @@ const SPHERES: { centre: P3; radius: number; deck?: number }[] = ([
   { centre: [-80, 100, 180], radius: 22, deck: 30 },
   { centre: [-300, 104, 40], radius: 17, deck: 26 },
 ] as { centre: P3; radius: number; deck?: number }[]).filter(r => !inMega(r.centre[0], r.centre[2], r.radius + 8));
+// Road fix (owner 2026-11-20): links end on a ring, sphere or chassis at both ends. The Nikko-ring stub, the front-left link out over the
+// bay and the sweepway lost an end (the Nikko ring gave way to a megastructure; the others ran out of frame), so they are gone.
 const LINKS: (readonly (readonly [number, number, number])[])[] = ([
   [[276.3, 90, -304.1], [300, 78, -240], [285, 67, -150], [262, 62, -60], [215, 62, 0], [140, 62, 20], [70, 62.5, 14], [12.3, 63, 7.6]],
   [[-41.3, 63, 47.8], [-75, 64, 50], [-120, 79, 94], [-159.4, 92, 118.9]],
-  [[-106, 98, 180], [-124, 95, 179], [-140, 92, 178]],
   [[-291.6, 102, 59.3], [-285, 97, 75], [-280, 92, 86.3]],
-  // Front-left: out of the 151 m tower ring over the north-east waterfront to the frame edge (target v2's long front-left skyway).
-  [[304, 90, -373], [350, 80, -400], [410, 68, -440], [480, 60, -490], [560, 56, -545]],
   ...midDecks,
 ] as (readonly (readonly [number, number, number])[])[]).filter(link => !link.some(p => inMega(p[0], p[2], 6))); // P1: nothing stands inside a megastructure footprint
 
@@ -180,7 +179,7 @@ export function skyways() {
     }
   };
   for (const ring of RINGS) { skyway(root, circle(ring), true); garden(circle(ring), true, false); }
-  for (const points of [...LINKS, sweepway.map(p => [...p] as P3)]) skyway(root, new T.CatmullRomCurve3(points.map(p => new T.Vector3(...p)), false, 'centripetal'), false);
+  for (const points of LINKS) skyway(root, new T.CatmullRomCurve3(points.map(p => new T.Vector3(...p)), false, 'centripetal'), false);
   for (const points of gardenDecks) { const curve = new T.CatmullRomCurve3(points.map(p => new T.Vector3(...p)), false, 'centripetal'); skyway(root, curve, false); garden(curve, false); }
   for (const s of SPHERES) sphere(root, s.centre, s.radius, s.deck);
   // Lit blue lines at street level too (target v2): both edges of the seaside promenades, over a 7.2 m paved boardwalk whose top is the

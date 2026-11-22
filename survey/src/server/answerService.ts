@@ -7,6 +7,7 @@ import { transaction } from './database.ts';
 import { fail, type ServiceOutcome, type SurveyContext } from './context.ts';
 import { activeRun, CorruptStateError, readExhibitionSnapshot, runAnswerEvents, runProposalLadder, runProposalRecords, toAnswerEvent, writeSnapshot } from './runStore.ts';
 import { findGuestSession, requireActiveRun, settleExpiry } from './sessionService.ts';
+import { rotationActive, rotationCity, runRotation, withRotation } from './rotationRun.ts';
 
 const MAX_ID_LENGTH = 128;
 const isId = (value: unknown): value is string => typeof value === 'string' && value.trim() !== '' && value.length <= MAX_ID_LENGTH;
@@ -100,7 +101,10 @@ export function currentState(ctx: SurveyContext): CitySurveyState | ExhibitionSt
 export function viewOf(ctx: SurveyContext, state: CitySurveyState | ExhibitionState): CityView {
   if ('algorithmVersion' in state) {
     const fold = runProposalLadder(ctx.db, state.runId);
-    return buildExhibitionCityView(state, runProposalRecords(ctx.db, state.runId, 64, fold), fold.ladder);
+    const records = runProposalRecords(ctx.db, state.runId, 64, fold);
+    if (!rotationActive(ctx, state.runId)) return buildExhibitionCityView(state, records, fold.ladder);
+    const rotation = runRotation(ctx, state.runId);
+    return { ...buildExhibitionCityView(state, records.map(record => withRotation(record, rotation)), fold.ladder), rotation: rotationCity(ctx.rotation, rotation.fold) };
   }
   return buildCityView(state, runAnswerEvents(ctx.db, state.runId), ctx.legacyQuestions);
 }

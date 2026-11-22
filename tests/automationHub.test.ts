@@ -89,6 +89,17 @@ runtime.setTarget({ band: 'high', automatedPorts: 6 }, 24, true);
 runtime.setTarget({ band: 'low', automatedPorts: 0 }, 24, false);
 runtime.update(25.5);
 assert.ok(ringScale(17) < ringScale(0), 'spire rings come down from the top');
+// Question rotation swaps A↔C directly (−1↔+1): the mixed hall never shows mid-jump, and the jump settles in the same 3 s.
+assert.equal(level(hall.mixed), 0, 'a direct high→low jump passes no mixed state');
+runtime.update(27);
+assert.equal(level(hall.low), 1);
+assert.equal(runtime.getDiagnostics().visibleAutomatedPorts, 0, 'high→low settles after 3 s');
+runtime.setTarget({ band: 'high', automatedPorts: 6 }, 30, false);
+runtime.update(31.5);
+assert.equal(level(hall.mixed), 0, 'a direct low→high jump passes no mixed state');
+runtime.update(33);
+assert.equal(level(hall.low), 0);
+assert.equal(runtime.getDiagnostics().visibleAutomatedPorts, 6, 'low→high settles after 3 s');
 
 // Visible mesh budget per state (previous hub: 28 / 28 / 33 meshes, +20 %).
 for (const [band, ports, budget] of [['low', 0, 33], ['mixed', 3, 33], ['high', 6, 40]] as const) {

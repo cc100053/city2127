@@ -1,5 +1,6 @@
 import { isEnergyChoice, isEnergyConfiguration, isEnergyState, sameEnergyConfiguration, energyConfiguration, emptyEnergyConfiguration, type EnergyConfiguration, type EnergyState, type EnergyChoice } from '../survey/src/shared/energy.ts';
 import { DISPLAY_MS } from '../survey/src/shared/displayTiming.ts';
+import type { ProposalRotation, RotationCity } from '../survey/src/shared/cityView.ts';
 import { isDisplayMode, type DisplayMode } from './dayCycle.ts';
 export const AXES = ['automation', 'publicSharing', 'environmentalPriority', 'urbanConcentration'] as const;
 export type Scores = Record<typeof AXES[number], number>;
@@ -60,6 +61,8 @@ export type ExhibitionProposal = {
   beforeLayout: ExhibitionLayout;
   afterLayout: ExhibitionLayout;
   cityChanges: ExhibitionCityChange[];
+  /** Question rotation runs only (survey `ProposalRotation`); the city draws Q01 swaps (src/rotationLayout.ts). */
+  rotation?: ProposalRotation;
 };
 export type ExhibitionView = {
   version: 2;
@@ -76,6 +79,8 @@ export type ExhibitionView = {
   layout: ExhibitionLayout;
   recentProposals: ExhibitionProposal[];
   latestProposal?: ExhibitionProposal;
+  /** Question rotation runs only: the option each question's site shows. */
+  rotation?: RotationCity;
 };
 export type CityView = SurveyView | ExhibitionView;
 export type SurveyEventKind = 'city-state-snapshot' | 'city-state-updated' | 'run-reset';
@@ -139,6 +144,32 @@ function isVotes(value: unknown): value is Scores {
     && (!Object.hasOwn(value, 'energy') || (isEnergyChoice(value.energy) && value.environmentalPriority === 0)) && AXES.every(axis => value[axis] === -1 || value[axis] === 0 || value[axis] === 1);
 }
 
+const isTextRecord = (value: unknown, values: (item: unknown) => boolean): value is Record<string, unknown> =>
+  isRecord(value) && Object.keys(value).length <= 64 && Object.entries(value).every(([key, item]) => isBoundedText(key, 128) && values(item));
+
+/** A rotation proposal names one of its own answers as the swapped (or fallback) site, optionally another as the visited site
+ *  (plan 3.4), and carries one share per answer. */
+function isProposalRotation(value: unknown, answers: ProposalAnswer[]): value is ProposalRotation {
+  if (!isRecord(value) || !hasExactKeys(value, ['outcome', 'shares', ...(Object.hasOwn(value, 'visit') ? ['visit'] : [])])
+    || !isRecord(value.outcome) || !Array.isArray(value.shares)) return false;
+  const outcome = value.outcome, byQuestion = new Map(answers.map(answer => [answer.questionId, answer.optionId]));
+  if (Object.hasOwn(value, 'visit') && !byQuestion.has(value.visit as string)) return false;
+  const outcomeValid = outcome.kind === 'swap'
+    ? hasExactKeys(outcome, ['kind', 'questionId', 'from', 'to']) && isBoundedText(outcome.from, 128) && outcome.to === byQuestion.get(outcome.questionId as string) && outcome.from !== outcome.to
+    : outcome.kind === 'fallback' && hasExactKeys(outcome, ['kind', 'questionId']) && byQuestion.has(outcome.questionId as string);
+  return outcomeValid && value.shares.length === answers.length && value.shares.every((share, i) => isRecord(share)
+    && hasExactKeys(share, ['questionId', 'optionId', 'votes', 'total', ...(Object.hasOwn(share, 'percent') ? ['percent'] : [])])
+    && share.questionId === answers[i].questionId && share.optionId === answers[i].optionId
+    && isSafeCount(share.votes) && isSafeCount(share.total) && share.votes >= 1 && share.votes <= share.total
+    && (!Object.hasOwn(share, 'percent') || (Number.isInteger(share.percent) && isFiniteBetween(share.percent, 0, 100))));
+}
+
+function isRotationCity(value: unknown): value is RotationCity {
+  return isRecord(value) && hasExactKeys(value, ['version', 'shown', 'changedAt']) && isSafeCount(value.version) && value.version >= 1
+    && isTextRecord(value.shown, item => isBoundedText(item, 128)) && isTextRecord(value.changedAt, isSafeCount)
+    && hasExactKeys(value.changedAt as Record<string, unknown>, Object.keys(value.shown as Record<string, unknown>));
+}
+
 function isChangeValues(value: unknown, layout: ExhibitionLayout, socketId: LotSocketId): value is Record<string, number | string> {
   if (!isRecord(value) || !isOneOf(value.band, ['low', 'mixed', 'high']) || value.band !== layout.bands[socketId] || value.tier !== layout.tiers[socketId]) return false;
   return hasExactKeys(value, ['band', 'tier', ...EXHIBITION_SITE_FIELDS[socketId]])
@@ -156,7 +187,7 @@ function isExhibitionCityChange(value: unknown, before: ExhibitionLayout, after:
 }
 
 function isExhibitionProposal(value: unknown, runId: string, revision: number): value is ExhibitionProposal {
-  if (!isRecord(value) || !hasExactKeys(value, ['id', 'runId', 'guestSessionId', 'ordinal', 'questionSetVersion', 'algorithmVersion', 'answers', 'votes', 'revisionBefore', 'revisionAfter', 'submittedAt', 'beforeScores', 'afterScores', 'beforeLayout', 'afterLayout', 'cityChanges', ...(Object.hasOwn(value, 'stationId') ? ['stationId'] : []), ...(Object.hasOwn(value, 'displayAt') ? ['displayAt'] : [])])
+  if (!isRecord(value) || !hasExactKeys(value, ['id', 'runId', 'guestSessionId', 'ordinal', 'questionSetVersion', 'algorithmVersion', 'answers', 'votes', 'revisionBefore', 'revisionAfter', 'submittedAt', 'beforeScores', 'afterScores', 'beforeLayout', 'afterLayout', 'cityChanges', ...(Object.hasOwn(value, 'stationId') ? ['stationId'] : []), ...(Object.hasOwn(value, 'displayAt') ? ['displayAt'] : []), ...(Object.hasOwn(value, 'rotation') ? ['rotation'] : [])])
     || (Object.hasOwn(value, 'stationId') && (!isOneOf(value.stationId, ['A', 'B']) || !Object.hasOwn(value, 'displayAt')))
     || (Object.hasOwn(value, 'displayAt') && (!isBoundedText(value.displayAt, 80) || !Number.isFinite(Date.parse(value.displayAt))))
     || !isBoundedText(value.id, 128) || value.runId !== runId
@@ -172,17 +203,22 @@ function isExhibitionProposal(value: unknown, runId: string, revision: number): 
   const answers = value.answers as ProposalAnswer[];
   const changedSites = new Set(value.cityChanges.map(change => (change as ExhibitionCityChange).socketId));
   const expectedChanges = LOT_SOCKET_IDS.filter(id => exhibitionSiteChanged(value.beforeLayout as ExhibitionLayout, value.afterLayout as ExhibitionLayout, id));
+  const rotation = Object.hasOwn(value, 'rotation');
+  // Rotation proposals vote on no axis, so they carry neither the energy nor the climate answer.
+  if (rotation && (!isProposalRotation(value.rotation, answers) || Object.hasOwn(value.votes, 'energy')
+    || AXES.some(axis => (value.votes as Scores)[axis] !== 0))) return false;
   return new Set(answers.map(answer => answer.questionId)).size === answers.length
-    && (Object.hasOwn(value.votes, 'energy')
+    && (rotation || (Object.hasOwn(value.votes, 'energy')
       ? value.questionSetVersion >= 4 && answers.some(answer => answer.questionId === 'energy-2127' && answer.optionId === (value.votes as ExhibitionProposal['votes']).energy) && !!value.afterLayout.energy
-      : answers.some(answer => answer.questionId === 'cooling-2127'))
+      : answers.some(answer => answer.questionId === 'cooling-2127')))
     && changedSites.size === value.cityChanges.length
     && expectedChanges.length === changedSites.size
     && expectedChanges.every(id => changedSites.has(id));
 }
 
 function parseExhibitionView(value: unknown): ExhibitionView | null {
-  if (!isRecord(value) || !hasExactKeys(value, ['version', 'runId', 'revision', 'guestCount', 'algorithmVersion', 'voteSums', 'recentVotes', 'scores', 'layout', 'recentProposals', ...(Object.hasOwn(value, 'energy') ? ['energy'] : []), ...(Object.hasOwn(value, 'slotSeeds') ? ['slotSeeds'] : []), ...(Object.hasOwn(value, 'latestProposal') ? ['latestProposal'] : [])])
+  if (!isRecord(value) || !hasExactKeys(value, ['version', 'runId', 'revision', 'guestCount', 'algorithmVersion', 'voteSums', 'recentVotes', 'scores', 'layout', 'recentProposals', ...(Object.hasOwn(value, 'energy') ? ['energy'] : []), ...(Object.hasOwn(value, 'slotSeeds') ? ['slotSeeds'] : []), ...(Object.hasOwn(value, 'latestProposal') ? ['latestProposal'] : []), ...(Object.hasOwn(value, 'rotation') ? ['rotation'] : [])])
+    || (Object.hasOwn(value, 'rotation') && !isRotationCity(value.rotation))
     || value.version !== 2 || !isBoundedText(value.runId, 128)
     || !isSafeCount(value.revision) || !isSafeCount(value.guestCount) || value.revision !== value.guestCount
     || value.algorithmVersion !== 2 || !isIntegerScores(value.voteSums, -value.guestCount, value.guestCount)

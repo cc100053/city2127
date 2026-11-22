@@ -1,5 +1,7 @@
 # 文件索引 — Odaiba 2127
 
+> **2026-11-21 owner 決定：九題抽題輪換（9 題 × 3 模型）係唯一現行版本，未來只做呢個版本。** 舊 version4 四題／四個 Meter（−12..12 分數、ladder、district carriers、Meter 預留位）已退役；本文件入面講 Meter 嘅內容只係歷史或 code 對照，唔好再按佢規劃（例如唔好為 Meter 塔位／court／pod 留地）。現行規則見 [EXHIBITION_SPEC 抽題輪換](EXHIBITION_SPEC.md#抽題輪換唯一現行版本)。
+
 2026-10-02 整理。**現行場地只有台場；Shibuya 已結束，未來不再開發。** 歷史中的未完成項目不再當 backlog。Owner：cc100053；索引維護：任務文件 owner。
 
 ## 現行入口
@@ -29,9 +31,8 @@
 
 | 文件 | 狀態 |
 | --- | --- |
-| [PROPOSAL_JA](PROPOSAL_JA.md)／[PDF](PROPOSAL_JA.pdf) | 舊企劃書：現行 4 問／4 Meter 展覽嘅日文說明 |
-| [QUESTION_CANDIDATES_JA](QUESTION_CANDIDATES_JA.md) | 舊提案（4 參數版）嘅 9 個追加質問候補（2026-10-09）；1／4／5 對應 `publicSharing`／`automation`／`environmentalPriority`，其餘係新參數 |
-| [planning-team](planning-team/README.md) | 2026-11-06 新提案：アンケート Ver.2（9 題）、交通・社會仮説、27 案圖像 prompt；可能同舊提案矛盾，並列作對比 |
+| [planning-team](planning-team/README.md) | 2026-11-06 新提案：アンケート Ver.2（9 題）、交通・社會仮説、27 案圖像 prompt；係現行九題版本嘅來源 |
+| [QUESTION_ROTATION_PLAN](QUESTION_ROTATION_PLAN.md) | **現行唯一版本**（2026-11-18 批准，2026-11-20 接入城市，2026-11-21 定為唯一版本）：SURVEY_V2 抽 4 題、每份提案直接換一個模型、顯示群眾比例；題目 × 模型 × 地塊總表及分階段執行步驟 |
 
 ## 完成記錄與歷史
 
@@ -39,6 +40,7 @@
 | --- | --- |
 | [ODAIBA_VENUE_TRANSITION](history/ODAIBA_VENUE_TRANSITION.md) | 換場 P0–P5 已整合；P6/S5 仍待展覽驗收；原估計不是現行 runtime |
 | [Shibuya Plan 01](SHIBUYA.md)／[Plan 02](history/SHIBUYA_PLAN02.md)／[Art](history/SHIBUYA_ART.md) | 已結束歷史；未完成項目不再推進 |
+| [PROPOSAL_JA](history/PROPOSAL_JA.md)／[PDF](history/PROPOSAL_JA.pdf)／[QUESTION_CANDIDATES_JA](history/QUESTION_CANDIDATES_JA.md) | 舊 4 問／4 Meter 企劃書同 4 參數版追加質問候補（2026-11-21 移入 history；version4 已退役） |
 | [Original MVP](history/EXHIBITION_MVP.md) | 原始規劃及 dated updates；由現行 SPEC 取代 |
 | [Implementation snapshot](history/PROJECT_2026-10-02.md)／[Validation snapshot](history/VALIDATION_2026-10-02.md) | 保留舊 deep links／證據，不作現行規則 |
 | [City master taste 2026-11-02 前版](history/CITY_MASTER_TASTE_2026-11-02.md) | 「克制、合理」版 taste 及 hologram／hero amendments；由現行 taste 取代 |

@@ -2,12 +2,14 @@ import type { EnergyConfiguration } from '../survey/src/shared/energy.ts';
 import { DISPLAY_MS } from '../survey/src/shared/displayTiming.ts';
 import { reasonDelayMs } from './resultTimeline.ts';
 import { SITE_TRANSITION_SECONDS } from './siteBuilders/siteRuntime.ts';
-import { headlineTransitionSeconds } from './siteBuilders/shelfTimeline.ts';
+import { headlineTransitionSeconds, SHELF_TRANSITION_SECONDS } from './siteBuilders/shelfTimeline.ts';
 import { addHudChrome } from './hudFrame.ts';
 import type { CarrierChange } from './cityChangeManager.ts';
 import type { DisplayMode } from './dayCycle.ts';
 import { presets, type WorldState } from './presets.ts';
 import { changeSites } from './layout.ts';
+import { conceptVisit, q01Swap, q02Swap, q03Result, q03Swap, q06Result, q06Swap, q08Result, q08Swap, Q02_RESULTS, Q03_RESULTS, Q06_RESULTS, Q08_RESULTS, rotationLayout, rotationVisit } from './rotationLayout.ts';
+import { ALREADY_HERE, crowdShareText, FACILITY_TO_COME } from '../survey/src/shared/rotation.ts';
 import { AXES, connectSurvey, isExhibitionView, supersedes, type CityView, type Decision, type ExhibitionProposal, type ExhibitionView, type SurveyEventKind, type SurveyView, type ExploreLook } from './surveyView.ts';
 
 // Root-scene side of the survey server's CityView contract (survey/src/shared/cityView.ts).
@@ -125,7 +127,7 @@ export const RESIDENT_CARDS: Record<string, readonly [string, string]> = {
 };
 
 export function residentCards(view: ExhibitionView): ResidentCard[] {
-  const l = view.layout;
+  const l = rotationLayout(view);
   const ids = ['intro.origin', 'intro.identity', 'intro.lineage', 'intro.participation'];
   if (view.recentProposals.length) ids.splice(2, 0, 'intro.inherited');
   const facilityIds = [
@@ -164,6 +166,10 @@ const RESIDENT_PREFERENCES: Record<string, string> = {
   'mixed-functions': 'あなたは、高さの違う建物をめぐる日常を選びました。',
   'vertical-functions': 'あなたは、一つのタワーで用事を済ませる日常を選びました。',
 };
+/** Interim concept-lot card (owner 2026-11-20; provisional copy, plan 5.2): never claims the facility exists. */
+export const CONCEPT_JOINED = 'あなたの声は、この暮らしの構想に加わりました。', CONCEPT_PLACE = 'アクアシティ北・構想地';
+/** Rotation Q01 options share the version4 service preferences (A −1, B 0, C +1 on the same NW hub). */
+const Q01_PREFERENCES: Record<string, string> = { A: 'human-led', B: 'human-machine', C: 'autonomous' };
 const RESULT_AXES = { nw: 'service-2127', sw: 'commons-2127', ne: 'cooling-2127', se: 'functions-2127' } as const;
 const DISTRICT_RESULTS = {
   nw: ['水辺のサービス拠点・移動ルート', 'サービス拠点と移動の構成が変わり、日々の用事を支える配置が調整されました。'],
@@ -177,20 +183,58 @@ export function energyChangedPart(before: EnergyConfiguration, after: EnergyConf
   return (['waterGardens', 'receiver', 'flywheel', 'island'] as const).find(part => before[part] !== after[part] || before.activity?.[part] !== after.activity?.[part]) ?? null;
 }
 
+/** The preference line for a visited rotation answer (plan 3.4), from the same provisional copy its swap card uses. */
+function visitPreference(questionId: string, optionId: string, label?: string) {
+  const line = questionId === 'Q01' ? RESIDENT_PREFERENCES[Q01_PREFERENCES[optionId]]
+    : questionId === 'Q02' ? Q02_RESULTS[optionId]?.[2]
+    : ({ Q03: Q03_RESULTS, Q06: Q06_RESULTS, Q08: Q08_RESULTS } as Record<string, Record<string, readonly [string, string]>>)[questionId]?.[optionId]?.[1];
+  return line ?? (label ? `あなたは「${label.replace(/[。.]$/, '')}」という暮らしを選びました。` : 'あなたの思いが、住民の声に加わりました。');
+}
+
 /** Evidence is the renderer's before/after targets, including visible pairings and shuffled slots. */
 export function residentResult(proposal: ExhibitionProposal, changes?: readonly CarrierChange[]) {
+  // Rotation runs: the crowd share of the outcome's question (plan 3.3, 2.6) — the "one voice among many" half of the story.
+  const outcomeShare = proposal.rotation?.shares.find(share => share.questionId === proposal.rotation!.outcome.questionId);
+  const share = outcomeShare ? { share: crowdShareText(outcomeShare) } : {};
+  // Plan 3.4: nothing visibly changed, so the camera visits a site already showing one of the guest's answers; its share goes with it.
+  const visit = rotationVisit(proposal);
+  if (visit) {
+    const visitShare = proposal.rotation!.shares.find(item => item.questionId === visit.questionId);
+    return { preference: visitPreference(visit.questionId, visit.optionId), effect: `${ALREADY_HERE}。`, place: visit.place, kind: 'already-here',
+      ...(visitShare ? { share: crowdShareText(visitShare) } : {}) };
+  }
+  // Interim (owner 2026-11-20): nothing new to show and no site to visit, so the camera flies to the concept lot's hologram of this option.
+  const concept = conceptVisit(proposal);
+  if (concept) return { preference: visitPreference(concept.questionId, concept.optionId, concept.label), effect: CONCEPT_JOINED, place: CONCEPT_PLACE, kind: 'concept', ...share };
+  // A Q02 swap moves the shown model between three lots (src/lotRuntime.ts); no Meter carrier changes, so it reads its own copy.
+  const q02 = q02Swap(proposal);
+  if (q02) {
+    const [place, effect, preference] = Q02_RESULTS[q02.to];
+    return { preference, effect, place, kind: 'configuration', ...share };
+  }
+  // A Q08 swap shows or empties the SW lot through the vacancy override (src/lotRuntime.ts), not the neutral Meter band.
+  const q08 = q08Swap(proposal);
+  if (q08) return { ...q08Result(q08), kind: 'configuration', ...share };
+  // A Q03 swap shows or fades the drawer housing on its lot (src/lotRuntime.ts).
+  const q03 = q03Swap(proposal);
+  if (q03) return { ...q03Result(q03), kind: 'configuration', ...share };
+  // A Q06 swap shows or fades the pod-frame tower on its lot (src/lotRuntime.ts).
+  const q06 = q06Swap(proposal);
+  if (q06) return { ...q06Result(q06), kind: 'configuration', ...share };
   const change = changes?.[0];
-  const questionId = change?.energy || (!change && proposal.votes.energy) ? 'energy-2127' : change ? RESULT_AXES[change.socketId]
+  // Rotation runs (Q01 only so far): the guest's own Q01 answer swapped the NW AUTO HUB; its layouts come from the outcome, not the neutral Meter layout.
+  const swap = q01Swap(proposal);
+  const questionId = swap ? 'Q01' : change?.energy || (!change && proposal.votes.energy) ? 'energy-2127' : change ? RESULT_AXES[change.socketId]
     : Object.values(RESULT_AXES)[AXES.findIndex(axis => proposal.votes[axis] !== 0)];
   const answer = proposal.answers.find(answer => answer.questionId === questionId) ?? proposal.answers[0];
-  const preference = RESIDENT_PREFERENCES[answer?.optionId] ?? 'あなたの思いが、住民の声に加わりました。';
+  const preference = RESIDENT_PREFERENCES[swap ? Q01_PREFERENCES[swap.to] : answer?.optionId] ?? 'あなたの思いが、住民の声に加わりました。';
   let effect = '回答を記録しました。', place = 'お台場全景', kind = 'recorded';
   if (change) {
     kind = 'configuration';
     place = change.focal && !change.district ? changeSites[change.socketId].place : DISTRICT_RESULTS[change.socketId][0];
     effect = DISTRICT_RESULTS[change.socketId][1];
     if (change.focal && !change.district) {
-      const before = proposal.beforeLayout, after = proposal.afterLayout;
+      const before = swap?.before ?? proposal.beforeLayout, after = swap?.after ?? proposal.afterLayout;
       if (change.socketId === 'nw') effect = after.automatedPorts > before.automatedPorts
         ? 'この拠点では、自分の都合で使える自律サービスの端口が増えました。'
         : after.automatedPorts < before.automatedPorts ? 'この拠点では、人に相談できる窓口が増えました。' : 'この拠点のサービスの構成が変わりました。';
@@ -232,15 +276,18 @@ export function residentResult(proposal: ExhibitionProposal, changes?: readonly 
         place = '沖のエネルギー島'; effect = after.island ? '沖に、原子力施設を置く島と検修橋が加わりました。' : '沖のエネルギー島と検修橋は配置から外れました。';
       }
     }
-    effect = `ほかの住民の声と重なり、${effect}`;
+    // Version4 changes come from many voices; a rotation swap is this guest's own answer (plan 3.7), so it takes no shared prefix.
+    if (!swap) effect = `ほかの住民の声と重なり、${effect}`;
   } else if (changes) {
     const direction = AXES.some(axis => proposal.beforeScores[axis] !== proposal.afterScores[axis]);
     kind = direction ? 'direction' : 'maintained';
     if (proposal.votes.energy) {
       effect = '思いは住民の声に加わり、街のエネルギー設備は今の配置を受け継いでいます。';
     } else effect = direction ? '街の方向は少し動きましたが、見えている施設の構成は維持されました。' : '思いは記録され、見えている施設の構成は維持されました。';
+    // Rotation runs: no model came or went and no drawn site shows the guest's answer yet (plan 3.4); say its facility is still to come.
+    if (proposal.rotation) effect = FACILITY_TO_COME;
   }
-  return { preference, effect, place, kind };
+  return { preference, effect, place, kind, ...share };
 }
 
 const LEGACY_HISTORY_SHOWN = 3;
@@ -253,6 +300,8 @@ export function startSurveyAtmosphere(
   apply: (kind: SurveyEventKind, view: CityView, displayMs: number) => CarrierChange[] | void,
   onDisplayMode?: (mode: DisplayMode) => void,
   onExplore?: (look: ExploreLook | null) => void,
+  // DEV `?rotation` swaps in a page-held run (src/devRotationPanel.ts) for the WebSocket.
+  connect: typeof connectSurvey = connectSurvey,
 ) {
   document.body.dataset.mode = 'survey';
   // Latest choice → policy change → city effect, then the run's history (ported from module-swap's CausalPanel).
@@ -286,7 +335,7 @@ export function startSurveyAtmosphere(
       el('p', 'resident-place', `街の画面：${card.place}`));
     storyTimer = window.setTimeout(showAmbient, 12_000);
   };
-  connectSurvey(url, (kind, view, displayMs = DISPLAY_MS) => {
+  connect(url, (kind, view, displayMs = DISPLAY_MS) => {
     if (kind !== 'city-state-snapshot' && !supersedes(current, view, kind)) return;
     const previous = current;
     current = view;
@@ -312,8 +361,10 @@ export function startSurveyAtmosphere(
           el('p', 'resident-place', `街の画面：${result.place}`));
         const showReason = () => {
           latest.querySelector('.resident-card-copy')!.textContent = `${result.preference}${result.effect}`;
+          // The share joins the reason, so the number never precedes the city's answer.
+          if (result.share) latest.querySelector('.resident-card-copy')!.after(el('p', 'resident-share', `住民の声：${result.share}`));
         };
-        const transitionMs = reasonDelayMs(displayMs, globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false, headlineTransitionSeconds(evidence?.[0], SITE_TRANSITION_SECONDS));
+        const transitionMs = reasonDelayMs(displayMs, globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false, q08Swap(proposal)?.shelf ? SHELF_TRANSITION_SECONDS : headlineTransitionSeconds(evidence?.[0], SITE_TRANSITION_SECONDS));
         if (transitionMs === 0) showReason();
         else reasonTimer = window.setTimeout(showReason, transitionMs);
         storyTimer = window.setTimeout(showAmbient, displayMs);
