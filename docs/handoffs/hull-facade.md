@@ -73,3 +73,4 @@ R4 加闊兩道斜框上緣，讓銀色折面從下層框延至樓板邊，沿�
 ### R4 整合
 
 - 工作分支提交 `d6f42e3a`，整合提交 `9aa343da`。獨立整合工作樹重跑 root `npm test`、`npm run build`、`git diff --check origin/main..HEAD` 及圖檔規格檢查，全部通過。整份整合版 `dist/` 與 Chrome 已驗證的 build 逐檔一致。
+- [GitHub main CI](https://github.com/cc100053/city2127/actions/runs/45023045907) 驗證 `d2cf5210`。Root、survey、module-swap 的測試及 build、差異空白和圖檔規格全數通過。[工作分支 CI](https://github.com/cc100053/city2127/actions/runs/45022673969) 驗證 `d6f42e3a`，亦已通過。
