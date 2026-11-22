@@ -81,4 +81,6 @@ Apple M6／Chrome 157.0.8103.79 headless（ANGLE Metal），主鏡 1920×1080／
 
 [扶梯頂日景](../../artifacts/fuji-civic-facade/r5/upper-day.jpg) · [扶梯頂夜景](../../artifacts/fuji-civic-facade/r5/upper-night.jpg) · [拱腳近鏡](../../artifacts/fuji-civic-facade/r5/arch-foot-day.jpg) · [南面同鏡日景](../../artifacts/fuji-civic-facade/r5/south-day.jpg) · [南面同鏡夜景](../../artifacts/fuji-civic-facade/r5/south-night.jpg)。
 
+2026-11-22，owner 確認保存白拱背景 [〈白拱下嘅路〉](../EXHIBITION_SPEC.md#白拱下嘅路)。故事將原通勤吊橋、保留嘅白拱同今日公共步廊連起來，收錄於展覽規格。
+
 下一步由 owner 驗收上層出口、拱腳收邊同南面日夜對照。
