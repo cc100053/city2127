@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
-import { readFile } from 'node:fs/promises';
+import { appendFile, mkdir, readFile } from 'node:fs/promises';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
+import { createServer as createHttpsServer } from 'node:https';
 import { networkInterfaces, type NetworkInterfaceInfo } from 'node:os';
 import { dirname, extname, resolve, sep } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -34,9 +35,10 @@ const MAX_BODY = 16 * 1024;
 const mime: Record<string, string> = {
   '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8',
   '.json': 'application/json', '.glb': 'model/gltf-binary', '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml',
+  '.wasm': 'application/wasm', '.task': 'application/octet-stream',
 };
 /** Debug pages from the Vite build. /admin is loopback-only like the admin API. */
-const pages: Record<string, string> = { '/guest': 'guest.html', '/monitor': 'monitor.html', '/admin': 'admin.html', '/pool': 'pool.html' };
+const pages: Record<string, string> = { '/guest': 'guest.html', '/monitor': 'monitor.html', '/admin': 'admin.html', '/pool': 'pool.html', '/hand-spike': 'handspike.html' };
 
 class HttpError extends Error {
   readonly status: number;
@@ -72,9 +74,11 @@ export type SurveyServerOptions = {
   staticDir?: string;
   /** Source address used for the loopback check; tests substitute a LAN address here. */
   remoteAddress?: (req: IncomingMessage) => string | undefined;
+  /** SPIKE (M0 hand tracking), dev-only: JSONL file that POST /api/dev/hand-spike-log appends to; endpoint is 404 when unset. */
+  handLogPath?: string;
 };
 
-export function createSurveyServer({ ctx, staticDir, devAuto = false, remoteAddress = req => req.socket.remoteAddress }: SurveyServerOptions) {
+export function createSurveyServer({ ctx, staticDir, devAuto = false, remoteAddress = req => req.socket.remoteAddress, handLogPath }: SurveyServerOptions) {
   const server = createServer((req, res) => {
     handle(req, res).catch(error => {
       if (error instanceof UnsupportedRunVersionError) {
@@ -116,7 +120,9 @@ export function createSurveyServer({ ctx, staticDir, devAuto = false, remoteAddr
     let body: Buffer;
     try { body = await readFile(file); }
     catch { throw new HttpError(404, 'not_found', relative.endsWith('.html') ? 'Page not built. Run npm run build first.' : 'Not found.'); }
-    res.writeHead(200, { 'content-type': mime[extname(file)] ?? 'application/octet-stream', 'cache-control': 'no-cache' });
+    // SPIKE: the 22 MB MediaPipe runtime under /hand/ is cached for a day so a reload does not refetch it.
+    const cache = relative.startsWith('/hand/') ? 'max-age=86400' : 'no-cache';
+    res.writeHead(200, { 'content-type': mime[extname(file)] ?? 'application/octet-stream', 'cache-control': cache });
     res.end(body);
   }
 
@@ -132,6 +138,15 @@ export function createSurveyServer({ ctx, staticDir, devAuto = false, remoteAddr
     if (path === '/api/admin/dev-survey-config' && method === 'GET') {
       if (!devAuto) throw new HttpError(404, 'not_found', 'Development auto-answer is disabled.');
       return sendJson(res, { ok: true, data: devSurveyConfig(ctx.questions) });
+    }
+
+    // SPIKE (M0 hand tracking), dev-only: stats lines from /hand-spike, enabled by SURVEY_DEV_HAND=1.
+    if (path === '/api/dev/hand-spike-log' && method === 'POST') {
+      if (!handLogPath) throw new HttpError(404, 'not_found', 'Hand-spike logging is disabled.');
+      const line = await readJson(req);
+      await mkdir(dirname(handLogPath), { recursive: true });
+      await appendFile(handLogPath, JSON.stringify({ at: new Date().toISOString(), from: remoteAddress(req), ...(typeof line === 'object' && line ? line : { value: line }) }) + '\n');
+      return sendJson(res, { ok: true, data: null });
     }
 
     if (path === '/api/health' && method === 'GET') {
@@ -208,7 +223,17 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const port = Number(env.SURVEY_PORT ?? 8787), host = env.SURVEY_HOST ?? '127.0.0.1';
   const dbPath = resolve(env.SURVEY_DB_PATH ?? 'data/survey.sqlite');
   const ctx = createContext({ dbPath, questionsPath: resolve(env.SURVEY_QUESTIONS ?? 'src/survey/questions.exhibition.json') });
-  const { server, realtime } = createSurveyServer({ ctx, staticDir: resolve(env.SURVEY_STATIC_DIR ?? 'dist'), devAuto: env.SURVEY_DEV_AUTO === '1' });
+  const { server, realtime } = createSurveyServer({ ctx, staticDir: resolve(env.SURVEY_STATIC_DIR ?? 'dist'), devAuto: env.SURVEY_DEV_AUTO === '1',
+    ...(env.SURVEY_DEV_HAND === '1' ? { handLogPath: resolve('data/hand-spike.jsonl') } : {}) });
+  // Optional HTTPS beside plain HTTP (iPad camera needs a secure origin): same handler and WebSocket upgrade.
+  const tls = env.SURVEY_TLS_CERT && env.SURVEY_TLS_KEY
+    ? createHttpsServer({ cert: readFileSync(env.SURVEY_TLS_CERT), key: readFileSync(env.SURVEY_TLS_KEY) }, (req, res) => server.emit('request', req, res))
+    : undefined;
+  if (tls) {
+    const tlsPort = Number(env.SURVEY_TLS_PORT ?? 8443);
+    tls.on('upgrade', (req, socket, head) => server.emit('upgrade', req, socket, head));
+    tls.listen(tlsPort, host, () => console.log(`HTTPS on port ${tlsPort}${host === '0.0.0.0' ? ' (all interfaces)' : ''}`));
+  }
   const state = currentState(ctx);
   server.listen(port, host, () => {
     console.log(`Survey server on http://${host === '0.0.0.0' ? '127.0.0.1' : host}:${port}  (db ${dbPath})`);
@@ -218,7 +243,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     console.log('Pages: /guest  /monitor  /admin (loopback only)');
     for (const url of lanGuestUrls(host, port)) console.log(`LAN Guest: ${url}`);
   });
-  const stop = () => { realtime.close(); server.close(() => { ctx.db.close(); process.exit(0); }); };
+  const stop = () => { realtime.close(); tls?.close(); server.close(() => { ctx.db.close(); process.exit(0); }); };
   process.on('SIGINT', stop);
   process.on('SIGTERM', stop);
 }
