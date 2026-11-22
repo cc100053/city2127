@@ -63,9 +63,10 @@ within(RING.outer * 2, 210, 'ring diameter'); within(Math.hypot(ARCH.b[0] - ARCH
       const d = tier * HULL.recede - 8 * (1 - (u / halfLength) ** 2);
       for (const rise of [3.5, 6.5, 9.5, 12.5]) {
         const p = new Vector3(u, tier * HULL.step + rise, d - 4).applyAxisAngle(axis, HULL.yaw).add(origin);
-        const hits = new Raycaster(p, inward, 0, 14).intersectObjects(structureBatches, false);
+        const hits = new Raycaster(p, inward, 0, tier === 0 ? 23 : 14).intersectObjects(structureBatches, false);
         if (hits[0]?.object !== glass) continue;
-        assert.ok(hits[0].distance > 5.38 && hits[0].distance < 5.46, `tier ${tier}: glass is inset`);
+        const paneDepth = tier === 0 && width > .65 ? 3.45 : 1.42;
+        assert.ok(Math.abs(hits[0].distance - 4 - paneDepth) < .04, `tier ${tier}: glass is inset`);
         assert.ok(hits.some(hit => hit.object !== glass && hit.distance > hits[0].distance + .1),
           `tier ${tier}: window has an interior surface behind the pane`);
         insetPanes++;
@@ -77,10 +78,46 @@ within(RING.outer * 2, 210, 'ring diameter'); within(Math.hypot(ARCH.b[0] - ARCH
     const d = -8 * (1 - (u / halfLength) ** 2);
     for (const y of [1.35, 2.6, 4]) {
       const p = new Vector3(u, y, d - 4).applyAxisAngle(axis, HULL.yaw).add(origin);
-      assert.equal(new Raycaster(p, inward, 0, 6).intersectObjects(structureBatches, false).length, 0,
+      assert.equal(new Raycaster(p, inward, 0, 12).intersectObjects(structureBatches, false).length, 0,
         `plaza door clear at ${u}, ${y}`);
     }
   }
+
+  const cove = facadeBatches.find(part => part.material.name === 'hull-room-cove');
+  assert.ok(cove);
+  const localPoint = (u: number, y: number, depth: number) =>
+    new Vector3(u, y, depth).applyAxisAngle(axis, HULL.yaw).add(origin);
+  const front = (tier: number, u: number) => tier * HULL.recede - 8 * (1 - (u / halfLength) ** 2);
+  // At the entrance centre the full-height pane and warm back wall are separated by over thirteen metres.
+  const [pane, rear] = new Raycaster(localPoint(53, 8, front(0, 53) - 4), inward, 0, 24).intersectObjects(structureBatches, false);
+  assert.ok(pane?.object === glass && rear?.object === cove && rear.distance - pane.distance > 13.6, 'lobby opens behind its glazing');
+  for (const u of [43, 64]) {
+    const [mezzanine] = new Raycaster(localPoint(u, 2, front(0, u) + 12), axis, 0, 8).intersectObjects(structureBatches, false);
+    assert.ok(mezzanine && Math.abs(mezzanine.point.y - 5.115) < .02, `mezzanine wing at ${u}`);
+  }
+  const [ceiling] = new Raycaster(localPoint(53, 2, front(0, 53) + 12), axis, 0, 13).intersectObjects(structureBatches, false);
+  assert.ok(ceiling?.object === cove && ceiling.point.y > 11, 'warm ceiling above full-height entry');
+  for (const u of [44.5, 61.5]) {
+    const [column] = new Raycaster(localPoint(u, 2.25, front(0, u) + 5), inward, 0, 5).intersectObjects(structureBatches, false);
+    assert.ok(column && Math.abs(column.distance - 2.23) < .25, `column behind the pane at ${u}`);
+  }
+  // The middle deck remains open from the walking surface to the water above the existing guardrail.
+  for (let u = -37; u <= 7; u++) {
+    if (u === -35 || u === -15) continue; // Existing canopy posts.
+    for (const y of [61.55, 62.5, 63.3]) {
+      const sights = new Raycaster(localPoint(u, y, front(3, u) + 6.2), inward.clone().negate(), 0, 8);
+      assert.equal(sights.intersectObjects(structureBatches, false).length, 0, `middle terrace sightline at ${u}, ${y}`);
+    }
+  }
+  const positions = cove.geometry.getAttribute('position'), uv = cove.geometry.getAttribute('uv');
+  const lightRoles = new Set<number>();
+  let canopyVertices = 0;
+  for (let i = 0; i < uv.count; i++) {
+    lightRoles.add(uv.getX(i));
+    if (uv.getX(i) === 2 && Math.abs(positions.getY(i) - 63.96) < .01) canopyVertices++;
+  }
+  assert.deepEqual([...lightRoles].sort(), [0, 1, 2, 3], 'ordinary rooms, focused rooms, warm soffits and lobby bounce share one batch');
+  assert.equal(canopyVertices, 18, 'all three shade panels have warm soffits');
 }
 // Ground contacts (plinth, arch feet, hull footprint) keep 14 m clear of every Meter site and of the civic core base.
 const contacts = groundContacts(), all = [contacts.ring, ...contacts.archFeet, contacts.hull];

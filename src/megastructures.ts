@@ -1,6 +1,6 @@
 import * as T from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { buildHullFacade } from './hullFacade.ts';
+import { buildHullFacade, hullFrameReturns, hullLobby } from './hullFacade.ts';
 import { hash, plantCanopy, plantShrubs } from './coastalCanopy.ts';
 import { bodyFootprints, inRect } from './megaFootprints.ts';
 import { addCityModel } from './modelAssets.ts';
@@ -58,13 +58,18 @@ const hullCove = new T.MeshStandardMaterial({
 });
 hullCove.onBeforeCompile = shader => {
   shader.vertexShader = shader.vertexShader
-    .replace('#include <common>', '#include <common>\nvarying float hullRoomHeight;')
-    .replace('#include <project_vertex>', '#include <project_vertex>\nhullRoomHeight = uv.y;');
+    .replace('#include <common>', '#include <common>\nvarying vec2 hullRoom;')
+    .replace('#include <project_vertex>', '#include <project_vertex>\nhullRoom = uv;');
   shader.fragmentShader = shader.fragmentShader
-    .replace('#include <common>', '#include <common>\nvarying float hullRoomHeight;')
+    .replace('#include <common>', '#include <common>\nvarying vec2 hullRoom;')
+    .replace('#include <color_fragment>', `#include <color_fragment>
+      diffuseColor.rgb *= mix(vec3(1.), vec3(1.12, .92, .73), step(.5, hullRoom.x));`)
     .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
-      float cove = smoothstep(.685, .76, hullRoomHeight) * (1. - smoothstep(.845, .94, hullRoomHeight));
-      totalEmissiveRadiance *= .13 + .28 * hullRoomHeight + .71 * cove;`);
+      float cove = smoothstep(.685, .76, hullRoom.y) * (1. - smoothstep(.845, .94, hullRoom.y));
+      float rooms = .13 + .28 * hullRoom.y + .71 * cove;
+      float focus = mix(.41 + .48 * hullRoom.y, 1.28, step(1.5, hullRoom.x));
+      focus = mix(focus, .24, step(2.5, hullRoom.x));
+      totalEmissiveRadiance *= mix(rooms, focus, step(.5, hullRoom.x));`);
 };
 hullCove.customProgramCacheKey = () => 'hull-room-cove';
 const hullFinishes = { shell: megaShell, silver: megaRib, shadow: megaJoint, glass: hullGlass, cove: hullCove };
@@ -320,8 +325,18 @@ function hull(batch: Batch, trees: Plant[], shrubs: Shrub[]) {
   const left = (k: number) => -L2 + (k > 2 ? (k - 2) * length * .75 / (steps - 3) : 0); // terraces 0-2 run the full length, then the left end steps in
   const dAt = (k: number, u: number, grow: number) => k * recede - grow - 8 * (1 - (u / L2) ** 2);
   const front = (k: number, grow: number, n = 24) => Array.from({ length: n + 1 }, (_, i) => { const u = left(k) - grow + (L2 - left(k) + 2 * grow) * i / n; return [u, dAt(k, u, grow)] as [number, number]; });
-  const slab = (k: number, y: number, h: number, grow: number, material: T.Material) => {
-    const f = front(k, grow), shape = new T.Shape(); shape.moveTo(f[0][0], -f[0][1]); f.forEach(([u, d]) => shape.lineTo(u, -d));
+  const lobby = { start: T.MathUtils.lerp(-L2, L2, hullLobby.start), end: T.MathUtils.lerp(-L2, L2, hullLobby.end) };
+  const slab = (k: number, y: number, h: number, grow: number, material: T.Material, recessLobby = false) => {
+    const f = front(k, grow), shape = new T.Shape();
+    const rimEnd = f[f.length - 1][0], start = lobby.start, end = Math.min(lobby.end, rimEnd);
+    const back = (u: number) => dAt(k, u, 0) + hullLobby.back + .3;
+    const outline = recessLobby ? [
+      ...f.filter(([u]) => u < start), [start, dAt(k, start, grow)], [start, back(start)],
+      ...f.filter(([u]) => u > start && u < end).map(([u]) => [u, back(u)]),
+      [end, back(end)], ...(end < rimEnd ? [[end, dAt(k, end, grow)], ...f.filter(([u]) => u > end)] : []),
+    ] : f;
+    shape.moveTo(f[0][0], -f[0][1]);
+    for (const [u, d] of outline) shape.lineTo(u, -d);
     shape.lineTo(f[f.length - 1][0], -depth); shape.lineTo(f[0][0], -depth);
     put(batch, material, new T.ExtrudeGeometry(shape, { depth: h, bevelEnabled: false }).rotateX(-Math.PI / 2), root.clone().multiply(new T.Matrix4().makeTranslation(0, y, 0)));
   };
@@ -355,7 +370,7 @@ function hull(batch: Batch, trees: Plant[], shrubs: Shrub[]) {
     // Close the body behind the rooms and retain the top deck's original footprint.
     slab(k, y0, .72, 1.6, megaRib);
     slab(k, y0 + .14, .17, 1.62, megaSeam);
-    slab(k, y0 + .72, step - 1.22, -8.35, megaShell);
+    slab(k, y0 + .72, step - 1.22, -8.35, megaShell, k === 0);
     slab(k, y0 + step - .5, .5, .85, megaShell);
     buildHullFacade({
       tier: k, from: u0, to: L2, height: step, entrance,
@@ -380,6 +395,13 @@ function hull(batch: Batch, trees: Plant[], shrubs: Shrub[]) {
     const terrace = publicTerraces.get(k);
     const deckY = y0 + step;
     const deckPoint = (u: number, inset: number, rise: number) => world(u, dAt(k, u, 0) + inset, deckY + rise);
+    // The silver frames fold into shallow deck trims at each staggered join.
+    for (const { head, foot } of hullFrameReturns(k)) {
+      const start = T.MathUtils.lerp(u0, L2, head);
+      const end = foot === undefined ? start : T.MathUtils.lerp(left(k + 1), L2, foot);
+      const inset = foot === undefined ? 1.5 : recede - .72;
+      bar(batch, megaRib, deckPoint(start, -.79, .04), deckPoint(end, inset, .04), 1.9, .08);
+    }
     const clearOfTerrace = (u: number, radius: number) => !terrace || u + radius <= terrace.start || u - radius >= terrace.end;
     for (let i = 0; i < f.length - 1; i++) {
       const a = f[i][0], b = f[i + 1][0];
@@ -442,6 +464,11 @@ function hull(batch: Batch, trees: Plant[], shrubs: Shrub[]) {
         }
         for (const off of [3, 10, 17]) {
           bar(batch, megaShell, deckPoint(a + off, 1.7, 4.18), deckPoint(a + off, 7.6, 4.18), 6.1, .42);
+          const soffit = new T.PlaneGeometry(4.65, 4.9).rotateX(Math.PI / 2);
+          const uv = soffit.getAttribute('uv');
+          for (let i = 0; i < uv.count; i++) uv.setX(i, 2);
+          put(batch, hullCove, soffit, at(a + off, dAt(k, a + off, 0) + 4.65, deckY + 3.96));
+          soffit.dispose();
         }
       }
       if (k === 6) {
