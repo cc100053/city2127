@@ -48,3 +48,4 @@
 ### R3 整合
 
 - 工作分支提交 `d6bafbc5`，整合提交 `d4e43a28`。在獨立整合工作樹重跑 root `npm test`、`npm run build`、`git diff --check origin/main..HEAD` 及圖檔規格檢查，全部通過。整合後的整份 `dist/` 與 Chrome 已驗證的 build 逐檔一致。
+- [GitHub main CI](https://github.com/cc100053/city2127/actions/runs/44999367968) 已驗證 `5087b7d8`。Root、survey、module-swap 測試及 build、差異空白與圖檔規格全數通過。工作分支的 [CI](https://github.com/cc100053/city2127/actions/runs/44999035557) 亦已通過。
