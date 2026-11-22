@@ -6,8 +6,8 @@ export const RING = { x: 95, z: -195, centreY: 90, outer: 105, inner: 73, depth:
  * (megastructures `carved`) and lined as a tunnel. */
 export const RING_GATE = { left: 30.5, right: [53.5, 65] as const, top: 22, reach: 25 };
 export const ARCH = { a: [-9, -237] as const, b: [58, -5] as const, apex: 135 };
-// r2: front base line (-160, 20) to (-330, 95); local +x runs along it toward the left end, +z recedes from the camera. Low left end (3 terraces), 8 at the right end.
-export const HULL = { x: -260, z: 64, yaw: .4155, length: 180, depth: 90, steps: 8, step: 15, recede: 9 };
+// Local +u runs along the base toward the tall shoulder; +d recedes away from the camera.
+export const HULL = { x: -260, z: 64, yaw: .4155, length: 180, depth: 90 };
 
 export const rect = (cx: number, cz: number, ux: number, uz: number, hu: number, hv: number) => ({ cx, cz, ux, uz, hu, hv });
 /** Hull footprint rectangle, `front` m wider toward the camera and `side` m longer. */

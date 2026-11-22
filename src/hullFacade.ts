@@ -1,4 +1,30 @@
 import * as T from 'three';
+import { HULL } from './megaFootprints.ts';
+
+const end = HULL.length / 2;
+/** Tier bounds in hull-local metres. The lower decks keep the plaza, rail and public-floor elevations. */
+export const hullTiers = [
+  { from: -end, to: end, base: 0, deck: 15, setback: 0, bow: 0, sweep: 0 },
+  { from: -end, to: end, base: 15, deck: 30, setback: 9, bow: 0, sweep: 0 },
+  { from: -end, to: end, base: 30, deck: 45, setback: 18, bow: 24, sweep: 17 },
+  { from: -70, to: end, base: 45, deck: 60, setback: 27, bow: 20, sweep: 12 },
+  { from: -48, to: end, base: 60, deck: 75, setback: 36, bow: 17, sweep: 10 },
+  { from: -38, to: 88, base: 75, deck: 90, setback: 45, bow: 15, sweep: 9 },
+  { from: -10, to: 86, base: 90, deck: 105, setback: 54, bow: 12, sweep: 7 },
+  { from: 8, to: 83, base: 105, deck: 134, setback: 63, bow: 9, sweep: 6 },
+];
+
+export function hullFront(tier: number, u: number, grow = 0) {
+  const { from, setback, bow, sweep } = hullTiers[tier];
+  // A quarter ellipse turns the front toward the end wall at the prow.
+  const t = bow ? T.MathUtils.clamp(1 - (u - from) / bow, 0, 1) : 0;
+  return setback - grow - 8 * (1 - (u / end) ** 2) + sweep * (1 - Math.sqrt(1 - t * t));
+}
+
+export function hullRear(tier: number, u: number) {
+  // Pull the upper shell away from Grand Nikko, then widen it beyond the hotel's east edge.
+  return tier < 2 ? HULL.depth : T.MathUtils.lerp(65.5, HULL.depth, T.MathUtils.smoothstep(u, 38, 53));
+}
 
 type Opening = readonly [
   start: number, end: number, fromHeight: number, toHeight: number, below: number, above: number,
@@ -15,13 +41,15 @@ const openings: readonly (readonly Opening[])[] = [
   [[.012, .24, 4, 8.2, 3.3, 6], [.25, .54, 8.7, 4.7, 3, 5.8], [.55, .77, 4.4, 8.8, 3, 6.3], [.78, .983, 9.1, 5, 4.5, 3.7, 'screen']],
   [[.016, .17, rakeFoot, rakeHead, 4.8, 2.2, 'west-frame'], [.18, .34, 13.1, 2.4, 5.9, 3.3, 'screen'],
     [.35, .485, rakeFoot, rakeHead, 4.9, 1.9, 'east-frame'], [.495, .82, 13, 4.8, 5.5, 4.1], [.83, .986, 4.6, 7.4, 3.5, 5.7]],
-  [[.025, .118, rakeFoot, rakeHead, 4.2, 1.8, 'west-frame'], [.128, .38, 13, 2.4, 6.3, 3.4, 'screen'],
-    [.395, .505, rakeFoot, rakeHead, 4.2, 1.9, 'east-frame'], [.516, .985, 13.1, 4.5, 5.9, 4.6]],
-  [[.012, .30, 5.2, 6.8, 4.4, 6.8, 'terrace'], [.31, .39, 6.7, 2.4, 3.1, 3.4],
-    [.40, .59, rakeFoot, rakeHead, 5.3, 2.4, 'east-frame'], [.60, .758, 13, 8.3, 7, 2.8, 'screen'], [.77, .988, 8.1, 4.4, 3.5, 5.4]],
-  [[.013, .31, 4, 9.4, 3.5, 6.2], [.32, .57, 9.6, 4.5, 3.9, 3.4, 'screen'], [.58, .987, 4.3, 8.2, 3.4, 7]],
-  [[.014, .29, 7.9, 4.7, 3.5, 4, 'screen'], [.30, .585, 4.5, 8.5, 3.6, 6.7], [.597, .985, 8.8, 5, 4.7, 4.7]],
-  [[.015, .41, 4.1, 8.5, 3, 6.7], [.425, .984, 8.8, 5.2, 4.7, 5.2]],
+  [[.068, .172, rakeFoot, rakeHead, 4.2, 1.8, 'west-frame'], [.182, .41, 13, 2.4, 6.3, 3.4, 'screen'],
+    [.421, .527, rakeFoot, rakeHead, 4.2, 1.9, 'east-frame'], [.54, .985, 13.1, 4.5, 5.9, 4.6]],
+  [[.098, .361, 5.2, 6.8, 4.4, 6.8, 'terrace'], [.367, .442, 6.7, 2.4, 3.1, 3.4],
+    [.452, .625, rakeFoot, rakeHead, 5.3, 2.4, 'east-frame'], [.635, .789, 13, 8.3, 7, 2.8, 'screen'], [.801, .988, 8.1, 4.4, 3.5, 5.4]],
+  [[.024, .108, 5.1, 2.3, 2.2, 5.9, 'screen'], [.118, .301, rakeFoot, rakeHead, 5.2, 3.3, 'west-frame'],
+    [.312, .716, 13.1, 4.7, 6.3, 3.2], [.73, .99, 4.8, 9.3, 3.4, 4.7]],
+  [[.026, .099, 4.3, 2.4, 2.9, 6.7, 'screen'], [.108, .358, rakeFoot, rakeHead, 5.2, 3.1, 'west-frame'],
+    [.37, .983, 13.1, 5.2, 6.7, 3.5]],
+  [[.025, .212, 5.1, 2.4, 3.3, 7.4], [.222, .97, rakeFoot, rakeHead, 4.7, 3.8, 'west-frame']],
 ];
 
 // Fractions of the lower and upper frontages where a frame folds over a deck.
@@ -48,7 +76,7 @@ type Tier = {
 
 /** Swept frames, recessed glazing and shallow interior rooms specific to the hull's eight-tier elevation. */
 export function buildHullFacade({ tier, from, to, height, entrance, point, surface, bar }: Tier) {
-  const toe = .72, crown = height - .5, skin = -.85;
+  const toe = .72, crown = height - .5, skin = -.85, vertical = height / 15;
   const strip = (finish: Finish, lower: T.Vector3[], upper: T.Vector3[], lighting: 'room' | 'focus' | 'soffit' | 'bounce' | 'lobby-back' = 'room') => {
     const light = { room: 0, focus: 1, soffit: 2, bounce: 3, 'lobby-back': 4 }[lighting];
     const positions: number[] = [], uv: number[] = [];
@@ -65,15 +93,20 @@ export function buildHullFacade({ tier, from, to, height, entrance, point, surfa
     surface(finish, mesh);
     mesh.dispose();
   };
-  const tipRim = .89;
+  const tipRim = tier < 2 ? .89 : 1.15 * Math.sqrt(vertical);
   const join = (a: number, b: number, startHeight: number, endHeight: number) => {
-    const sill = [point(a, startHeight - tipRim, skin), point(b, endHeight - tipRim, skin)];
-    const head = [point(a, startHeight + tipRim, skin), point(b, endHeight + tipRim, skin)];
-    strip('shadow', [point(a, toe, skin), point(b, toe, skin)], sill);
+    const segments = tier < 2 ? 1 : Math.ceil((b - a) / 1.5);
+    const samples = Array.from({ length: segments + 1 }, (_, i) => {
+      const t = i / segments;
+      return [T.MathUtils.lerp(a, b, t), T.MathUtils.lerp(startHeight, endHeight, t) * vertical];
+    });
+    const sill = samples.map(([u, y]) => point(u, Math.max(toe, y - tipRim), skin));
+    const head = samples.map(([u, y]) => point(u, Math.min(crown, y + tipRim), skin));
+    strip('shadow', samples.map(([u]) => point(u, toe, skin)), sill);
     strip('silver', sill, head);
-    strip('shadow', head, [point(a, crown, skin), point(b, crown, skin)]);
+    strip('shadow', head, samples.map(([u]) => point(u, crown, skin)));
   };
-  let last = from, lastHeight = 4.1;
+  let last = from, lastHeight = tier < 2 ? 4.1 : 8.8;
   for (const [start, end, fromHeight, toHeight, below, above, kind] of openings[tier]) {
     const a = T.MathUtils.lerp(from, to, start), b = T.MathUtils.lerp(from, to, end);
     join(last, a, lastHeight, fromHeight);
@@ -87,15 +120,15 @@ export function buildHullFacade({ tier, from, to, height, entrance, point, surfa
     const profile = (t: number) => {
       const taper = Math.pow(Math.sin(Math.PI * t), .82);
       const rise = rake ? t + .09 * Math.sin(t * Math.PI * 2) : T.MathUtils.smoothstep(t, 0, 1);
-      const centre = T.MathUtils.lerp(fromHeight, toHeight, rise);
+      const centre = T.MathUtils.lerp(fromHeight, toHeight, rise) * vertical;
       const u = T.MathUtils.lerp(a, b, t);
       const entry = isLobby ? 1 - T.MathUtils.smoothstep(Math.abs(u - entrance), 2.45, 6.5) : 0;
       return {
         u,
-        lower: T.MathUtils.lerp(Math.max(toe + .48, centre - below * taper * (1.26 - .52 * t)), toe + .08, entry),
-        upper: Math.min(crown - .48, centre + above * taper * (.68 + .64 * t)),
+        lower: T.MathUtils.lerp(Math.max(toe + .48, centre - below * vertical * taper * (1.26 - .52 * t)), toe + .08, entry),
+        upper: Math.min(crown - .48, centre + above * vertical * taper * (.68 + .64 * t)),
         sillRim: tipRim + 1.16 * taper * (1 - t),
-        headRim: tipRim + (rake ? (2.9 + 1.8 * t) * Math.sin(Math.PI * t) : 1.71 * taper * t),
+        headRim: tipRim + (rake ? (3.8 + 1.65 * t) * Math.sin(Math.PI * t) : 1.71 * taper * t),
       };
     };
     const samples = Array.from({ length: segments + 1 }, (_, i) => profile(i / segments));
