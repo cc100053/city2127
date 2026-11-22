@@ -3,7 +3,7 @@
 - Owner: Codex
 - Branch: `codex/fuji-facade-pilot`
 - Base: `2ab01ea77125fbd8c54e5c8dc9f1ec79a3d97ac8`
-- Status: 已選 R1 為外觀基準。Owner 已接受 R8 闊翼外牆樣板，Gemini 燈光候選待審閱（2026-11-22）
+- Status: 已選 R1 為外觀基準。Owner 已接受 R8 闊翼外牆樣板，R9 窗套導光候選待驗收（2026-11-23）
 - R1 已驗證實作：`19432b6360eecbf58181ec69d6a3235a0bf82280`
 - 遠端分支：`origin/codex/fuji-facade-pilot`
 
@@ -139,3 +139,24 @@ Chrome 喺日夜主鏡實際載入 R8 GLB（HTTP 200），模擬 404 時城市�
 ### R8 驗收與燈光候選（2026-11-22）
 
 Owner 回覆「R8 ok」，接受外牆樣板，並要求 Gemini 出未來感燈光目標。以 `352f07fe` 同鏡日夜近鏡做輸入，Gemini 生成一張 2752×1536 夜景候選。兩組窗嘅冷白導光藏喺窗套內緣，沿大窗窗台接過玻璃轉角，夾層有短狀態燈，室內仍見暖光。生成稿微調咗畫面及畫面文字，後續以 R8 實景作幾何同介面依據。原圖喺 `~/city2127-evidence/fuji-civic-facade/lighting-target/gemini-night-target.jpg`，等 owner 審閱燈光方向。[Gemini 原對話](https://gemini.google.com/u/3/app/c37b00694101e1f9)。
+
+## R9 窗套導光
+
+2026-11-23 由專用工作樹 `/private/tmp/city2127-fuji-polish` 接續。Fetch 後本機及遠端驗收分支都係 `e5423bbe156db0d550cf8a8c9e691cbbc2ed1597`，差異 0／0，工作樹乾淨。當時 `origin/main` 為 `565de9fb099f31f89a8dc9e62dfdb0849f4ffcb3`，驗收分支及 main 分別有 20／15 個獨有提交。Owner 指示「ok, do this on R9」，採用 [Gemini 夜景](../../artifacts/fuji-civic-facade/r9/gemini-night-target.jpg) 作燈光目標。
+
+發布前再 fetch，遠端驗收分支仍為 `e5423bbe`，`origin/main` 已到 `2df6d8b6`。驗收圖跟隨原分支嘅 R9 實作提交。
+
+- R8 兩組雙層窗嘅 18 塊原窗套斜面加上光學 UV。冷白導光沿窗頂、窗台、兩側同共用斜肋走，長段有短接縫，轉角兩面嘅光帶同一深度接合。斜面上淡藍掠光由同一 shader 衰減，暗處可以照見玻璃後嘅暖色工作室。
+- 七粒淡藍狀態燈沿大窗夾層排列，燈面闊 0.34–0.52 m、高 0.14 m，出夾層面 0.022 m（civic-local）。燈光角色 `fuji_guide` 合成一批，隨現有城市日夜訊號淡入，日景關燈。五材質舊 GLB 照常載入，資產載入失敗仍使用程序窗牆。
+- R8／R9 GLB 比對覆核原有三角面位置、法線同主 UV，新增只有狀態燈 84 個三角面。全棟 933,984 面、12 批，保留整棟包圍盒。導光同狀態燈跟富士轉角及夾層定形，屬現有大樓專用圖庫條目。
+- Blender 5.2.2 Game QA 以實際夾層平面位置做測試承托，七粒燈全有接觸，無幾何錯誤。外殼最低 4.195 m 提示符合樓板位置。已覆核材質及線框圖。用 `gltf` preset、`--no-anim` 匯出及重匯入，六個材質角色、39,512 面、2,996,532 bytes，無紋理或擴展。
+
+實作 `3bf3a92eda8b4f9bea61222d233a95eec52c36b3`。根目錄 `npm test`、`npm run build`、`git diff --check` 通過。[Odaiba 幾何回歸](../../tests/odaiba.test.ts) 核對光線 UV 穿過兩面窗台斜接、狀態燈間隙、單一光批、原來窗形、泊位同公共動線。開發 Mac Chrome 157.0.8103.79 headless 以 R8 同鏡 12:00／21:00、3200×1800、DPR 1、`reviewTime=20`，喺乾淨提交擷取兩張近鏡同兩張主鏡，共四張零頁面錯誤。原圖、sidecar 同 QA 在 `~/city2127-evidence/fuji-civic-facade/r9/`。
+
+夜景近鏡清楚見到兩組窗光，窗台沿玻璃轉角接埋，夾層暖光同冷白窗框可分辨。日景導光熄滅，夾層只見深色燈粒。城市原主鏡銀球左邊嘅開口下半辨到導光，橫樑仍遮住部分窗頂，狀態燈主要喺近鏡讀到。展覽機與 owner 實景驗收待做。
+
+Chrome 主鏡載入 R9／R8 GLB 均回應 HTTP 200，模擬 404 顯示程序窗牆。三條路徑零頁面錯誤或 shader 編譯錯誤。
+
+開發 Mac Apple M6／headless Chrome 以 1920×1080、DPR 1，同一份 runtime 交替載入兩個 GLB。首輪各量一次 6 秒 rAF，R8／R9 日景 59.7／33.6 FPS、夜景 31.1／58.0 FPS。倒轉次序再量日景各兩個 6 秒窗口，R9 為 60.0／59.5 FPS，R8 為 60.0／60.0 FPS。日景低值未重現。日夜一般幀各增加 2 次 draw call 同 168 個 render triangles。數據及腳本喺 `r9/qa/chrome-glb.json` 同 `r9/qa/chrome-repeat-day.json`。
+
+[近鏡日景](../../artifacts/fuji-civic-facade/r9/comparison-day.jpg) · [近鏡夜景](../../artifacts/fuji-civic-facade/r9/comparison-night.jpg) · [主鏡日景](../../artifacts/fuji-civic-facade/r9/hero-comparison-day.jpg) · [主鏡夜景](../../artifacts/fuji-civic-facade/r9/hero-comparison-night.jpg)。
