@@ -1,4 +1,5 @@
-// SPIKE (M0 hand tracking): pure helpers for /hand-spike, kept DOM-free so tests can run them in Node.
+// Hand pointer logic (M1): turns HandLandmarker results into a screen cursor, pinch edges and dwell selection.
+// DOM-free so the node tests run it directly; times are milliseconds on the performance.now() clock.
 
 export type Point = { x: number; y: number };
 export type Landmark = { x: number; y: number; z?: number };
@@ -128,5 +129,94 @@ export class SelectGate {
   private select(card: number, now: number) {
     this.cooldownUntil = now + this.cooldownMs; this.blocked = card; this.since = now;
     return card;
+  }
+}
+
+/**
+ * Display-rate cursor: landmark updates arrive at camera rate (~30 Hz) and some tens of ms late, so the render
+ * loop extrapolates the last filtered sample along its velocity, at most `maxAheadMs` past the sample time.
+ */
+export class Predictor {
+  private last?: { t: number; p: Point };
+  private v: Point = { x: 0, y: 0 };
+  private readonly maxAheadMs: number;
+  constructor(maxAheadMs = 40) { this.maxAheadMs = maxAheadMs; }
+  clear() { this.last = undefined; this.v = { x: 0, y: 0 }; }
+  push(t: number, p: Point) {
+    if (this.last && t > this.last.t) {
+      const dt = t - this.last.t;
+      this.v = dt < 200 ? { x: (p.x - this.last.p.x) / dt, y: (p.y - this.last.p.y) / dt } : { x: 0, y: 0 };
+    } else if (!this.last) this.v = { x: 0, y: 0 };
+    this.last = { t, p };
+  }
+  at(now: number): Point | undefined {
+    if (!this.last) return undefined;
+    const ahead = Math.min(this.maxAheadMs, Math.max(0, now - this.last.t));
+    return { x: this.last.p.x + this.v.x * ahead, y: this.last.p.y + this.v.y * ahead };
+  }
+}
+
+export type PointerOptions = { minCutoff?: number; beta?: number; predictMs?: number; pinchLookbackMs?: number; zone?: number };
+export type PointerUpdate = {
+  /** The controlling hand's landmarks, undefined when no hand is seen. */
+  landmarks?: Landmark[];
+  /** True on the frame the controlling hand disappears. */
+  lost: boolean;
+  /** Screen point to select at when a pinch closes on this frame (the cursor ~100 ms earlier). */
+  pinchAt?: Point;
+  pinchRatio: number;
+};
+
+/**
+ * One controlling hand turned into a cursor: sticky largest hand, mirrored active-zone mapping, One-Euro
+ * smoothing, pinch with hysteresis (cursor frozen while closed) and display-rate prediction.
+ */
+export class HandPointer {
+  private readonly fx: OneEuro;
+  private readonly fy: OneEuro;
+  private readonly history = new History();
+  private readonly predictor: Predictor;
+  readonly pinch = new Pinch();
+  private readonly lookback: number;
+  private readonly zone: number;
+  private prevBox?: HandBox;
+  private frozen?: Point;
+  present = false;
+  constructor(options: PointerOptions = {}) {
+    this.fx = new OneEuro(options.minCutoff ?? 1.0, options.beta ?? 0.01);
+    this.fy = new OneEuro(options.minCutoff ?? 1.0, options.beta ?? 0.01);
+    this.predictor = new Predictor(options.predictMs ?? 40);
+    this.lookback = options.pinchLookbackMs ?? 100;
+    this.zone = options.zone ?? 0.6;
+  }
+  reset() {
+    this.present = false; this.prevBox = undefined; this.frozen = undefined;
+    this.fx.reset(); this.fy.reset(); this.history.clear(); this.predictor.clear(); this.pinch.reset();
+  }
+  /** Feeds one inference result captured at `t` (ms). */
+  update(hands: Landmark[][], t: number, screenW: number, screenH: number, frameW = 640, frameH = 480): PointerUpdate {
+    if (!hands.length) {
+      const lost = this.present;
+      this.reset();
+      return { lost, pinchRatio: NaN };
+    }
+    this.present = true;
+    const boxes = hands.map(handBox), pick = pickHand(boxes, this.prevBox);
+    const lm = hands[pick];
+    this.prevBox = boxes[pick];
+    const raw = zoneToScreen(lm[8], screenW, screenH, this.zone);
+    const p = { x: this.fx.filter(raw.x, t / 1000), y: this.fy.filter(raw.y, t / 1000) };
+    this.history.push(t, p);
+    this.predictor.push(t, p);
+    const ratio = pinchRatio(lm, frameW, frameH);
+    let pinchAt: Point | undefined;
+    if (this.pinch.update(ratio)) pinchAt = this.frozen = this.history.at(t - this.lookback) ?? p;
+    if (!this.pinch.closed) this.frozen = undefined;
+    return { landmarks: lm, lost: false, pinchAt, pinchRatio: ratio };
+  }
+  /** Cursor for a render frame at `now`: frozen while pinched, otherwise predicted; undefined without a hand. */
+  cursorAt(now: number): Point | undefined {
+    if (!this.present) return undefined;
+    return this.frozen ?? this.predictor.at(now);
   }
 }

@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { History, OneEuro, Pinch, SelectGate, percentile, pickHand, pinchRatio, zoneToScreen } from '../src/ui/handSpikeCore.ts';
+import { HandPointer, History, OneEuro, Pinch, Predictor, SelectGate, percentile, pickHand, pinchRatio, zoneToScreen } from '../src/ui/hand/handPointer.ts';
 
 // Sticky hand: the kept hand stays unless another is more than 30% larger.
 const a = { area: 0.04, cx: 0.3, cy: 0.5 }, b = { area: 0.05, cx: 0.7, cy: 0.5 }, big = { area: 0.06, cx: 0.7, cy: 0.5 };
@@ -44,4 +44,29 @@ assert.equal(g.pinch(0, 5000), -1, 'pinch on the blocked card ignored');
 assert.equal(g.hover(1, 5001), -1); assert.equal(g.pinch(1, 5002), 1, 'other card pinch after cooldown');
 assert.equal(g.pinch(2, 5100), -1, 'cooldown blocks every card');
 assert.equal(g.hover(-1, 5700), -1); assert.equal(g.hover(1, 5701), -1); assert.equal(g.hover(1, 6701), 1, 'left and came back: dwell again');
-console.log('handSpike tests passed');
+
+// Predictor: extrapolates along velocity, capped at maxAhead; no motion before two samples.
+const pr = new Predictor(40);
+pr.push(0, { x: 0, y: 0 });
+assert.deepEqual(pr.at(30), { x: 0, y: 0 });
+pr.push(33, { x: 33, y: 0 });
+assert.equal(pr.at(53)?.x, 53, '20 ms ahead at 1 px/ms');
+assert.equal(pr.at(500)?.x, 73, 'capped at 40 ms ahead');
+assert.equal(pr.at(10)?.x, 33, 'never behind the last sample');
+
+// HandPointer: no hand -> no cursor; lost fires once; pinch freezes the cursor at the earlier point.
+const hp = new HandPointer({ predictMs: 0, beta: 0, minCutoff: 1000 });
+const open = (x: number) => { const h = Array.from({ length: 21 }, () => ({ x, y: 0.5 })); h[0] = { x, y: 0.7 }; h[9] = { x, y: 0.5 }; h[4] = { x: x + 0.1, y: 0.5 }; h[8] = { x, y: 0.5 }; return h; };
+const closed = (x: number) => { const h = open(x); h[4] = { x, y: 0.5 }; return h; };
+assert.equal(hp.update([], 0, 1000, 800).lost, false);
+assert.equal(hp.cursorAt(0), undefined);
+hp.update([open(0.5)], 0, 1000, 800); hp.update([open(0.5)], 33, 1000, 800);
+assert.ok(Math.abs(hp.cursorAt(40)!.x - 500) < 1, 'centre maps to centre');
+hp.update([open(0.4)], 66, 1000, 800); hp.update([open(0.4)], 99, 1000, 800);
+const up = hp.update([closed(0.3)], 132, 1000, 800);
+assert.ok(up.pinchAt && Math.abs(up.pinchAt.x - 500) < 2, `pinch selects where the cursor was 100 ms ago (${up.pinchAt?.x})`);
+hp.update([closed(0.2)], 165, 1000, 800);
+assert.deepEqual(hp.cursorAt(170), up.pinchAt, 'frozen while closed');
+assert.equal(hp.update([], 200, 1000, 800).lost, true);
+assert.equal(hp.update([], 233, 1000, 800).lost, false, 'lost fires once');
+console.log('handPointer tests passed');

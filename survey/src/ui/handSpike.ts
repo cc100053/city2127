@@ -1,13 +1,14 @@
-// SPIKE (M0 hand tracking, iPad voting plan): measures MediaPipe HandLandmarker on the guest iPad.
+// SPIKE page (iPad voting plan, M0 + M1): measures hand tracking on the guest iPad with the reusable modules in ./hand/.
 // Front camera at 640x480, no video shown; index fingertip drives a cursor over three cards (dwell 1 s or pinch).
-// Runtime is self-hosted under /hand/ (npm run fetch:hand-model). Not product code.
-import { FilesetResolver, HandLandmarker, type HandLandmarkerResult } from '@mediapipe/tasks-vision';
-import { History, OneEuro, Pinch, SelectGate, handBox, percentile, pickHand, pinchRatio, zoneToScreen, type HandBox, type Point } from './handSpikeCore.ts';
+// Runtime is self-hosted under /hand/ (npm run fetch:hand-model). ?mode=worker|main forces the inference path.
+import { HandPointer, SelectGate, percentile, type Landmark, type Point } from './hand/handPointer.ts';
+import { HandTracker, type HandFrame } from './hand/handTracker.ts';
 
 const params = new URLSearchParams(location.search);
 const num = (key: string, fallback: number) => { const v = Number(params.get(key)); return params.has(key) && Number.isFinite(v) ? v : fallback; };
-const DWELL_MS = num('dwell', 1000), COOLDOWN_MS = 600, PINCH_LOOKBACK_MS = 100, LOG_EVERY_MS = 10_000;
-const euro = { minCutoff: num('mincutoff', 1.0), beta: num('beta', 0.01) };
+const DWELL_MS = num('dwell', 1000), COOLDOWN_MS = 600, LOG_EVERY_MS = 10_000;
+// MediaPipe's 21-point hand topology (same pairs as HandLandmarker.HAND_CONNECTIONS).
+const HAND_CONNECTIONS = [[0, 1], [1, 2], [2, 3], [3, 4], [0, 5], [5, 6], [6, 7], [7, 8], [5, 9], [9, 10], [10, 11], [11, 12], [9, 13], [13, 14], [14, 15], [15, 16], [13, 17], [0, 17], [17, 18], [18, 19], [19, 20]];
 
 const style = document.createElement('style');
 style.textContent = `
@@ -58,9 +59,8 @@ const RING_LEN = 2 * Math.PI * 36;
 
 // ---- metrics --------------------------------------------------------------------------------------------
 const startedAt = performance.now();
-const inferMs: number[] = [];
-let inferCount = 0, renderCount = 0, inferFps = 0, renderFps = 0, fpsWindowStart = performance.now();
-let handLost = 0, selects = { dwell: 0, pinch: 0, touch: 0 }, cameraRes = '-', delegate = '-', gpuFallbackReason = '';
+let renderCount = 0, inferFps = 0, renderFps = 0, fpsWindowStart = performance.now(), resultsAtWindow = 0;
+let handLost = 0, selects = { dwell: 0, pinch: 0, touch: 0 }, cameraRes = '-', lastPinchRatio = NaN;
 const errors: string[] = [];
 function recordError(message: string) {
   const line = `${new Date().toISOString().slice(11, 19)} ${message}`.slice(0, 160);
@@ -81,34 +81,6 @@ async function keepScreenAwake() {
 }
 document.addEventListener('pointerdown', () => void keepScreenAwake());
 
-// ---- landmarker -------------------------------------------------------------------------------------------
-let landmarker: HandLandmarker | undefined;
-let fileset: Awaited<ReturnType<typeof FilesetResolver.forVisionTasks>> | undefined;
-async function createLandmarker(which: 'GPU' | 'CPU') {
-  fileset ??= await FilesetResolver.forVisionTasks('/hand/wasm');
-  const lm = await HandLandmarker.createFromOptions(fileset, {
-    baseOptions: { modelAssetPath: '/hand/hand_landmarker.task', delegate: which },
-    runningMode: 'VIDEO', numHands: 2,
-    minHandDetectionConfidence: 0.5, minHandPresenceConfidence: 0.5, minTrackingConfidence: 0.5,
-  });
-  delegate = which;
-  return lm;
-}
-async function ensureLandmarker() {
-  if (landmarker) return;
-  if (params.get('delegate') !== 'cpu') {
-    try { landmarker = await createLandmarker('GPU'); return; }
-    catch (error) { gpuFallbackReason = String(error).slice(0, 80); recordError(`GPU delegate failed, using CPU: ${gpuFallbackReason}`); }
-  }
-  landmarker = await createLandmarker('CPU');
-}
-async function fallBackToCpu(reason: string) {
-  recordError(`GPU detect failed, switching to CPU: ${reason}`);
-  gpuFallbackReason = reason.slice(0, 80);
-  landmarker?.close(); landmarker = undefined;
-  landmarker = await createLandmarker('CPU');
-}
-
 // ---- camera -----------------------------------------------------------------------------------------------
 let stream: MediaStream | undefined;
 async function startCamera() {
@@ -127,16 +99,23 @@ function stopCamera() {
   stream = undefined; video.srcObject = null;
 }
 
-// ---- interaction state ------------------------------------------------------------------------------------
-const fx = new OneEuro(euro.minCutoff, euro.beta), fy = new OneEuro(euro.minCutoff, euro.beta);
-const history = new History(), pinch = new Pinch(), gate = new SelectGate(DWELL_MS, COOLDOWN_MS);
+// ---- tracking + pointer -----------------------------------------------------------------------------------
+const pathParam = params.get('mode');
+const tracker = new HandTracker(video, {
+  path: pathParam === 'worker' || pathParam === 'main' ? pathParam : 'auto',
+  preferGpu: params.get('delegate') !== 'cpu',
+  useVfc: params.get('vfc') !== '0',
+  mainGapFrames: num('maingap', 3),
+  onResult: onHandFrame,
+  onError: recordError,
+});
+const pointer = new HandPointer({ minCutoff: num('mincutoff', 1.0), beta: num('beta', 0.01), predictMs: num('predict', 40) });
+const gate = new SelectGate(DWELL_MS, COOLDOWN_MS);
 let rects: DOMRect[] = [];
 const measure = () => { rects = cards.map(c => c.getBoundingClientRect()); };
 addEventListener('resize', measure);
 const cardAt = (p: Point) => rects.findIndex(r => p.x >= r.left && p.x <= r.right && p.y >= r.top && p.y <= r.bottom);
-
-let cursor: Point | undefined, frozen: Point | undefined, prevBox: HandBox | undefined, lastLandmarks: { x: number; y: number }[] | undefined;
-let handPresent = false, lastVideoTime = -1, lastPinchRatio = NaN;
+let lastLandmarks: Landmark[] | undefined;
 
 function select(card: number, how: keyof typeof selects) {
   counts[card]++; selects[how]++;
@@ -146,107 +125,75 @@ function select(card: number, how: keyof typeof selects) {
 }
 cards.forEach((c, i) => c.addEventListener('pointerdown', () => select(i, 'touch')));
 
-function onResult(result: HandLandmarkerResult, now: number) {
-  const hands = result.landmarks;
-  if (!hands.length) {
-    if (handPresent) handLost++;
-    handPresent = false; prevBox = undefined; cursor = undefined; frozen = undefined; lastLandmarks = undefined;
-    fx.reset(); fy.reset(); history.clear(); pinch.reset();
-    return;
-  }
-  handPresent = true;
-  const boxes = hands.map(handBox), pick = pickHand(boxes, prevBox);
-  const lm = hands[pick];
-  prevBox = boxes[pick]; lastLandmarks = lm;
-  const raw = zoneToScreen(lm[8], innerWidth, innerHeight);
-  const p = { x: fx.filter(raw.x, now / 1000), y: fy.filter(raw.y, now / 1000) };
-  history.push(now, p);
-  lastPinchRatio = pinchRatio(lm, video.videoWidth || 640, video.videoHeight || 480);
-  if (pinch.update(lastPinchRatio)) {
-    frozen = history.at(now - PINCH_LOOKBACK_MS) ?? p;
-    const hit = gate.pinch(cardAt(frozen), now);
-    if (hit >= 0) select(hit, 'pinch');
-  }
-  if (!pinch.closed) frozen = undefined;
-  cursor = frozen ?? p;
+function onHandFrame(frame: HandFrame) {
+  const up = pointer.update(frame.landmarks, frame.t, innerWidth, innerHeight, frame.width || 640, frame.height || 480);
+  if (up.lost) handLost++;
+  tracker.handPresent = pointer.present;
+  lastLandmarks = up.landmarks;
+  lastPinchRatio = up.pinchRatio;
+  if (up.pinchAt) { const hit = gate.pinch(cardAt(up.pinchAt), performance.now()); if (hit >= 0) select(hit, 'pinch'); }
 }
 
-// ---- loops ------------------------------------------------------------------------------------------------
-let running = false, rafId = 0, vfcId = 0, detecting = false;
-// New camera frames drive inference: requestVideoFrameCallback where available (Safari 15.4+), else a currentTime check per render frame.
-let useVfc = 'requestVideoFrameCallback' in HTMLVideoElement.prototype && params.get('vfc') !== '0';
-let totalInfer = 0, runningSince = 0;
-function detect() {
-  if (!landmarker || detecting || video.readyState < 2) return;
-  const t0 = performance.now();
-  try {
-    const result = landmarker.detectForVideo(video, t0);
-    const ms = performance.now() - t0;
-    inferMs.push(ms); if (inferMs.length > 300) inferMs.shift();
-    inferCount++; totalInfer++;
-    onResult(result, t0);
-  } catch (error) {
-    if (delegate === 'GPU') { detecting = true; void fallBackToCpu(String(error)).finally(() => { detecting = false; }); }
-    else recordError(`detect: ${String(error)}`);
-  }
-}
-function onVideoFrame() {
-  if (!running) return;
-  vfcId = video.requestVideoFrameCallback(onVideoFrame);
-  detect();
-}
+// ---- render loop (display rate; inference runs in the tracker) -----------------------------------------------
+let running = false, rafId = 0;
 function frame() {
   if (!running) return;
   rafId = requestAnimationFrame(frame);
   const now = performance.now();
   renderCount++;
-  // Watchdog: if Safari never fires requestVideoFrameCallback for the hidden video, fall back to the rAF path.
-  if (useVfc && totalInfer === 0 && landmarker && now - runningSince > 2000 && video.currentTime > 0) {
-    useVfc = false; video.cancelVideoFrameCallback(vfcId); recordError('no video-frame callbacks in 2 s, switched to rAF');
-  }
-  if (!useVfc && video.currentTime !== lastVideoTime) { lastVideoTime = video.currentTime; detect(); }
-  // Selection gate and visuals run every render frame.
+  const cursor = pointer.cursorAt(now), pinched = pointer.pinch.closed;
   const hovered = cursor ? cardAt(cursor) : -1;
   // While pinched the gate is frozen (no dwell, block kept); a lost hand counts as leaving every card.
   if (!cursor) gate.hover(-1, now);
-  else if (!pinch.closed) { const dwellHit = gate.hover(hovered, now); if (dwellHit >= 0) select(dwellHit, 'dwell'); }
+  else if (!pinched) { const dwellHit = gate.hover(hovered, now); if (dwellHit >= 0) select(dwellHit, 'dwell'); }
   cards.forEach((c, i) => c.classList.toggle('hover', i === hovered));
   if (cursor) {
     const t = `translate3d(${cursor.x}px,${cursor.y}px,0)`;
     cursorEl.style.transform = t; ringEl.style.transform = t;
-    cursorEl.style.opacity = '1'; cursorEl.classList.toggle('pinched', pinch.closed);
-    const prog = pinch.closed ? 0 : gate.progress(now);
+    cursorEl.style.opacity = '1'; cursorEl.classList.toggle('pinched', pinched);
+    const prog = pinched ? 0 : gate.progress(now);
     ringEl.style.opacity = prog > 0 ? '1' : '0';
     ringArc.setAttribute('stroke-dashoffset', String(RING_LEN * (1 - prog)));
   } else { cursorEl.style.opacity = '0'; ringEl.style.opacity = '0'; }
   if (now - fpsWindowStart >= 1000) {
     const dt = (now - fpsWindowStart) / 1000;
-    inferFps = inferCount / dt; renderFps = renderCount / dt; inferCount = 0; renderCount = 0; fpsWindowStart = now;
+    inferFps = (tracker.results - resultsAtWindow) / dt; renderFps = renderCount / dt;
+    resultsAtWindow = tracker.results; renderCount = 0; fpsWindowStart = now;
     drawHud(now);
   }
   drawSkeleton();
 }
 
 function stats(now: number) {
-  const mem = (performance as unknown as { memory?: { usedJSHeapSize: number; jsHeapSizeLimit: number } }).memory;
+  const mem = (performance as unknown as { memory?: { usedJSHeapSize: number } }).memory;
+  const r1 = (v: number) => +v.toFixed(1);
   return {
-    uptimeS: Math.round((now - startedAt) / 1000), inferFps: +inferFps.toFixed(1), renderFps: +renderFps.toFixed(1),
-    inferP50: +percentile(inferMs, 0.5).toFixed(1), inferP95: +percentile(inferMs, 0.95).toFixed(1),
-    camera: cameraRes, delegate, gpuFallbackReason: gpuFallbackReason || undefined, handLost, handPresent, selects: { ...selects }, counts: [...counts],
-    screen: `${innerWidth}x${innerHeight}@${devicePixelRatio}`, memoryMB: mem ? +(mem.usedJSHeapSize / 1048576).toFixed(1) : undefined,
+    uptimeS: Math.round((now - startedAt) / 1000), inferFps: r1(inferFps), renderFps: r1(renderFps),
+    inferP50: r1(percentile(tracker.inferMs, 0.5)), inferP95: r1(percentile(tracker.inferMs, 0.95)),
+    rttP50: r1(percentile(tracker.roundTripMs, 0.5)), rttP95: r1(percentile(tracker.roundTripMs, 0.95)),
+    mode: tracker.mode, delegate: tracker.mode.endsWith('gpu') ? 'GPU' : tracker.mode.endsWith('cpu') ? 'CPU' : '-',
+    fallbackReason: tracker.fallbackReason || undefined, pump: tracker.useVfc ? 'vfc' : 'raf',
+    framesSent: tracker.framesSent, framesDropped: tracker.framesDropped,
+    camera: cameraRes, handLost, handPresent: pointer.present, selects: { ...selects }, counts: [...counts],
+    screen: `${innerWidth}x${innerHeight}@${devicePixelRatio}`, memoryMB: mem ? r1(mem.usedJSHeapSize / 1048576) : undefined,
     errors: [...errors],
   };
 }
 function drawHud(now: number) {
   const s = stats(now);
   const up = `${Math.floor(s.uptimeS / 3600)}h${String(Math.floor(s.uptimeS / 60) % 60).padStart(2, '0')}m${String(s.uptimeS % 60).padStart(2, '0')}s`;
+  const f = (v: number) => Number.isFinite(v) ? v.toFixed(1) : '-';
   hud.textContent = [
-    `推論 fps   ${s.inferFps.toFixed(1)}`, `描画 fps   ${s.renderFps.toFixed(1)}`,
-    `推論 ms    p50 ${s.inferP50.toFixed(1)} / p95 ${s.inferP95.toFixed(1)}`,
-    `カメラ     ${s.camera}`, `デリゲート ${s.delegate}${useVfc ? ' (vfc)' : ' (raf)'}`, `稼働       ${up}`,
+    `モード     ${s.mode} (${s.pump})`,
+    `推論 fps   ${f(s.inferFps)}`, `描画 fps   ${f(s.renderFps)}`,
+    `推論 ms    p50 ${f(s.inferP50)} / p95 ${f(s.inferP95)}`,
+    `往復 ms    p50 ${f(s.rttP50)} / p95 ${f(s.rttP95)}`,
+    `フレーム   送信 ${s.framesSent} / 破棄 ${s.framesDropped}`,
+    `カメラ     ${s.camera}`, `稼働       ${up}`,
     `手の喪失   ${s.handLost}  ピンチ比 ${Number.isFinite(lastPinchRatio) ? lastPinchRatio.toFixed(2) : '-'}`,
     `選択       滞留 ${selects.dwell} / ピンチ ${selects.pinch} / タッチ ${selects.touch}`,
     s.memoryMB !== undefined ? `メモリ     ${s.memoryMB} MB` : 'メモリ     -',
+    ...(s.fallbackReason ? [`切替理由   ${s.fallbackReason.slice(0, 90)}`] : []),
     ...(errors.length ? ['エラー', ...errors] : []),
   ].join('\n');
 }
@@ -259,7 +206,7 @@ function drawSkeleton() {
   if (!lastLandmarks) return;
   const lm = lastLandmarks, X = (i: number) => (1 - lm[i].x) * w, Y = (i: number) => lm[i].y * h;
   sctx.strokeStyle = '#6fd3ff'; sctx.lineWidth = 3; sctx.beginPath();
-  for (const { start, end } of HandLandmarker.HAND_CONNECTIONS) { sctx.moveTo(X(start), Y(start)); sctx.lineTo(X(end), Y(end)); }
+  for (const [a, b] of HAND_CONNECTIONS) { sctx.moveTo(X(a), Y(a)); sctx.lineTo(X(b), Y(b)); }
   sctx.stroke();
   sctx.fillStyle = '#fff';
   for (let i = 0; i < lm.length; i++) { sctx.beginPath(); sctx.arc(X(i), Y(i), i === 8 ? 6 : 3, 0, Math.PI * 2); sctx.fill(); }
@@ -268,19 +215,23 @@ function drawSkeleton() {
 // ---- stats log --------------------------------------------------------------------------------------------
 let sentUserAgent = false, logFailures = 0;
 setInterval(() => {
-  const body = { kind: 'hand-spike', ...stats(performance.now()), logFailures, ...(sentUserAgent ? {} : { userAgent: navigator.userAgent }) };
+  const body = { kind: 'hand-spike', build: 'm1', ...stats(performance.now()), logFailures, ...(sentUserAgent ? {} : { userAgent: navigator.userAgent }) };
   fetch('/api/dev/hand-spike-log', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) })
     .then(r => { if (r.ok) sentUserAgent = true; else logFailures++; })
     .catch(() => { logFailures++; });
 }, LOG_EVERY_MS);
 
 // ---- lifecycle --------------------------------------------------------------------------------------------
+function halt() {
+  running = false; cancelAnimationFrame(rafId); tracker.pause(); stopCamera();
+  lastLandmarks = undefined; pointer.reset(); tracker.handPresent = false;
+}
 function showError(message: string) {
-  running = false; cancelAnimationFrame(rafId); if (useVfc) video.cancelVideoFrameCallback(vfcId); stopCamera();
+  halt();
   overlayMsg.textContent = message; overlay.classList.add('show');
   recordError(message); drawHud(performance.now());
 }
-let starting = false;
+let starting = false, trackerReady: Promise<void> | undefined;
 async function start() {
   if (starting || running) return;
   starting = true;
@@ -288,11 +239,13 @@ async function start() {
   hud.textContent = 'カメラとモデルを準備中…';
   try {
     if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) throw new Error('insecure');
-    await Promise.all([ensureLandmarker(), startCamera()]);
+    trackerReady ??= tracker.init();
+    try { await Promise.all([trackerReady, startCamera()]); }
+    catch (error) { if (tracker.mode === 'failed') trackerReady = undefined; throw error; }
     measure();
-    lastVideoTime = -1; running = true; runningSince = performance.now(); totalInfer = 0; fpsWindowStart = performance.now(); inferCount = renderCount = 0;
+    running = true; fpsWindowStart = performance.now(); renderCount = 0; resultsAtWindow = tracker.results;
     rafId = requestAnimationFrame(frame);
-    if (useVfc) vfcId = video.requestVideoFrameCallback(onVideoFrame);
+    tracker.start();
     void keepScreenAwake();
   } catch (error) {
     const name = (error as { name?: string }).name ?? '', msg = (error as Error).message ?? String(error);
@@ -303,13 +256,8 @@ async function start() {
       : `起動に失敗しました: ${msg}`);
   } finally { starting = false; }
 }
-function pause() {
-  running = false; cancelAnimationFrame(rafId); if (useVfc) video.cancelVideoFrameCallback(vfcId); stopCamera();
-  cursor = undefined; lastLandmarks = undefined; handPresent = false; prevBox = undefined;
-  fx.reset(); fy.reset(); history.clear(); pinch.reset();
-}
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'hidden') pause();
+  if (document.visibilityState === 'hidden') halt();
   else if (!overlay.classList.contains('show')) void start();
 });
 app.querySelector('#retry')!.addEventListener('click', () => void start());

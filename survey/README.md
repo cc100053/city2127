@@ -103,11 +103,12 @@ Fresh scratch SQLite、localhost port 8788、`/guest?dev-auto`。Root City は `
 
 ## M0 手部追蹤驗證頁（spike，非產品）
 
-`/hand-spike`（`handspike.html`、`src/ui/handSpike.ts`、`src/ui/handSpikeCore.ts`）在 iPad 前鏡頭上以 MediaPipe HandLandmarker（`@mediapipe/tasks-vision`，精確版本鎖定）量測手勢選擇：食指尖游標、停留 1 秒或捏合選擇三張卡片，並顯示推論/描畫 fps、推論時間 p50/p95、delegate 等。執行環境自行託管於 `public/hand/`（git 忽略），建置前先執行 `npm run fetch:hand-model`（複製 wasm、下載 `hand_landmarker.task`）。
+`/hand-spike`（`handspike.html`、`src/ui/handSpike.ts`、`src/ui/hand/`）在 iPad 前鏡頭上以 MediaPipe HandLandmarker（`@mediapipe/tasks-vision`，精確版本鎖定）量測手勢選擇：食指尖游標、停留 1 秒或捏合選擇三張卡片，並顯示推論/描畫 fps、推論時間 p50/p95、delegate 等。執行環境自行託管於 `public/hand/`（git 忽略），建置前先執行 `npm run fetch:hand-model`（複製 wasm、下載 `hand_landmarker.task`）。
 
 - `SURVEY_DEV_HAND=1`：啟用 `POST /api/dev/hand-spike-log`，每 10 秒的統計追加至 `data/hand-spike.jsonl`；未設定時回 404。
 - `SURVEY_TLS_CERT`、`SURVEY_TLS_KEY`（選用 `SURVEY_TLS_PORT`，預設 8443）：另以 HTTPS 監聽同一處理器與 WebSocket；HTTP 監聽不變。iPad 相機需要安全來源，憑證以 mkcert 產生於 `data/tls/`，並將 `rootCA.pem` 安裝至 iPad 且於「憑證信任設定」啟用。
-- URL 參數：`?delegate=cpu`、`?dwell=<ms>`、`?mincutoff=`、`?beta=`（One-Euro）、`?vfc=0`。
+- M1 起推論在 module worker 執行（`src/ui/hand/`：`handPointer.ts`、`handTracker.ts`、`handWorker.ts`、`landmarker.ts`），失敗時改用節流的主執行緒推論。
+- URL 參數：`?mode=worker|main`、`?delegate=cpu`、`?dwell=<ms>`、`?mincutoff=`、`?beta=`（One-Euro）、`?predict=<ms>`（游標外推上限）、`?maingap=<幀>`、`?vfc=0`。
 
 ## Legacy and historical records
 
