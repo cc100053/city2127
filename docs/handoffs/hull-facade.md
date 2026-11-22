@@ -44,3 +44,7 @@
 - [城市主鏡日／昏／夜對照](../../artifacts/hull-facade/r3-hero.jpg) · [立面近鏡日／昏／夜對照](../../artifacts/hull-facade/r3-close.jpg) · [廣場入口及簷篷下對照](../../artifacts/hull-facade/r3-entry.jpg)。2400×1350／DPR 1，場景時間固定 20 秒，九組前後對照的 sidecar 均無頁面例外。
 - 主鏡沿用 R2 預設，立面近鏡沿用 `review=street&cam=-350,100,-110&at=-244,64,75`。廣場對照用 `review=street&cam=-222,8,18&at=-211,6,44`；簷篷下用 `review=ring&cam=-221,2.8,20&at=-211,6,44`。日夜主鏡及立面近鏡沿用 R2 的原檔（sidecar 記錄 R2 候選工作樹），新拍黃昏及廣場基準來自 `5759a37c`。新原檔與 sidecar 在 `~/city2127-evidence/hull-facade/r3/{before,after}/`。
 - 日間保留框架兩側的深窗陰影，兩道斜框在主鏡可見。18:00 和 21:25 的大堂及中層後窗是兩處連續暖光，附近窗面仍有亮暗間隔；簷篷下可見柱、夾層邊緣及天花。展覽機與業主視覺驗收待完成。
+
+### R3 整合
+
+- 工作分支提交 `d6bafbc5`，整合提交 `d4e43a28`。在獨立整合工作樹重跑 root `npm test`、`npm run build`、`git diff --check origin/main..HEAD` 及圖檔規格檢查，全部通過。整合後的整份 `dist/` 與 Chrome 已驗證的 build 逐檔一致。
