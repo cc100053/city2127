@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { Box3, Group, InstancedMesh, Matrix4, Mesh, Quaternion, Raycaster, Scene, Vector3 } from 'three';
+import { Box3, Group, InstancedMesh, LineCurve3, Matrix4, Mesh, Quaternion, Raycaster, Scene, Vector3 } from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { placeOdaibaModel } from '../src/odaibaPlacement.ts';
 import { changeSites, skyBridges, inDistrict, DISTRICT, CIVIC, civicAt } from '../src/layout.ts';
@@ -9,7 +9,7 @@ import { heroCamera, heroSettledCamera } from '../src/heroCamera.ts';
 import { pavilionFlight, plazaPose, routes, mobility, publishDoorways, publishEntrances, forecourtVisits, promenadeBenches, visitPose, entranceJourneys, entrancePose, laneOffset, CARRIAGEWAY, inWater } from '../src/mobility.ts';
 import { presets } from '../src/presets.ts';
 import { civicCore } from '../src/civicCore.ts';
-import { publishOccupants, publishRoofWalks, occupantFleet, occupants, rideShown, strollPose } from '../src/occupants.ts';
+import { publishOccupants, publishRoofWalks, occupantFleet, occupants, ridePose, rideShown, strollPose } from '../src/occupants.ts';
 import { bake } from '../src/cityRig.ts';
 import { contextFacades } from '../src/contextFacades.ts';
 import { plantCanopy, plantLandscapeCanopy, plantRoofCanopy } from '../src/coastalCanopy.ts';
@@ -21,7 +21,7 @@ import { checkHousingCity } from './housingCityCheck.ts';
 import { onFormerStreet, repairRoads } from '../src/roadRepair.ts';
 import { FORECOURTS, streetNetwork } from '../src/streetKit.ts';
 import { megastructures } from '../src/megastructures.ts';
-import { groundContacts, inRect } from '../src/megaFootprints.ts';
+import { ARCH, groundContacts, inRect } from '../src/megaFootprints.ts';
 import { BOULEVARD, EVENT_SHELF_FRONTAGE, POD_TOWER, STREET_KIT, WATER } from '../src/layout.ts';
 /** A ladder target with the given rungs; the rest mixed. */
 const rungs = (t: Partial<Record<'nw' | 'ne' | 'sw' | 'se', number>>) => ({ tiers: { nw: 0, ne: 0, sw: 0, se: 0, ...t } });
@@ -141,8 +141,8 @@ const support=(p:Vector3,seated=false)=>{
 };
 for(const s of fuji.spots)assert.ok(support(s.at,s.seated),`Fuji ${s.mode} at ${s.at.toArray().map(v=>v.toFixed(1))} needs a floor or seat and headroom`);
 const lanes=[...fuji.walks.map(w=>w.curve.getSpacedPoints(Math.ceil(w.curve.getLength()/.5))),
-  ...fuji.rides.map(r=>{const length=r.from.distanceTo(r.to),n=Math.ceil(length/.5);return Array.from({length:n+1},(_,i)=>i/n)
-    .filter(f=>rideShown(r,length,f*length)>0).map(f=>r.from.clone().lerp(r.to,f));})];
+  ...fuji.rides.map(r=>{const length=r.path.getLength(),n=Math.ceil(length/.5);return Array.from({length:n+1},(_,i)=>i/n)
+    .filter(f=>rideShown(length,f*length)>0).map(f=>r.path.getPoint(f));})];
 lanes.forEach((points,l)=>points.forEach(p=>{
   assert.ok(support(p),`Fuji lane ${l} at ${p.toArray().map(v=>v.toFixed(1))} needs a floor and headroom`);
   for(const s of fuji.spots)if(Math.abs(s.at.y-p.y)<1.5)assert.ok(Math.hypot(s.at.x-p.x,s.at.z-p.z)>(s.seated?1:.8),`Fuji lane ${l} brushes a ${s.mode} person at ${s.at.toArray().map(v=>v.toFixed(1))}`);
@@ -168,9 +168,37 @@ for (const [x,z] of [[55.4,-16.9],[55.4,-13],[53,-13],[51.1,-13]]) {
   const at = new Vector3(...civicAt([x,0,z])).setY(landing.y);
   assert.ok(support(at), 'Fuji gallery landing joins the old tread mouth at grade');
 }
-const escalator = fuji.rides[0], incline = escalator.from.distanceTo(escalator.to);
-const forumDistance = incline*(24*CIVIC.k-escalator.from.y)/(escalator.to.y-escalator.from.y);
-assert.equal(rideShown(escalator,incline,forumDistance),1,'Fuji riders stay visible through the public forum floor');
+const escalator = fuji.rides[0], routeLength = escalator.path.getLength(), [lowerFlight] = escalator.path.curves;
+const rise = lowerFlight.getPoint(1).y - lowerFlight.getPoint(0).y;
+const forumDistance = lowerFlight.getLength()*(24*CIVIC.k-lowerFlight.getPoint(0).y)/rise;
+const exit = escalator.path.getPoint(1);
+assert.ok(exit.distanceTo(new Vector3(...civicAt([-58.3,65,-12.5])))<.01, 'Fuji riders step onto the beam-top promenade');
+for (let d=forumDistance;d<=routeLength-.6;d+=.2)
+  assert.equal(ridePose(d/escalator.speed,escalator,routeLength,0).visible,1,'Fuji riders stay fully visible from forum to upper exit');
+const topRoute = escalator.path.curves.slice(1);
+const bodyRay = new Raycaster(new Vector3(),downward,0,2.55), forwardRay = new Raycaster();
+for (const leg of [new LineCurve3(lowerFlight.getPoint(.84), lowerFlight.getPoint(1)), ...topRoute]) {
+  const centerline = leg.getSpacedPoints(Math.ceil(leg.getLength()/.18));
+  const tangent = leg.getTangent(0), side = new Vector3(tangent.z,0,-tangent.x).normalize();
+  for (const offset of [-.55,0,.55]) {
+    const edge = centerline.map(p=>p.clone().addScaledVector(side,offset));
+    for (const at of edge) {
+      bodyRay.ray.origin.copy(at).y+=2.3;
+      const hit = bodyRay.intersectObject(core,true)[0];
+      assert.ok(hit && Math.abs(hit.point.y-at.y)<.12, `Fuji upper route needs a supported, clear surface at ${at.toArray()}: ${hit?.point.y}`);
+    }
+    // Bidirectional casts catch thin vertical rail panes and the exit guard between the floor probes.
+    for (const [start,end] of [[edge[0],edge[edge.length-1]],[edge[edge.length-1],edge[0]]]) {
+      const direction = end.clone().sub(start).normalize();
+      forwardRay.far = start.distanceTo(end);
+      for (const height of [.35,1.1,1.7,2.25]) {
+        forwardRay.set(start.clone().add(new Vector3(0,height,0)),direction);
+        assert.equal(forwardRay.intersectObject(core,true).length,0,`Fuji upper route blocked at ${start.toArray()} and height ${height}`);
+      }
+    }
+  }
+}
+
 const approach=routes().approach,clearanceRay=new Raycaster();
 for(let i=0;i<=160;i++) {
   const p=approach.getPointAt(i/160);
@@ -212,6 +240,16 @@ const streetKit = streetNetwork(environment);
   const solids = surroundings.children.filter(o=>o instanceof Mesh && !(o instanceof InstancedMesh));
   environment.traverse(o=>{if (o instanceof Mesh && o.name.startsWith('YURIKAMOME_PIERS')) solids.push(o);});
   const archFeet = groundContacts().archFeet, clearanceRay = new Raycaster(new Vector3(),downward,0,3.7);
+  // Probe the footing and its open perimeter below the elevated forum.
+  const [footX,footZ] = ARCH.b, plinthRay = new Raycaster(new Vector3(),downward,0,4.68);
+  let collarHits = 0;
+  for (let dx=-13.5;dx<=13.5;dx+=.5) for (let dz=-13.5;dz<=13.5;dz+=.5) {
+    if (Math.hypot(dx,dz)>ARCH.footRadius+1.05) continue;
+    plinthRay.ray.origin.set(footX+dx,4.68,footZ+dz);
+    assert.equal(plinthRay.intersectObject(core,true).length,0,`Fuji plinth crosses the arch reveal at ${dx},${dz}`);
+    if (Math.hypot(dx,dz)<ARCH.footRadius && plinthRay.intersectObjects(solids,false).length) collarHits++;
+  }
+  assert.ok(collarHits>1500,'The separate arch footing is present at grade');
   for (let i=0;i<=150;i++) {
     const p = gallery.curve.getPointAt(i/150), dir = gallery.curve.getTangentAt(i/150);
     const side = new Vector3(dir.z,0,-dir.x).normalize();
@@ -964,7 +1002,7 @@ console.log(`Odaiba: ${visits.length} forecourt visits and ${entrances.length} d
 {
   publishOccupants(core.occupants);
   const published=occupants(),occScene=new Scene(),updateOccupants=occupantFleet(occScene);
-  const riders=published.rides.reduce((n,r)=>n+Math.ceil(r.from.distanceTo(r.to)/r.gap),0);
+  const riders=published.rides.reduce((n,r)=>n+Math.ceil(r.path.getLength()/r.gap),0);
   const walkers=published.walks.reduce((n,w)=>n+(w.pair?2:1),0),total=published.spots.length+walkers+riders;
   let previous:Vector3[]=[],striding:boolean[]=[],moved=0;
   for(const [hour,share] of [[12,0],[21,1]] as const)for(let time=0;time<=150;time+=.25){
@@ -973,7 +1011,7 @@ console.log(`Odaiba: ${visits.length} forecourt visits and ${entrances.length} d
     if(time===0){assert.equal(mesh.count,total,'occupant fleet holds every published person');previous=[];}
     const now=Array.from({length:total},(_,k)=>{mesh.getMatrixAt(k,m);m.decompose(p,new Quaternion(),scale);return {at:p.clone(),size:scale.x};});
     now.forEach(({at,size},k)=>{
-      // Riders alone fade, at the landings and through structure.
+      // Riders alone fade, at the ends of the route.
       assert.ok(size===0||(size>.9&&size<1.06)||(k>=published.spots.length+walkers&&size<1.06),`occupant ${k} drawn part-shrunk (${size}) at a held hour`);
       if(!previous.length||size===0)return;
       const step=at.distanceTo(previous[k]);

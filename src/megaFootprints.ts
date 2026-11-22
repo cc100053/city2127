@@ -5,7 +5,7 @@ export const RING = { x: 95, z: -195, centreY: 90, outer: 105, inner: 73, depth:
  * skewed right edge (`right[0]` at the -z face, `right[1]` at +z, following the road's slant), world y 0 to `top`; the hoop is cut open there
  * (megastructures `carved`) and lined as a tunnel. */
 export const RING_GATE = { left: 30.5, right: [53.5, 65] as const, top: 22, reach: 25 };
-export const ARCH = { a: [-9, -237] as const, b: [58, -5] as const, apex: 135 };
+export const ARCH = { a: [-9, -237] as const, b: [58, -5] as const, apex: 135, footRadius: 12.5 };
 // r2: front base line (-160, 20) to (-330, 95); local +x runs along it toward the left end, +z recedes from the camera. Low left end (3 terraces), 8 at the right end.
 export const HULL = { x: -260, z: 64, yaw: .4155, length: 180, depth: 90, steps: 8, step: 15, recede: 9 };
 
@@ -15,7 +15,7 @@ const hullRect = (front: number, side: number) => rect(HULL.x + Math.sin(HULL.ya
 /** Ground footprints (centre, unit axis, half extents along axis and across it) of what each piece stands on; the test and the carve use them. */
 export const groundContacts = () => ({
   ring: rect(RING.x, RING.z, Math.cos(RING.yaw), -Math.sin(RING.yaw), RING.plinth[0] / 2, RING.plinth[1] / 2),
-  archFeet: [ARCH.a, ARCH.b].map(f => rect(f[0], f[1], 1, 0, 12.5, 12.5)),
+  archFeet: [ARCH.a, ARCH.b].map(f => rect(f[0], f[1], 1, 0, ARCH.footRadius, ARCH.footRadius)),
   hull: hullRect(8, 0),
 });
 /** polish2: plan footprint of the enlarged Fuji frame (local x -84..80, z -21..79), treated like a megastructure body. */

@@ -5,6 +5,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { megaGlass, megaSeam } from './megastructures.ts';
 import { CIVIC, civicAt } from './layout.ts';
+import { ARCH } from './megaFootprints.ts';
 import { deck } from './skyways.ts';
 
 /** polish2: the chrome sphere's sky reflection dims at night (gunmetal with highlights, as the night target), set by `updateCivic`. */
@@ -170,7 +171,8 @@ export function civicCore(facade?: T.Group) {
   piercedSlab(new T.Shape().moveTo(-58,-4).lineTo(42,-4).lineTo(42,32).lineTo(-58,32).closePath(),21,3);
   for(const x of [-50,34])for(const z of [-27,0])member([x,2,z],[x,21,z],3,4);
   // Inhabited diagonals are wide public terrain, with a deep triangulated underside, not escalator banks.
-  const boarding = new T.Vector3();
+  const boarding = new T.Vector3(), ridePoints: T.Vector3[] = [];
+  const upperExit = { west: -59.5, east: -55.1 };
   const spine=[[52,3,-12],[-54,62,-12]]; // P2 r2: the upper diagonal that crossed in front of the chrome sphere is removed
   for(let i=1;i<spine.length;i++) {
     const a=new T.Vector3(...spine[i-1]),b=new T.Vector3(...spine[i]),length=a.distanceTo(b);
@@ -179,45 +181,97 @@ export function civicCore(facade?: T.Group) {
     const dir=b.clone().sub(a).normalize();if(dir.x>0)dir.negate();
     const across=new T.Vector3(0,0,1);
     street.quaternion.setFromRotationMatrix(new T.Matrix4().makeBasis(across,dir.clone().cross(across),dir));street.updateMatrix();
-    box(street,[10,2.8,length],[0,0,0],stone);
+    // Finish the first flight below the transfer beam. The second flight climbs outside its bay face.
+    const midY = 55.5;
+    const end = (midY - street.position.y - 1.58 * street.matrix.elements[5]) / dir.y;
+    const clippedBox = (x: number, y: number, width: number, height: number, start: number, finish: T.Material, sharp = false) =>
+      box(street,[width,height,end-start],[x,y,(end+start)/2],finish,sharp ? 0 : undefined);
+    clippedBox(0,0,10,2.8,-length/2,stone);
     // A glazed mobility channel shares the inclined terrain with the planted pedestrian edge.
-    box(street,[2.8,.16,length-4],[-1,1.5,0],trim); // pale steps with dark tread lines read as a silver escalator, not a slate band
-    for(let z=-length/2+3;z<length/2-3;z+=1.6)box(street,[2.6,.1,.12],[-1,1.6,z],solar);
-    // An open escalator with glass balustrades and blue-lit handrails: riders stay visible against the void.
+    clippedBox(-1,1.5,2.8,.16,-length/2+2,trim);
+    for(let z=-length/2+3;z<end-.35;z+=1.6)box(street,[2.6,.1,.12],[-1,1.6,z],solar);
     for(const x of [-2.6,.6]) {
-      box(street,[.1,1.7,length-4],[x,2.45,0],silverGlass); // clear panes keep the riders and pale treads visible from the bay
-      box(street,[.16,.16,length-4],[x,1.65,0],broadcastLight);
-      box(street,[.2,.14,length-4],[x,3.35,0],megaSeam,0);
+      clippedBox(x,2.45,.1,1.7,-length/2+2,silverGlass);
+      clippedBox(x,1.65,.16,.16,-length/2+2,broadcastLight);
+      clippedBox(x,3.35,.2,.14,-length/2+2,megaSeam,true);
+      for(let z=-length/2+3;z<end-.35;z+=4)box(street,[.12,1.75,.12],[x,2.45,z],trim);
     }
-    for(let z=-length/2+3;z<length/2-2;z+=4)for(const x of [-2.6,.6])box(street,[.12,1.75,.12],[x,2.45,z],trim);
-    // The landing meets the low end of the tread surface. Riders stay visible through the forum opening.
-    boarding.set(-1,1.58,-length / 2 + 2).applyMatrix4(street.matrix);
-    const ends=[-1,1].map(e=>new T.Vector3(-1,1.6,e*(length/2-3)).applyMatrix4(street.matrix)).sort((p,q)=>p.y-q.y);
-    rides.push({from:ends[0],to:ends[1],gap:4.5,speed:.5,through:[[57.1,70]]});
+    boarding.set(-1,1.58,-length/2+2).applyMatrix4(street.matrix);
+    const lowerStart = new T.Vector3(-1,1.6,-length/2+3).applyMatrix4(street.matrix);
+    const lowerEnd = new T.Vector3(-1,1.58,end).applyMatrix4(street.matrix);
     for(const x of [-5,5]) {
-      // The bay-facing edge is a clear balustrade with a blue lit rail: the diagonal reads as a bright glazed escalator bank.
       const bay=x<0;
-      const open = bay ? 3.5 : 0;
-      box(street,[.25,1.5,length-open],[x,2,open/2],bay ? silverGlass : membrane);
-      box(street,[.22,.2,length-open],[x,2.85,open/2],bay ? megaSeam : trim,bay ? 0 : undefined);
-      box(street,[.18,.18,length],[x,.9,0],publicLight);
+      const start = -length/2 + (bay ? 3.5 : 0);
+      clippedBox(x,2,.25,1.5,start,bay ? silverGlass : membrane);
+      clippedBox(x,2.85,.22,.2,start,bay ? megaSeam : trim,bay);
+      clippedBox(x,.9,.18,.18,-length/2,publicLight);
     }
-    // A slim navy-glass fascia with a lit lower edge outlines the incline, as in the target's dark escalator trim.
-    box(street,[.12,1.2,length-1],[-5.1,-.7,0],glass);
-    box(street,[.14,.16,length-1],[-5.12,-1.3,0],broadcastLight);
+    clippedBox(-5.1,-.7,.12,1.2,-length/2+.5,glass);
+    clippedBox(-5.12,-1.3,.14,.16,-length/2+.5,broadcastLight);
     // Continuous soil edge turns the structural incline into a climate street.
-    for(let u=.12;u<.95;u+=.16) {
+    for(let u=.12;u<(end/length+.5)-.035;u+=.16) {
       const p=a.clone().lerp(b,u);
       box(root,[5,1.2,2.1],[p.x,p.y+1.5,p.z+3.7],leaf);
       grove(p.x,p.y+2.1,p.z+3.7,Math.round(u*20));
       member([p.x,p.y+1,p.z-5],[p.x,p.y+3,p.z-5],.18,.18,trim);
     }
     // Ivory underside truss: the load path stays legible without drawing dark lines across the glazed wings.
-    member([a.x,a.y-7,a.z],[b.x,b.y-7,b.z],1.5,2);
-    for(let u=0;u<1;u+=.2) {
-      const p=a.clone().lerp(b,u),q=a.clone().lerp(b,Math.min(1,u+.2));
+    const endFraction = end/length+.5;
+    const spineEnd = a.clone().lerp(b,endFraction);
+    member([a.x,a.y-7,a.z],[spineEnd.x,spineEnd.y-7,spineEnd.z],1.5,2);
+    for(let u=0;u<endFraction;u+=.2) {
+      const p=a.clone().lerp(b,u),q=a.clone().lerp(b,Math.min(endFraction,u+.2));
       member([p.x,p.y-7,p.z],[q.x,q.y-1,q.z],1,1.2);
     }
+
+    const upperStart = new T.Vector3(-43,midY,-20.4), upperEnd = new T.Vector3(-57.4,65,upperStart.z);
+    const platform = (west: number, east: number, bay: number, inland: number, y: number) =>
+      box(root,[east-west,.72,inland-bay],[(west+east)/2,y-.36,(bay+inland)/2],stone,0);
+    const edge = (x1: number, z1: number, x2: number, z2: number, y: number) => {
+      const line = new T.LineCurve3(new T.Vector3(x1,y,z1),new T.Vector3(x2,y,z2));
+      for (const [width, depth, lift, finish] of [[.12,1.02,1.02,silverGlass],[.18,.12,1.08,megaSeam]] as const) {
+        const rail = new T.Mesh(deck(line,width,depth,1),finish);
+        rail.position.y = lift;
+        root.add(rail);
+      }
+    };
+    platform(upperStart.x,lowerEnd.x+.01,-22.25,-11.15,midY);
+    edge(upperStart.x,-22.22,lowerEnd.x,-22.22,midY);
+    edge(lowerEnd.x,-22.22,lowerEnd.x,-17.1,midY);
+    edge(upperStart.x,-18.61,upperStart.x,-11.18,midY);
+    edge(lowerEnd.x,-11.18,upperStart.x,-11.18,midY);
+
+    // The treads meet level landings at both ends of the glazed stringers.
+    const flight = new T.LineCurve3(upperStart,upperEnd);
+    const inclined = (offset: number, width: number, depth: number, lift: number, finish: T.Material) => {
+      const strip = new T.Mesh(deck(flight,width,depth,1),finish);
+      strip.position.set(0,lift,offset);
+      root.add(strip);
+    };
+    inclined(0,3.7,1.3,-.13,stone);
+    const steps = 64, treadRun = (upperStart.x-upperEnd.x)/steps;
+    for(let step=0;step<steps;step++) {
+      const p = flight.getPoint((step+.5)/steps);
+      box(root,[treadRun,.24,3.24],[p.x,p.y-.12,p.z],trim,0);
+      box(root,[.045,.013,3.14],[p.x+treadRun*.38,p.y,p.z],solar,0);
+    }
+    for(const offset of [-1.79,1.79]) {
+      inclined(offset,.13,1.18,1.05,silverGlass);
+      inclined(offset,.19,.12,1.11,megaSeam);
+      inclined(offset,.10,.13,-.93,broadcastLight);
+    }
+
+    platform(upperExit.west,upperEnd.x,-22.25,-15.95,65);
+    platform(upperEnd.x,upperExit.east,-18.61,-15.95,65);
+    edge(upperExit.west,-22.22,upperExit.west,-16.8,65);
+    edge(upperExit.west,-22.22,upperEnd.x,-22.22,65);
+    edge(upperEnd.x,-18.61,upperExit.east,-18.61,65);
+    edge(upperExit.east,-18.61,upperExit.east,-16.8,65);
+    member([upperEnd.x,63.8,-21.7],[upperEnd.x,62,-15.6],1.35,1.2);
+    member([upperStart.x,54.3,-21.3],[lowerEnd.x+2.8,47,-13.5],1.1,1.2);
+    ridePoints.push(lowerStart,lowerEnd,new T.Vector3(-41.1,midY,-13),
+      new T.Vector3(-41.1,midY,upperStart.z),upperStart,upperEnd,
+      new T.Vector3(upperEnd.x-.9,65,upperEnd.z),new T.Vector3(upperEnd.x-.9,65,-12.5));
   }
   const transferA=new T.Vector3(14,100,-12),transferB=new T.Vector3(-18,100,-1);
   const transfer=box(root,[7,2.5,transferA.distanceTo(transferB)],transferA.clone().add(transferB).multiplyScalar(.5).toArray(),stone);
@@ -555,10 +609,22 @@ export function civicCore(facade?: T.Group) {
   }
   // The original terraced drum flanks a finer public stair, aligned with the existing promenade.
   const door = CIVIC.door, stairStart = door - .14, stairEnd = door + .14;
-  arc(root,19,44,3,[-8,0,-2],stone);
+  // The circular reveal is centred on the independent arch footing, in the foyer's shape plane (+X, -Z).
+  const [foyerX,,foyerZ] = civicAt([-8,0,-2]);
+  const foot = new T.Vector2((ARCH.b[0]-foyerX)/CIVIC.k,(foyerZ-ARCH.b[1])/CIVIC.k);
+  const footAngle = foot.angle(), distance = foot.length(), reveal = (ARCH.footRadius+1.5)/CIVIC.k, outer = 44;
+  const cut = Math.acos((outer**2+distance**2-reveal**2)/(2*outer*distance));
+  const cutAtFoot = Math.acos((outer**2-distance**2-reveal**2)/(2*distance*reveal));
+  const podium = new T.Shape().absarc(0,0,outer,footAngle+cut,footAngle+2*Math.PI-cut,false)
+    .absarc(foot.x,foot.y,reveal,footAngle-cutAtFoot,footAngle+cutAtFoot,true).closePath();
+  podium.holes.push(new T.Path().absarc(0,0,19,0,2*Math.PI,true));
+  const plinth = new T.Mesh(new T.ExtrudeGeometry(podium,{depth:3,bevelEnabled:false,curveSegments:64}).rotateX(-Math.PI/2),stone);
+  plinth.position.set(-8,0,-2);
+  root.add(plinth);
   for (const [i,r] of [44,45.4,46.8].entries()) {
-    const tread = 2.25 - i * .75;
-    arc(root,r,r+1.4,tread,[-8,0,-2],stone,.15,stairStart-.15);
+    const tread = 2.25 - i * .75, before = footAngle-cut, after = footAngle+cut;
+    arc(root,r,r+1.4,tread,[-8,0,-2],stone,.15,before-.15);
+    arc(root,r,r+1.4,tread,[-8,0,-2],stone,after,stairStart-after);
     arc(root,r,r+1.4,tread,[-8,0,-2],stone,stairEnd,Math.PI-.15-stairEnd);
   }
   const risers = 18, run = (CIVIC.stepEdge - 44) / risers, grade = CIVIC.foyerPavingY / CIVIC.k;
@@ -597,8 +663,11 @@ export function civicCore(facade?: T.Group) {
   for(let a=2.3,i=0;a<7.9;a+=.19,i++) {
     const x=-8+Math.cos(a)*37,z=-2-Math.sin(a)*37,outer=-8+Math.cos(a)*41;
     if(z>-3 && (outer>20 || outer<-44))continue; // Wing ground floors keep their own production rooms.
-    box(root,[6,11,.3],[x,9.2,z],i%4===2 ? broadcastLight : publicLight).rotation.y=a+Math.PI/2;
-    box(root,[.6,15,.8],[-8+Math.cos(a+.095)*37,10.5,-2-Math.sin(a+.095)*37],stone).rotation.y=a+Math.PI/2;
+    if (Math.hypot(x+8-foot.x,-2-z-foot.y)>reveal+3)
+      box(root,[6,11,.3],[x,9.2,z],i%4===2 ? broadcastLight : publicLight).rotation.y=a+Math.PI/2;
+    const px = Math.cos(a+.095)*37, py = Math.sin(a+.095)*37;
+    if (Math.hypot(px-foot.x,py-foot.y)>reveal+.5)
+      box(root,[.6,15,.8],[px-8,10.5,-2-py],stone).rotation.y=a+Math.PI/2;
     if (a < arcadeStart) standing(-8+Math.cos(a)*(40.5-(i%2)*1.6),3,-2-Math.sin(a)*(40.5-(i%2)*1.6),outward(a),'public');
   }
   for(const a of [.15,2.25,3.15,4.7]) {
@@ -642,9 +711,14 @@ export function civicCore(facade?: T.Group) {
   for(const y of [63,134]) {
     box(root,[132,1.4,10],[-2,y,-12],stone);
     for(const z of [-16.8,-7.2]) {
-      box(root,[132,1.5,.22],[-2,y+1.5,z],membrane);
-      box(root,[132,.18,.22],[-2,y+2.3,z],trim);
-      box(root,[128,.15,.15],[-2,y+.85,z],publicLight);
+      const spans = y===63 && z===-16.8 ? [[-68,upperExit.west],[upperExit.east,64]] : [[-68,64]];
+      for (const [from,to] of spans) {
+        const x = (from+to)/2, span = to-from;
+        box(root,[span,1.5,.22],[x,y+1.5,z],membrane);
+        box(root,[span,.18,.22],[x,y+2.3,z],trim);
+        const start = Math.max(-66,from), end = Math.min(62,to);
+        box(root,[end-start,.15,.15],[(start+end)/2,y+.85,z],publicLight);
+      }
     }
     box(root,[120,.9,2.4],[-2,y+1.1,-8.7],leaf);
     for(let x=-56;x<57;x+=8)grove(x,y+1.6,-8.7,x);
@@ -762,6 +836,9 @@ export function civicCore(facade?: T.Group) {
   const place=new T.Matrix4().compose(root.position,root.quaternion,root.scale);
   for(const spot of spots){spot.at.applyMatrix4(place);if(spot.seated)spot.at.y+=.48*(CIVIC.k-1);}
   for(const walk of walks){(walk.curve as T.CatmullRomCurve3).points.forEach(p=>p.applyMatrix4(place));walk.curve.updateArcLengths();}
-  for(const ride of rides){ride.from.applyMatrix4(place);ride.to.applyMatrix4(place);ride.through=ride.through?.map(([a,b])=>[a*CIVIC.k,b*CIVIC.k] as const);}
+  const ridePath = new T.CurvePath<T.Vector3>();
+  ridePoints.forEach(point=>point.applyMatrix4(place));
+  for(let i=1;i<ridePoints.length;i++)ridePath.add(new T.LineCurve3(ridePoints[i-1],ridePoints[i]));
+  rides.push({path:ridePath,gap:4.5,speed:.5});
   return Object.assign(root,{occupants:{spots,walks,rides}});
 }
