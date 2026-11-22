@@ -105,8 +105,9 @@ for n in rings:
     r0, r1 = min(rs), max(rs)
     near = [r for r, z in static_r if z0 + .01 < z < z1 - .01 and r0 - .3 < r < r1 + .7]
     outer = min([r for r in near if r > r1 - 1e-4] or [99])
-    # the core is one tall cylinder with vertices only at its ends, so look for it over the whole tower height
-    inner = max([r for r, z in static_r if r < r0 + 1e-4 and r > .5 and 3 < z < 13.5] or [0])
+    # the core is one tall cylinder with vertices only at its ends, so look for it over the drums' whole height,
+    # up to the deck (12.3 m); the unload table and its bays sit on the deck, above every drum
+    inner = max([r for r, z in static_r if r < r0 + 1e-4 and r > .5 and 3 < z < 12.3] or [0])
     print("RING %s turned 37deg: r %.3f..%.3f, z %.2f..%.2f, nearest static inside %.3f, outside %.3f" % (n, r0, r1, z0, z1, inner, outer))
     if outer - r1 < .02 or r0 - inner < .02:
         errs.append(n + " would touch static geometry when turning")

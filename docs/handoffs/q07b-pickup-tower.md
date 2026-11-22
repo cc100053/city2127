@@ -1,7 +1,7 @@
 # q07b-pickup-tower — Q07-B 回る本棚のような受け取り塔 (Blender model, Dream Loop)
 
 - Owner: repository owner (requester of this task)
-- Status: IN_PROGRESS — v3 (roof arms polished, 2026-11-22) committed locally for owner review; not placed, not pushed
+- Status: IN_PROGRESS — v4 (readable parcel route, 2026-11-22) committed locally for owner review; not placed, not pushed
 - Branch: `feat/q07b-pickup-tower` (created locally from `main`)
 - Base commit: `df59a7defc14552fadd3f91920498c58707fe532`
 - Last verified commit: NONE — checks ran on the uncommitted worktree on top of the base commit
@@ -244,6 +244,107 @@ The v3 per-arm count splits into 816 fixed (mount) and 3,752 above the bearing.
 - The arms are static and site-only. They could become a kit entry once accepted.
 - 4.6k tris per arm is heavy for a part seen mostly from afar. An LOD or a lighter far version is the lever if the budget tightens.
 
+## v4 round (2026-11-22, owner request: a readable parcel route)
+
+Owner brief: keep the round tower and the roof arms, follow the original 7B design, and make the parcel route readable from outside.
+- **Roof:** an explicit unload point and fixed buffer positions, and an arm that reaches both.
+- **Lift:** a level hand-over into the car at the roof and at the ground.
+- **Ground:** a resident entrance, a rain shelter and a pickup counter on the sidewalk side, reached through a back-of-house area.
+- **Checks:** one parcel through the whole route, three Dream Loop angles, and a flow preview with arrows.
+
+**Session Git state.**
+- `origin/main` was fetched at `e4bc592b`. The main checkout's `main` is 3 behind it and was left alone.
+- The branch `feat/q07b-pickup-tower` at `cc2b561b` was resumed in `../city2127-q07b`, not merged with `main`.
+
+**What the original design says.**
+- **Central round platform:** in v1–v3 it was only the cap of the static service core (`R_CORE` 1.25 m, 0.55 m above the deck), with a white ring to r 1.7 and a teal "drone pad ring" at r 2.35–2.55.
+  - The only story was "drones land on the roof deck".
+  - The target image shows the roof centre as plain deck.
+  - So it had no assigned use. v4 makes it the unload table.
+- **Freight lift:** the side vertical member is v2's front glass chute, with `Q07B_LiftCarriage` inside it.
+  - Its tower side (−z) is open, so the roof and ground doors both go on that side, one above the other.
+  - The older drum route (a drum turns a cubby to the lift) stays possible as a storage branch.
+
+**Changes.** Levels: roof hand-over 12.95 m, ground hand-over 1.05 m, car floor 0.26 m below the car centre.
+
+| Area | v4 |
+| --- | --- |
+| Unload table | r 1.85 m on the core, top 13.08 m, dark inlay, teal landing ring and rim light. One unload bay per arm on r 1.45, with end stops (the fingers pass on the sides) and teal side marks |
+| Arms | `build_arm(…, pc, tool_s)` places them with a 2-link IK on the v3 link lengths. The mount stays on v3's home direction; the turntable mark turns with the arm; J6 aligns the gripper to the parcel. The front arm sets a parcel on the roller table, the left arm lifts one off its bay, the right arm stacks one on a buffer pallet. The grip pads bite 2 mm; the lips sit just under the parcel |
+| Buffer | four fixed pallets with teal corner marks, two beside each rear arm (±28°, r 3.25), replacing v3's six scattered pallets |
+| Roof roller table | z 3.75–5.60 at x 0, end stop at the arm end, legs on the deck. The planter ring opens ±7° there, with no leaves within 11°. The two front arcade arches become three 20° arches, so one opens over the table; the other nine are unchanged. Lift door: sill flush with the car floor, lit header, the rails as jambs |
+| Lift foot | replaces the kiosk: hollow shaft base, pit at 0.90 m, rails down to it, a cap ring round the car hole. The door on the tower side is level with the car floor. The street face has a small light service hatch and the lift light |
+| Passage | glazed roller passage from the lift-foot door to a hatch in the storefront's service wall |
+| Storefront | left: the residents' sliding door with lit jambs. Middle: the service wall with the roller hatch. Right: the pickup counter (lit frame, hand-over tray, operation panel, header sign, standing mark) |
+| Back-of-house | room behind the counter (staff door from the lobby, ceiling light), roller runs with two ball-transfer corners, and the kit prop `upper_cabinet` from `city-kit-2127` |
+| Canopy | over the forecourt on two posts, open round the chute, with underside lights, a teal fascia and the residents' entrance sign hung under it |
+| Fixes | the hall paving ends at the storefront; the storefront mullion feet sit 5 mm up (fewer coplanar faces than v3) |
+
+**Unchanged.** The rng consumption is kept: `burn_v3_roof_draws`, and the counter parcel is still the first port draw. So the six drums are byte-identical to v3 (vertex hash).
+
+**New scripts and checks.**
+- `render_flow.py` draws arrows, numbered badges and a legend from `q07b-flow.json` over four views. The arrow layer is laid over the model, so the back-of-house leg stays visible.
+- `staging.py` has the cameras `rooftop`, `liftside` and `entrance`. `liftside` was raised once after R1 so the roof hand-over shows; every set was re-rendered with it.
+- **`route_check`** (in the build) moves one 0.34 × 0.26 × 0.28 m parcel, shrunk 4 mm, through every stage, checks the arm reach, and rides the empty car through the shaft.
+  - It has a self-test: known collisions must be detected.
+  - It also measures each hand-over level on the geometry.
+- `CANOPY_CLEARANCE` checks the canopy against the shell.
+- `check_glb.py`: the drums' inner-clearance window now stops at the deck (12.3 m). The unload table sits above every drum and was a false hit.
+
+**Dream Loop.** Angles: roof from above, lift side, ground entrance, plus the whole tower.
+- **R1:** the roof route reads well. Problems found:
+  - The lift foot's dark street door read as the main entrance.
+  - The residents' door had no sign.
+  - The lift-side camera could not see the roof hand-over.
+- **R2:**
+  - A light service hatch replaces the dark door.
+  - The residents' door got lit jambs and a hung sign.
+  - The camera was raised.
+- **Final:** QA fixes only. The rollers run into the rails; the conveyor bodies sit under their pans; the room walls stand on the paving; the corner marks no longer overlap; the canopy caps are wound correctly; the stop laps the rails.
+
+Renders are in `~/city2127-evidence/q07b-flow/`:
+- Folders: `{before,r1,r2,final}/`.
+- `rounds-{rooftop,liftside,entrance,oblique}.jpg`.
+- `flow-final/*_flow.png` and `flow-preview.jpg` (arrow sheet).
+
+**Files.**
+- The asset path holds v4.
+- The previous version is `.dream-loop/q07b/v3-arm/`.
+- v4 is copied to `.dream-loop/q07b/v4-flow/q07b-pickup-tower-v4-flow.{blend,glb}` (GLB SHA256 `645A5CA2…996278DC`).
+- The R1 GLB is in `.dream-loop/q07b/v4-r1/`.
+
+**Validation, uncommitted worktree on `cc2b561b`.**
+- **Build checks:**
+  - `ARM_CLEARANCE` 0 and `CANOPY_CLEARANCE` 0.
+  - `ROUTE`: unload bay, arm lift, swing, set-down, rollers into the car, lift down, out to the back-of-house, across, onto the tray: 0 hits in every stage (297 positions).
+  - Arm reach 1.469–1.851 m of 1.933.
+  - The empty car rides 1.31–13.21 m with 0 hits.
+  - Measured levels: roof rollers, roof sill and car floor 12.950; car floor, ground sill, back-of-house rollers and counter tray 1.050.
+  - Car fit: the parcel fits a 0.49 × 0.49 m car with 0.52 m clear height.
+- **`check_glb.py`:** PASS.
+  - 91,496 tris (v3 87,552), 22 materials, 9 meshes, GLB 4,530,228 bytes.
+  - Bounds 13.80 × 14.21 × 14.28 m.
+- **Node comparison with v3:** the six drums are identical. The shell (49,108 → 51,428), the port (2,436 → 4,060) and the carriage (parcel and size) differ.
+- **`qa_check.py`** on shell, port and carriage:
+  - z-fighting: the port has 9 pairs (v3: 22), the door leaves from v2. Shell↔port has 5 pairs, the hall side walls against the lobby glass band, as in v3.
+  - No floating parts. The v3 roof parcel and the kiosk part are gone.
+- **`assetLibrary.test.ts`:** PASS.
+- **Root tests,** each of the 46 run separately: 44 PASS.
+  - `surveyMeterPipeline` and `energyPipeline` fail on the known Windows path issue in `survey/tests/surveyFixture.ts`.
+- **`npm run build`:** PASS.
+- **`git diff --check`:** PASS.
+
+**v4 gaps and limits.**
+- **Budget:** 91,496 tris is over the self-set ≤ 90k.
+- **Street-view legibility:** from the street the counter is less prominent than v3's lit kiosk. It sits to the right of the lift and a staging figure stands in front of it. The lift foot reads as a plain white box.
+- **Static model:** the arms, the car and the parcels show one frozen moment. There is no animation.
+- **Plan cut:** the plan cut shows no wall fill, because EEVEE does not cap the cut.
+
 ## Next expected step
 
-The owner reviews the v3 arms (comparison sheets and the `v2` / `v3-arm` copies). After acceptance: push `feat/q07b-pickup-tower` (v3 is a local commit only); then, as a separate task, choose a lot and integrate (`addCityModel`, budget, `?asset-preview`, browser checks).
+The owner reviews v4:
+- `flow-preview.jpg`
+- the `rounds-*.jpg` sheets
+- the `v3-arm` / `v4-flow` copies
+
+After acceptance: push `feat/q07b-pickup-tower` (v3 and v4 are local commits only). Then, as a separate task, choose a lot and integrate it (`addCityModel`, budget, `?asset-preview`, browser checks).

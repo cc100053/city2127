@@ -22,6 +22,10 @@ CAMERAS = {
     "armbase": ((3.55, 13.85, 1.75), (3.12, 13.05, -.50), 45, (1600, 900)),
     "armtool": ((3.05, 14.20, 2.00), (2.15, 13.60, .45), 45, (1600, 900)),
     "oblique": ((17, 17, 23), (0, 7.0, 0), 38, (1100, 825)),          # whole tower, front-right from above
+    # v4 parcel route: roof from above, the lift from its side, the ground entrance from the sidewalk
+    "rooftop": ((0, 26, 2.0), (0, 12.6, .2), 38, (1400, 1400)),
+    "liftside": ((7.5, 17.5, 13.0), (0, 6.8, 5.6), 28, (900, 1600)),   # roof hand-over and ground exit in one frame
+    "entrance": ((3.2, 1.7, 13.0), (.2, 1.5, 5.3), 26, (1600, 900)),
 }
 
 
