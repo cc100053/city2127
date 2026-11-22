@@ -2,21 +2,36 @@ import * as T from 'three';
 
 type Opening = readonly [
   start: number, end: number, fromHeight: number, toHeight: number, below: number, above: number,
-  screen?: 'screen',
+  kind?: 'screen' | 'west-frame' | 'east-frame' | 'lobby' | 'terrace',
 ];
+
+export const hullLobby = { start: .65, end: .99, glass: 3.45, back: 17.2 };
+const rakeFoot = 1.61, rakeHead = 13.61;
 
 // Heights are measured from the tier's toe, spans as fractions of its frontage.
 // Stagger the high ends and low ends along the stack to carry the sweeps across tiers.
 const openings: readonly (readonly Opening[])[] = [
-  [[.018, .33, 5, 8.2, 3.8, 4.8], [.35, .63, 8.7, 4.2, 3.5, 4.5, 'screen'], [.65, .99, 5.2, 4.2, 4.1, 8.2]],
+  [[.018, .33, 5, 8.2, 3.8, 4.8], [.35, .63, 8.7, 4.2, 3.5, 4.5, 'screen'], [hullLobby.start, hullLobby.end, 6.2, 6.55, 5.3, 9, 'lobby']],
   [[.012, .24, 4, 8.2, 3.3, 6], [.25, .54, 8.7, 4.7, 3, 5.8], [.55, .77, 4.4, 8.8, 3, 6.3], [.78, .983, 9.1, 5, 4.5, 3.7, 'screen']],
-  [[.012, .22, 9.5, 4.7, 4, 4, 'screen'], [.23, .58, 4.4, 9.5, 3.4, 5.6], [.59, .82, 9.4, 4.8, 3.7, 3.8], [.83, .986, 4.6, 7.4, 3.5, 5.7]],
-  [[.015, .30, 4.3, 9.4, 3.7, 5.5], [.31, .53, 9.7, 7, 6.2, 3.8, 'screen'], [.54, .985, 7.2, 4.5, 4.5, 6.3]],
-  [[.012, .29, 9.4, 5.2, 4.6, 4.1], [.3, .60, 5, 9.4, 3.7, 6.2], [.61, .758, 9.4, 8.3, 5.4, 2.8, 'screen'], [.77, .988, 8.1, 4.4, 3.5, 5.4]],
+  [[.016, .17, rakeFoot, rakeHead, 4.8, 2.2, 'west-frame'], [.18, .34, 13.1, 2.4, 5.9, 3.3, 'screen'],
+    [.35, .485, rakeFoot, rakeHead, 4.9, 1.9, 'east-frame'], [.495, .82, 13, 4.8, 5.5, 4.1], [.83, .986, 4.6, 7.4, 3.5, 5.7]],
+  [[.025, .118, rakeFoot, rakeHead, 4.2, 1.8, 'west-frame'], [.128, .38, 13, 2.4, 6.3, 3.4, 'screen'],
+    [.395, .505, rakeFoot, rakeHead, 4.2, 1.9, 'east-frame'], [.516, .985, 13.1, 4.5, 5.9, 4.6]],
+  [[.012, .30, 5.2, 6.8, 4.4, 6.8, 'terrace'], [.31, .39, 6.7, 2.4, 3.1, 3.4],
+    [.40, .59, rakeFoot, rakeHead, 5.3, 2.4, 'east-frame'], [.60, .758, 13, 8.3, 7, 2.8, 'screen'], [.77, .988, 8.1, 4.4, 3.5, 5.4]],
   [[.013, .31, 4, 9.4, 3.5, 6.2], [.32, .57, 9.6, 4.5, 3.9, 3.4, 'screen'], [.58, .987, 4.3, 8.2, 3.4, 7]],
   [[.014, .29, 7.9, 4.7, 3.5, 4, 'screen'], [.30, .585, 4.5, 8.5, 3.6, 6.7], [.597, .985, 8.8, 5, 4.7, 4.7]],
   [[.015, .41, 4.1, 8.5, 3, 6.7], [.425, .984, 8.8, 5.2, 4.7, 5.2]],
 ];
+
+// Fractions of the lower and upper frontages where a frame folds over a deck.
+export function hullFrameReturns(tier: number) {
+  return openings[tier].flatMap(([, head, , , , , kind]) => {
+    if (kind !== 'west-frame' && kind !== 'east-frame') return [];
+    const foot = openings[tier + 1]?.find(opening => opening[6] === kind)?.[0];
+    return [{ head, foot }];
+  });
+}
 
 type Finish = 'shell' | 'silver' | 'shadow' | 'glass' | 'cove';
 type Tier = {
@@ -33,14 +48,15 @@ type Tier = {
 
 /** Swept frames, recessed glazing and shallow interior rooms specific to the hull's eight-tier elevation. */
 export function buildHullFacade({ tier, from, to, height, entrance, point, surface, bar }: Tier) {
-  const toe = .72, crown = height - .5, skin = -.85, glassDepth = 1.42, backDepth = 7.6;
-  const strip = (finish: Finish, lower: T.Vector3[], upper: T.Vector3[]) => {
+  const toe = .72, crown = height - .5, skin = -.85;
+  const strip = (finish: Finish, lower: T.Vector3[], upper: T.Vector3[], lighting: 'room' | 'focus' | 'soffit' | 'bounce' = 'room') => {
+    const light = { room: 0, focus: 1, soffit: 2, bounce: 3 }[lighting];
     const positions: number[] = [], uv: number[] = [];
     for (let i = 1; i < lower.length; i++) {
       for (const p of [lower[i - 1], upper[i - 1], lower[i], lower[i], upper[i - 1], upper[i]]) {
         positions.push(p.x, p.y, p.z);
       }
-      if (finish === 'cove') uv.push(i - 1, 0, i - 1, 1, i, 0, i, 0, i - 1, 1, i, 1);
+      if (finish === 'cove') uv.push(light, 0, light, 1, light, 0, light, 0, light, 1, light, 1);
     }
     const mesh = new T.BufferGeometry();
     mesh.setAttribute('position', new T.Float32BufferAttribute(positions, 3));
@@ -63,22 +79,26 @@ export function buildHullFacade({ tier, from, to, height, entrance, point, surfa
     join(last, a, lastHeight, fromHeight);
     last = b;
     lastHeight = toHeight;
+    const isLobby = kind === 'lobby', focused = isLobby || kind === 'terrace';
+    const rake = kind === 'west-frame' || kind === 'east-frame';
+    const glassDepth = isLobby ? hullLobby.glass : 1.42, backDepth = isLobby ? hullLobby.back : 7.6;
     // Sample the apex and the mullions on the same curve so none cross a curved reveal.
     const panes = Math.ceil((b - a) / 3.4), segments = panes * 4;
-    const samples = Array.from({ length: segments + 1 }, (_, i) => {
-      const t = i / segments;
+    const profile = (t: number) => {
       const taper = Math.pow(Math.sin(Math.PI * t), .82);
-      const centre = T.MathUtils.lerp(fromHeight, toHeight, T.MathUtils.smoothstep(t, 0, 1));
+      const rise = rake ? t + .09 * Math.sin(t * Math.PI * 2) : T.MathUtils.smoothstep(t, 0, 1);
+      const centre = T.MathUtils.lerp(fromHeight, toHeight, rise);
       const u = T.MathUtils.lerp(a, b, t);
-      const entry = tier === 0 ? 1 - T.MathUtils.smoothstep(Math.abs(u - entrance), 2.45, 6.5) : 0;
+      const entry = isLobby ? 1 - T.MathUtils.smoothstep(Math.abs(u - entrance), 2.45, 6.5) : 0;
       return {
         u,
         lower: T.MathUtils.lerp(Math.max(toe + .48, centre - below * taper * (1.26 - .52 * t)), toe + .08, entry),
         upper: Math.min(crown - .48, centre + above * taper * (.68 + .64 * t)),
         sillRim: tipRim + 1.16 * taper * (1 - t),
-        headRim: tipRim + 1.71 * taper * t,
+        headRim: tipRim + (rake ? 2.9 * Math.sin(Math.PI * t) : 1.71 * taper * t),
       };
-    });
+    };
+    const samples = Array.from({ length: segments + 1 }, (_, i) => profile(i / segments));
     const bottom = samples.map(({ u, lower }) => point(u, lower, -1.16));
     const top = samples.map(({ u, upper }) => point(u, upper, -1.16));
     const lowerRim = samples.map(({ u, lower, sillRim }) => point(u, Math.max(toe, lower - sillRim), skin));
@@ -92,7 +112,7 @@ export function buildHullFacade({ tier, from, to, height, entrance, point, surfa
     strip('silver', top, upperRim);
     strip('shell', bottom, innerBottom);
     strip('silver', innerTop, top);
-    if (tier === 0 && entrance > a && entrance < b) {
+    if (isLobby) {
       let firstDoorSegment = 0, lastDoorSegment = segments;
       while (samples[firstDoorSegment].u < entrance - 2.45) firstDoorSegment++;
       while (samples[lastDoorSegment].u > entrance + 2.45) lastDoorSegment--;
@@ -107,24 +127,40 @@ export function buildHullFacade({ tier, from, to, height, entrance, point, surfa
 
     for (let i = 4; i < segments; i += 4) {
       const { u, lower, upper } = samples[i];
-      const base = tier === 0 && Math.abs(u - entrance) < 2.45 ? 4.35 : lower;
+      const base = isLobby && Math.abs(u - entrance) < 2.45 ? 4.35 : lower;
       bar('shadow', point(u, base, glassDepth + .035), point(u, upper, glassDepth + .035), .17, .23);
     }
 
     // Ceiling wash and pale mezzanines sit behind the panes, with unlit rooms between them.
     for (let i = 1; i <= panes; i++) {
       const row = samples.slice((i - 1) * 4, i * 4 + 1);
-      const dark = kind === 'screen' ? (i + tier) % 5 > 1 : (i + tier * 5 + Math.round(a)) % 7 < 2;
+      const dark = !focused && (kind === 'screen' ? (i + tier) % 5 > 1 : (i + tier * 5 + Math.round(a)) % 7 < 2);
       strip(dark ? 'shadow' : 'cove',
         row.map(({ u, lower }) => point(u, lower, backDepth)),
-        row.map(({ u, upper }) => point(u, upper, backDepth)));
+        row.map(({ u, upper }) => point(u, upper, backDepth)), focused ? 'focus' : 'room');
       const near = row[0], far = row[4], mezzanine = 5.8;
-      if (b - a > 31 && Math.min(near.upper, far.upper) > mezzanine + .6 && Math.max(near.lower, far.lower) < mezzanine - .55) {
+      if (!isLobby && b - a > 31 && Math.min(near.upper, far.upper) > mezzanine + .6 && Math.max(near.lower, far.lower) < mezzanine - .55) {
         bar('shell', point(near.u, mezzanine, 5.75), point(far.u, mezzanine, 5.75), 3.1, .31);
       }
     }
-    strip('shell', innerBottom, samples.map(({ u, lower }) => point(u, lower, backDepth)));
-    strip('silver', samples.map(({ u, upper }) => point(u, upper, backDepth)), innerTop);
+    strip(isLobby ? 'cove' : 'shell', innerBottom, samples.map(({ u, lower }) => point(u, lower, backDepth)), isLobby ? 'bounce' : 'room');
+    strip(isLobby ? 'cove' : 'silver', samples.map(({ u, upper }) => point(u, upper, backDepth)), innerTop, isLobby ? 'soffit' : 'room');
+
+    if (isLobby) {
+      // The mezzanine wings leave a full-height view through the middle of the entry.
+      for (const [start, end] of [[entrance - 20, entrance - 6], [entrance + 7, entrance + 22]]) {
+        bar('shell', point(start, 5.4, 12.8), point(end, 5.4, 12.8), 7.6, .57);
+        strip('cove', [point(start, 5.10, 10), point(end, 5.10, 10)],
+          [point(start, 5.10, 9.15), point(end, 5.10, 9.15)], 'soffit');
+        strip('cove', [point(start, 5.17, 8.88), point(end, 5.17, 8.88)],
+          [point(start, 5.32, 8.88), point(end, 5.32, 8.88)], 'focus');
+      }
+      for (const offset of [-17, -8.5, 8.5, 17]) {
+        const u = entrance + offset;
+        const { lower, upper } = profile((u - a) / (b - a));
+        bar('shell', point(u, lower, 7.6), point(u, upper, 7.6), .66, .74);
+      }
+    }
 
     if (kind === 'screen') {
       // Diamond lattice laid into selected vents, following the curves at the edge.
