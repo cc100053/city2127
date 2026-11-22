@@ -56,7 +56,7 @@ try {
   };
 
   // Welcome: the prompt invites a hand; dwell on はじめる starts the session.
-  assert.equal(await page.locator('.hand-prompt').textContent(), '画面に手をかざしてください');
+  await page.waitForFunction(() => document.querySelector('.hand-prompt')?.textContent === '画面に手をかざしてください', null, { timeout: 3000 });
   await hold(await center('[data-auto-action="start"]'));
   await waitFor(async () => (await screen()) === 'question', 'first question');
 
