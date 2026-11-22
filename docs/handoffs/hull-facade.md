@@ -25,3 +25,4 @@
 ## 整合
 
 - 工作分支 `9cde348c`，整合提交 `2826b2cd`。整合版本重跑 root `npm test`、`npm run build` 和 `git diff --check origin/main..HEAD`，均通過。正式 bundle 與已在 Chrome 測試的版本一致。
+- [GitHub main CI](https://github.com/cc100053/city2127/actions/runs/44995673556) 驗證 `e4bc592b`，root、survey、module-swap、差異空白及圖檔規格檢查全部通過。
