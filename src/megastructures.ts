@@ -69,6 +69,7 @@ hullCove.onBeforeCompile = shader => {
       float rooms = .13 + .28 * hullRoom.y + .71 * cove;
       float focus = mix(.41 + .48 * hullRoom.y, 1.28, step(1.5, hullRoom.x));
       focus = mix(focus, .24, step(2.5, hullRoom.x));
+      focus = mix(focus, .23 + .47 * smoothstep(.1, 1., hullRoom.y), step(3.5, hullRoom.x));
       totalEmissiveRadiance *= mix(rooms, focus, step(.5, hullRoom.x));`);
 };
 hullCove.customProgramCacheKey = () => 'hull-room-cove';
@@ -395,12 +396,44 @@ function hull(batch: Batch, trees: Plant[], shrubs: Shrub[]) {
     const terrace = publicTerraces.get(k);
     const deckY = y0 + step;
     const deckPoint = (u: number, inset: number, rise: number) => world(u, dAt(k, u, 0) + inset, deckY + rise);
-    // The silver frames fold into shallow deck trims at each staggered join.
+    // One skin wraps the slab nose and returns across the deck to the next tier's frame foot.
     for (const { head, foot } of hullFrameReturns(k)) {
       const start = T.MathUtils.lerp(u0, L2, head);
       const end = foot === undefined ? start : T.MathUtils.lerp(left(k + 1), L2, foot);
-      const inset = foot === undefined ? 1.5 : recede - .72;
-      bar(batch, megaRib, deckPoint(start, -.79, .04), deckPoint(end, inset, .04), 1.9, .08);
+      const sections = [
+        [start - 2.65, -.94, -4.1, .3],
+        [start - 1.45, -1.1, -2.5, 1.14],
+        [start - .35, -1.68, -.8, 1.84],
+        [start + .26, -1.82, .12, 2.12],
+        [start + .52, -1.58, .69, 2.02],
+        [start + .65, -.96, 1.03, 1.82],
+        [start + .65, .2, 1.06, 1.63],
+        [start + .49, 1.51, .78, 1.38],
+      ];
+      if (foot !== undefined) {
+        sections.push(
+          [end, 2.4, .09, 1.12],
+          [end - .28, recede - 1.73, .09, 1.12],
+          [end - .19, recede - 1.73, .65, 1.12],
+          [end + .18, recede - 1.13, 1.25, 1.29],
+          [end + .9, recede - .98, 2.53, .94],
+          [end + 2.3, recede - .94, 3.65, .22],
+        );
+      } else sections.push([end + .49, 1.84, .1, .9]);
+
+      const edges = sections.map(([u, inset, rise, halfWidth]) => [
+        deckPoint(u - halfWidth, inset, rise), deckPoint(u + halfWidth, inset, rise),
+      ]);
+      const positions: number[] = [];
+      for (let i = 1; i < edges.length; i++) {
+        const [a, b] = edges[i - 1], [c, d] = edges[i];
+        for (const p of [a, c, b, b, c, d]) positions.push(p.x, p.y, p.z);
+      }
+      const frame = new T.BufferGeometry();
+      frame.setAttribute('position', new T.Float32BufferAttribute(positions, 3));
+      frame.computeVertexNormals();
+      put(batch, megaRib, frame);
+      frame.dispose();
     }
     const clearOfTerrace = (u: number, radius: number) => !terrace || u + radius <= terrace.start || u - radius >= terrace.end;
     for (let i = 0; i < f.length - 1; i++) {

@@ -97,6 +97,15 @@ within(RING.outer * 2, 210, 'ring diameter'); within(Math.hypot(ARCH.b[0] - ARCH
   }
   const [ceiling] = new Raycaster(localPoint(53, 2, front(0, 53) + 12), axis, 0, 13).intersectObjects(structureBatches, false);
   assert.ok(ceiling?.object === cove && ceiling.point.y > 11, 'warm ceiling above full-height entry');
+  for (const depth of [5.5, 15]) {
+    const [reveal] = new Raycaster(localPoint(53, 2, front(0, 53) + depth), axis, 0, 13)
+      .intersectObjects(structureBatches, false);
+    assert.ok(reveal && reveal.object !== cove && reveal.point.y > ceiling.point.y + .25,
+      `ceiling reveal stands above the warm panel at ${depth} m`);
+  }
+  const [header] = new Raycaster(localPoint(53, 4.42, front(0, 53) - 4), inward, 0, 8)
+    .intersectObjects(structureBatches, false);
+  assert.ok(header && header.object !== glass && Math.abs(header.distance - 7.18) < .04, 'entrance transom sits in front of the pane');
   for (const u of [44.5, 61.5]) {
     const [column] = new Raycaster(localPoint(u, 2.25, front(0, u) + 5), inward, 0, 5).intersectObjects(structureBatches, false);
     assert.ok(column && Math.abs(column.distance - 2.23) < .25, `column behind the pane at ${u}`);
@@ -109,6 +118,23 @@ within(RING.outer * 2, 210, 'ring diameter'); within(Math.hypot(ARCH.b[0] - ARCH
       assert.equal(sights.intersectObjects(structureBatches, false).length, 0, `middle terrace sightline at ${u}, ${y}`);
     }
   }
+  // Each cross-tier fold covers the slab nose and meets the upper frame without raising the public deck.
+  const silver = structureBatches.find(part => part.material instanceof MeshStandardMaterial
+    && part.material.color.getHexString() === 'dde1e2');
+  assert.ok(silver);
+  for (const [tier, head, foot] of [[2, -59.4, -59.175], [2, -2.7, -2.565], [3, 14.265, 14.4]]) {
+    const deck = (tier + 1) * HULL.step;
+    for (const [u, rise, depth] of [[head, -.25, -1.8], [foot + .4, 1.35, HULL.recede - 1.12]]) {
+      const [fold] = new Raycaster(localPoint(u, deck + rise, front(tier, u) + depth - 1.1), inward, 0, 2)
+        .intersectObjects(structureBatches, false);
+      assert.ok(fold?.object === silver && Math.abs(fold.distance - 1.1) < .22,
+        `silver fold at tier ${tier}, ${u}, ${rise}: distance ${fold?.distance}`);
+    }
+    const [deckFold] = new Raycaster(localPoint(head + .49, deck + 1.4, front(tier, head + .49) + .9),
+      axis.clone().negate(), 0, 1).intersectObjects(structureBatches, false);
+    assert.ok(deckFold?.object === silver && deckFold.point.y > deck + .8 && deckFold.point.y < deck + 1.1,
+      `silver turns above the existing kerb at tier ${tier}, ${head}`);
+  }
   const positions = cove.geometry.getAttribute('position'), uv = cove.geometry.getAttribute('uv');
   const lightRoles = new Set<number>();
   let canopyVertices = 0;
@@ -116,7 +142,7 @@ within(RING.outer * 2, 210, 'ring diameter'); within(Math.hypot(ARCH.b[0] - ARCH
     lightRoles.add(uv.getX(i));
     if (uv.getX(i) === 2 && Math.abs(positions.getY(i) - 63.96) < .01) canopyVertices++;
   }
-  assert.deepEqual([...lightRoles].sort(), [0, 1, 2, 3], 'ordinary rooms, focused rooms, warm soffits and lobby bounce share one batch');
+  assert.deepEqual([...lightRoles].sort(), [0, 1, 2, 3, 4], 'ordinary rooms, focused rooms, warm soffits, lobby bounce and lobby back wall share one batch');
   assert.equal(canopyVertices, 18, 'all three shade panels have warm soffits');
 }
 // Ground contacts (plinth, arch feet, hull footprint) keep 14 m clear of every Meter site and of the civic core base.

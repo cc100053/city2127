@@ -49,8 +49,8 @@ type Tier = {
 /** Swept frames, recessed glazing and shallow interior rooms specific to the hull's eight-tier elevation. */
 export function buildHullFacade({ tier, from, to, height, entrance, point, surface, bar }: Tier) {
   const toe = .72, crown = height - .5, skin = -.85;
-  const strip = (finish: Finish, lower: T.Vector3[], upper: T.Vector3[], lighting: 'room' | 'focus' | 'soffit' | 'bounce' = 'room') => {
-    const light = { room: 0, focus: 1, soffit: 2, bounce: 3 }[lighting];
+  const strip = (finish: Finish, lower: T.Vector3[], upper: T.Vector3[], lighting: 'room' | 'focus' | 'soffit' | 'bounce' | 'lobby-back' = 'room') => {
+    const light = { room: 0, focus: 1, soffit: 2, bounce: 3, 'lobby-back': 4 }[lighting];
     const positions: number[] = [], uv: number[] = [];
     for (let i = 1; i < lower.length; i++) {
       for (const p of [lower[i - 1], upper[i - 1], lower[i], lower[i], upper[i - 1], upper[i]]) {
@@ -95,7 +95,7 @@ export function buildHullFacade({ tier, from, to, height, entrance, point, surfa
         lower: T.MathUtils.lerp(Math.max(toe + .48, centre - below * taper * (1.26 - .52 * t)), toe + .08, entry),
         upper: Math.min(crown - .48, centre + above * taper * (.68 + .64 * t)),
         sillRim: tipRim + 1.16 * taper * (1 - t),
-        headRim: tipRim + (rake ? 2.9 * Math.sin(Math.PI * t) : 1.71 * taper * t),
+        headRim: tipRim + (rake ? (2.9 + 1.8 * t) * Math.sin(Math.PI * t) : 1.71 * taper * t),
       };
     };
     const samples = Array.from({ length: segments + 1 }, (_, i) => profile(i / segments));
@@ -120,9 +120,12 @@ export function buildHullFacade({ tier, from, to, height, entrance, point, surfa
       strip('glass', samples.slice(firstDoorSegment, lastDoorSegment + 1).map(({ u }) => point(u, 4.35, glassDepth)),
         innerTop.slice(firstDoorSegment, lastDoorSegment + 1));
       strip('glass', innerBottom.slice(lastDoorSegment), innerTop.slice(lastDoorSegment));
-      for (const { u } of [samples[firstDoorSegment], samples[lastDoorSegment]]) {
-        bar('shadow', point(u, 1, glassDepth), point(u, 4.35, glassDepth), .21, .28);
+      const door = samples.slice(firstDoorSegment, lastDoorSegment + 1);
+      for (const { u } of [door[0], door[door.length - 1]]) {
+        bar('silver', point(u, .88, glassDepth - .12), point(u, 4.44, glassDepth - .12), .3, .28);
       }
+      strip('silver', door.map(({ u }) => point(u, 4.26, glassDepth - .27)),
+        door.map(({ u }) => point(u, 4.56, glassDepth - .27)));
     } else strip('glass', innerBottom, innerTop);
 
     for (let i = 4; i < segments; i += 4) {
@@ -137,19 +140,29 @@ export function buildHullFacade({ tier, from, to, height, entrance, point, surfa
       const dark = !focused && (kind === 'screen' ? (i + tier) % 5 > 1 : (i + tier * 5 + Math.round(a)) % 7 < 2);
       strip(dark ? 'shadow' : 'cove',
         row.map(({ u, lower }) => point(u, lower, backDepth)),
-        row.map(({ u, upper }) => point(u, upper, backDepth)), focused ? 'focus' : 'room');
+        row.map(({ u, upper }) => point(u, upper, backDepth)), isLobby ? 'lobby-back' : focused ? 'focus' : 'room');
       const near = row[0], far = row[4], mezzanine = 5.8;
       if (!isLobby && b - a > 31 && Math.min(near.upper, far.upper) > mezzanine + .6 && Math.max(near.lower, far.lower) < mezzanine - .55) {
         bar('shell', point(near.u, mezzanine, 5.75), point(far.u, mezzanine, 5.75), 3.1, .31);
       }
     }
     strip(isLobby ? 'cove' : 'shell', innerBottom, samples.map(({ u, lower }) => point(u, lower, backDepth)), isLobby ? 'bounce' : 'room');
-    strip(isLobby ? 'cove' : 'silver', samples.map(({ u, upper }) => point(u, upper, backDepth)), innerTop, isLobby ? 'soffit' : 'room');
-
     if (isLobby) {
+      // Step the ceiling behind the glass head, leaving a dark reveal at each edge of the warm panel.
+      const ceilingAt = (inset: number, drop: number) =>
+        samples.map(({ u, upper }) => point(u, upper - drop, inset));
+      const nearReveal = ceilingAt(6.25, .12), nearPanel = ceilingAt(6.25, .46);
+      const farReveal = ceilingAt(13.6, .12), farPanel = ceilingAt(13.6, .46);
+      strip('silver', nearReveal, innerTop);
+      strip('shadow', nearPanel, nearReveal);
+      strip('cove', farPanel, nearPanel, 'soffit');
+      strip('shadow', farReveal, farPanel);
+      strip('silver', ceilingAt(backDepth, 0), farReveal);
+
       // The mezzanine wings leave a full-height view through the middle of the entry.
       for (const [start, end] of [[entrance - 20, entrance - 6], [entrance + 7, entrance + 22]]) {
         bar('shell', point(start, 5.4, 12.8), point(end, 5.4, 12.8), 7.6, .57);
+        bar('shadow', point(start, 5.48, 8.94), point(end, 5.48, 8.94), .34, .36);
         strip('cove', [point(start, 5.10, 10), point(end, 5.10, 10)],
           [point(start, 5.10, 9.15), point(end, 5.10, 9.15)], 'soffit');
         strip('cove', [point(start, 5.17, 8.88), point(end, 5.17, 8.88)],
@@ -160,7 +173,7 @@ export function buildHullFacade({ tier, from, to, height, entrance, point, surfa
         const { lower, upper } = profile((u - a) / (b - a));
         bar('shell', point(u, lower, 7.6), point(u, upper, 7.6), .66, .74);
       }
-    }
+    } else strip('silver', samples.map(({ u, upper }) => point(u, upper, backDepth)), innerTop);
 
     if (kind === 'screen') {
       // Diamond lattice laid into selected vents, following the curves at the edge.

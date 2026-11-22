@@ -49,3 +49,23 @@
 
 - 工作分支提交 `d6bafbc5`，整合提交 `d4e43a28`。在獨立整合工作樹重跑 root `npm test`、`npm run build`、`git diff --check origin/main..HEAD` 及圖檔規格檢查，全部通過。整合後的整份 `dist/` 與 Chrome 已驗證的 build 逐檔一致。
 - [GitHub main CI](https://github.com/cc100053/city2127/actions/runs/44999367968) 已驗證 `5087b7d8`。Root、survey、module-swap 測試及 build、差異空白與圖檔規格全數通過。工作分支的 [CI](https://github.com/cc100053/city2127/actions/runs/44999035557) 亦已通過。
+
+## R4 · 樓板折返與大堂層次
+
+- Owner 為 cc100053。工作分支 `codex/hull-facade-r4` 從已 fetch 的 `origin/main`（`43137115d73d9dc8504a4fc6d5cbc08ce981e63e`）開獨立工作樹。本機 `main` 落後 4 個提交，領先 0 個，主工作區未追蹤的 `Dev_QA.md` 保留。
+- 參考 R3 主鏡、近鏡及入口照片，以及[業主方向圖](../../artifacts/hull-facade/target.jpg)。R3 的銀框接點在水平樓板邊容易斷讀，夜間入口的暖色背牆和天花容易看成一片。
+
+R4 加闊兩道斜框上緣，讓銀色折面從下層框延至樓板邊，沿外緣翻上並接入上層框腳。三個跨層接點及兩處終端沿用船身自身的曲面和結構合批。廣場入口在玻璃前加厚門框和門楣，兩翼夾層用暗色前緣襯出燈線，前後襯板壓出中間暖天花的深度，夜間背牆亮度低於頂中燈區。構件屬這座船身的曲窗、樓板折角和大堂夾層，沿用現有外殼、銀框、深色、玻璃和燈槽材質。
+
+八級船身、三處公共退台、植栽、廣場步道、原簷篷及兩側列車口沿用 R3。大堂及中層退台跟隨原日夜週期，附近窗洞保有原來錯落的亮窗。
+
+### R4 驗證
+
+- [主鏡日／昏／夜](../../artifacts/hull-facade/r4-hero.jpg)和[近鏡日／昏／夜及折返局部](../../artifacts/hull-facade/r4-close.jpg)以 R3 同鏡位比較。加闊的折面在近鏡可跟到樓板外緣，植栽仍遮住部分平台內側的折返。主鏡保留兩處暖光和周邊不規則的亮暗窗。
+- [廣場及簷篷下入口](../../artifacts/hull-facade/r4-entry.jpg)記錄日間與夜間門框，以及暖色天花與暗色夾層前緣的分別。九組對照沿 R3 sidecar 的網址參數，固定場景時間 20 秒、2400×1350／DPR 1，頁面例外為零。原圖和 sidecar 在 `~/city2127-evidence/hull-facade/{r3,r4}/after/`。
+- Root `npm test`、`npm run build`、`git diff --check` 通過。完整測試包括本機 survey HTTP／WebSocket 串接。
+- [幾何測試](../../tests/megastructures.test.ts)核對三個跨層接點各三個位置、天花前後襯板相對暖天花的高差，以及玻璃前的門楣。三處退台鋪面及植栽、60 m 退台向海淨空和入口九條通行射線均通過。
+- 用船身局部座標的掃描盒篩出兩側列車口的三角面包圍盒，再逐面比對材質及頂點。兩側各 608／610 個三角面與 `43137115` 完全相同。巨構模型構件由 11 個相同的材質批次繪製，船身玻璃和燈槽各一批。
+- 正式 build 在開發 Mac 的桌面 Chrome 157.0.8103.79（Apple M6／ANGLE Metal），以 1600×900／DPR 1 檢查 12:00、18:00、21:25。三個時段均有畫布診斷，頁面例外、shader 及本機資源錯誤均為零。記錄在 `~/city2127-evidence/hull-facade/r4/preview.json`。
+
+業主視覺驗收及展覽機驗證待完成。
