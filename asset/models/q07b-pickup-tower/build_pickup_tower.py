@@ -21,6 +21,8 @@ tray in the warm-lit pickup window, next to the operation panel. The hall behind
 wall and lockers for collection inside.
 Textures: a 512 px parcel atlas (four box styles with tape, labels and shaded edges) and a 512 px UI atlas (panel
 screen, header sign); both are generated here and packed, so the GLB embeds them.
+Roof arms (v3, 2026-11-22): three palletising arms merged into Q07B_Shell (see build_arm). The build prints their
+triangle count (ARM_TRIS) and fails if a part above the bearing intersects the roof or a pallet (ARM_CLEARANCE).
 """
 import math
 import os
@@ -324,6 +326,7 @@ def make_materials():
         "soil": mat("soil", (.20, .13, .08, 1), .9),
         "paving": mat("paving", (.62, .60, .56, 1), .85),
         "screen": mat("screen", (.06, .22, .28, 1), .3, emit=(.35, .85, .95, 1), strength=1.5),
+        "cable": mat("cable", (.035, .038, .042, 1), .75),                  # #353739 rubber harness (arms)
     }
 
 
@@ -522,22 +525,203 @@ def parcel(a, rng, c, size, t=X, n=Z, jitter=0.0):
     tbox(a["parcel"], pick_tile(rng), c, size, t, n)
 
 
-def build_roof_kit(a, rng):
-    """Loader arms and parcel pallets on the roof deck (part of the shell)."""
+# --- roof loader arms (v3, 2026-11-22: arm-only polish) ---------------------------------------------------
+# Same three sites and reach as v2: base on r 3.2, wrist over r 2.2 / +0.38 rad, parcel held ~0.73 m above the deck.
+# Each arm is a palletising robot in the reference's language: a dark fixed mount bolted to the deck, a white
+# turntable over a dark bearing gap, shoulder / elbow / wrist housings with metal rings and dark caps, links with
+# dark seam rings, a harness that loops round each joint, and a parallel gripper holding one parcel.
+# The arms stay merged into Q07B_Shell (no pivots, no animation in v2 or v3).
+ARM_ANGLES = tuple(FRONT + math.radians(d) for d in (20, 140, 260))
+ARM_R, ARM_WRIST_R, ARM_WRIST_DA = 3.2, 2.2, .38
+UP = Vector((0, 1, 0))
+
+
+def perp_basis(ax):
+    e1 = ax.cross(UP if abs(ax.y) < .9 else Vector((1, 0, 0))).normalized()
+    return e1, ax.cross(e1)
+
+
+def lathe(acc, c, ax, prof, n=24):
+    """Solid of revolution about the unit axis ax through c; prof = [(radius, offset along ax)], end to end."""
+    e1, e2 = perp_basis(ax)
+    ring = [math.cos(2 * math.pi * i / n) * e1 + math.sin(2 * math.pi * i / n) * e2 for i in range(n)]
+    loft(acc, [[tuple(c + d * ax + r * q) for q in ring] for r, d in prof])
+
+
+def chamf(r, d0, d1, ch):
+    return [(r - ch, d0), (r, d0 + ch), (r, d1 - ch), (r - ch, d1)]
+
+
+def rsec(c, e1, e2, h1, h2, rc, k=0.0):
+    """Rounded-rect section centred c in the plane (e1, e2), half sizes h1 x h2, inset by k."""
+    return [tuple(c + x * e1 + z * e2) for x, z in rrect_pts(0, 0, h1, h2, [rc] * 4, 2, k)]
+
+
+def gbox(acc, c, ex, ey, ez, size):
+    """Box centred c with edges along the orthonormal ex, ey, ez; size along each."""
+    hx, hy, hz = (s / 2 for s in size)
+    verts = [tuple(c + sy * hy * ey + a * hx * ex + b * hz * ez)
+             for sy in (-1, 1) for a, b in ((-1, -1), (1, -1), (1, 1), (-1, 1))]
+    acc.solid(verts, [(3, 2, 1, 0), (4, 5, 6, 7), (0, 1, 5, 4), (1, 2, 6, 5), (2, 3, 7, 6), (3, 0, 4, 7)])
+
+
+def pipe(acc, pts, r, n=6):
+    """Round tube through the points (parallel-transport frames), capped."""
+    pts = [Vector(p) for p in pts]
+    secs, nrm = [], None
+    for i, p in enumerate(pts):
+        t = (pts[min(i + 1, len(pts) - 1)] - pts[max(i - 1, 0)]).normalized()
+        nrm = perp_basis(t)[0] if nrm is None else (nrm - t * nrm.dot(t)).normalized()
+        bi = t.cross(nrm)
+        secs.append([tuple(p + r * (math.cos(2 * math.pi * k / n) * nrm + math.sin(2 * math.pi * k / n) * bi))
+                     for k in range(n)])
+    loft(acc, secs)
+
+
+def joint(m, c, ax, r, half, n=20, hub=False):
+    """Joint housing along ax: white chamfered drum; each end steps down to a metal ring, a dark cap (and a hub)."""
+    lathe(m["white"], c, ax, chamf(r, -half, half, r * .12), n)
+    for sg in (-1, 1):
+        a = ax * sg
+        lathe(m["node"], c, a, [(r * .8, half - .01), (r * .84, half), (r * .84, half + .014), (r * .78, half + .02)], n)
+        lathe(m["frame"], c, a, [(r * .58, half + .012), (r * .58, half + .03), (r * .5, half + .037)], max(n // 2, 8))
+        if hub:
+            lathe(m["node"], c, a, [(r * .2, half + .03), (r * .2, half + .045)], 8)
+
+
+def link(m, p0, p1, side, h0, h1, rc=.035, ends=(.24, .2), gap=.03, inset=.012):
+    """Tapered rounded-rect link from p0 to p1 (joint axis `side`): white body with a dark recessed seam ring
+    `ends` from each end. Half sizes h = (along side, across). Returns (direction, in-plane normal)."""
+    d = p1 - p0
+    ln = d.length
+    d.normalize()
+    w = d.cross(side).normalized()
+    hs = lambda t: [h0[i] + (h1[i] - h0[i]) * t / ln for i in (0, 1)]
+    sec = lambda t, k=0.0: rsec(p0 + d * t, side, w, *hs(t), rc, k)
+    cuts = [0, ends[0], ends[0] + gap, ln - ends[1] - gap, ln - ends[1], ln]
+    for i in range(5):
+        loft(m["frame"] if i in (1, 3) else m["white"], [sec(cuts[i], inset if i in (1, 3) else 0), sec(cuts[i + 1], inset if i in (1, 3) else 0)])
+    return d, w
+
+
+def arc(c, rad, th0, th1, steps, u, b0, b1, side):
+    """Points on a circle of radius rad round c in the (u, up) plane, side offset b0 -> b1."""
+    return [c + rad * (math.cos(th0 + (th1 - th0) * i / steps) * u + math.sin(th0 + (th1 - th0) * i / steps) * UP)
+            + (b0 + (b1 - b0) * i / steps) * side for i in range(steps + 1)]
+
+
+def build_arm(mount, mech, rng, ang):
+    """One loader arm. mount: the fixed parts bolted to the deck; mech: everything above the bearing."""
     y = Y_DECK1 + .02
-    for ang in (FRONT + math.radians(20), FRONT + math.radians(140), FRONT + math.radians(260)):
-        c = P(3.2, ang, y)
-        cyl(a["frame"], c[0], c[2], .32, y, y + .3, 16)
-        cyl(a["white"], c[0], c[2], .22, y + .3, y + .55, 16)
-        elbow = P(2.75, ang + .18, y + 1.5)
-        rod(a["white"], (c[0], y + .55, c[2]), elbow, .11, 10)
-        ball(a["node"], elbow, .16)
-        wrist = P(2.2, ang + .38, y + 1.15)
-        rod(a["white"], elbow, wrist, .085, 10)
-        ball(a["node"], wrist, .11)
-        t, n = radial(ang + .38)
-        obox(a["white"], (wrist[0], wrist[1] - .18, wrist[2]), (.32, .2, .22), t, n)
-        parcel(a, rng, (wrist[0], wrist[1] - .42, wrist[2]), (.4, .28, .34), t, n)
+    c, w = P(ARM_R, ang, y), P(ARM_WRIST_R, ang + ARM_WRIST_DA, y)
+    O = Vector(c)
+    U = Vector((w[0] - c[0], 0, w[2] - c[2])).normalized()    # reach direction (horizontal)
+    S = UP.cross(U)                                            # joint axis; the harness runs on +S
+    L = lambda a, h, b=0.0: O + a * U + h * UP + b * S
+
+    # fixed: chamfered mount plate, anchor bolts, flanged pedestal with flange bolts, junction box
+    loft(mount["frame"], [rsec(L(0, hh), U, S, .40, .40, .06, k) for k, hh in ((.012, 0), (0, .012), (0, .038), (.012, .05))])
+    for sa in (-1, 1):
+        for sb in (-1, 1):
+            lathe(mount["node"], L(.32 * sa, .05, .32 * sb), UP,                  # washer + hex nut
+                  [(.045, -.002), (.045, .008), (.027, .008), (.027, .03), (.019, .038)], 6)
+    lathe(mount["alu"], L(0, 0), UP, [(.33, .045), (.34, .055), (.34, .085), (.30, .095), (.30, .27), (.285, .29)], 24)
+    for i in range(8):
+        q = 2 * math.pi * (i + .5) / 8
+        lathe(mount["node"], L(.32 * math.cos(q), .083, .32 * math.sin(q)), UP, [(.016, 0), (.014, .022)], 6)
+    gbox(mount["frame"], L(-.335, .121), U, UP, S, (.12, .14, .22))                 # junction box, inside the plate
+    lathe(mount["cable"], L(-.335, .19), UP, [(.028, -.005), (.028, .02), (.02, .03)], 8)
+
+    # rotating: dark bearing gap, white turntable with a teal index mark, turret
+    lathe(mech["frame"], L(0, 0), UP, [(.272, .28), (.272, .33)], 24)
+    lathe(mech["white"], L(0, 0), UP, [(.28, .31), (.30, .325), (.30, .40), (.27, .43)], 24)
+    gbox(mech["tealglow"], L(.297, .365), U, UP, S, (.012, .03, .09))
+    lathe(mech["white"], L(0, 0), UP, [(.25, .40), (.25, .46), (.20, .62), (.18, .66)], 24)
+
+    # shoulder (J2), upper arm, elbow (J3) with its rear motor, forearm, wrist roll (J4), wrist pitch (J5)
+    J2, J3, J5 = L(0, .74), L(.35, 1.50), L(1.42, 1.26)      # elbow at v2's 1.5 m above the deck
+    joint(mech, J2, S, .21, .19, hub=True)
+    lathe(mech["white"], J2, -S, [(.085, .225), (.10, .245), (.10, .35), (.085, .37)], 16)   # shoulder motor
+    lathe(mech["frame"], J2, -S, [(.07, .365), (.07, .385)], 12)
+    d1, _ = link(mech, J2, J3, S, (.13, .12), (.11, .095))
+    joint(mech, J3, S, .16, .17)
+    d2 = (J5 - J3).normalized()
+    lathe(mech["white"], J3, -d2, [(.085, .10), (.105, .12), (.105, .27), (.09, .29)], 16)   # elbow motor
+    lathe(mech["frame"], J3, -d2, [(.07, .285), (.07, .305)], 12)
+    J4 = J5 - d2 * .17
+    link(mech, J3, J4, S, (.095, .09), (.075, .068), ends=(.2, .12))
+    lathe(mech["node"], J4, d2, [(.07, -.005), (.074, 0), (.074, .028), (.07, .033)], 16)     # wrist roll ring
+    lathe(mech["white"], J4, d2, [(.068, .03), (.068, .13), (.05, .17)], 16)
+    joint(mech, J5, S, .085, .10, n=12)
+
+    # tool: J6 rotary and flange pointing down, parallel gripper (body, rail, fingers, pads, lips), one parcel
+    lathe(mech["node"], J5, -UP, [(.055, .05), (.055, .12)], 12)
+    lathe(mech["frame"], J5, -UP, [(.08, .115), (.085, .12), (.085, .14), (.08, .145)], 16)
+    tb = J5 - UP * .145
+    bb = tb - UP * .095
+    loft(mech["white"], [rsec(bb + UP * hh, S, U, .24, .075, .025, k) for k, hh in ((.01, 0), (0, .01), (0, .085), (.01, .095))])
+    gbox(mech["tealglow"], bb + UP * .05 + U * .0755, S, UP, U, (.2, .014, .004))
+    gbox(mech["alu"], bb - UP * .012, S, UP, U, (.46, .024, .05))
+    ptop = bb - UP * .03
+    pc = ptop - UP * .13
+    for sg in (-1, 1):
+        f_top, f_bot = bb - UP * .004, pc - UP * .145
+        gbox(mech["alu"], bb - UP * .01 + S * sg * .1945, S, UP, U, (.05, .032, .075))         # finger carriage on the rail
+        gbox(mech["node"], (f_top + f_bot) / 2 + S * sg * .1945, S, UP, U, (.025, (f_top - f_bot).y, .065))
+        gbox(mech["node"], f_bot + UP * .012 + S * sg * .182, S, UP, U, (.045, .02, .057))     # lip under the parcel
+        gbox(mech["teal"], pc + S * sg * .17725, S, UP, U, (.0135, .19, .085))                   # grip pad, wider than the finger
+    parcel(mech, rng, tuple(pc), (.34, .26, .28), (S.x, S.z), (U.x, U.z))
+
+    # harness: turret -> loop round the shoulder -> back of the upper arm -> loop over the elbow -> forearm -> wrist
+    wb = S.cross(d1)
+    wb = -wb if wb.dot(U) > 0 else wb
+    n2 = d2.cross(S)
+    n2 = -n2 if n2.y < 0 else n2
+    th = lambda v: math.atan2(v.y, v.dot(U))
+    l1, l2 = (J3 - J2).length, (J4 - J3).length
+    pts = [L(-.13, .47, .12), L(-.2, .52, .15)]
+    pts += arc(J2, .27, math.radians(215), th(wb), 6, U, .15, .15, S)
+    pts += [J2 + d1 * t + wb * .15 + S * .15 for t in (.4, l1 - .3)]
+    pts += arc(J3, .21, th(wb), th(n2), 7, U, .15, .1, S)
+    pts += [J3 + d2 * t + n2 * .12 + S * .06 for t in (.3, l2 - .1)]
+    pts += [J4 + n2 * .03 + S * .03]
+    pipe(mech["cable"], pts, .024, 6)
+    for t in (.45, l1 - .5):
+        gbox(mech["node"], J2 + d1 * t + wb * .13 + S * .14, d1, wb, S, (.035, .09, .075))
+    for t in (.45, l2 - .25):
+        gbox(mech["node"], J3 + d2 * t + n2 * .1 + S * .06, d2, n2, S, (.03, .06, .07))
+
+
+def tri_count(accs):
+    return sum(len(f) - 2 for acc in accs.values() for f in acc.f)
+
+
+def merge_accs(dst, src):
+    for role, acc in src.items():
+        d = dst[role]
+        base = len(d.v)
+        d.v += acc.v
+        d.f += [tuple(base + i for i in f) for f in acc.f]
+        if hasattr(d, "uvt"):
+            d.uvt += acc.uvt
+
+
+def bvh(accs):
+    from mathutils.bvhtree import BVHTree
+    vs, fs = [], []
+    for acc in accs.values():
+        base = len(vs)
+        vs += acc.v
+        fs += [tuple(base + i for i in f) for f in acc.f]
+    return BVHTree.FromPolygons(vs, fs)
+
+
+def build_roof_kit(a, rng):
+    """Loader arms and parcel pallets on the roof deck (both end up in the shell). Returns (mount, mech) of the arms."""
+    mount, mech = Accs(), Accs()
+    for ang in ARM_ANGLES:
+        build_arm(mount, mech, rng, ang)
+    y = Y_DECK1 + .02
     for ang in (FRONT + math.radians(d) for d in (70, 110, 190, 230, 310, 350)):
         c = P(3.0, ang, y)
         t, n = radial(ang)
@@ -549,6 +733,7 @@ def build_roof_kit(a, rng):
                     if rng.random() < .85:
                         parcel(a, rng, (c[0] + t[0] * sx + n[0] * sz, hy + .15, c[2] + t[1] * sx + n[1] * sz), (.5, .3, .36), t, n)
             hy += .3
+    return mount, mech
 
 
 # --- rotating drums -----------------------------------------------------------------------------------------
@@ -795,7 +980,17 @@ def main():
 
     shell = Accs()
     build_shell(shell)
-    build_roof_kit(shell, rng)
+    mount, mech = build_roof_kit(shell, rng)
+    # arms: triangle count; the parts above the bearing must not touch the deck, arcade, planters or pallets
+    hits_roof = len(bvh(mech).overlap(bvh(shell)))
+    print("ARM_TRIS per arm %d (mount %d, mech %d), three arms %d" % (
+        (tri_count(mount) + tri_count(mech)) // len(ARM_ANGLES), tri_count(mount) // len(ARM_ANGLES),
+        tri_count(mech) // len(ARM_ANGLES), tri_count(mount) + tri_count(mech)))
+    print("ARM_CLEARANCE arm moving parts x roof and pallets: %d overlapping triangle pairs" % hits_roof)
+    if hits_roof:
+        raise SystemExit("arm parts intersect the roof or pallets")
+    merge_accs(shell, mount)
+    merge_accs(shell, mech)
     make_obj("Q07B_Shell", shell, asset_col, root)
     port = Accs()
     build_port(port, rng)

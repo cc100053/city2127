@@ -1,7 +1,7 @@
 # q07b-pickup-tower — Q07-B 回る本棚のような受け取り塔 (Blender model, Dream Loop)
 
 - Owner: repository owner (requester of this task)
-- Status: IN_PROGRESS — local asset ready for owner review; not placed, not committed, not pushed
+- Status: IN_PROGRESS — v3 (roof arms polished, 2026-11-22) committed locally for owner review; not placed, not pushed
 - Branch: `feat/q07b-pickup-tower` (created locally from `main`)
 - Base commit: `df59a7defc14552fadd3f91920498c58707fe532`
 - Last verified commit: NONE — checks ran on the uncommitted worktree on top of the base commit
@@ -157,6 +157,93 @@ Owner brief: thinner bands, glass, metal frames and depth in front of the shelve
 - **Pickup.** The kiosk is small at main-view scale. The target's wide lit bay with the hand-over in front is shown as kiosk plus storefront instead.
 - **Budget.** It is self-set (≤ 90k) and not yet agreed with the owner.
 
+## v3 round (2026-11-22, owner request: roof arms only)
+
+Owner brief: polish only the roof arms. Keep their roof sites and scale; follow the target for use, proportion, pose and end tool; make the fixed and rotating base layers, the joints and the end tool readable (grey model first), and keep the 7B palette. Two Dream Loop rounds with a fixed camera and light, no intersection with the roof, local only until the owner reviews.
+
+**Session Git state.** Main checkout `main` at `a0df0603`, clean and equal to `origin/main` (fetched 2026-11-22). The branch `feat/q07b-pickup-tower` (`8b12ab44`, local only, on `df59a7d`) was resumed in the worktree `../city2127-q07b`, not merged with `main`.
+
+**Reference reading.** The target's roof shows white palletising robots on dark square base plates. Each has a short turret, a big round shoulder, an upper arm leaning back, an elbow, and a forearm reaching over the deck. The wrist points the tool down to pick parcels. No drive rods or harness can be made out at the target's resolution. v3 therefore adds a harness only as the brief's material layer and routes it round the joints. It has no drive rods.
+
+**What changed** (`build_arm`, one call per arm; v2 sites and reach are unchanged):
+- Bases stay on r 3.2 at FRONT + 20°, 140° and 260°.
+- The wrist is over r 2.2, +0.38 rad.
+- The elbow is 1.5 m above the deck, as in v2.
+
+| Part | v3 |
+| --- | --- |
+| Fixed | 0.8 m chamfered dark mount plate with four washer + hex anchor bolts; dark-metal flanged pedestal with 8 flange bolts; junction box with a cable gland |
+| Rotating | dark recessed bearing gap, then a white chamfered turntable with a teal index mark, and the turret |
+| Joints | shoulder (r 0.21, side motor on −S, hub), elbow (r 0.16, rear motor along the forearm), wrist roll ring (J4), wrist pitch (J5); each housing steps down to a metal ring and a dark cap |
+| Links | tapered rounded-rect upper arm and forearm, a dark recessed seam ring near each end |
+| Harness | dark rubber (`q07b_cable`, new material): turret → loop round the shoulder → back of the upper arm → loop over the elbow → top of the forearm → wrist, held by four metal clamps |
+| Tool | J6 rotary and dark tool flange, white gripper body with a teal status strip, dark rail, two finger carriages, metal fingers with lips under the parcel, teal grip pads; one parcel held ≈ 0.73 m above the deck |
+
+The arms stay merged into `Q07B_Shell`; v2 had no arm nodes, pivots or animation, so nothing was preserved or re-checked for motion. The build keeps `rng` consumption identical (one parcel per arm), and the other eight nodes are byte-identical in their vertices to v2 (hash check below).
+
+**Dream Loop.**
+- Fixed setup:
+  - New cameras in `staging.py`: `arm`, `armbase` and `armtool` on the right arm (FRONT + 260°), from its front-right on the harness side, plus `oblique` for the whole tower.
+  - The light is the shared sun.
+  - `render_glb.py --clay` renders the grey model.
+- **R1 (silhouette, proportion, joint positions):**
+  - The joints read in order.
+  - The first camera cut the elbow; it was re-aimed once, and before and after were re-rendered with the final cameras.
+  - The elbow harness loop was too wide and one clamp floated.
+  - The fingers were broad slabs that hid the pads.
+  - At 5,840 tris per arm the arms were too heavy.
+- **R2 (seams, end tool, roof junction):**
+  - The plate sits flat on the deck, and the bolts and flange read.
+  - The bearing gap separates the fixed and rotating layers.
+  - Seam rings and caps read in grey.
+  - Fingers were narrowed so the pad edges show, and finger carriages were added on the rail.
+- **Final:**
+  - The elbow was lowered from 1.6 m back to v2's 1.5 m, to keep the scale.
+  - Lips and the junction box were moved off coplanar faces.
+
+Renders are in `~/city2127-evidence/q07b-arm-polish/`, outside Git:
+- Folders: `{before,r1,r2,final}/`.
+- Sheets: `compare-closeup.jpg`, `compare-clay.jpg`, `rounds-arm.jpg`, `compare-oblique.jpg`.
+
+**Files.**
+- The asset path holds v3.
+- v2 is preserved outside Git in `.dream-loop/q07b/v2/`: `.blend`, `.glb` (SHA256 `C3F52F0B…60AD76`) and scripts.
+- v3 is copied to `.dream-loop/q07b/v3-arm/q07b-pickup-tower-v3-arm.{blend,glb}` (GLB SHA256 `D911B9ED…2CA8358`).
+- The R1 GLB is in `.dream-loop/q07b/v3-r1/`.
+
+**Validation, uncommitted worktree on `8b12ab44`.**
+
+Arm triangles (fan count, n-gon = n − 2):
+
+| | Per arm | Three arms |
+| --- | --- | --- |
+| v2 | 256 | 768 |
+| v3 | 4,568 | 13,704 |
+
+The v3 per-arm count splits into 816 fixed (mount) and 3,752 above the bearing.
+
+- **Build checks:**
+  - `ARM_CLEARANCE`: 0 overlapping triangle pairs between the parts above the bearing and the deck, arcade, planters and pallets.
+- **`check_glb.py`:** PASS.
+  - 87,552 tris (v2 74,616), 22 materials, 9 meshes.
+  - GLB 4,287,436 bytes.
+  - Bounds 13.80 × 13.85 × 14.35 m. It is 14.26 m in v2: the harness loop over the elbow is now the highest point, about 9 cm above the mast caps.
+- **Node comparison with v2:** the carriage, the port and all six drums are identical (triangles and vertex hash). Only `Q07B_Shell` differs: 36,172 → 49,108, which is −768 + 13,704.
+- **`qa_check.py` on `Q07B_Shell`:**
+  - z-fighting 0 (the first build had 47, from the gripper lips and the junction box; fixed).
+  - The only error is the floating roof parcel at (0.22, 2.80, 13.51), also present in v2.
+- **`assetLibrary.test.ts`:** PASS.
+- **Root `npm test`:** FAILED at `surveyMeterPipeline.test.ts`, which stops the chain.
+  - The tests after it were run one by one: all PASS except `energyPipeline.test.ts`.
+  - Both failures have one cause. `survey/tests/surveyFixture.ts` turns `new URL(...).pathname` into a file path, which breaks on Windows under this non-ASCII path (`C:\C:\…%E6…`).
+  - The cause is outside this change: `survey/` is untouched.
+- **`npm run build`:** PASS.
+- **`git diff --check`:** PASS.
+
+**v3 gaps and limits.**
+- The arms are static and site-only. They could become a kit entry once accepted.
+- 4.6k tris per arm is heavy for a part seen mostly from afar. An LOD or a lighter far version is the lever if the budget tightens.
+
 ## Next expected step
 
-The owner reviews the local asset (renders, `.blend`, `.glb`). After acceptance: commit and push `feat/q07b-pickup-tower`; then, as a separate task, choose a lot and integrate (`addCityModel`, budget, `?asset-preview`, browser checks).
+The owner reviews the v3 arms (comparison sheets and the `v2` / `v3-arm` copies). After acceptance: push `feat/q07b-pickup-tower` (v3 is a local commit only); then, as a separate task, choose a lot and integrate (`addCityModel`, budget, `?asset-preview`, browser checks).

@@ -17,6 +17,11 @@ CAMERAS = {
     "street": ((5.0, 1.6, 20), (.8, 6.4, 0), 20, (1600, 900)),  # eye height, whole tower
     "port": ((-2.8, 1.65, 11.5), (.5, 2.0, 4.2), 28, (1600, 900)),
     "pickup": ((1.9, 1.6, 10.4), (0, 1.75, 6.0), 30, (1600, 900)),  # close-up of the pickup window
+    # roof arm close-ups (v3 arm polish): the right arm (FRONT + 260 deg), seen from its front-right, harness side
+    "arm": ((3.18, 15.12, 3.50), (2.66, 13.62, -.06), 35, (1600, 900)),
+    "armbase": ((3.55, 13.85, 1.75), (3.12, 13.05, -.50), 45, (1600, 900)),
+    "armtool": ((3.05, 14.20, 2.00), (2.15, 13.60, .45), 45, (1600, 900)),
+    "oblique": ((17, 17, 23), (0, 7.0, 0), 38, (1100, 825)),          # whole tower, front-right from above
 }
 
 
