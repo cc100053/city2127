@@ -114,11 +114,26 @@ const towardWing = new Vector3(0, 0, 1);
 const alongReturn = new Vector3(1, 0, 0);
 const facadeHit = (origin: Vector3, direction: Vector3) =>
   new Raycaster(origin, direction, 0, 8).intersectObject(facade, true)[0];
-for (const [x, y] of [[35.1, 87], [31.8, 98]]) {
+for (const [x, y] of [[37.25, 87], [31.8, 98]]) {
   const rib = facadeHit(new Vector3(x, y, -7), towardWing);
-  assert.ok(rib?.object.name === 'Facade_ceramic' && rib.point.z < -4.8,
-    'The two-storey ceramic pier is proud of the curtain wall and leans across the paired openings');
+  assert.ok(rib?.object.name === 'Facade_ceramic' && rib.point.z < -5.45 &&
+    Math.abs(rib.face?.normal.x ?? 0) > .2,
+    'The projecting pier has oblique faces and rakes across the two openings');
 }
+const seaSill = facadeHit(new Vector3(21.5, 86.3, -7), towardWing);
+const returnSill = facadeHit(new Vector3(16, 86.3, -2.76), alongReturn);
+const cornerSill = facadeHit(new Vector3(16, 86.3, -8.26), new Vector3(1, 0, 1).normalize());
+assert.ok(seaSill?.object.name === 'Facade_ceramic' && returnSill?.object === seaSill.object &&
+  cornerSill?.object === seaSill.object &&
+  Math.abs(seaSill.point.z + 4.25) < .03 &&
+  Math.abs(returnSill.point.x - 20.01) < .03 &&
+  cornerSill.point.distanceTo(new Vector3(returnSill.point.x, 86.3, seaSill.point.z)) < .02,
+  'The splayed sill meets at one continuous miter across both faces');
+const lowerReturn = facadeHit(new Vector3(16, 90, 7), alongReturn);
+const upperReturn = facadeHit(new Vector3(16, 98, 7), alongReturn);
+assert.ok(lowerReturn?.object.name === 'Facade_ceramic' && (lowerReturn.face?.normal.z ?? 0) > .3 &&
+  upperReturn?.object.name === 'Facade_clear',
+  'The return jamb tapers toward the corner at the bottom and opens up above');
 for (const y of [87, 98]) {
   for (const x of [22.18, 43]) {
     const seaGlass = facadeHit(new Vector3(x, y, -7), towardWing);

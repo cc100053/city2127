@@ -91,20 +91,23 @@ def pilot_frame(ceramic, x, z, sea_end, return_end, low, high):
             result.append(indices[point])
         return result
 
-    pier = (13.8, 9.45)
-    for left, right, wraps in (((z - return_end,) * 2, pier, True),
+    pier = (14.45, 8.65)
+    return_jamb = z - return_end
+    for left, right, wraps in (((return_jamb + 2.35, return_jamb), pier, True),
                                (pier, (sea_end - x,) * 2, False)):
-        # The return jamb leans further in at the head. Fine mullions stay behind this structure.
-        inset_left = (1.35, 2.65) if wraps else (1.15, 1.15)
-        inset_right = (1.15, 1.15) if wraps else (1.25, 1.8)
+        # The return rakes toward the corner at the sill, then fans out at the head.
+        inset_left = (2.25, 1.45) if wraps else (1.35, 1.35)
+        inset_right = (1.35, 1.35) if wraps else (1.35, 1.75)
         opening_left = tuple(u + inset for u, inset in zip(left, inset_left))
         opening_right = tuple(u - inset for u, inset in zip(right, inset_right))
-        throat_left = tuple(u + .38 for u in opening_left)
-        throat_right = tuple(u - .38 for u in opening_right)
-        outer = loop(left, right, low, high, .8, 0, -2.20, wraps)
-        mouth = loop(opening_left, opening_right, low + 1.13, high - 1.02, 1.10, .96, -2.20, wraps)
-        throat = loop(throat_left, throat_right, low + 1.51, high - 1.40, .82, .72, .36, wraps)
-        back = loop(left, right, low, high, .8, 0, .36, wraps)
+        throat_left = tuple(u + .94 for u in opening_left)
+        throat_right = tuple(u - .94 for u in opening_right)
+        # Two facets meet along the projecting lip and follow the same miter into the return.
+        outer = loop(left, right, low, high, .8, 0, -1.68, wraps)
+        mouth = loop(opening_left, opening_right, low + 1.40, high - 1.31, 1.72, 1.48, -3.05, wraps)
+        throat = loop(throat_left, throat_right, low + 2.12, high - 1.98, 1.03, .89, .36, wraps)
+        back_left = (return_jamb,) * 2 if wraps else left
+        back = loop(back_left, right, low, high, .8, 0, .36, wraps)
         shared_edge = 3 if wraps else 6
         for i in range(len(outer)):
             j = (i + 1) % len(outer)
