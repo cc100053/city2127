@@ -10,7 +10,11 @@ import { deck } from './skyways.ts';
 
 /** polish2: the chrome sphere's sky reflection dims at night (gunmetal with highlights, as the night target), set by `updateCivic`. */
 const civicSphere={material:null as T.MeshPhysicalMaterial|null};
-export const updateCivic=(night:number)=>{if(civicSphere.material)civicSphere.material.envMapIntensity=1.1-night*.7;};
+const guideNight={value:0};
+export const updateCivic=(night:number)=>{
+  if(civicSphere.material)civicSphere.material.envMapIntensity=1.1-night*.7;
+  guideNight.value=T.MathUtils.smoothstep(night,.12,.87);
+};
 export async function loadCivicFacade() {
   const url = new URL('../asset/models/fuji-civic-facade/fuji-civic-facade.glb', import.meta.url).href;
   try { return (await new GLTFLoader().loadAsync(url)).scene; }
@@ -25,6 +29,30 @@ export function civicCore(facade?: T.Group) {
   // so occupied rooms read as silhouettes against warm light instead of blue-grey rows.
   const glass=megaGlass.clone();glass.color.set('#c5d3db');glass.roughness=.4;glass.metalness=.05; // pale glass for the frame's window panels
   const trim=cityTrim.clone();trim.color.set('#f3f2ec');
+  const guideLight=trim.clone();
+  guideLight.name='fuji_guide';
+  // OpticalLayout in the GLB follows each ceramic reveal and marks the mezzanine status lenses.
+  guideLight.onBeforeCompile=shader=>{
+    shader.uniforms.guideNight=guideNight;
+    shader.vertexShader=shader.vertexShader.replace('#include <common>',`#include <common>
+      attribute vec2 uv1;
+      varying vec2 vFujiOptical;`)
+      .replace('#include <uv_vertex>','#include <uv_vertex>\nvFujiOptical=uv1;');
+    shader.fragmentShader=shader.fragmentShader.replace('#include <common>',`#include <common>
+      uniform float guideNight;
+      varying vec2 vFujiOptical;`)
+      .replace('#include <emissivemap_fragment>',`#include <emissivemap_fragment>
+        float status=step(.8,vFujiOptical.x);
+        float offset=abs(vFujiOptical.y-.5);
+        float aa=max(fwidth(vFujiOptical.y)*.65,.001);
+        float line=1.-smoothstep(.031-aa,.031+aa,offset);
+        float joint=smoothstep(.007,.017,abs(vFujiOptical.x-.48));
+        float graze=exp(-max(0.,offset-.03)*19.);
+        diffuseColor.rgb*=mix(1.,.30,status);
+        totalEmissiveRadiance+=vec3(.49,.77,1.)*guideNight*
+          mix(joint*(line*3.25+graze*.21),1.55,status);`);
+  };
+  guideLight.customProgramCacheKey=()=>'fuji-optical-guide';
   const stone=trim; // P2: one white finish for frame and slabs (keeps the batch count)
   const solar=citySolar.clone();solar.color.set('#6a7279'); // warm umber: unlit room depth reads brown-dark under the amber light
   // Warm occupied rooms follow the existing city clock, using one shared finish for this building.
@@ -76,17 +104,20 @@ export function civicCore(facade?: T.Group) {
     ['fuji_ceramic', trim], ['fuji_graphite', solar], ['fuji_clear', silverGlass],
     ['fuji_warm', publicLight], ['fuji_studio', broadcastLight],
   ]);
+  const missingFinishes = new Set(finishes.values());
+  finishes.set('fuji_guide',guideLight);
   const facadeMeshes = new Map<T.Mesh, T.Material>();
-  const foundFinishes = new Set<T.Material>();
   let invalidFacade = false;
   facade?.traverse(object => {
     if (!(object instanceof T.Mesh)) return;
     const finish = Array.isArray(object.material) ? undefined : finishes.get(object.material.name);
-    if (!finish) { invalidFacade = true; return; }
+    if (!finish || (finish === guideLight && !object.geometry.hasAttribute('uv1'))) {
+      invalidFacade = true; return;
+    }
     facadeMeshes.set(object, finish);
-    foundFinishes.add(finish);
+    missingFinishes.delete(finish);
   });
-  const facadeReady = !!facade && !invalidFacade && foundFinishes.size === finishes.size;
+  const facadeReady = !!facade && !invalidFacade && missingFinishes.size === 0;
   if (facadeReady) {
     for (const [mesh, finish] of facadeMeshes) mesh.material = finish;
     root.add(facade);

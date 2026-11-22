@@ -15,6 +15,7 @@ FINISHES = {
     'clear': ((.57, .68, .74, .22), .34),
     'warm': ((.78, .63, .48, 1), .65, (.90, .57, .30, 1), .35),
     'studio': ((.36, .55, .76, 1), .58, (.31, .57, .92, 1), .28),
+    'guide': ((.89, .87, .81, 1), .64),
 }
 
 
@@ -66,7 +67,7 @@ def curtain_wall(parts, point, length, level, height, count, floor, wing, return
 
 def pilot_frame(ceramic, x, z, sea_end, return_end, low, high):
     """One mitered surround with a slanted shared pier and two splayed openings."""
-    vertices, faces, indices = [], [], {}
+    vertices, faces, indices, reveals = [], [], {}, {}
 
     def corner_point(u, y, depth):
         # Negative u runs up the return. At u=0 both offsets meet on the miter.
@@ -111,6 +112,11 @@ def pilot_frame(ceramic, x, z, sea_end, return_end, low, high):
         shared_edge = 3 if wraps else 6
         for i in range(len(outer)):
             j = (i + 1) % len(outer)
+            reveals[len(ceramic.f) + len(faces) + 1] = (
+                {len(ceramic.v) + index for index in (mouth[i], mouth[j])},
+                {len(ceramic.v) + index for index in (mouth[j], throat[j])},
+                .72 if sum((a - b) ** 2 for a, b in zip(vertices[mouth[i]], vertices[mouth[j]])) > 3.5 ** 2 else .20,
+            )
             faces.extend(((outer[i], mouth[i], mouth[j], outer[j]),
                           (mouth[i], throat[i], throat[j], mouth[j]),
                           (throat[i], back[i], back[j], throat[j])))
@@ -118,6 +124,13 @@ def pilot_frame(ceramic, x, z, sea_end, return_end, low, high):
                 faces.append((back[i], outer[i], outer[j], back[j]))
 
     ceramic.solid(vertices, faces)
+    return reveals
+
+
+def pilot_status(guide, x, z, level):
+    """Status lenses sit in the front of the existing studio mezzanine beam."""
+    for i, width in enumerate((.34, .34, .34, .52, .34, .34, .52)):
+        obox(guide, (x + 4.35 + i * .55, level + 9.2, z - .04), (width, .14, .044))
 
 
 def pilot_panes(parts, x, z, sea_end, return_end, level, height, sea_bays, return_bays):
@@ -179,13 +192,15 @@ def build():
                 corner_x, corner_z = x - width / 2 + .5, -2.76
                 sea_end = x - span / 2 + span * pilot_sea_bays / sea_bays
                 return_end = -2.72 + side_span * pilot_side_bays / side_bays
-                pilot_frame(parts['ceramic'], corner_x, corner_z, sea_end - .025, return_end - .025,
-                            level + 1.57, level + height + .91)
+                reveals = pilot_frame(parts['ceramic'], corner_x, corner_z, sea_end - .025, return_end - .025,
+                                      level + 1.57, level + height + .91)
                 pilot_panes(parts, corner_x, corner_z, sea_end, return_end, level, height,
                             pilot_sea_bays, pilot_side_bays)
+                pilot_status(parts['guide'], corner_x, corner_z, level)
 
+    guide_finish = material('fuji_guide', *FINISHES['guide'])
     for role, geometry in parts.items():
-        finish = material(f'fuji_{role}', *FINISHES[role])
+        finish = guide_finish if role == 'guide' else material(f'fuji_{role}', *FINISHES[role])
         obj = finish_mesh(f'Facade_{role}', geometry, finish)
         # Keep each quad in its own UV tile for editable panel finishes.
         uv = obj.data.uv_layers.new().uv
@@ -194,6 +209,19 @@ def build():
             x, y = face.index % tiles, face.index // tiles
             for loop, (u, v) in zip(face.loop_indices, ((.05, .05), (.95, .05), (.95, .95), (.05, .95))):
                 uv[loop].vector = ((x + u) / tiles, (y + v) / tiles)
+        if role == 'ceramic':
+            obj.data.materials.append(guide_finish)
+            optical = obj.data.uv_layers.new(name='OpticalLayout').uv
+            for face_index, (lip, end, end_u) in reveals.items():
+                face = obj.data.polygons[face_index]
+                face.material_index = 1
+                for loop, vertex in zip(face.loop_indices, face.vertices):
+                    optical[loop].vector = (end_u if vertex in end else .05, 0 if vertex in lip else 1)
+        elif role == 'guide':
+            optical = obj.data.uv_layers.new(name='OpticalLayout').uv
+            for face in obj.data.polygons:
+                for loop, (u, v) in zip(face.loop_indices, ((.84, .05), (.95, .05), (.95, .95), (.84, .95))):
+                    optical[loop].vector = (u, v)
         bpy.context.collection.objects.link(obj)
     bpy.ops.wm.save_as_mainfile(filepath=str(HERE / 'fuji-civic-facade.blend'))
 

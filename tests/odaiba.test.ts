@@ -114,24 +114,31 @@ const towardWing = new Vector3(0, 0, 1);
 const alongReturn = new Vector3(1, 0, 0);
 const facadeHit = (origin: Vector3, direction: Vector3) =>
   new Raycaster(origin, direction, 0, 8).intersectObject(facade, true)[0];
+const ceramicSurround = facade.getObjectByName('Facade_ceramic');
+assert.ok(ceramicSurround, 'The GLB retains the ceramic surround and its material primitives');
 for (const [x, y] of [[37.25, 87], [31.8, 98]]) {
   const rib = facadeHit(new Vector3(x, y, -7), towardWing);
-  assert.ok(rib?.object.name === 'Facade_ceramic' && rib.point.z < -5.45 &&
+  assert.ok(rib?.object.parent === ceramicSurround && rib.point.z < -5.45 &&
     Math.abs(rib.face?.normal.x ?? 0) > .2,
     'The projecting pier has oblique faces and rakes across the two openings');
 }
 const seaSill = facadeHit(new Vector3(21.5, 86.3, -7), towardWing);
 const returnSill = facadeHit(new Vector3(16, 86.3, -2.76), alongReturn);
 const cornerSill = facadeHit(new Vector3(16, 86.3, -8.26), new Vector3(1, 0, 1).normalize());
-assert.ok(seaSill?.object.name === 'Facade_ceramic' && returnSill?.object === seaSill.object &&
+assert.ok(seaSill?.object.parent === ceramicSurround && returnSill?.object === seaSill.object &&
   cornerSill?.object === seaSill.object &&
   Math.abs(seaSill.point.z + 4.25) < .03 &&
   Math.abs(returnSill.point.x - 20.01) < .03 &&
   cornerSill.point.distanceTo(new Vector3(returnSill.point.x, 86.3, seaSill.point.z)) < .02,
   'The splayed sill meets at one continuous miter across both faces');
+assert.ok(seaSill.uv1 && returnSill.uv1 && cornerSill.uv1 &&
+  Math.abs(cornerSill.uv1.y - .5) < .045 &&
+  Math.abs(seaSill.uv1.y - cornerSill.uv1.y) < .001 &&
+  Math.abs(returnSill.uv1.y - cornerSill.uv1.y) < .001,
+  'One optical band follows both sill surfaces through the ceramic miter');
 const lowerReturn = facadeHit(new Vector3(16, 90, 7), alongReturn);
 const upperReturn = facadeHit(new Vector3(16, 98, 7), alongReturn);
-assert.ok(lowerReturn?.object.name === 'Facade_ceramic' && (lowerReturn.face?.normal.z ?? 0) > .3 &&
+assert.ok(lowerReturn?.object.parent === ceramicSurround && (lowerReturn.face?.normal.z ?? 0) > .3 &&
   upperReturn?.object.name === 'Facade_clear',
   'The return jamb tapers toward the corner at the bottom and opens up above');
 for (const y of [87, 98]) {
@@ -147,8 +154,13 @@ for (const y of [87, 98]) {
     'Clear panes wrap both faces of the same slim dark corner joint');
 }
 const opaquePanel = facadeHit(new Vector3(39, 98, -7), towardWing);
-assert.ok(opaquePanel?.object.name === 'Facade_ceramic' && Math.abs(opaquePanel.point.z + 2.38) < .02,
+assert.ok(opaquePanel?.object.parent === ceramicSurround && Math.abs(opaquePanel.point.z + 2.38) < .02,
   'The solid ceramic panel stays at the rear glazing plane');
+const statusLens = facadeHit(new Vector3(25.85, 92.2, -6), towardWing);
+const statusGap = facadeHit(new Vector3(26.1, 92.2, -6), towardWing);
+assert.ok(statusLens?.object.name === 'Facade_guide' && (statusLens.uv1?.x ?? 0) > .8 &&
+  Math.abs(statusLens.point.z + 2.822) < .002 && statusGap?.object.name === 'Facade_graphite',
+  'Discrete status lenses project from the real mezzanine datum with dark gaps');
 const core = civicCore(facade);
 const fallback = civicCore();
 assert.equal(core.userData.facade, 'blender');
@@ -164,8 +176,10 @@ landmarks.push(core);
 const coreBounds=new Box3().setFromObject(core);
 assert.deepEqual(coreBounds, new Box3().setFromObject(fallback), 'The projecting facade fits within the existing civic silhouette bounds');
 assert.ok(coreBounds.min.y>=-7 && coreBounds.max.y<195, 'Civic chassis (polish2: 1.35× frame) stays below the sphere approach tier'); // the district loop at 164–176 m runs ~350 m out
-assert.ok(core.children.length<=11, 'Static civic chassis batches by shared material, including matte landing stone');
+assert.ok(core.children.length<=12, 'Static civic chassis adds at most one batch for the optical guide');
 assert.ok(core.children.every(object=>object instanceof Mesh && !Array.isArray(object.material)), 'No per-member draws');
+assert.equal(core.children.filter(object=>object instanceof Mesh && !Array.isArray(object.material) &&
+  object.material.name === 'fuji_guide').length, 1, 'Both reveals and seven lenses share one guide batch');
 // Actual chassis must preserve the bay approach and berth, including a 22 m aircraft wing envelope.
 core.updateMatrixWorld(true);
 // Occupied production floors in both wings need real support and standing headroom after material batching.
