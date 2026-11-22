@@ -1,5 +1,6 @@
 import * as T from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { buildHullFacade } from './hullFacade.ts';
 import { hash, plantCanopy, plantShrubs } from './coastalCanopy.ts';
 import { bodyFootprints, inRect } from './megaFootprints.ts';
 import { addCityModel } from './modelAssets.ts';
@@ -47,6 +48,26 @@ const megaPortal = new T.MeshStandardMaterial({ color: '#141b20', emissive: '#30
 /** Tunnel lights in the ring's road gate (outside the carve, so its own finish). */
 const gateLight = new T.MeshStandardMaterial({ color: '#fff4dc', emissive: '#fff1d0', emissiveIntensity: .8, roughness: .4 });
 const ringGlazing = new T.MeshStandardMaterial({ color: '#6c8895', emissive: '#c59262', emissiveIntensity: .06, roughness: .22, metalness: .26 });
+// The hull's single pane layer reveals the built recesses behind it.
+const hullGlass = new T.MeshPhysicalMaterial({
+  name: 'hull-glass', color: '#789bac', transparent: true, opacity: .32, depthWrite: false,
+  roughness: .15, metalness: .26, clearcoat: .65, clearcoatRoughness: .13,
+});
+const hullCove = new T.MeshStandardMaterial({
+  name: 'hull-room-cove', color: '#b9afa1', emissive: '#ffd29b', emissiveIntensity: .02, roughness: .64,
+});
+hullCove.onBeforeCompile = shader => {
+  shader.vertexShader = shader.vertexShader
+    .replace('#include <common>', '#include <common>\nvarying float hullRoomHeight;')
+    .replace('#include <project_vertex>', '#include <project_vertex>\nhullRoomHeight = uv.y;');
+  shader.fragmentShader = shader.fragmentShader
+    .replace('#include <common>', '#include <common>\nvarying float hullRoomHeight;')
+    .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
+      float cove = smoothstep(.685, .76, hullRoomHeight) * (1. - smoothstep(.845, .94, hullRoomHeight));
+      totalEmissiveRadiance *= .13 + .28 * hullRoomHeight + .71 * cove;`);
+};
+hullCove.customProgramCacheKey = () => 'hull-room-cove';
+const hullFinishes = { shell: megaShell, silver: megaRib, shadow: megaJoint, glass: hullGlass, cove: hullCove };
 const transferCove = gateLight.clone();
 transferCove.color.set('#f1cf9d'); transferCove.emissive.set('#ffc77d');
 const ringFinishes = new Map([
@@ -75,6 +96,7 @@ export const updateMegastructures = (night: number) => {
   gateLight.emissiveIntensity = .8 + night * 1.4; roomGlow.value = night;
   ringGlazing.emissiveIntensity = .06 + night * 1.05;
   transferCove.emissiveIntensity = .62 + night * 1.3;
+  hullCove.emissiveIntensity = .02 + night * 1.21;
   lightSlopePlants(night);
 };
 
@@ -84,7 +106,8 @@ type Batch = Map<T.Material, T.BufferGeometry[]>;
 /** Queue a geometry (placed by `m`) under a material; everything is normalised so per-material merging always succeeds. */
 function put(batch: Batch, material: T.Material, g: T.BufferGeometry, m?: T.Matrix4) {
   const flat = g.index ? g.toNonIndexed() : g.clone();
-  flat.deleteAttribute('uv'); if (m) flat.applyMatrix4(m);
+  if (material !== hullCove) flat.deleteAttribute('uv');
+  if (m) flat.applyMatrix4(m);
   (batch.get(material) ?? batch.set(material, []).get(material)!).push(flat);
 }
 /** Turn a surface inside out (inner faces of the ring). */
@@ -312,6 +335,14 @@ function hull(batch: Batch, trees: Plant[], shrubs: Shrub[]) {
     put(batch, megaPortal, new T.BoxGeometry(.3, h, w), at(u, c, y));
     for (const [dy, dd, bh, bw] of [[h / 2, 0, .7, w + 1.4], [-h / 2, 0, .7, w + 1.4], [0, w / 2 + .35, h, .7], [0, -w / 2 - .35, h, .7]])
       put(batch, megaSeam, new T.BoxGeometry(.9, bh, bw), at(u + sgn * .3, c + dd, y + dy));
+    // A rounded metal collar stays outside the original rectangular train envelope.
+    const collar = new T.Shape(), outerHalf = w / 2 + 1.85, outerTop = h / 2 + 1.85;
+    for (const [side, rise, start] of [[1, 1, 0], [-1, 1, 1], [-1, -1, 2], [1, -1, 3]]) {
+      collar.absarc(side * (outerHalf - 2.1), rise * (outerTop - 2.1), 2.1, start * Math.PI / 2, (start + 1) * Math.PI / 2, false);
+    }
+    collar.closePath();
+    const edge = collar.getPoints(5).map(({ x, y: rise }) => world(u + sgn * .24, c + x, y + rise));
+    for (let i = 1; i < edge.length; i++) bar(batch, megaRib, edge[i - 1], edge[i], .8, .8);
   }
   const entrance = 53; // Existing plaza walk lands here.
   const publicTerraces = new Map([
@@ -321,23 +352,24 @@ function hull(batch: Batch, trees: Plant[], shrubs: Shrub[]) {
   ]);
   for (let k = 0; k < steps; k++) {
     const y0 = k * step, f = front(k, 0), u0 = left(k);
-    slab(k, y0, 1.2, 1.6, megaSeam); // glowing lip at the foot of each face
-    // polish2: the white slab carries the read (target: white terraced hull), one recessed glass storey under the next lip.
-    const g0 = 9.5;
-    if (k === 0) { // Entrance polish (owner 2026-11-20): the street storey is a glazed shopfront, set 1.5 m back under a white fascia on columns every 6 m
-      slab(k, y0 + 1.2, 5.4, -1.5, megaGlass);
-      slab(k, y0 + 6.6, g0 - 6.6, 1.2, megaShell);
-      const column = new T.BoxGeometry(.9, 5.4, .9);
-      for (let u = u0 + 3; u < L2 - 1; u += 6) put(batch, megaRib, column, at(u, dAt(k, u, 0) - .6, y0 + 3.9));
-      // Main door where the plaza walk lands (u 53): a deep canopy with a lit front edge over the forecourt.
+    // Close the body behind the rooms and retain the top deck's original footprint.
+    slab(k, y0, .72, 1.6, megaRib);
+    slab(k, y0 + .14, .17, 1.62, megaSeam);
+    slab(k, y0 + .72, step - 1.22, -8.35, megaShell);
+    slab(k, y0 + step - .5, .5, .85, megaShell);
+    buildHullFacade({
+      tier: k, from: u0, to: L2, height: step, entrance,
+      point: (u, rise, inset) => world(u, dAt(k, u, 0) + inset, y0 + rise),
+      surface: (finish, geometry) => put(batch, hullFinishes[finish], geometry),
+      bar: (finish, a, b, width, height) => bar(batch, hullFinishes[finish], a, b, width, height),
+    });
+
+    if (k === 0) {
+      // Match the existing plaza walk and keep its projecting entrance canopy.
       const dd = dAt(k, entrance, 0);
       put(batch, megaShell, new T.BoxGeometry(18, .5, 7), at(entrance, dd - 4.7, y0 + 6.9));
       put(batch, megaSeam, new T.BoxGeometry(18.2, .3, .3), at(entrance, dd - 8.2, y0 + 6.75));
-    } else slab(k, y0 + 1.2, g0 - 1.2, 1.2, megaShell);
-    slab(k, y0 + g0 - .5, .35, 1.5, megaSeam); // cool seam line along the top of the white slab
-    slab(k, y0 + g0, step - g0, -.8, megaGlass); // glass set 0.8 m back under the slab
-    const fin = new T.BoxGeometry(.5, step - g0 - .3, .7);
-    for (let u = u0 + 3; u < L2 - 1; u += 6) put(batch, megaRib, fin, at(u, dAt(k, u, 0) + .5, y0 + g0 + (step - g0) / 2));
+    }
     // end bulkheads: white walls with fins every 8 m and one vertical seam at the front corner
     for (const [u, sgn] of [[L2, 1], [u0, -1]] as const) {
       const d0 = dAt(k, u, 0), len = depth - d0, wall = new T.BoxGeometry(2.4, step, len);
@@ -453,7 +485,12 @@ export function megastructures(ringModels?: { entrance: T.Group; body?: T.Group;
   const batch: Batch = new Map(), trees: Plant[] = [], shrubs: Shrub[] = [], plants: SlopePlant[] = [], tops: [number, number][] = [];
   ring(batch, plants, Boolean(ringModels), Boolean(ringModels?.body), Boolean(ringModels?.hasTransfer)); arch(batch, tops); hull(batch, trees, shrubs);
   for (const [material, list] of batch) {
-    const mesh = new T.Mesh(mergeGeometries(list), carved.get(material) ?? material); mesh.castShadow = mesh.receiveShadow = true; mesh.name = 'megastructure'; root.add(mesh); list.forEach(g => g.dispose());
+    const mesh = new T.Mesh(mergeGeometries(list), carved.get(material) ?? material);
+    mesh.castShadow = material !== hullGlass;
+    mesh.receiveShadow = true;
+    mesh.name = 'megastructure';
+    root.add(mesh);
+    list.forEach(g => g.dispose());
   }
   // R5 seeded hull planting after these ring instances. Retain its poses and pigments after removing the ring from the shared batches.
   const treeOffset = ringModels?.hasTransfer ? 82 : 87;

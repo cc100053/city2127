@@ -16,8 +16,12 @@ const group = megastructures(), box = new Box3(), parts = new Map<string, Box3>(
 group.updateMatrixWorld(true);
 group.traverse(o => { if (o instanceof Mesh && !(o instanceof InstancedMesh)) { o.geometry.computeBoundingBox(); parts.set(`${o.material.color.getHexString()}${parts.size}`, box.copy(o.geometry.boundingBox!).clone()); } });
 const shell =[...parts.entries()].find(([k]) => k.startsWith('f3f2ec'))![1];
-const structureBatches = group.children.filter(part => part instanceof Mesh).length;
-assert.ok(structureBatches >= 4 && structureBatches <= 12, `structure draws ${structureBatches}`);
+const structureBatches = group.children.filter(part => part instanceof Mesh);
+const facadeBatches = structureBatches.filter(part => part.material instanceof MeshStandardMaterial
+  && ['hull-glass', 'hull-room-cove'].includes(part.material.name));
+assert.deepEqual(facadeBatches.map(part => part.material.name).sort(), ['hull-glass', 'hull-room-cove']);
+const sharedBatchCount = structureBatches.length - facadeBatches.length;
+assert.ok(sharedBatchCount >= 4 && sharedBatchCount <= 12, `shared structure draws ${sharedBatchCount}`);
 // Heights: the hoop's top, the arch apex and the hull top all lie inside the shell batch's bounds.
 const within = (v: number, want: number, what: string) => assert.ok(v >= want * .75 && v <= want * 1.25, `${what} ${v.toFixed(0)} m vs ${want} m`);
 within(RING.centreY + RING.outer, 195, 'ring top'); within(ARCH.apex, 170, 'arch apex'); within(HULL.steps * HULL.step, 120, 'hull top');
@@ -40,6 +44,41 @@ within(RING.outer * 2, 210, 'ring diameter'); within(Math.hypot(ARCH.b[0] - ARCH
     for (const u of [start - 4, end + 4]) {
       const hit = floorHit(tier, u, 3.6);
       assert.ok(hit && hit.point.y >= deck + .59, `terrace ${tier}: planting beside the opening at ${u}`);
+    }
+  }
+}
+// Every tier has real, inset glass and interior room faces behind it.
+{
+  const axis = new Vector3(0, 1, 0);
+  const origin = new Vector3(HULL.x, 0, HULL.z);
+  const inward = new Vector3(0, 0, 1).applyAxisAngle(axis, HULL.yaw);
+  const halfLength = HULL.length / 2;
+  const glass = facadeBatches.find(part => part.material.name === 'hull-glass');
+  assert.ok(glass && glass.material.transparent && !glass.castShadow);
+  for (let tier = 0; tier < HULL.steps; tier++) {
+    const from = -halfLength + Math.max(0, tier - 2) * HULL.length * .75 / (HULL.steps - 3);
+    let insetPanes = 0;
+    for (const width of [.12, .24, .36, .48, .6, .72, .84]) {
+      const u = from + (halfLength - from) * width;
+      const d = tier * HULL.recede - 8 * (1 - (u / halfLength) ** 2);
+      for (const rise of [3.5, 6.5, 9.5, 12.5]) {
+        const p = new Vector3(u, tier * HULL.step + rise, d - 4).applyAxisAngle(axis, HULL.yaw).add(origin);
+        const hits = new Raycaster(p, inward, 0, 14).intersectObjects(structureBatches, false);
+        if (hits[0]?.object !== glass) continue;
+        assert.ok(hits[0].distance > 5.38 && hits[0].distance < 5.46, `tier ${tier}: glass is inset`);
+        assert.ok(hits.some(hit => hit.object !== glass && hit.distance > hits[0].distance + .1),
+          `tier ${tier}: window has an interior surface behind the pane`);
+        insetPanes++;
+      }
+    }
+    assert.ok(insetPanes >= 4, `tier ${tier}: only ${insetPanes} pane samples visible`);
+  }
+  for (const u of [51.4, 53, 54.6]) {
+    const d = -8 * (1 - (u / halfLength) ** 2);
+    for (const y of [1.35, 2.6, 4]) {
+      const p = new Vector3(u, y, d - 4).applyAxisAngle(axis, HULL.yaw).add(origin);
+      assert.equal(new Raycaster(p, inward, 0, 6).intersectObjects(structureBatches, false).length, 0,
+        `plaza door clear at ${u}, ${y}`);
     }
   }
 }
