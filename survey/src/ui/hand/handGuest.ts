@@ -1,55 +1,98 @@
-// Hand control layer for the guest page (M2), lazy-loaded by guestDebugView.ts for `/guest?hand`.
-// The index fingertip drives a cursor; dwelling 1 s or pinching clicks the actionable element under it, so every
-// action runs through the page's own click/change/submit handlers. Touch keeps working; failures fall back to
-// touch-only with one status line. `&dev-hand` (DEV-ONLY) replaces the camera with window.__handDev for tests.
+// Hand control layer for the guest page (M3), lazy-loaded by guestDebugView.ts for `/guest?hand`.
+// Pinch-only: a pointing index finger shows the cursor and previews what is under it; a pinch clicks it through
+// the page's own click/change/submit handlers. Open palm, relaxed or lowered hand = rest (no cursor, nothing fires).
+// Welcome is 住民登録 (open palm scan, pinch to register); after submit a look-up screen points to the city display.
+// Touch keeps working; failures fall back to touch-only. `&dev-hand` (DEV-ONLY) feeds synthetic hands for tests.
 import './handGuest.css';
 import { HandPointer, percentile, type Landmark, type Point } from './handPointer.ts';
 import { AutoAdvance, TargetGate, nearestBox } from './handTargets.ts';
+import { PoseFilter, ReadLock, Registration, classifyPose, synthHand, type Pose } from './handPose.ts';
 import type { HandFrame, HandTracker } from './handTracker.ts';
 
 export type HandGuestOptions = {
   app: HTMLElement;
   /** Hand presence and hand actions count as guest activity (the page's resetIdleTimer). */
   onActivity: () => void;
+  /** Latest public head count, for the resident number shown on registration (display only). */
+  cityGuestCount?: () => number | undefined;
   /** DEV-ONLY: feed synthetic landmarks through window.__handDev instead of the camera. */
   dev?: boolean;
 };
 
-const DWELL_MS = 1000, COOLDOWN_MS = 600, ADVANCE_MS = 800, SNAP_PX = 56, ACTIVITY_MS = 1000, LOG_EVERY_MS = 10_000;
+const COOLDOWN_MS = 600, PICK_MS = 500, READ_LOCK_MS = 1500, LOOK_UP_MS = 4000, SNAP_PX = 48, ACTIVITY_MS = 1000, LOG_EVERY_MS = 10_000;
 const TARGETS = 'button, label.guest-choice, .guest-review-row';
-const RING_LEN = 2 * Math.PI * 36;
-const HAND_CONNECTIONS = [[0, 1], [1, 2], [2, 3], [3, 4], [0, 5], [5, 6], [6, 7], [7, 8], [5, 9], [9, 10], [10, 11], [11, 12], [9, 13], [13, 14], [14, 15], [15, 16], [13, 17], [0, 17], [17, 18], [18, 19], [19, 20]];
+const RING_LEN = 2 * Math.PI * 148;
 
-export function mountHandGuest({ app, onActivity, dev = false }: HandGuestOptions) {
+const palmSvg = `<svg class="hw-palm" viewBox="0 0 200 240" aria-hidden="true">
+  <rect x="52" y="104" width="100" height="104" rx="38"/>
+  <rect x="58" y="40" width="20" height="84" rx="10"/><rect x="82" y="22" width="20" height="96" rx="10"/>
+  <rect x="106" y="28" width="20" height="92" rx="10"/><rect x="130" y="50" width="18" height="74" rx="9"/>
+  <rect x="18" y="112" width="20" height="66" rx="10" transform="rotate(-38 28 145)"/></svg>`;
+const ringSvg = `<svg class="hw-ring" viewBox="0 0 320 320" aria-hidden="true">
+  <circle cx="160" cy="160" r="148" class="hw-ring-track"/>
+  <circle cx="160" cy="160" r="148" class="hw-ring-arc" transform="rotate(-90 160 160)" stroke-dasharray="${RING_LEN}" stroke-dashoffset="${RING_LEN}"/>
+  ${Array.from({ length: 48 }, (_, i) => `<line x1="160" y1="4" x2="160" y2="${i % 4 ? 10 : 16}" transform="rotate(${i * 7.5} 160 160)" class="hw-ring-tick"/>`).join('')}</svg>`;
+const pinchSvg = `<svg class="hw-pinch" viewBox="0 0 120 80" aria-hidden="true">
+  <path class="hw-pinch-thumb" d="M12 62 C30 60 44 52 54 40"/><path class="hw-pinch-index" d="M108 18 C88 22 70 30 58 38"/>
+  <circle class="hw-pinch-spark" cx="56" cy="39" r="5"/></svg>`;
+
+export function mountHandGuest({ app, onActivity, cityGuestCount = () => undefined, dev = false }: HandGuestOptions) {
   app.classList.add('guest--hand');
   document.body.classList.add('guest-page--hand');
-  const overlay = document.createElement('div');
-  overlay.className = 'hand-layer';
-  overlay.innerHTML = `
-<svg class="hand-ring" viewBox="0 0 84 84" aria-hidden="true"><circle cx="42" cy="42" r="36" class="hand-ring-track"/>
-<circle cx="42" cy="42" r="36" class="hand-ring-arc" transform="rotate(-90 42 42)" stroke-dasharray="${RING_LEN}" stroke-dashoffset="${RING_LEN}"/></svg>
+  const layer = document.createElement('div');
+  layer.className = 'hand-layer';
+  layer.innerHTML = `
+<section class="hand-welcome" aria-live="polite" hidden>
+  <div class="hw-scan">
+    <div class="hw-scanner">${ringSvg}${palmSvg}<div class="hw-scanline"></div>${pinchSvg}</div>
+    <div class="hw-copy">
+      <p class="hw-eyebrow">住民登録</p>
+      <h2 class="hw-title">手のひらをかざして住民登録</h2>
+      <p class="hw-lead"></p>
+      <ol class="hw-steps"><li data-step="1"><b>1</b>手のひらをかざす</li><li data-step="2"><b>2</b>そのまま待つ</li><li data-step="3"><b>3</b>つまんで登録</li></ol>
+      <p class="hw-privacy">手の形は保存しません。カメラ映像は端末の外へ送られません。</p>
+    </div>
+  </div>
+  <div class="hw-registered">
+    <p class="hw-eyebrow">住民登録完了</p>
+    <p class="hw-number-label">あなたの住民番号</p>
+    <p class="hw-number"></p>
+    <p class="hw-lead">ようこそ、2127年の台場へ。まもなく最初の質問です。</p>
+  </div>
+  <button type="button" class="hw-touch">タッチで始める</button>
+</section>
+<section class="hand-lookup" hidden>
+  <div class="hl-beam"></div>
+  <div class="hl-chevrons">${[0, 1, 2, 3, 4].map(i => `<span style="--i:${i}"></span>`).join('')}</div>
+  <div class="hl-copy"><p class="hl-eyebrow"></p><h2>上の画面をご覧ください</h2><p class="hl-lead">あなたの声が街へ</p></div>
+  <p class="hl-dim-note">上の画面で、あなたの声が街に届いています。</p>
+</section>
 <div class="hand-cursor" aria-hidden="true"></div>
-<p class="hand-prompt" role="status" aria-live="polite"></p>
-<p class="hand-status" role="status"></p>
-<canvas class="hand-skeleton" width="240" height="180" aria-hidden="true"></canvas>`;
-  document.body.append(overlay);
-  const cursorEl = overlay.querySelector<HTMLElement>('.hand-cursor')!, ringEl = overlay.querySelector<SVGElement>('.hand-ring')!;
-  const ringArc = overlay.querySelector<SVGCircleElement>('.hand-ring-arc')!, promptEl = overlay.querySelector<HTMLElement>('.hand-prompt')!;
-  const statusEl = overlay.querySelector<HTMLElement>('.hand-status')!, skel = overlay.querySelector<HTMLCanvasElement>('.hand-skeleton')!;
-  const sctx = skel.getContext('2d')!;
+<p class="hand-state" role="status"><span class="hand-state-dot"></span><span class="hand-state-text"></span></p>
+<p class="hand-status" role="status" hidden></p>`;
+  document.body.append(layer);
+  const $ = <T extends Element>(selector: string) => layer.querySelector<T>(selector)!;
+  const cursorEl = $<HTMLElement>('.hand-cursor'), stateEl = $<HTMLElement>('.hand-state'), stateText = $<HTMLElement>('.hand-state-text');
+  const statusEl = $<HTMLElement>('.hand-status'), welcomeEl = $<HTMLElement>('.hand-welcome'), lookupEl = $<HTMLElement>('.hand-lookup');
+  const ringArc = $<SVGCircleElement>('.hw-ring-arc');
   const setStatus = (text: string) => { statusEl.textContent = text; statusEl.hidden = !text; };
+  const startButton = () => app.querySelector<HTMLButtonElement>('[data-auto-action="start"]:not(:disabled)');
+  $<HTMLButtonElement>('.hw-touch').addEventListener('click', () => startButton()?.click());
 
   const pointer = new HandPointer();
-  const gate = new TargetGate<HTMLElement>(DWELL_MS, COOLDOWN_MS);
-  const advance = new AutoAdvance(ADVANCE_MS);
-  let landmarks: Landmark[] | undefined, lastActivity = 0, screenKey = '';
-  let hovered: HTMLElement | null = null, confirmed: HTMLElement | null = null;
-  const stats = { dwell: 0, pinch: 0, handLost: 0, frames: 0 };
+  const poses = new PoseFilter(150);
+  const gate = new TargetGate<HTMLElement>(Infinity, COOLDOWN_MS); // pinch-only: hovering never fires
+  const advance = new AutoAdvance(PICK_MS);
+  const readLock = new ReadLock(READ_LOCK_MS);
+  const registration = new Registration();
+  let landmarks: Landmark[] | undefined, frameSize = { w: 640, h: 480 }, pendingPinch: Point | undefined, pinchEdge = false;
+  let pose: Pose = 'rest', lastActivity = 0, screenKey = '', hovered: HTMLElement | null = null, resultShownAt = 0;
+  const stats = { pinch: 0, handLost: 0, frames: 0, registered: 0 };
 
   // ---- targets --------------------------------------------------------------------------------------------
   const usable = (t: HTMLElement) => {
     if (t.matches('.guest-review-row')) return !!t.querySelector('button:not(:disabled)');
-    if (t.matches('button')) return !(t as HTMLButtonElement).disabled && !t.closest('.guest-review-row');
+    if (t.matches('button')) return !(t as HTMLButtonElement).disabled && !t.closest('.guest-review-row') && t.getClientRects().length > 0;
     return true;
   };
   function targetAt(p: Point): HTMLElement | null {
@@ -60,15 +103,14 @@ export function mountHandGuest({ app, onActivity, dev = false }: HandGuestOption
     const index = nearestBox(p, targets.map(t => t.getBoundingClientRect()), SNAP_PX);
     return index >= 0 ? targets[index] : null;
   }
-  function activate(target: HTMLElement, how: 'dwell' | 'pinch', now: number) {
-    stats[how]++;
+  function activate(target: HTMLElement, now: number) {
+    stats.pinch++;
     onActivity();
     if (target.matches('label.guest-choice')) {
       const input = target.querySelector<HTMLInputElement>('input');
       if (input && !input.checked) input.click(); // the page's change handler records the draft
-      confirmed?.classList.remove('is-hand-confirm');
-      confirmed = target; target.classList.add('is-hand-confirm');
-      advance.schedule(screenKey, now);
+      target.classList.add('is-hand-picked');
+      advance.schedule(screenKey, now); // gold flash, then the form's own submit (次へ / 回答を確認する)
     } else if (target.matches('.guest-review-row')) target.querySelector<HTMLButtonElement>('button')?.click();
     else target.click();
   }
@@ -76,66 +118,118 @@ export function mountHandGuest({ app, onActivity, dev = false }: HandGuestOption
   // ---- hand frames ----------------------------------------------------------------------------------------
   function onHandFrame(frame: HandFrame) {
     stats.frames++;
-    const up = pointer.update(frame.landmarks, frame.t, innerWidth, innerHeight, frame.width || 640, frame.height || 480);
+    frameSize = { w: frame.width || 640, h: frame.height || 480 };
+    const up = pointer.update(frame.landmarks, frame.t, innerWidth, innerHeight, frameSize.w, frameSize.h);
     if (up.lost) stats.handLost++;
     if (tracker) tracker.handPresent = pointer.present;
     landmarks = up.landmarks;
-    if (up.pinchAt) {
-      const now = performance.now(), fired = gate.pinch(targetAt(up.pinchAt), now);
-      if (fired) activate(fired, 'pinch', now);
-    }
+    if (up.pinchAt) { pendingPinch = up.pinchAt; pinchEdge = true; }
   }
 
   // ---- render loop ----------------------------------------------------------------------------------------
-  let rafId = 0, renderCount = 0, renderFps = 0, fpsStart = performance.now(), resultsAt = 0, inferFps = 0;
+  let renderCount = 0, renderFps = 0, fpsStart = performance.now(), resultsAt = 0, inferFps = 0;
   function frame() {
-    rafId = requestAnimationFrame(frame);
+    requestAnimationFrame(frame);
     const now = performance.now();
     renderCount++;
-    const key = `${app.dataset.screen ?? ''}|${app.querySelector('h1')?.textContent ?? ''}`;
-    if (key !== screenKey) { screenKey = key; gate.blockUntilLeave(); confirmed = null; }
-    const cursor = pointer.cursorAt(now), pinched = pointer.pinch.closed;
-    const target = cursor ? targetAt(cursor) : null;
-    if (!cursor) gate.hover(null, now);
-    else if (!pinched) { const fired = gate.hover(target, now); if (fired) activate(fired, 'dwell', now); }
+    const screen = app.dataset.screen ?? '';
+    const key = `${screen}|${app.querySelector('h1')?.textContent ?? ''}`;
+    if (key !== screenKey) {
+      screenKey = key;
+      if (screen === 'question') readLock.start(now); else readLock.clear();
+      if (screen !== 'welcome') registration.reset();
+      if (screen === 'result') resultShownAt = now;
+    }
+    // Pose: pinching from the pointing pose keeps pointing; everything else is filtered with 150 ms hysteresis.
+    const raw = pointer.present ? classifyPose(landmarks, frameSize.w, frameSize.h) : 'rest';
+    pose = poses.update(pointer.pinch.closed && pose === 'point' ? 'point' : raw, now);
+    const edge = pinchEdge, pinchAt = pendingPinch;
+    pinchEdge = false; pendingPinch = undefined;
+
+    // Welcome: 住民登録 over the page's welcome screen while hand control runs.
+    const welcomeOn = active && screen === 'welcome' && !!startButton();
+    welcomeEl.hidden = !welcomeOn;
+    if (welcomeOn) {
+      const state = registration.update(pose, pointer.present, edge, now);
+      if (state === 'registered' && !welcomeEl.dataset.number) {
+        const count = cityGuestCount();
+        welcomeEl.dataset.number = count === undefined ? '—' : `#${String(count + 1).padStart(4, '0')}`;
+        $<HTMLElement>('.hw-number').textContent = welcomeEl.dataset.number;
+        stats.registered++;
+        onActivity();
+      }
+      if (state === 'done') { registration.reset(); delete welcomeEl.dataset.number; startButton()?.click(); }
+      renderWelcome(state);
+    } else delete welcomeEl.dataset.number;
+
+    // Look-up when the city display of this proposal starts, dimmed after LOOK_UP_MS.
+    const lookupOn = screen === 'result';
+    lookupEl.hidden = !lookupOn;
+    if (lookupOn) {
+      lookupEl.classList.toggle('is-dim', now - resultShownAt > LOOK_UP_MS);
+      const number = app.querySelector('.guest-result-number')?.textContent ?? '';
+      $<HTMLElement>('.hl-eyebrow').textContent = number ? `${number} の声を記録しました` : '';
+    }
+
+    // Pointing cursor, preview and pinch.
+    const blocked = welcomeOn || lookupOn;
+    const pointing = pose === 'point' && pointer.present && !blocked;
+    const cursor = pointing ? pointer.cursorAt(now) : undefined;
+    const locked = screen === 'question' && readLock.locked(now);
+    const target = cursor && !locked ? targetAt(cursor) : null;
+    gate.hover(target, now);
+    if (edge && pointing && pinchAt && !locked) { const fired = gate.pinch(targetAt(pinchAt), now); if (fired) activate(fired, now); }
     if (advance.due(screenKey, now)) {
       const form = app.querySelector<HTMLFormElement>('form.guest-form');
-      if (form?.querySelector('input:checked')) form.requestSubmit(); // same path as 次へ / 回答を確認する
+      if (form?.querySelector('input:checked')) form.requestSubmit();
     }
     if (pointer.present && now - lastActivity > ACTIVITY_MS) { lastActivity = now; onActivity(); }
     if (target !== hovered) { hovered?.classList.remove('is-hand-hover'); target?.classList.add('is-hand-hover'); hovered = target; }
+    renderReadLock(screen === 'question' && locked ? readLock.progress(now) : undefined);
 
+    layer.classList.toggle('has-cursor', !!cursor);
     if (cursor) {
-      const t = `translate3d(${cursor.x}px,${cursor.y}px,0)`;
-      cursorEl.style.transform = t; ringEl.style.transform = t;
-      overlay.classList.add('has-hand'); cursorEl.classList.toggle('is-pinched', pinched);
-      const progress = pinched ? 0 : gate.progress(now);
-      ringEl.style.opacity = progress > 0 ? '1' : '0';
-      ringArc.setAttribute('stroke-dashoffset', String(RING_LEN * (1 - progress)));
-    } else overlay.classList.remove('has-hand');
-
-    const welcome = app.dataset.screen === 'welcome';
-    const start = app.querySelector<HTMLElement>('[data-auto-action="start"]');
-    start?.classList.toggle('is-hand-suggest', welcome && pointer.present);
-    promptEl.textContent = !welcome || !active ? '' : pointer.present ? '「はじめる」に指先を合わせてください' : '画面に手をかざしてください';
-    promptEl.hidden = !promptEl.textContent;
+      cursorEl.style.transform = `translate3d(${cursor.x}px,${cursor.y}px,0)`;
+      cursorEl.classList.toggle('is-pinched', pointer.pinch.closed);
+    }
+    const handOn = active && !blocked;
+    stateEl.hidden = !handOn;
+    stateEl.classList.toggle('is-point', pointing);
+    stateText.textContent = pointing ? '指で操作中' : '休止中 — 指を伸ばすと操作';
 
     if (now - fpsStart >= 1000) {
       const dt = (now - fpsStart) / 1000, results = tracker?.results ?? stats.frames;
       renderFps = renderCount / dt; inferFps = (results - resultsAt) / dt; resultsAt = results; renderCount = 0; fpsStart = now;
     }
-    drawSkeleton();
   }
-  function drawSkeleton() {
-    const w = skel.width, h = skel.height;
-    sctx.clearRect(0, 0, w, h);
-    sctx.strokeStyle = 'rgba(148,201,194,.3)'; sctx.lineWidth = 2;
-    sctx.strokeRect(w * 0.2, h * 0.2, w * 0.6, h * 0.6);
-    if (!landmarks) return;
-    const lm = landmarks, X = (i: number) => (1 - lm[i].x) * w, Y = (i: number) => lm[i].y * h;
-    sctx.strokeStyle = '#94c9c2'; sctx.lineWidth = 3; sctx.beginPath();
-    for (const [a, b] of HAND_CONNECTIONS) { sctx.moveTo(X(a), Y(a)); sctx.lineTo(X(b), Y(b)); }
-    sctx.stroke();
+
+  function renderWelcome(state: ReturnType<Registration['update']>) {
+    welcomeEl.dataset.state = state;
+    ringArc.setAttribute('stroke-dashoffset', String(RING_LEN * (1 - registration.progress)));
+    const title = state === 'pinch' ? 'つまんで登録' : '手のひらをかざして住民登録';
+    const lead = state === 'idle' ? '2127年の台場へようこそ。手のひらを画面に向けてください。'
+      : state === 'scanning' ? 'そのまま手のひらを向けていてください…' : '親指と人さし指をつまむと、住民として登録されます。';
+    const eyebrow = state === 'scanning' ? `スキャン中 ${Math.round(registration.progress * 100)}%` : state === 'pinch' ? '確認' : '住民登録';
+    $<HTMLElement>('.hw-title').textContent = title;
+    $<HTMLElement>('.hw-lead').textContent = lead;
+    $<HTMLElement>('.hw-eyebrow').textContent = eyebrow;
+    const step = state === 'idle' ? 1 : state === 'scanning' ? 2 : 3;
+    layer.querySelectorAll<HTMLElement>('.hw-steps li').forEach(li => {
+      const n = Number(li.dataset.step);
+      li.className = n === step ? 'now' : n < step ? 'done' : '';
+    });
+  }
+
+  function renderReadLock(progress: number | undefined) {
+    let el = app.querySelector<HTMLElement>('.hand-readlock');
+    if (progress === undefined) { el?.remove(); return; }
+    if (!el) {
+      el = document.createElement('div');
+      el.className = 'hand-readlock';
+      el.innerHTML = '<span><i></i></span><em>読み終わると選べます</em>';
+      app.querySelector('h1')?.after(el);
+    }
+    el.querySelector<HTMLElement>('i')!.style.transform = `scaleX(${progress})`;
   }
 
   // ---- source: camera + tracker, or DEV landmarks ---------------------------------------------------------
@@ -143,7 +237,7 @@ export function mountHandGuest({ app, onActivity, dev = false }: HandGuestOption
   const video = document.createElement('video');
   video.muted = true; video.playsInline = true; video.autoplay = true; video.setAttribute('playsinline', '');
   video.className = 'hand-video';
-  overlay.append(video);
+  layer.append(video);
   let stream: MediaStream | undefined;
   const stopCamera = () => { stream?.getTracks().forEach(t => t.stop()); stream = undefined; video.srcObject = null; };
   async function startCamera() {
@@ -151,39 +245,38 @@ export function mountHandGuest({ app, onActivity, dev = false }: HandGuestOption
     video.srcObject = stream;
     await video.play();
   }
+  function rest() { pointer.reset(); poses.reset(); landmarks = undefined; registration.reset(); if (tracker) tracker.handPresent = false; }
   function fail(reason: string) {
-    active = false; tracker?.pause(); stopCamera(); pointer.reset(); landmarks = undefined;
-    overlay.classList.add('is-failed');
+    active = false; tracker?.pause(); stopCamera(); rest();
+    layer.classList.add('is-failed');
     setStatus('手の操作は利用できません。画面をタッチして操作してください。');
     console.warn('[hand] touch only:', reason);
   }
   let resuming = false;
   async function resume() {
-    if (active || resuming || overlay.classList.contains('is-failed') || document.visibilityState !== 'visible' || !tracker) return;
+    if (active || resuming || layer.classList.contains('is-failed') || document.visibilityState !== 'visible' || !tracker) return;
     resuming = true;
     try { await startCamera(); tracker.start(); active = true; setStatus(''); }
     catch (error) { fail(`camera: ${String(error)}`); }
     finally { resuming = false; }
   }
-  function pause() { active = false; tracker?.pause(); stopCamera(); pointer.reset(); landmarks = undefined; if (tracker) tracker.handPresent = false; }
+  function pause() { active = false; tracker?.pause(); stopCamera(); rest(); }
 
   if (dev) {
-    // DEV-ONLY test hook: holds a synthetic hand with the index fingertip at a screen point, fed at 30 Hz.
-    let held: { x: number; y: number; pinch: boolean } | undefined;
-    const synth = (x: number, y: number, pinch: boolean): Landmark[] => {
-      const tx = 1 - 0.2 - 0.6 * (x / innerWidth), ty = 0.2 + 0.6 * (y / innerHeight);
-      const h = Array.from({ length: 21 }, () => ({ x: tx, y: ty + 0.1 }));
-      h[0] = { x: tx, y: ty + 0.3 }; h[8] = { x: tx, y: ty };
-      h[4] = pinch ? { x: tx, y: ty } : { x: tx + 0.1, y: ty + 0.1 };
-      return h;
-    };
-    setInterval(() => onHandFrame({ t: performance.now(), landmarks: held ? [synth(held.x, held.y, held.pinch)] : [], width: 640, height: 480 }), 33);
+    // DEV-ONLY test hook: holds a synthetic hand (pose, optional pinch) with the index fingertip at a screen point.
+    let held: { x: number; y: number; pose: Pose; pinch: boolean } | undefined;
+    const toCamera = (x: number, y: number) => ({ tx: 1 - 0.2 - 0.6 * (x / innerWidth), ty: 0.2 + 0.6 * (y / innerHeight) });
+    setInterval(() => {
+      const hands = held ? (() => { const { tx, ty } = toCamera(held.x, held.y); return [synthHand(tx, ty, held.pose, held.pinch)]; })() : [];
+      onHandFrame({ t: performance.now(), landmarks: hands, width: 640, height: 480 });
+    }, 33);
     (window as unknown as { __handDev: unknown }).__handDev = {
-      hold(x: number, y: number, pinch = false) { held = { x, y, pinch }; },
+      hold(x: number, y: number, options: { pose?: Pose; pinch?: boolean } = {}) { held = { x, y, pose: options.pose ?? 'point', pinch: options.pinch ?? false }; },
       release() { held = undefined; },
-      state: () => ({ screen: app.dataset.screen, present: pointer.present, dwell: stats.dwell, pinch: stats.pinch }),
+      state: () => ({ screen: app.dataset.screen, present: pointer.present, pose, pinch: stats.pinch, registered: stats.registered,
+        welcome: welcomeEl.hidden ? undefined : welcomeEl.dataset.state, lookup: lookupEl.hidden ? undefined : lookupEl.classList.contains('is-dim') ? 'dim' : 'look-up' }),
     };
-    active = true; setStatus('');
+    active = true;
   } else if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) {
     fail('insecure context');
   } else {
@@ -195,7 +288,7 @@ export function mountHandGuest({ app, onActivity, dev = false }: HandGuestOption
     }).catch(error => fail(String(error)));
     document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') pause(); else void resume(); });
   }
-  rafId = requestAnimationFrame(frame);
+  requestAnimationFrame(frame);
 
   // ---- optional dev stats (endpoint exists only with SURVEY_DEV_HAND=1) -------------------------------------
   let sentUserAgent = false, logOff = false;
@@ -203,7 +296,7 @@ export function mountHandGuest({ app, onActivity, dev = false }: HandGuestOption
   setInterval(() => {
     if (logOff || dev) return;
     const body = {
-      kind: 'hand-guest', build: 'm2', screen: app.dataset.screen, mode: tracker?.mode ?? (overlay.classList.contains('is-failed') ? 'failed' : 'starting'),
+      kind: 'hand-guest', build: 'm3', screen: app.dataset.screen, pose, mode: tracker?.mode ?? (layer.classList.contains('is-failed') ? 'failed' : 'starting'),
       fallbackReason: tracker?.fallbackReason || undefined, renderFps: r1(renderFps), inferFps: r1(inferFps),
       inferP50: r1(percentile(tracker?.inferMs ?? [], 0.5)), inferP95: r1(percentile(tracker?.inferMs ?? [], 0.95)),
       rttP50: r1(percentile(tracker?.roundTripMs ?? [], 0.5)), framesSent: tracker?.framesSent, framesDropped: tracker?.framesDropped,

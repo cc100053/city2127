@@ -1,8 +1,8 @@
 // Optional browser acceptance for hand mode (M2): drives a full guest run with the DEV-only synthetic hand
-// (welcome -> four questions -> review -> submit -> result) against a scratch-DB server on the rotation set.
+// (住民登録 palm scan + pinch -> four questions by pinch -> review -> submit -> look-up -> handoff) against a scratch-DB server on the rotation set.
 // Uses an existing Playwright installation, not a repo dependency (same convention as tests/surveyAuto.browser.mjs):
 //   npm run build && CITY2127_PLAYWRIGHT_PATH=/path/to/playwright/index.mjs npm run test:hand-browser
-// Optional: CITY2127_CHROME_PATH (browser binary), HAND_SHOTS_DIR (saves question/review screenshots).
+// Optional: CITY2127_CHROME_PATH (browser binary), HAND_SHOTS_DIR (saves a screenshot of each hand-mode screen).
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { mkdtempSync, mkdirSync } from 'node:fs';
@@ -48,44 +48,79 @@ try {
   const screen = () => page.evaluate(() => document.querySelector('#app').dataset.screen);
   const title = () => page.evaluate(() => document.querySelector('#app h1')?.textContent ?? '');
   const center = selector => page.evaluate(sel => { const r = document.querySelector(sel).getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }, selector);
-  const hold = (p, pinch = false) => page.evaluate(([x, y, pinch]) => window.__handDev.hold(x, y, pinch), [p.x, p.y, pinch]);
+  const hold = (p, pose = 'point', pinch = false) => page.evaluate(([x, y, pose, pinch]) => window.__handDev.hold(x, y, { pose, pinch }), [p.x, p.y, pose, pinch]);
   const release = () => page.evaluate(() => window.__handDev.release());
+  const state = () => page.evaluate(() => window.__handDev.state());
+  const shot = async name => { if (shots) await page.screenshot({ path: join(shots, `${name}.png`) }); };
+  const hasCursor = () => page.evaluate(() => document.querySelector('.hand-layer').classList.contains('has-cursor'));
   const waitFor = async (check, what, timeout = 6000) => {
     for (const end = Date.now() + timeout; Date.now() < end; await sleep(50)) if (await check()) return;
     throw new Error(`timed out waiting for ${what}`);
   };
+  /** Point at p, open, then close the pinch (a fresh closing edge from the pointing pose). */
+  const pinchAt = async p => { await hold(p, 'point'); await sleep(300); await hold(p, 'point', true); await sleep(150); await hold(p, 'point'); };
+  const mid = { x: 590, y: 420 };
 
-  // Welcome: the prompt invites a hand; dwell on はじめる starts the session.
-  await page.waitForFunction(() => document.querySelector('.hand-prompt')?.textContent === '画面に手をかざしてください', null, { timeout: 3000 });
-  await hold(await center('[data-auto-action="start"]'));
-  await waitFor(async () => (await screen()) === 'question', 'first question');
+  // Welcome = 住民登録: a pointing finger or a pinch does nothing; an open palm scans, then a pinch registers.
+  await waitFor(async () => (await state()).welcome === 'idle', 'registration overlay');
+  await shot('01-welcome-idle');
+  await hold(mid, 'point'); await sleep(400); await pinchAt(mid); await sleep(300);
+  assert.equal((await state()).welcome, 'idle', 'pointing and pinching do not register');
+  await hold(mid, 'palm'); await sleep(800);
+  assert.equal((await state()).welcome, 'scanning');
+  await shot('02-welcome-scanning');
+  await waitFor(async () => (await state()).welcome === 'pinch', 'scan complete', 3000);
+  await shot('03-welcome-pinch');
+  await hold(mid, 'palm', true); await sleep(150);
+  await waitFor(async () => (await state()).welcome === 'registered', 'registered', 2000);
+  await release();
+  await shot('04-registered');
+  await waitFor(async () => (await screen()) === 'question', 'first question after registration', 6000);
 
   for (let q = 0; q < 4; q++) {
     const before = await title();
     const count = await page.locator('label.guest-choice').count();
     const target = `label.guest-choice:nth-of-type(${(q % count) + 1})`;
-    await release(); await sleep(150); // leave whatever the new screen put under the cursor
     const p = await center(target);
-    if (q % 2 === 1) { await hold(p); await sleep(250); await hold(p, true); } // pinch
-    else await hold(p); // dwell 1 s
-    if (q === 0 && shots) { await sleep(550); await page.screenshot({ path: join(shots, 'hand-question.png') }); }
-    await waitFor(async () => (await page.locator(`${target} input`).isChecked()), `question ${q + 1} choice`, 3000);
-    // Auto-advance: next question (or review) without touching 次へ.
+    // Read lock first; pinching during it does nothing.
+    await waitFor(async () => (await page.locator('.hand-readlock').count()) === 1, `question ${q + 1} read lock`, 500);
+    if (q === 0) { await sleep(450); await shot('05-question-read-lock'); }
+    await pinchAt(p);
+    assert.equal(await page.locator(`${target} input`).isChecked(), false, 'pinch during the read lock ignored');
+    await waitFor(async () => (await page.locator('.hand-readlock').count()) === 0, 'read lock end', 3000);
+    if (q === 0) {
+      // Rest: an open palm over a card shows no cursor; a pointing finger previews but never selects by itself.
+      await hold(p, 'palm'); await sleep(600);
+      assert.equal(await hasCursor(), false, 'open palm = rest, no cursor');
+      await hold(p, 'point'); await sleep(2500);
+      assert.equal(await hasCursor(), true);
+      assert.ok(await page.locator(`${target}.is-hand-hover`).count() === 1, 'pointing previews the card');
+      assert.equal(await page.locator(`${target} input`).isChecked(), false, 'hovering never selects');
+      await shot('06-question-preview');
+    }
+    await pinchAt(p);
+    await waitFor(async () => page.locator(`${target} input`).isChecked(), `question ${q + 1} pick`, 2000);
+    if (q === 0) { await sleep(120); await shot('07-picked'); }
     await waitFor(async () => (await screen()) === 'review' || (await title()) !== before, `advance after question ${q + 1}`, 3000);
   }
   assert.equal(await screen(), 'review');
-  await release(); await sleep(150);
-  // Dwell on the large submit button records the proposal.
-  await hold(await center('[data-auto-action="submit"]'));
-  if (shots) { await sleep(450); await page.screenshot({ path: join(shots, 'hand-review.png') }); }
-  await waitFor(async () => ['submitting', 'waiting', 'result', 'handoff'].includes(await screen()), 'submit', 6000);
-  await waitFor(async () => ['waiting', 'result', 'handoff'].includes(await screen()), 'result', 10_000);
-  const stats = await page.evaluate(() => window.__handDev.state());
-  assert.ok(stats.dwell >= 3 && stats.pinch >= 2, `dwell ${stats.dwell}, pinch ${stats.pinch}`);
+  await hold(await center('.guest-review-row:nth-of-type(2)'), 'point'); await sleep(400);
+  await shot('08-review');
+  await pinchAt(await center('[data-auto-action="submit"]'));
+  await release();
+  await waitFor(async () => (await state()).lookup === 'look-up', 'look-up screen', 10_000);
+  await sleep(800); await shot('09-look-up');
+  await waitFor(async () => (await state()).lookup === 'dim', 'dimmed', 6000);
+  await sleep(1300); await shot('10-dimmed');
+  await waitFor(async () => (await screen()) === 'handoff', 'handoff', 20_000);
+  await sleep(500); await shot('11-handoff');
+  const stats = await state();
+  assert.equal(stats.registered, 1);
+  assert.ok(stats.pinch >= 5, `pinch actions ${stats.pinch}`);
   const city = await (await fetch(`${base}/api/city-state`)).json();
   assert.equal(city.data.guestCount, 1, 'one proposal recorded');
   assert.deepEqual(errors, []);
-  console.log(`PASS hand guest run: welcome -> 4 questions -> review -> ${await screen()} (dwell ${stats.dwell}, pinch ${stats.pinch})`);
+  console.log(`PASS hand guest run: palm scan -> pinch register -> 4 questions (pinch) -> review -> look-up -> dim -> handoff (pinch ${stats.pinch})`);
 } finally {
   await browser.close();
   server.kill();

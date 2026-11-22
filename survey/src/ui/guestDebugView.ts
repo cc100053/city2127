@@ -721,7 +721,7 @@ if (stationId) setInterval(async () => {
 // above; touch keeps working, and without `?hand` nothing of it loads. `&dev-hand` is a DEV-ONLY synthetic-hand hook.
 if (new URLSearchParams(location.search).has('hand')) {
   void import('./hand/handGuest.ts').then(({ mountHandGuest }) => mountHandGuest({
-    app, onActivity: resetIdleTimer, dev: new URLSearchParams(location.search).has('dev-hand'),
+    app, onActivity: resetIdleTimer, cityGuestCount: () => cityGuestCount, dev: new URLSearchParams(location.search).has('dev-hand'),
   })).catch(error => console.error('Hand control:', error));
 }
 
