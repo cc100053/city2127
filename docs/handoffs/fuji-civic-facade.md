@@ -3,7 +3,7 @@
 - Owner: Codex
 - Branch: `codex/fuji-facade-pilot`
 - Base: `2ab01ea77125fbd8c54e5c8dc9f1ec79a3d97ac8`
-- Status: 已選 R1 為外觀基準。R8 闊翼嘅兩組雙層窗及轉角樣板待 owner 驗收（2026-11-22）
+- Status: 已選 R1 為外觀基準。Owner 已接受 R8 闊翼外牆樣板，Gemini 燈光候選待審閱（2026-11-22）
 - R1 已驗證實作：`19432b6360eecbf58181ec69d6a3235a0bf82280`
 - 遠端分支：`origin/codex/fuji-facade-pilot`
 
@@ -135,3 +135,7 @@ Chrome 喺日夜主鏡實際載入 R8 GLB（HTTP 200），模擬 404 時城市�
 開發 Mac Apple M6／headless Chrome 以 1920×1080、DPR 1，同一份城市程式分別載入 R7 同 R8 GLB。固定主鏡每個條件量一次 6 秒 rAF，R7 → R8 日景 59.8 → 60.0 FPS、夜景 60.0 → 60.0 FPS。記錄在 `r8/qa/chrome-glb.json`。
 
 [近鏡日景](../../artifacts/fuji-civic-facade/r8/comparison-day.jpg) · [近鏡夜景](../../artifacts/fuji-civic-facade/r8/comparison-night.jpg) · [城市主鏡日景](../../artifacts/fuji-civic-facade/r8/hero-comparison-day.jpg) · [城市主鏡夜景](../../artifacts/fuji-civic-facade/r8/hero-comparison-night.jpg)。
+
+### R8 驗收與燈光候選（2026-11-22）
+
+Owner 回覆「R8 ok」，接受外牆樣板，並要求 Gemini 出未來感燈光目標。以 `352f07fe` 同鏡日夜近鏡做輸入，Gemini 生成一張 2752×1536 夜景候選。兩組窗嘅冷白導光藏喺窗套內緣，沿大窗窗台接過玻璃轉角，夾層有短狀態燈，室內仍見暖光。生成稿微調咗畫面及畫面文字，後續以 R8 實景作幾何同介面依據。原圖喺 `~/city2127-evidence/fuji-civic-facade/lighting-target/gemini-night-target.jpg`，等 owner 審閱燈光方向。[Gemini 原對話](https://gemini.google.com/u/3/app/c37b00694101e1f9)。

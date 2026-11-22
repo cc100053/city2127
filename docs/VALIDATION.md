@@ -103,7 +103,7 @@ use explicit `nw:-12/0/12` for 0/3/6 automated ports (band shorthand `low/high` 
 
 富士大樓 R7 外牆樣板（2026-11-22，`c9792c7b`）。Blender Game QA 無幾何錯誤，GLB 重匯入 39,428 面、五個材質角色。[Odaiba 幾何回歸](../tests/odaiba.test.ts) 驗證兩組窗嘅外框、退入玻璃、轉角接縫同整棟包圍盒。根測試、build 同差異檢查通過。開發 Mac Chrome headless 3200×1800／DPR 1 同鏡日夜及城市主鏡共四張零頁面錯誤，真 GLB 200 同模擬 404 回退通過。展覽機及 owner 樣板驗收待做。[日景](../artifacts/fuji-civic-facade/r7/comparison-day.jpg) · [夜景](../artifacts/fuji-civic-facade/r7/comparison-night.jpg) · [R7 交接](handoffs/fuji-civic-facade.md#r7-兩翼外牆樣板)。
 
-富士大樓 R8 外牆樣板（2026-11-22，`352f07fe`）。Blender Game QA 通過，五種材質及 39,428 個三角面。[Odaiba 幾何回歸](../tests/odaiba.test.ts) 射線核對斜肋折面、轉角窗台斜接、側邊收分、兩面玻璃及原路徑淨空。根目錄測試、build 和差異檢查通過。開發 Mac Chrome headless 3200×1800／DPR 1 同鏡日夜及城市主鏡四張零頁面錯誤。展覽機及 owner 驗收待做。[近鏡日景](../artifacts/fuji-civic-facade/r8/comparison-day.jpg) · [近鏡夜景](../artifacts/fuji-civic-facade/r8/comparison-night.jpg) · [R8 交接](handoffs/fuji-civic-facade.md#r8-轉角陶板折面)。
+富士大樓 R8 外牆樣板（2026-11-22，`352f07fe`）。Blender Game QA 通過，五種材質及 39,428 個三角面。[Odaiba 幾何回歸](../tests/odaiba.test.ts) 射線核對斜肋折面、轉角窗台斜接、側邊收分、兩面玻璃及原路徑淨空。根目錄測試、build 和差異檢查通過。開發 Mac Chrome headless 3200×1800／DPR 1 同鏡日夜及城市主鏡四張零頁面錯誤。Owner 已接受外牆樣板，展覽機待測。[近鏡日景](../artifacts/fuji-civic-facade/r8/comparison-day.jpg) · [近鏡夜景](../artifacts/fuji-civic-facade/r8/comparison-night.jpg) · [R8 交接](handoffs/fuji-civic-facade.md#r8-轉角陶板折面)。
 
 Measure current Odaiba on the stated real GPU, ideally the exhibition machine at 1920×1080. State pixel ratio, actual viewport, camera/hour/mode, frame sampling interval, draw calls/triangles and console/network results. Mesh counts, source file size, headless/software FPS and old Shibuya 60 FPS are not equivalent to a current measurement. Do not claim Windows or another workstation was tested from Mac evidence.
 
