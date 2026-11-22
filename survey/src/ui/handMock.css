@@ -118,11 +118,13 @@ h1 { margin: 0; font-weight: 500; letter-spacing: .02em; }
 /* Over the dimmed, unpicked cards: never covers the question text or the picked card. */
 .picked { position: absolute; left: 66%; top: 390px; transform: translate(-50%, -50%); display: flex; align-items: center; gap: 22px; padding: 14px 18px 14px 28px;
   border: 1px solid var(--amber); border-radius: 10px; background: #2a2a22f2; box-shadow: 0 16px 40px #000a; }
+.picked { flex-direction: column; align-items: flex-start; gap: 6px; padding: 16px 28px 20px; }
+.picked small { color: var(--muted); font-size: 13px; }
 .picked p { margin: 0; font-size: 24px; } .picked p b { color: var(--amber); font-size: 30px; margin-right: 4px; }
 .undo { display: grid; justify-items: center; min-width: 150px; padding: 12px 18px; color: var(--ink); font-size: 20px; border: 1px solid var(--line); border-radius: 8px; background: #222826; }
 .undo small { color: var(--muted); font-size: 12px; }
 .picked-bar { position: absolute; left: 0; right: 0; bottom: 0; height: 4px; border-radius: 0 0 10px 10px; overflow: hidden; }
-.picked-bar span { display: block; height: 100%; background: var(--amber); transform-origin: left; animation: fill 1.5s linear infinite; }
+.picked-bar span { display: block; height: 100%; background: var(--amber); transform-origin: left; animation: fill .6s linear infinite; }
 
 /* ---- review ------------------------------------------------------------------------------------------------------ */
 .review-band { position: absolute; left: 28px; right: 28px; top: 190px; bottom: 26px; display: grid; grid-template-columns: 1fr 300px; gap: 28px; }

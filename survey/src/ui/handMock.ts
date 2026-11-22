@@ -105,8 +105,8 @@ function questionScreen(mode: 'read' | 'hover' | 'picked') {
   </div>
   ${mode === 'hover' ? '<div class="cursor" style="left:592px;top:520px"></div>' : ''}
   ${mode === 'picked' ? `<div class="picked">
-    <p><b>A</b> を選択</p>
-    <div class="undo">やり直す<small>つまむと取り消し</small></div>
+    <p><b>A</b> を選択しました</p>
+    <small>次の質問へ進みます — 戻るときは「前の質問へ」</small>
     <div class="picked-bar"><span></span></div>
   </div>` : ''}
 </section>`;
@@ -156,7 +156,7 @@ const screens: Record<string, { name: string; render: () => string }> = {
   registered: { name: '登録完了', render: registered },
   question: { name: '質問（読む）', render: () => questionScreen('read') },
   'question-hover': { name: '質問・プレビュー', render: () => questionScreen('hover') },
-  'picked-undo': { name: '選択・やり直す', render: () => questionScreen('picked') },
+  picked: { name: '選択・次へ', render: () => questionScreen('picked') },
   review: { name: '確認', render: review },
   'submitted-look-up': { name: '送信・上を見る', render: lookUp },
   dimmed: { name: '減光', render: dimmed },
