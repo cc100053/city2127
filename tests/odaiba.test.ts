@@ -10,7 +10,7 @@ import { pavilionFlight, plazaPose, routes, mobility, publishDoorways, publishEn
 import { presets } from '../src/presets.ts';
 import { civicCore } from '../src/civicCore.ts';
 import { publishOccupants, publishRoofWalks, occupantFleet, occupants, ridePose, rideShown, strollPose } from '../src/occupants.ts';
-import { bake } from '../src/cityRig.ts';
+import { bake, stone as cityStone } from '../src/cityRig.ts';
 import { contextFacades } from '../src/contextFacades.ts';
 import { plantCanopy, plantLandscapeCanopy, plantRoofCanopy } from '../src/coastalCanopy.ts';
 import { tidalEdge } from '../src/amphibiousShore.ts';
@@ -20,7 +20,7 @@ import { acceleratedRaycast, MeshBVH } from 'three-mesh-bvh';
 import { checkHousingCity } from './housingCityCheck.ts';
 import { onFormerStreet, repairRoads } from '../src/roadRepair.ts';
 import { FORECOURTS, streetNetwork } from '../src/streetKit.ts';
-import { megastructures } from '../src/megastructures.ts';
+import { megastructures, megaSeam } from '../src/megastructures.ts';
 import { ARCH, groundContacts, inRect } from '../src/megaFootprints.ts';
 import { BOULEVARD, EVENT_SHELF_FRONTAGE, POD_TOWER, STREET_KIT, WATER } from '../src/layout.ts';
 /** A ladder target with the given rungs; the rest mixed. */
@@ -122,7 +122,7 @@ city.add(core);
 landmarks.push(core);
 const coreBounds=new Box3().setFromObject(core);
 assert.ok(coreBounds.min.y>=-7 && coreBounds.max.y<195, 'Civic chassis (polish2: 1.35× frame) stays below the sphere approach tier'); // the district loop at 164–176 m runs ~350 m out
-assert.ok(core.children.length<=10, 'Static civic chassis batches by shared material, including broadcast screens');
+assert.ok(core.children.length<=11, 'Static civic chassis batches by shared material, including matte landing stone');
 assert.ok(core.children.every(object=>object instanceof Mesh && !Array.isArray(object.material)), 'No per-member draws');
 // Actual chassis must preserve the bay approach and berth, including a 22 m aircraft wing envelope.
 core.updateMatrixWorld(true);
@@ -196,6 +196,25 @@ for (const leg of [new LineCurve3(lowerFlight.getPoint(.84), lowerFlight.getPoin
         assert.equal(forwardRay.intersectObject(core,true).length,0,`Fuji upper route blocked at ${start.toArray()} and height ${height}`);
       }
     }
+  }
+}
+
+// Both facade paths keep the light inlays close to the matte paving through both turns and over the guard threshold.
+for (const chassis of [core, fallback]) {
+  chassis.updateMatrixWorld(true);
+  const guideRay = new Raycaster(new Vector3(),downward,0,.32);
+  for (const [x,y,z] of [
+    [-40.25,55.5,-13], [-41.1,55.5,-14.5], [-42,55.5,-20.4],
+    [-58.3,65,-19], [-58.3,65,-16.8], [-58.3,65,-14.25],
+  ]) {
+    const at = new Vector3(...civicAt([x,y,z]));
+    guideRay.ray.origin.copy(at).y += .25;
+    const hits = guideRay.intersectObject(chassis,true);
+    const [guide] = hits;
+    const floor = hits.find(hit=>hit.object instanceof Mesh && hit.object.material === cityStone);
+    assert.ok(guide?.object instanceof Mesh && guide.object.material === megaSeam && floor,
+      `Fuji needs a clock-lit guide on matte paving at ${at.toArray()}`);
+    assert.ok(guide.point.y-floor.point.y>0 && guide.point.y-at.y<.03, 'Fuji inlays stay at grade');
   }
 }
 

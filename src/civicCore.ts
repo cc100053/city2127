@@ -226,7 +226,7 @@ export function civicCore(facade?: T.Group) {
 
     const upperStart = new T.Vector3(-43,midY,-20.4), upperEnd = new T.Vector3(-57.4,65,upperStart.z);
     const platform = (west: number, east: number, bay: number, inland: number, y: number) =>
-      box(root,[east-west,.72,inland-bay],[(west+east)/2,y-.36,(bay+inland)/2],stone,0);
+      box(root,[east-west,.72,inland-bay],[(west+east)/2,y-.36,(bay+inland)/2],cityStone,0);
     const edge = (x1: number, z1: number, x2: number, z2: number, y: number) => {
       const line = new T.LineCurve3(new T.Vector3(x1,y,z1),new T.Vector3(x2,y,z2));
       for (const [width, depth, lift, finish] of [[.12,1.02,1.02,silverGlass],[.18,.12,1.08,megaSeam]] as const) {
@@ -267,11 +267,35 @@ export function civicCore(facade?: T.Group) {
     edge(upperExit.west,-22.22,upperEnd.x,-22.22,65);
     edge(upperEnd.x,-18.61,upperExit.east,-18.61,65);
     edge(upperExit.east,-18.61,upperExit.east,-16.8,65);
+    // Matte paving breaks the sky reflection at the two landings and just beyond the guard opening.
+    const exitX = upperEnd.x-.9, transferX = -41.1;
+    const exitThreshold = -15.95, exitEnd = -12.5, pavingDepth = .012;
+    box(root,[upperExit.east-upperExit.west,pavingDepth,exitEnd-exitThreshold],
+      [(upperExit.east+upperExit.west)/2,65+pavingDepth/2,(exitEnd+exitThreshold)/2],cityStone,0);
+
+    // Short cold-blue inlays follow the existing changes in direction at walking level.
+    const inlay = (y: number, x1: number, z1: number, x2: number, z2: number) => {
+      const dx = x2-x1, dz = z2-z1;
+      box(root,[.135,.016,Math.hypot(dx,dz)],[(x1+x2)/2,y+.012,(z1+z2)/2],megaSeam,0)
+        .rotation.y = Math.atan2(dx,dz);
+    };
+    const arrow = (y: number, x1: number, z1: number, x2: number, z2: number) => {
+      inlay(y,x1,z1,x2,z2);
+      const direction = new T.Vector2(x2-x1,z2-z1).normalize();
+      for (const side of [-.32,.32]) inlay(y,x2-direction.x*.48-direction.y*side,
+        z2-direction.y*.48+direction.x*side,x2,z2);
+    };
+    inlay(midY,lowerEnd.x-.26,lowerEnd.z,transferX+.06,lowerEnd.z);
+    arrow(midY,transferX,lowerEnd.z-.06,transferX,-15.45);
+    arrow(midY,transferX+.34,upperStart.z,upperStart.x+.2,upperStart.z);
+    inlay(65,upperEnd.x-.18,upperEnd.z,exitX,upperEnd.z+.55);
+    arrow(65,exitX,upperEnd.z+.55,exitX,-13.4);
+
     member([upperEnd.x,63.8,-21.7],[upperEnd.x,62,-15.6],1.35,1.2);
     member([upperStart.x,54.3,-21.3],[lowerEnd.x+2.8,47,-13.5],1.1,1.2);
-    ridePoints.push(lowerStart,lowerEnd,new T.Vector3(-41.1,midY,-13),
-      new T.Vector3(-41.1,midY,upperStart.z),upperStart,upperEnd,
-      new T.Vector3(upperEnd.x-.9,65,upperEnd.z),new T.Vector3(upperEnd.x-.9,65,-12.5));
+    ridePoints.push(lowerStart,lowerEnd,new T.Vector3(transferX,midY,-13),
+      new T.Vector3(transferX,midY,upperStart.z),upperStart,upperEnd,
+      new T.Vector3(exitX,65,upperEnd.z),new T.Vector3(exitX,65,exitEnd));
   }
   const transferA=new T.Vector3(14,100,-12),transferB=new T.Vector3(-18,100,-1);
   const transfer=box(root,[7,2.5,transferA.distanceTo(transferB)],transferA.clone().add(transferB).multiplyScalar(.5).toArray(),stone);
