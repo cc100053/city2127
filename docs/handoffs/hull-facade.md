@@ -69,3 +69,7 @@ R4 加闊兩道斜框上緣，讓銀色折面從下層框延至樓板邊，沿�
 - 正式 build 在開發 Mac 的桌面 Chrome 157.0.8103.79（Apple M6／ANGLE Metal），以 1600×900／DPR 1 檢查 12:00、18:00、21:25。三個時段均有畫布診斷，頁面例外、shader 及本機資源錯誤均為零。記錄在 `~/city2127-evidence/hull-facade/r4/preview.json`。
 
 業主視覺驗收及展覽機驗證待完成。
+
+### R4 整合
+
+- 工作分支提交 `d6f42e3a`，整合提交 `9aa343da`。獨立整合工作樹重跑 root `npm test`、`npm run build`、`git diff --check origin/main..HEAD` 及圖檔規格檢查，全部通過。整份整合版 `dist/` 與 Chrome 已驗證的 build 逐檔一致。
