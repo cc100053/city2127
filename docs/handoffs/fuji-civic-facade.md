@@ -3,7 +3,7 @@
 - Owner: Codex
 - Branch: `codex/fuji-facade-pilot`
 - Base: `2ab01ea77125fbd8c54e5c8dc9f1ec79a3d97ac8`
-- Status: 已選 R1 為外觀基準。R5 上層出口與拱腳收邊候選待 owner 驗收（2026-11-22）
+- Status: 已選 R1 為外觀基準。R6 轉乘台與上層出口導向候選待 owner 驗收（2026-11-22）
 - R1 已驗證實作：`19432b6360eecbf58181ec69d6a3235a0bf82280`
 - 遠端分支：`origin/codex/fuji-facade-pilot`
 
@@ -84,3 +84,19 @@ Apple M6／Chrome 157.0.8103.79 headless（ANGLE Metal），主鏡 1920×1080／
 2026-11-22，owner 確認保存白拱背景 [〈白拱下嘅路〉](../BUILDING_STORIES.md#white-arch)。故事將原通勤吊橋、保留嘅白拱同今日公共步廊連起來，收錄於建築故事集。
 
 下一步由 owner 驗收上層出口、拱腳收邊同南面日夜對照。
+
+## R6 轉乘台與上層出口導向
+
+2026-11-22 由專用工作樹 `/private/tmp/city2127-fuji-polish` 接續。Fetch 後乾淨嘅本機同遠端驗收分支都係 `31f935a85bc1dd2189593b808cf03677ff1761d6`，差異 0／0。`origin/main` 當時係 `a0df060333ecded0f368f62af5e2bb2e360f77db`，對比驗收分支各有 3／13 個獨有提交。本輪以 R5 原鏡位同乘客路線為對照。白拱故事見 [〈白拱下嘅路〉](../BUILDING_STORIES.md#white-arch)。
+
+- 同鏡夜景逐項隔離點光、月光同環境貼圖。停用環境貼圖時高光消失，定位為轉乘台淺色陶板嘅環境反射。轉乘台、上層落地台同上層步道入口短段改用現有啞面鋪石。夜景原圖以同一個轉乘台表面區塊抽樣，平均 8-bit sRGB 由 `247/249/245` 降至 `165/172/181`。
+- 三組短地面箭嘴分別指示離開第一段後轉向、踏上第二段、穿過欄邊開口。箭嘴沿用扶手嘅 `megaSeam` 與日夜調光。所有新增部分都係富士路線上嘅短鋪面和導線，沿用城市鋪石、發光材料和盒形工廠。
+- 由 R5 逐項比較，真 GLB 同程序回退嘅住民、步行及扶梯路線、整棟世界包圍盒完全一致。兩個版本各加 144 個三角面及 1 個鋪石批次，分別為 937,096／955,492 個三角面，各 11 批。
+
+實作提交係 `2e7da19461f55af49af7da415d316fb0bcacba28`。Odaiba 幾何回歸為兩種幕牆逐點確認導線貼住啞面鋪地，突出幅度少於 3 cm。沿用 R5 扶梯踏面、2.3 m 頭頂淨空、欄邊開口、拱腳退讓，及 R1 主結構和泊位淨空檢查。
+
+根目錄 `npm test`、`npm run build` 同 `git diff --check` 通過。桌面開發 Mac（macOS 27.2.1／Chrome 157.0.8103.79 headless）從乾淨嘅實作提交用 R5 相同鏡位、12:00／21:00、3200×1800、DPR 1 同 `reviewTime=20` 擷取，兩張圖零頁面錯誤。剪裁對照沿用相同範圍。[日景同鏡](../../artifacts/fuji-civic-facade/r6/comparison-day.jpg) · [夜景同鏡](../../artifacts/fuji-civic-facade/r6/comparison-night.jpg)
+
+行人視角以 1.64 m 眼高、沿同一條乘客路線側移 0.55 m，由第一段末端行到上層步道。日夜各約 23 秒，1440×810、DPR 1，固定住民時間 `reviewTime=28`，第二段上行加快供看片。逐段以 2 秒畫面核對 1.1–3.1 s 嘅落梯轉彎、7.1–9.1 s 嘅第二段入口、16.6–18.6 s 嘅上層落地台及欄邊開口。最後一段可跟住地面導線穿過開口，片中途人短暫遮住出口箭頭尖。[日景行人幀](../../artifacts/fuji-civic-facade/r6/walker-day.jpg) · [夜景行人幀](../../artifacts/fuji-civic-facade/r6/walker-night.jpg)
+
+兩段錄影嘅 Fuji GLB 回應 200，零頁面錯誤。原圖與 sidecar 在 `~/city2127-evidence/fuji-civic-facade/r6-final/`，短片、sidecar 與錄製腳本在 `~/city2127-evidence/fuji-civic-facade/r6-route/`。短片擷取時工作樹有交接和證據更新，runtime 與實作提交一致。兩秒檢查為開發畫面覆核，owner 驗收和展覽機測試待做。下一步由 owner 審閱驗收分支嘅 R6 日夜對照和短片。
