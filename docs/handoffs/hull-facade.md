@@ -21,3 +21,7 @@
 - Chrome 2400×1350／DPR 1 以 12:00、21:25 和固定場景時間 20 秒拍攝。近鏡 pos (−350, 100, −110) 看向 (−244, 64, 75)，主鏡沿用全城預設。夜間主鏡基準由 main 的 Vite 供應，其 sidecar 的分支欄來自啟動擷取的候選工作樹。原檔及 sidecar 在 `~/city2127-evidence/hull-facade/{before,final}/`。
 - [幾何測試](../../tests/megastructures.test.ts) 覆蓋八級凹入玻璃和背牆、廣場入口下方通視、公共退台鋪面及植栽。原共用合批上限獨立檢查，另確認船身玻璃和暖光背牆各一批。
 - 方向圖把船身拉高、放大列車口，並加入可見的多層室內空間。本輪使用場內既有比例。窗後為可見的淺室內景，完整室內動線、樓梯與人流未實作。
+
+## 整合
+
+- 工作分支 `9cde348c`，整合提交 `2826b2cd`。整合版本重跑 root `npm test`、`npm run build` 和 `git diff --check origin/main..HEAD`，均通過。正式 bundle 與已在 Chrome 測試的版本一致。
