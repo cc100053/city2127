@@ -36,6 +36,8 @@ CI uses Node 24, installs/tests/builds all three packages and checks committed w
 
 Documentation-only changes require local Markdown file/anchor checks, tracked-target checks, renamed-path/plain-text-reference checks, source fact checks and self-review of the complete diff. Check both working/staged diffs and `git diff --check origin/main...HEAD`. Rendering/tests/builds are not required for prose-only changes, and CI skips pushes that touch only `docs/**` or `*.md`. No source/asset change can be disguised as documentation-only.
 
+階梯巨構公共退台 R1（2026-11-22）：[megastructures.test.ts](../tests/megastructures.test.ts) 以向下射線檢查 15、60、105 m 三處鋪面及兩側植栽，既有測試繼續核對巨構和交通淨空。Root test／build／diff check 與桌面畫面紀錄見 [交接](handoffs/hull-terraces.md)。
+
 ## Evidence storage
 
 On macOS, launch Chrome for capture or browser tests from Terminal or through Codex's per-command approval flow. The shared [capture launcher](../scripts/capture.mjs) checks for Codex's macOS command sandbox before starting Chrome, since Chrome can abort during macOS application registration. This also applies to review scripts that call `launchBrowser()`.
