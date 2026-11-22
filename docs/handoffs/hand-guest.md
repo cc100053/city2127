@@ -28,3 +28,9 @@
 ## 下一步
 
 rex 於 iPad 開啟 `https://<Mac LAN IP>:8443/guest?station=A&hand` 完成數輪真實操作；依手感調整停留時間、磁吸半徑與自動前進延遲。全息風格屬 M3。
+
+## M3 版面模擬（分支 `claude/hand-m3`，僅設計審閱）
+
+- rex 決定：只以捏合選擇（指向僅預覽，無停留選擇）；張開手掌或手放低、離開範圍時游標隱藏且無法觸發，只有伸出食指才顯示游標；上方約三成為純文字區；每題出現後鎖定 1.5 秒供閱讀；選擇後顯示「A を選択・やり直す」1.5 秒（捏合可取消）再自動前進；保留確認畫面（4 張答案卡 + 大送出）；送出後以向上箭頭與光束引導觀看上方大螢幕（iPad 位於大螢幕下方 20–30 cm），隨後減光；歡迎畫面改為「住民登録」（張開手掌掃描約 1.5 秒 → 捏合登錄 → 住民番号）；沿用 graphite 配色，全息風格延後；觸控保留為後備；大螢幕「新住民」提示另立任務。
+- `/hand-mock`（`survey/handmock.html`、`src/ui/handMock.ts`、`src/ui/handMock.css`）：DEV-ONLY 靜態版面，僅在 `SURVEY_DEV_HAND=1` 時提供；`?s=<畫面>` 切換、`?shot` 隱藏切換列、左右鍵切換。畫面：welcome-idle、welcome-scanning、welcome-pinch、registered、question、question-hover、picked-undo、review、submitted-look-up、dimmed。
+- 截圖（1180x746、未提交）：`artifacts/hand-m3-mock/01-…10-*.png` 與 `contact-sheet.png`。

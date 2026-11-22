@@ -38,7 +38,7 @@ const mime: Record<string, string> = {
   '.wasm': 'application/wasm', '.task': 'application/octet-stream',
 };
 /** Debug pages from the Vite build. /admin is loopback-only like the admin API. */
-const pages: Record<string, string> = { '/guest': 'guest.html', '/monitor': 'monitor.html', '/admin': 'admin.html', '/pool': 'pool.html', '/hand-spike': 'handspike.html' };
+const pages: Record<string, string> = { '/guest': 'guest.html', '/monitor': 'monitor.html', '/admin': 'admin.html', '/pool': 'pool.html', '/hand-spike': 'handspike.html', '/hand-mock': 'handmock.html' };
 
 class HttpError extends Error {
   readonly status: number;
@@ -186,6 +186,8 @@ export function createSurveyServer({ ctx, staticDir, devAuto = false, remoteAddr
       return publish(res, lifecycleCommand(ctx, await readJson(req)));
     }
     if (path.startsWith('/api/') || path === '/ws') throw new HttpError(404, 'not_found', 'Not found.');
+    // DEV-ONLY: the hand-flow layout mock exists only with SURVEY_DEV_HAND=1.
+    if ((path === '/hand-mock' || path === '/handmock.html') && !handLogPath) throw new HttpError(404, 'not_found', 'Not found.');
     if (method !== 'GET' && method !== 'HEAD') throw new HttpError(405, 'bad_request', 'Method not allowed.');
     return serveFile(res, pages[path] ? '/' + pages[path] : path === '/' ? '/index.html' : path);
   }
