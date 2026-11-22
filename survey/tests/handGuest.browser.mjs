@@ -48,7 +48,7 @@ try {
   const screen = () => page.evaluate(() => document.querySelector('#app').dataset.screen);
   const title = () => page.evaluate(() => document.querySelector('#app h1')?.textContent ?? '');
   const center = selector => page.evaluate(sel => { const r = document.querySelector(sel).getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }, selector);
-  const hold = (p, pose = 'point', pinch = false) => page.evaluate(([x, y, pose, pinch]) => window.__handDev.hold(x, y, { pose, pinch }), [p.x, p.y, pose, pinch]);
+  const hold = (p, pose = 'palm', pinch = false) => page.evaluate(([x, y, pose, pinch]) => window.__handDev.hold(x, y, { pose, pinch }), [p.x, p.y, pose, pinch]);
   const release = () => page.evaluate(() => window.__handDev.release());
   const state = () => page.evaluate(() => window.__handDev.state());
   const shot = async name => { if (shots) await page.screenshot({ path: join(shots, `${name}.png`) }); };
@@ -57,15 +57,15 @@ try {
     for (const end = Date.now() + timeout; Date.now() < end; await sleep(50)) if (await check()) return;
     throw new Error(`timed out waiting for ${what}`);
   };
-  /** Point at p, open, then close the pinch (a fresh closing edge from the pointing pose). */
-  const pinchAt = async p => { await hold(p, 'point'); await sleep(300); await hold(p, 'point', true); await sleep(150); await hold(p, 'point'); };
+  /** Open palm on p, then close the pinch (a fresh closing edge) and open again. */
+  const pinchAt = async p => { await hold(p, 'palm'); await sleep(300); await hold(p, 'palm', true); await sleep(150); await hold(p, 'palm'); };
   const mid = { x: 590, y: 420 };
 
-  // Welcome = 住民登録: a pointing finger or a pinch does nothing; an open palm scans, then a pinch registers.
+  // Welcome = 住民登録: a fist or a pinch before the scan does nothing; an open palm scans, then a pinch registers.
   await waitFor(async () => (await state()).welcome === 'idle', 'registration overlay');
   await shot('01-welcome-idle');
-  await hold(mid, 'point'); await sleep(400); await pinchAt(mid); await sleep(300);
-  assert.equal((await state()).welcome, 'idle', 'pointing and pinching do not register');
+  await hold(mid, 'rest'); await sleep(400); await hold(mid, 'rest', true); await sleep(300);
+  assert.equal((await state()).welcome, 'idle', 'a fist and a pinch do not register');
   await hold(mid, 'palm'); await sleep(800);
   assert.equal((await state()).welcome, 'scanning');
   await shot('02-welcome-scanning');
@@ -89,12 +89,15 @@ try {
     assert.equal(await page.locator(`${target} input`).isChecked(), false, 'pinch during the read lock ignored');
     await waitFor(async () => (await page.locator('.hand-readlock').count()) === 0, 'read lock end', 3000);
     if (q === 0) {
-      // Rest: an open palm over a card shows no cursor; a pointing finger previews but never selects by itself.
-      await hold(p, 'palm'); await sleep(600);
-      assert.equal(await hasCursor(), false, 'open palm = rest, no cursor');
-      await hold(p, 'point'); await sleep(2500);
+      // Rest: a fist or a lowered hand shows no cursor; an open palm previews but never selects by itself.
+      assert.equal(await page.locator('.hand-rest-hint').textContent(), '手を下ろすと休止');
+      await hold(p, 'rest'); await sleep(600);
+      assert.equal(await hasCursor(), false, 'fist = rest, no cursor');
+      await hold({ x: p.x, y: 920 }, 'palm'); // camera y ≈ 0.94, below the active zone await sleep(600);
+      assert.equal(await hasCursor(), false, 'lowered hand = rest, no cursor');
+      await hold(p, 'palm'); await sleep(2500);
       assert.equal(await hasCursor(), true);
-      assert.ok(await page.locator(`${target}.is-hand-hover`).count() === 1, 'pointing previews the card');
+      assert.ok(await page.locator(`${target}.is-hand-hover`).count() === 1, 'an open palm previews the card');
       assert.equal(await page.locator(`${target} input`).isChecked(), false, 'hovering never selects');
       await shot('06-question-preview');
     }
@@ -104,7 +107,7 @@ try {
     await waitFor(async () => (await screen()) === 'review' || (await title()) !== before, `advance after question ${q + 1}`, 3000);
   }
   assert.equal(await screen(), 'review');
-  await hold(await center('.guest-review-row:nth-of-type(2)'), 'point'); await sleep(400);
+  await hold(await center('.guest-review-row:nth-of-type(2)'), 'palm'); await sleep(400);
   await shot('08-review');
   await pinchAt(await center('[data-auto-action="submit"]'));
   await release();

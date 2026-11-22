@@ -1,6 +1,6 @@
 // Hand control layer for the guest page (M3), lazy-loaded by guestDebugView.ts for `/guest?hand`.
-// Pinch-only: a pointing index finger shows the cursor and previews what is under it; a pinch clicks it through
-// the page's own click/change/submit handlers. Open palm, relaxed or lowered hand = rest (no cursor, nothing fires).
+// Pinch-only: an open palm moves the cursor (palm centre) and previews what is under it; a thumb-index pinch clicks
+// it through the page's own click/change/submit handlers. Fist, lowered hand or no hand = rest (no cursor, nothing fires).
 // Welcome is 住民登録 (open palm scan, pinch to register); after submit a look-up screen points to the city display.
 // Touch keeps working; failures fall back to touch-only. `&dev-hand` (DEV-ONLY) feeds synthetic hands for tests.
 import './handGuest.css';
@@ -79,7 +79,7 @@ export function mountHandGuest({ app, onActivity, cityGuestCount = () => undefin
   const startButton = () => app.querySelector<HTMLButtonElement>('[data-auto-action="start"]:not(:disabled)');
   $<HTMLButtonElement>('.hw-touch').addEventListener('click', () => startButton()?.click());
 
-  const pointer = new HandPointer();
+  const pointer = new HandPointer({ anchor: 'palm' });
   const poses = new PoseFilter(150);
   const gate = new TargetGate<HTMLElement>(Infinity, COOLDOWN_MS); // pinch-only: hovering never fires
   const advance = new AutoAdvance(PICK_MS);
@@ -140,9 +140,9 @@ export function mountHandGuest({ app, onActivity, cityGuestCount = () => undefin
       if (screen !== 'welcome') registration.reset();
       if (screen === 'result') resultShownAt = now;
     }
-    // Pose: pinching from the pointing pose keeps pointing; everything else is filtered with 150 ms hysteresis.
+    // Pose: a pinch keeps the palm in control; everything else is filtered with 150 ms hysteresis.
     const raw = pointer.present ? classifyPose(landmarks, frameSize.w, frameSize.h) : 'rest';
-    pose = poses.update(pointer.pinch.closed && pose === 'point' ? 'point' : raw, now);
+    pose = poses.update(pointer.pinch.closed && pose === 'palm' ? 'palm' : raw, now);
     const edge = pinchEdge, pinchAt = pendingPinch;
     pinchEdge = false; pendingPinch = undefined;
 
@@ -173,12 +173,12 @@ export function mountHandGuest({ app, onActivity, cityGuestCount = () => undefin
 
     // Pointing cursor, preview and pinch.
     const blocked = welcomeOn || lookupOn;
-    const pointing = pose === 'point' && pointer.present && !blocked;
-    const cursor = pointing ? pointer.cursorAt(now) : undefined;
+    const controlling = pose === 'palm' && pointer.present && !blocked;
+    const cursor = controlling ? pointer.cursorAt(now) : undefined;
     const locked = screen === 'question' && readLock.locked(now);
     const target = cursor && !locked ? targetAt(cursor) : null;
     gate.hover(target, now);
-    if (edge && pointing && pinchAt && !locked) { const fired = gate.pinch(targetAt(pinchAt), now); if (fired) activate(fired, now); }
+    if (edge && controlling && pinchAt && !locked) { const fired = gate.pinch(targetAt(pinchAt), now); if (fired) activate(fired, now); }
     if (advance.due(screenKey, now)) {
       const form = app.querySelector<HTMLFormElement>('form.guest-form');
       if (form?.querySelector('input:checked')) form.requestSubmit();
@@ -186,6 +186,7 @@ export function mountHandGuest({ app, onActivity, cityGuestCount = () => undefin
     if (pointer.present && now - lastActivity > ACTIVITY_MS) { lastActivity = now; onActivity(); }
     if (target !== hovered) { hovered?.classList.remove('is-hand-hover'); target?.classList.add('is-hand-hover'); hovered = target; }
     renderReadLock(screen === 'question' && locked ? readLock.progress(now) : undefined);
+    renderRestHint(screen === 'question' && !!app.querySelector('.guest-steps li:first-child.is-current'));
 
     layer.classList.toggle('has-cursor', !!cursor);
     if (cursor) {
@@ -194,8 +195,8 @@ export function mountHandGuest({ app, onActivity, cityGuestCount = () => undefin
     }
     const handOn = active && !blocked;
     stateEl.hidden = !handOn;
-    stateEl.classList.toggle('is-point', pointing);
-    stateText.textContent = pointing ? '指で操作中' : '休止中 — 指を伸ばすと操作';
+    stateEl.classList.toggle('is-point', controlling);
+    stateText.textContent = controlling ? '手のひらで操作中' : '休止中 — 手のひらを向けると操作';
 
     if (now - fpsStart >= 1000) {
       const dt = (now - fpsStart) / 1000, results = tracker?.results ?? stats.frames;
@@ -232,6 +233,13 @@ export function mountHandGuest({ app, onActivity, cityGuestCount = () => undefin
     el.querySelector<HTMLElement>('i')!.style.transform = `scaleX(${progress})`;
   }
 
+  /** First question only: how to rest without a hand ledge. Sits under the title like the read lock. */
+  function renderRestHint(show: boolean) {
+    const el = app.querySelector('.hand-rest-hint');
+    if (!show) { el?.remove(); return; }
+    if (!el) { const hint = document.createElement('p'); hint.className = 'hand-rest-hint'; hint.textContent = '手を下ろすと休止'; app.querySelector('h1')?.after(hint); }
+  }
+
   // ---- source: camera + tracker, or DEV landmarks ---------------------------------------------------------
   let tracker: HandTracker | undefined, active = false;
   const video = document.createElement('video');
@@ -263,7 +271,7 @@ export function mountHandGuest({ app, onActivity, cityGuestCount = () => undefin
   function pause() { active = false; tracker?.pause(); stopCamera(); rest(); }
 
   if (dev) {
-    // DEV-ONLY test hook: holds a synthetic hand (pose, optional pinch) with the index fingertip at a screen point.
+    // DEV-ONLY test hook: holds a synthetic hand (pose, optional pinch) with its palm centre at a screen point.
     let held: { x: number; y: number; pose: Pose; pinch: boolean } | undefined;
     const toCamera = (x: number, y: number) => ({ tx: 1 - 0.2 - 0.6 * (x / innerWidth), ty: 0.2 + 0.6 * (y / innerHeight) });
     setInterval(() => {
@@ -271,7 +279,7 @@ export function mountHandGuest({ app, onActivity, cityGuestCount = () => undefin
       onHandFrame({ t: performance.now(), landmarks: hands, width: 640, height: 480 });
     }, 33);
     (window as unknown as { __handDev: unknown }).__handDev = {
-      hold(x: number, y: number, options: { pose?: Pose; pinch?: boolean } = {}) { held = { x, y, pose: options.pose ?? 'point', pinch: options.pinch ?? false }; },
+      hold(x: number, y: number, options: { pose?: Pose; pinch?: boolean } = {}) { held = { x, y, pose: options.pose ?? 'palm', pinch: options.pinch ?? false }; },
       release() { held = undefined; },
       state: () => ({ screen: app.dataset.screen, present: pointer.present, pose, pinch: stats.pinch, registered: stats.registered,
         welcome: welcomeEl.hidden ? undefined : welcomeEl.dataset.state, lookup: lookupEl.hidden ? undefined : lookupEl.classList.contains('is-dim') ? 'dim' : 'look-up' }),

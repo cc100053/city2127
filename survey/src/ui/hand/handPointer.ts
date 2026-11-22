@@ -55,6 +55,11 @@ export function zoneToScreen(tip: Landmark, width: number, height: number, zone 
   return { x: clamp((1 - tip.x - margin) / zone) * width, y: clamp((tip.y - margin) / zone) * height };
 }
 
+/** Palm centre: midway between the index and middle finger MCP joints (steady while the fingertips pinch). */
+export function palmCentre(lm: Landmark[]): Landmark {
+  return { x: (lm[5].x + lm[9].x) / 2, y: (lm[5].y + lm[9].y) / 2 };
+}
+
 /** Thumb-tip to index-tip distance over palm size (wrist to middle-finger MCP), in camera pixels. */
 export function pinchRatio(lm: Landmark[], frameW = 640, frameH = 480): number {
   const d = (a: Landmark, b: Landmark) => Math.hypot((a.x - b.x) * frameW, (a.y - b.y) * frameH);
@@ -170,7 +175,11 @@ export class Predictor {
   }
 }
 
-export type PointerOptions = { minCutoff?: number; beta?: number; predictMs?: number | 'auto'; pinchLookbackMs?: number; zone?: number };
+export type PointerOptions = {
+  minCutoff?: number; beta?: number; predictMs?: number | 'auto'; pinchLookbackMs?: number; zone?: number;
+  /** What drives the cursor: the index fingertip (spike) or the palm centre between index and middle MCP, which stays put while pinching. */
+  anchor?: 'index-tip' | 'palm';
+};
 export type PointerUpdate = {
   /** The controlling hand's landmarks, undefined when no hand is seen. */
   landmarks?: Landmark[];
@@ -193,6 +202,7 @@ export class HandPointer {
   readonly pinch = new Pinch();
   private readonly lookback: number;
   private readonly zone: number;
+  private readonly anchor: 'index-tip' | 'palm';
   private prevBox?: HandBox;
   private frozen?: Point;
   present = false;
@@ -202,6 +212,7 @@ export class HandPointer {
     this.predictor = new Predictor(options.predictMs ?? 'auto');
     this.lookback = options.pinchLookbackMs ?? 100;
     this.zone = options.zone ?? 0.6;
+    this.anchor = options.anchor ?? 'index-tip';
   }
   reset() {
     this.present = false; this.prevBox = undefined; this.frozen = undefined;
@@ -218,7 +229,7 @@ export class HandPointer {
     const boxes = hands.map(handBox), pick = pickHand(boxes, this.prevBox);
     const lm = hands[pick];
     this.prevBox = boxes[pick];
-    const raw = zoneToScreen(lm[8], screenW, screenH, this.zone);
+    const raw = zoneToScreen(this.anchor === 'palm' ? palmCentre(lm) : lm[8], screenW, screenH, this.zone);
     const p = { x: this.fx.filter(raw.x, t / 1000), y: this.fy.filter(raw.y, t / 1000) };
     this.history.push(t, p);
     this.predictor.push(t, p);

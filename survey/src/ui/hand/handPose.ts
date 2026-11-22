@@ -2,8 +2,11 @@
 // Times are milliseconds on the performance.now() clock; landmarks are MediaPipe's 21 normalized points.
 import type { Landmark } from './handPointer.ts';
 
-/** point = index out, other fingers curled (shows the cursor); palm = open hand (welcome scan); rest = anything else. */
-export type Pose = 'point' | 'palm' | 'rest';
+/**
+ * palm = open hand facing the screen: it scans for 住民登録 and drives the cursor; rest = fist, lowered hand or no hand.
+ * The index finger is not required, because it bends toward the thumb in a pinch.
+ */
+export type Pose = 'palm' | 'rest';
 
 const FINGERS = { index: [5, 6, 8], middle: [9, 10, 12], ring: [13, 14, 16], pinky: [17, 18, 20] } as const;
 
@@ -14,17 +17,14 @@ export function fingerExtended(lm: Landmark[], [, pip, tip]: readonly [number, n
 }
 
 /**
- * Raw pose of one frame. A fingertip below `zoneBottom` (normalized camera y; the cursor's active zone ends at 0.8)
- * counts as a lowered hand, i.e. rest.
+ * Raw pose of one frame: open palm when at least two of middle/ring/pinky are extended. A palm centre below
+ * `zoneBottom` (normalized camera y; the cursor's active zone ends at 0.8) counts as a lowered hand, i.e. rest.
  */
 export function classifyPose(lm: Landmark[] | undefined, frameW = 640, frameH = 480, zoneBottom = 0.85): Pose {
   if (!lm) return 'rest';
-  const ext = (f: keyof typeof FINGERS) => fingerExtended(lm, FINGERS[f], frameW, frameH);
-  const index = ext('index'), others = [ext('middle'), ext('ring'), ext('pinky')].filter(Boolean).length;
-  if (index && others >= 2) return 'palm';
-  if (lm[8].y > zoneBottom) return 'rest';
-  if (index && others === 0) return 'point';
-  return 'rest';
+  if ((lm[5].y + lm[9].y) / 2 > zoneBottom) return 'rest';
+  const open = (['middle', 'ring', 'pinky'] as const).filter(f => fingerExtended(lm, FINGERS[f], frameW, frameH)).length;
+  return open >= 2 ? 'palm' : 'rest';
 }
 
 /** Pose with hysteresis: a new raw pose must hold `holdMs` before it replaces the current one. */
@@ -106,25 +106,22 @@ export class Registration {
 }
 
 /**
- * Synthetic hand for tests and the DEV hook: index fingertip at normalized camera point (tx, ty), in `pose`
- * ('point' = index out, 'palm' = all out, 'rest' = fist), thumb tip on the index tip when `pinch`.
+ * Synthetic hand for tests and the DEV hook: palm centre (between index and middle MCP) at normalized camera point
+ * (cx, cy); 'palm' = all fingers out, 'rest' = fist; `pinch` puts the thumb tip on the index tip.
  */
-export function synthHand(tx: number, ty: number, pose: Pose, pinch = false): Landmark[] {
-  const h: Landmark[] = Array.from({ length: 21 }, () => ({ x: tx, y: ty }));
-  const wrist = { x: tx + 0.02, y: ty + 0.32 };
-  h[0] = wrist;
-  const finger = (base: number, dx: number, out: boolean, tip?: Landmark) => {
-    const mcp = { x: tx + dx, y: ty + 0.16 };
+export function synthHand(cx: number, cy: number, pose: Pose, pinch = false): Landmark[] {
+  const h: Landmark[] = Array.from({ length: 21 }, () => ({ x: cx, y: cy }));
+  h[0] = { x: cx + 0.01, y: cy + 0.16 };
+  const out = pose === 'palm';
+  const finger = (base: number, dx: number) => {
+    const mcp = { x: cx + dx, y: cy };
     h[base] = mcp;
     h[base + 1] = out ? { x: mcp.x, y: mcp.y - 0.06 } : { x: mcp.x, y: mcp.y - 0.035 };
     h[base + 2] = out ? { x: mcp.x, y: mcp.y - 0.11 } : { x: mcp.x, y: mcp.y - 0.02 };
-    h[base + 3] = tip ?? (out ? { x: mcp.x, y: mcp.y - 0.16 } : { x: mcp.x, y: mcp.y + 0.01 });
+    h[base + 3] = out ? { x: mcp.x, y: mcp.y - 0.16 } : { x: mcp.x, y: mcp.y + 0.01 };
   };
-  finger(5, 0, pose !== 'rest', pose !== 'rest' ? { x: tx, y: ty } : undefined);
-  finger(9, 0.035, pose === 'palm');
-  finger(13, 0.065, pose === 'palm');
-  finger(17, 0.09, pose === 'palm');
-  h[1] = { x: tx - 0.04, y: ty + 0.26 }; h[2] = { x: tx - 0.07, y: ty + 0.2 }; h[3] = { x: tx - 0.08, y: ty + 0.15 };
-  h[4] = pinch ? { x: tx, y: ty } : { x: tx - 0.09, y: ty + 0.1 };
+  finger(5, -0.0175); finger(9, 0.0175); finger(13, 0.05); finger(17, 0.08);
+  h[1] = { x: cx - 0.06, y: cy + 0.12 }; h[2] = { x: cx - 0.09, y: cy + 0.08 }; h[3] = { x: cx - 0.11, y: cy + 0.04 };
+  h[4] = pinch ? { ...h[8] } : { x: cx - 0.13, y: cy };
   return h;
 }
