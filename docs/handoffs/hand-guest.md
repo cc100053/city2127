@@ -107,3 +107,12 @@ rex 於 iPad 測試第 1、2 頁；之後 Phase 2 實作第 3–5 頁（確認�
 - headless Chromium（Mac，DPR 2）rAF 幀時間 p95：第 3 頁落卡 16.7 ms、送出合併 16.8 ms、第 4 頁 16.7 ms、第 5 頁砌出與比例 16.8 ms、消散 16.8 ms。不代表 iPad。
 - 截圖：`survey/artifacts/hand-ui/flow/10-…17-*.png` 與 `contact-sheet-pages3-5.png`（未提交）。
 - 未驗證：iPad 上的第 3–5 頁、兩站同時使用時的地標停用（僅以單站測試）。
+
+## iPad 實測後修正（2026-11-23 晚）
+
+rex 於 iPad 走完第 1–5 頁：整體可以，但途中一至兩次凍結、無法操作，之後自行恢復。依每 10 秒統計（`data/hand-spike.jsonl`）：22:36:43 頁面重新載入後，worker 首次推論超過 2 秒（GPU 預熱與舞台建構同時進行），追蹤器判定 worker 停頓並改用主執行緒推論，描畫由 57 降至 8 fps、推論降至 0 Hz，直到再次重新載入。另一段（22:34–22:36，住民登録）為手部追蹤反覆遺失（2 分鐘內 handLost +43），屬鏡頭取景問題，非程式凍結。
+
+- 追蹤器（`hand/handTracker.ts`）：首個結果最多等待 8 秒，之後在途影格超過 2 秒才算停頓；來賓頁使用 `path: 'worker'` 與 `workerRestarts: 2`：停頓或崩潰時重新建立 worker（最多兩次，連續正常 30 秒後額度恢復），用盡後 `onFailed` 轉為純觸控並顯示既有提示，不再改用主執行緒推論（`/hand-spike` 的 auto 路徑保留後備）。
+- 停頓追蹤（僅 `SURVEY_DEV_HAND=1`，同既有統計端點）：iPad 保留最近 30 秒、每 100 ms 一筆的狀態（畫面、頁面狀態、原始與過濾後姿勢、是否見到手、捏合比例、游標、追蹤模式、在途影格時間、距上次結果時間、最長 rAF 幀），於 rAF 停頓超過 500 ms（延後 1 秒送出）、追蹤器超過 1 秒無結果、見到手但休止超過 5 秒、頁面 busy 超過 4 秒時，以 `kind: "hand-stall"` 立即送出（15 秒內最多一次）；頁面載入與追蹤模式變更以 `kind: "hand-event"` 立即回報；伺服器將 WebSocket 連線與斷線以 `kind: "ws"` 寫入同一 jsonl。端點本文上限 256 KB（其他 API 仍為 16 KB）。
+- 文字（約 1 米觀看）：只放大需閱讀的文字，約 1.3–1.5 倍（題目 48 px、選項 28 px、確認卡答案 22 px、比例數字 40 px、說明 20–22 px、提示 15–18 px、按鈕 32 px），裝飾性數據字不變；確認卡與聲音卡改為文字優先。`&tune` 新增「文字比例」（`textScale`，1.0–1.8，預設 1.4＝上述大小；1.0 約等於 mock 原尺寸）。
+- 驗證：`npm test`、型別檢查、`git diff --check` 通過；`test:hand-browser` 通過（以暫存目錄建置，未執行 `npm run build`）；本機以 `SURVEY_DEV_HAND=1` 確認 `hand-event`、`ws` 紀錄與 rAF 停頓觸發的 `hand-stall`（含 30 秒環形資料）。截圖 `survey/artifacts/hand-ui/text14/`（1180x746，未提交）。iPad 伺服器仍為前一版，待 rex 指示再建置。

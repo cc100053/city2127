@@ -3,6 +3,8 @@
 // pages 2-5 reuse the names lockMs/relMs/shake/shakeAt for other effects. Page 3-5 keys are listed for later phases.
 
 export const TUNE_DEFAULTS = {
+  // Readable text for ~1 m viewing: 1.4 = the accepted tier (question 48 px, options 28 px…), 1.0 ≈ the mocks' sizes.
+  textScale: 1.4,
   // Page 1 住民登録
   regScanMs: 4000, regPull: 0.175, regMote: 0.35, regCurve: 2.8, regShakeAt: 0.75, regShake: 2.5, regLockMs: 150, regRelMs: 800, regOver: 2,
   // Page 2 question cards
@@ -38,6 +40,8 @@ const save = () => { try { localStorage.setItem(STORE, JSON.stringify(T)); } cat
 
 type Row = [TuneKey, string, number, number, number, string] | ['#', string];
 const SPEC: Row[] = [
+  ['#', '全頁'],
+  ['textScale', '文字比例（1.4＝預設；只放大要讀嘅字）', 1, 1.8, 0.05, '×'],
   ['#', '第 1 頁：住民登録'],
   ['regScanMs', '掃描時間', 3000, 5000, 100, 'ms'],
   ['regPull', '畫面收縮幅度', 0, 0.25, 0.005, ''],

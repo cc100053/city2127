@@ -4,6 +4,7 @@
 // a screen is built (rects are cached in stage pixels).
 import './holo.css';
 import type { Point } from '../handPointer.ts';
+import { T } from './tune.ts';
 
 export const W = 1180, H = 820;
 /** Hologram palette shared by the pages. */
@@ -78,8 +79,9 @@ export class Stage {
   private offX = 0;
   private offY = 0;
   private raf = 0;
+  private textScale = 1.4;
   private last = 0;
-  private onFrame: (now: number, dt: number) => void = () => undefined;
+  private onFrame: (now: number, dt: number, real: number) => void = () => undefined;
   private fpsEl?: HTMLElement;
   private frameTimes: number[] = [];
   private fpsAt = 0;
@@ -143,7 +145,7 @@ export class Stage {
   get shown() { return !this.root.hidden; }
 
   /** Start the single rAF loop; paused while the document is hidden. */
-  start(onFrame: (now: number, dt: number) => void) { this.onFrame = onFrame; this.run(); }
+  start(onFrame: (now: number, dt: number, real: number) => void) { this.onFrame = onFrame; this.run(); }
   private run() {
     if (this.raf || document.visibilityState === 'hidden') return;
     this.last = performance.now();
@@ -152,7 +154,8 @@ export class Stage {
       const real = now - this.last;
       this.last = now;
       if (this.fpsEl) this.meter(now, real);
-      this.onFrame(now, Math.min(50, real));
+      if (T.textScale !== this.textScale) { this.textScale = T.textScale; this.root.style.setProperty('--ts', String(T.textScale / 1.4)); }
+      this.onFrame(now, Math.min(50, real), real);
     };
     this.raf = requestAnimationFrame(tick);
   }

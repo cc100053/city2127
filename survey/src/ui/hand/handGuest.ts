@@ -100,6 +100,7 @@ export function mountHandGuest({ app, onActivity, subscribe, dev = false }: Hand
   const poses = new PoseFilter(150);
   const gate = new TargetGate<HTMLElement>(Infinity, COOLDOWN_MS); // pinch-only: hovering never fires
   let landmarks: Landmark[] | undefined, frameSize = { w: 640, h: 480 }, pendingPinch: Point | undefined, pinchEdge = false;
+  let pinchRatio = 0, rawPose: Pose = 'rest', cursorNow: Point | undefined;
   let pose: Pose = 'rest', lastActivity = 0, screenKey = '', hovered: HTMLElement | null = null, pickedAt = 0;
   const stats = { pinch: 0, handLost: 0, frames: 0, get registered() { return register.registrations; } };
 
@@ -138,22 +139,25 @@ export function mountHandGuest({ app, onActivity, subscribe, dev = false }: Hand
     if (tracker) tracker.handPresent = pointer.present;
     landmarks = up.landmarks;
     if (up.pinchAt) { pendingPinch = up.pinchAt; pinchEdge = true; }
+    pinchRatio = up.pinchRatio ?? 0;
   }
 
   // ---- the one render loop (owned by the stage) -------------------------------------------------------------
   let renderCount = 0, renderFps = 0, fpsStart = performance.now(), resultsAt = 0, inferFps = 0;
-  function frame(now: number, dt: number) {
+  function frame(now: number, dt: number, real: number) {
     renderCount++;
     const screen = app.dataset.screen ?? '';
     const key = `${screen}|${app.querySelector('h1')?.textContent ?? ''}`;
     if (key !== screenKey) { screenKey = key; pickedAt = 0; }
     // Pose: a pinch keeps the palm in control; everything else is filtered with 150 ms hysteresis.
     const raw = pointer.present ? classifyPose(landmarks, frameSize.w, frameSize.h) : 'rest';
+    rawPose = raw;
     pose = poses.update(pointer.pinch.closed && pose === 'palm' ? 'palm' : raw, now);
     const edge = pinchEdge, pinchAt = pendingPinch;
     pinchEdge = false; pendingPinch = undefined;
     const controlling = active && pose === 'palm' && pointer.present;
     const cursor = controlling ? pointer.cursorAt(now) : undefined;
+    cursorNow = cursor;
     if (pointer.present && now - lastActivity > ACTIVITY_MS) { lastActivity = now; onActivity(); }
 
     const holo = holoOn() && !!current;
@@ -184,6 +188,7 @@ export function mountHandGuest({ app, onActivity, subscribe, dev = false }: Hand
     stateEl.classList.toggle('is-point', controlling);
     stateText.textContent = controlling ? '手のひらで操作中' : '休止中 — 手のひらを向けると操作';
 
+    trace(now, real, screen);
     if (now - fpsStart >= 1000) {
       const span = (now - fpsStart) / 1000, results = tracker?.results ?? stats.frames;
       renderFps = renderCount / span; inferFps = (results - resultsAt) / span; resultsAt = results; renderCount = 0; fpsStart = now;
@@ -242,7 +247,10 @@ export function mountHandGuest({ app, onActivity, subscribe, dev = false }: Hand
   } else {
     setStatus('手の操作を準備しています…');
     void import('./handTracker.ts').then(async ({ HandTracker }) => {
-      tracker = new HandTracker(video, { path: 'auto', numHands: 1, onResult: onHandFrame, onError: message => console.warn('[hand]', message) });
+      // Worker only: a stalled worker is restarted (twice at most), never replaced by main-thread inference, which
+      // starves the stage on the iPad; when restarts run out the page falls back to touch.
+      tracker = new HandTracker(video, { path: 'worker', numHands: 1, workerRestarts: 2, onResult: onHandFrame,
+        onError: message => console.warn('[hand]', message), onFailed: reason => fail(`tracker: ${reason}`) });
       await Promise.all([tracker.init(), startCamera()]);
       tracker.start(); active = true; setStatus('');
     }).catch(error => fail(String(error)));
@@ -252,11 +260,51 @@ export function mountHandGuest({ app, onActivity, subscribe, dev = false }: Hand
 
   // ---- optional dev stats (endpoint exists only with SURVEY_DEV_HAND=1) -------------------------------------
   let sentUserAgent = false, logOff = false;
+  const postLog = (body: Record<string, unknown>) => {
+    if (logOff || dev) return;
+    fetch('/api/dev/hand-spike-log', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) })
+      .then(r => { if (r.status === 404) logOff = true; }).catch(() => { /* offline */ });
+  };
+  postLog({ kind: 'hand-event', event: 'load', build: 'holo2', screen: app.dataset.screen, screenSize: `${innerWidth}x${innerHeight}@${devicePixelRatio}`, userAgent: navigator.userAgent });
+
+  // ---- stall trace: the last 30 s at 100 ms, posted as `hand-stall` the moment a freeze-like state shows ------------
+  const TRACE_FIELDS = ['t', 'screen', 'page', 'state', 'raw', 'pose', 'seen', 'pinch', 'x', 'y', 'mode', 'inFlightMs', 'sinceResultMs', 'maxFrameMs'];
+  const ring: unknown[][] = [];
+  let gapDump: { trigger: string; at: number } | undefined;
+  let lastSample = 0, maxFrame = 0, restSince = 0, busySince = 0, lastDump = -Infinity, lastMode = '';
+  function dump(trigger: string, now: number) {
+    if (now - lastDump < 15_000) return;
+    lastDump = now;
+    postLog({ kind: 'hand-stall', trigger, build: 'holo2', screen: app.dataset.screen, mode: tracker?.mode, fallbackReason: tracker?.fallbackReason || undefined,
+      restarts: tracker?.restarts, fields: TRACE_FIELDS, ring: ring.slice() });
+  }
+  function trace(now: number, real: number, screen: string) {
+    maxFrame = Math.max(maxFrame, real);
+    // A rAF gap is dumped a second later, so the trace also shows what the page did right after it.
+    if (real > 500 && !gapDump) gapDump = { trigger: `raf gap ${Math.round(real)} ms`, at: now + 1000 };
+    if (gapDump && now >= gapDump.at) { dump(gapDump.trigger, now); gapDump = undefined; }
+    const mode = tracker?.mode ?? (layer.classList.contains('is-failed') ? 'failed' : dev ? 'dev' : 'starting');
+    if (mode !== lastMode) { if (lastMode) postLog({ kind: 'hand-event', event: 'tracker-mode', previous: lastMode, mode, reason: tracker?.fallbackReason || undefined, screen }); lastMode = mode; }
+    if (now - lastSample < 100) return;
+    lastSample = now;
+    const info = holoOn() && current ? { page: current.name, ...current.debug() } as Record<string, unknown> : undefined;
+    const state = info ? Object.entries(info).filter(([k]) => k !== 'page').map(([k, v]) => `${k}=${Array.isArray(v) ? v.join('/') : v}`).join(' ') : '';
+    const sinceResult = tracker?.lastResultAt ? Math.round(now - tracker.lastResultAt) : -1, inFlight = tracker?.inFlightSince ? Math.round(now - tracker.inFlightSince) : 0;
+    ring.push([Math.round(now), screen, info?.page ?? 'dom', state, rawPose, pose, pointer.present ? 1 : 0, +pinchRatio.toFixed(2),
+      cursorNow ? Math.round(cursorNow.x) : null, cursorNow ? Math.round(cursorNow.y) : null, mode, inFlight, sinceResult, Math.round(maxFrame)]);
+    maxFrame = 0;
+    while (ring.length > 300) ring.shift();
+    if (active && tracker && sinceResult > 1000 && document.visibilityState === 'visible') dump(`no tracker result for ${sinceResult} ms`, now);
+    restSince = pointer.present && pose === 'rest' ? restSince || now : 0;
+    if (restSince && now - restSince > 5000) dump('hand seen but resting > 5 s', now);
+    busySince = info?.busy === true ? busySince || now : 0;
+    if (busySince && now - busySince > 4000) dump('page busy > 4 s', now);
+  }
   const r1 = (v: number) => Number.isFinite(v) ? +v.toFixed(1) : undefined;
   setInterval(() => {
     if (logOff || dev) return;
     const body = {
-      kind: 'hand-guest', build: 'holo1', screen: app.dataset.screen, pose, mode: tracker?.mode ?? (layer.classList.contains('is-failed') ? 'failed' : 'starting'),
+      kind: 'hand-guest', build: 'holo2', restarts: tracker?.restarts, screen: app.dataset.screen, pose, mode: tracker?.mode ?? (layer.classList.contains('is-failed') ? 'failed' : 'starting'),
       fallbackReason: tracker?.fallbackReason || undefined, renderFps: r1(renderFps), inferFps: r1(inferFps),
       inferP50: r1(percentile(tracker?.inferMs ?? [], 0.5)), inferP95: r1(percentile(tracker?.inferMs ?? [], 0.95)),
       rttP50: r1(percentile(tracker?.roundTripMs ?? [], 0.5)), framesSent: tracker?.framesSent, framesDropped: tracker?.framesDropped,

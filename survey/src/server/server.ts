@@ -52,14 +52,14 @@ function sendJson<T>(res: ServerResponse, response: ApiResponse<T>, okStatus = 2
   res.end(JSON.stringify(response));
 }
 
-async function readJson(req: IncomingMessage): Promise<unknown> {
+async function readJson(req: IncomingMessage, maxBody = MAX_BODY): Promise<unknown> {
   if (!(req.headers['content-type'] ?? '').startsWith('application/json')) throw new HttpError(415, 'bad_request', 'Content-Type must be application/json.');
   const chunks: Buffer[] = [];
   let size = 0;
   for await (const chunk of req) {
     const buffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(String(chunk));
     size += buffer.length;
-    if (size > MAX_BODY) throw new HttpError(413, 'bad_request', 'Request body is too large.');
+    if (size > maxBody) throw new HttpError(413, 'bad_request', 'Request body is too large.');
     chunks.push(buffer);
   }
   try { return JSON.parse(Buffer.concat(chunks).toString('utf8')); }
@@ -95,7 +95,11 @@ export function createSurveyServer({ ctx, staticDir, devAuto = false, remoteAddr
       else res.end();
     });
   });
-  const realtime = attachRealtime(server, () => { const state = currentState(ctx); return { state, view: viewOf(ctx, state), displayMode: readDisplayMode(ctx.db) }; });
+  // DEV (SURVEY_DEV_HAND=1): live-socket opens and closes go to the hand log, so a guest iPad's reconnects line up with its traces.
+  const logSocket = handLogPath ? (event: 'open' | 'close', from: string | undefined) => {
+    void mkdir(dirname(handLogPath), { recursive: true }).then(() => appendFile(handLogPath, JSON.stringify({ at: new Date().toISOString(), from, kind: 'ws', event }) + '\n')).catch(() => undefined);
+  } : undefined;
+  const realtime = attachRealtime(server, () => { const state = currentState(ctx); return { state, view: viewOf(ctx, state), displayMode: readDisplayMode(ctx.db) }; }, logSocket);
   const stationTimer = setInterval(() => {
     try { const outcome = settleStations(ctx); if (outcome?.event) realtime.broadcast(outcome.event); }
     catch (error) { console.error('Station lifecycle error', error); }
@@ -143,7 +147,7 @@ export function createSurveyServer({ ctx, staticDir, devAuto = false, remoteAddr
     // SPIKE (M0 hand tracking), dev-only: stats lines from /hand-spike, enabled by SURVEY_DEV_HAND=1.
     if (path === '/api/dev/hand-spike-log' && method === 'POST') {
       if (!handLogPath) throw new HttpError(404, 'not_found', 'Hand-spike logging is disabled.');
-      const line = await readJson(req);
+      const line = await readJson(req, 256 * 1024); // hand-stall traces carry 30 s of samples
       await mkdir(dirname(handLogPath), { recursive: true });
       await appendFile(handLogPath, JSON.stringify({ at: new Date().toISOString(), from: remoteAddress(req), ...(typeof line === 'object' && line ? line : { value: line }) }) + '\n');
       return sendJson(res, { ok: true, data: null });

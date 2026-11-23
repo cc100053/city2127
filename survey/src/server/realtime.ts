@@ -6,13 +6,15 @@ import type { CityView } from '../shared/cityView.ts';
 import type { DisplayMode, ServerEvent } from '../shared/protocol.ts';
 
 /** Read-only monitor channel on /ws. HTTP GET /api/city-state and /api/city-view stay the recovery path after reconnects. */
-export function attachRealtime(server: Server, current: () => { displayMode?: DisplayMode; state: CitySurveyState | ExhibitionState; view: CityView }) {
+export function attachRealtime(server: Server, current: () => { displayMode?: DisplayMode; state: CitySurveyState | ExhibitionState; view: CityView },
+  onClient?: (event: 'open' | 'close', from: string | undefined) => void) {
   const wss = new WebSocketServer({ noServer: true, maxPayload: 1024 });
   const send = (socket: WebSocket, event: ServerEvent) => { if (socket.readyState === WebSocket.OPEN) socket.send(JSON.stringify(event)); };
   server.on('upgrade', (request: IncomingMessage, socket: Duplex, head: Buffer) => {
     if (new URL(request.url ?? '/', 'http://localhost').pathname !== '/ws') { socket.destroy(); return; }
     wss.handleUpgrade(request, socket, head, client => {
       client.on('error', error => console.warn('WebSocket client error', error.message));
+      if (onClient) { const from = request.socket.remoteAddress; onClient('open', from); client.on('close', () => onClient('close', from)); }
       send(client, { type: 'city-state-snapshot', ...current() });
     });
   });

@@ -1,6 +1,8 @@
 // Main-thread side of hand tracking (M1). Pumps camera frames to the HandLandmarker worker, one frame in flight
-// (frames arriving while the worker is busy are dropped), and falls back to throttled main-thread inference when
-// the worker cannot start, produces no result within 3 s, stalls or crashes.
+// (frames arriving while the worker is busy are dropped). The first result may take FIRST_RESULT_MS (GPU warm-up
+// while the page builds); after that a frame in flight longer than STALL_MS counts as a stall. On the 'auto' path a
+// worker that cannot start, stalls or crashes falls back to throttled main-thread inference (the /hand-spike page);
+// with `workerRestarts` (the guest page) the worker is restarted instead and, once those run out, `onFailed` fires.
 import type { HandLandmarker } from '@mediapipe/tasks-vision';
 import { createHandLandmarker, type Delegate } from './landmarker.ts';
 import type { WorkerIn, WorkerOut } from './handWorker.ts';
@@ -20,9 +22,13 @@ export type TrackerOptions = {
   mainGapFrames?: number;
   onResult: (frame: HandFrame) => void;
   onError?: (message: string) => void;
+  /** Path 'worker' only: restart a stalled or crashed worker up to this many times, then give up through onFailed. */
+  workerRestarts?: number;
+  /** Tracking gave up (path 'worker' with restarts used up); the caller falls back to touch. */
+  onFailed?: (reason: string) => void;
 };
 
-const READY_TIMEOUT_MS = 20_000, FIRST_RESULT_MS = 3000, STALL_MS = 2000, SAMPLES = 300;
+const READY_TIMEOUT_MS = 20_000, FIRST_RESULT_MS = 8000, STALL_MS = 2000, SAMPLES = 300;
 const push = (list: number[], v: number) => { list.push(v); if (list.length > SAMPLES) list.shift(); };
 
 export class HandTracker {
@@ -31,6 +37,12 @@ export class HandTracker {
   framesSent = 0;
   framesDropped = 0;
   results = 0;
+  /** performance.now() of the latest result (0 before any). */
+  lastResultAt = 0;
+  /** Worker restarts so far (path 'worker' with workerRestarts). */
+  restarts = 0;
+  /** performance.now() at which the frame now in flight was sent, or 0. */
+  get inFlightSince() { return this.inFlight?.sentAt ?? 0; }
   readonly inferMs: number[] = [];
   readonly roundTripMs: number[] = [];
   /** Set by the caller each result: whether a hand is currently controlling the cursor (throttles main mode). */
@@ -38,7 +50,8 @@ export class HandTracker {
   useVfc: boolean;
 
   private readonly video: HTMLVideoElement;
-  private readonly opts: Required<Omit<TrackerOptions, 'onError'>> & Pick<TrackerOptions, 'onError'>;
+  private readonly opts: Required<Omit<TrackerOptions, 'onError' | 'onFailed'>> & Pick<TrackerOptions, 'onError' | 'onFailed'>;
+  private workerResults = 0;
   private worker?: Worker;
   private main?: HandLandmarker;
   private mainDelegate: Delegate = 'CPU';
@@ -60,7 +73,7 @@ export class HandTracker {
 
   constructor(video: HTMLVideoElement, options: TrackerOptions) {
     this.video = video;
-    this.opts = { path: 'auto', preferGpu: true, useVfc: true, mainGapFrames: 3, numHands: 1, ...options };
+    this.opts = { path: 'auto', preferGpu: true, useVfc: true, mainGapFrames: 3, numHands: 1, workerRestarts: 0, ...options };
     this.useVfc = this.opts.useVfc && 'requestVideoFrameCallback' in HTMLVideoElement.prototype;
   }
 
@@ -132,7 +145,8 @@ export class HandTracker {
     if (!this.inFlight || msg.id !== this.inFlight.id) return; // stale (paused or restarted meanwhile)
     push(this.roundTripMs, performance.now() - this.inFlight.sentAt);
     push(this.inferMs, msg.inferMs);
-    this.inFlight = undefined; this.results++;
+    this.inFlight = undefined; this.results++; this.lastResultAt = performance.now();
+    if (++this.workerResults > 900) this.restarts = 0; // 30 s healthy again: the restart budget refills
     this.opts.onResult({ t: msg.t, landmarks: msg.landmarks, width: msg.width, height: msg.height });
     this.sendPending();
   }
@@ -146,11 +160,12 @@ export class HandTracker {
 
   private sendToWorker(now: number) {
     if (this.inFlight) {
-      if (now - this.inFlight.sentAt > STALL_MS) { this.workerFailed(`worker stalled > ${STALL_MS} ms`); return; }
+      const limit = this.workerResults === 0 ? FIRST_RESULT_MS : STALL_MS;
+      if (now - this.inFlight.sentAt > limit) { this.workerFailed(`worker stalled > ${limit} ms`); return; }
       this.framesDropped++; this.pending = true; return;
     }
     if (!this.firstSentAt) this.firstSentAt = now;
-    else if (this.results === 0 && now - this.firstSentAt > FIRST_RESULT_MS) { this.workerFailed(`no worker result within ${FIRST_RESULT_MS / 1000} s`); return; }
+    else if (this.workerResults === 0 && now - this.firstSentAt > FIRST_RESULT_MS) { this.workerFailed(`no worker result within ${FIRST_RESULT_MS / 1000} s`); return; }
     const id = this.nextId++, worker = this.worker!;
     this.inFlight = { id, sentAt: now };
     this.framesSent++;
@@ -166,10 +181,26 @@ export class HandTracker {
 
   private workerFailed(reason: string) {
     this.opts.onError?.(reason);
-    if (this.opts.path === 'worker') { this.inFlight = undefined; this.firstSentAt = 0; return; } // forced: keep retrying
+    if (this.opts.path === 'worker') {
+      if (this.opts.workerRestarts === 0) { this.inFlight = undefined; this.firstSentAt = 0; return; } // forced: keep retrying
+      if (this.restarts < this.opts.workerRestarts) { this.restarts++; void this.restartWorker(reason); return; }
+      this.worker?.terminate(); this.worker = undefined; this.inFlight = undefined;
+      this.mode = 'failed'; this.fallbackReason = reason;
+      this.opts.onFailed?.(reason);
+      return;
+    }
     this.worker?.terminate(); this.worker = undefined; this.inFlight = undefined;
     this.fallbackReason = reason;
     void this.startMain().catch(error => { this.mode = 'failed'; this.opts.onError?.(`main start: ${String(error)}`); });
+  }
+
+  /** A fresh worker replaces a stalled or crashed one; frames wait while it loads (mode 'starting'). */
+  private async restartWorker(reason: string) {
+    this.worker?.terminate(); this.worker = undefined; this.inFlight = undefined; this.pending = false;
+    this.firstSentAt = 0; this.workerResults = 0; this.mode = 'starting';
+    this.fallbackReason = `worker restart ${this.restarts}: ${reason}`;
+    try { await this.startWorker(); }
+    catch (error) { this.workerFailed(`worker restart failed: ${String(error).slice(0, 80)}`); }
   }
 
   // ---- main-thread path -------------------------------------------------------------------------------------
@@ -192,7 +223,7 @@ export class HandTracker {
       const result = this.main!.detectForVideo(this.video, t0);
       const ms = performance.now() - t0;
       push(this.inferMs, ms); push(this.roundTripMs, ms);
-      this.results++; this.framesSent++; this.rafAtLastInfer = this.rafCount;
+      this.results++; this.framesSent++; this.rafAtLastInfer = this.rafCount; this.lastResultAt = performance.now();
       this.opts.onResult({ t: now, landmarks: result.landmarks, width: this.video.videoWidth, height: this.video.videoHeight });
     } catch (error) {
       this.opts.onError?.(`main detect: ${String(error).slice(0, 100)}`);
