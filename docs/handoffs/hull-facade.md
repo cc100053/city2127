@@ -195,3 +195,19 @@ R4 加闊兩道斜框上緣，讓銀色折面從下層框延至樓板邊，沿�
 - 工作分支 `b237ca14` 已推送。從最新 `origin/main`（`a142d27f`）在獨立工作樹整合為 `4ef277d40eae420bec04f5852ed867db5a084808`。
 - 整合版 root `npm test`、`npm run build`、差異空白、圖檔規格及九個新文件連結全部通過。整份 `dist/` 與 Chrome 驗證過的正式 build 逐檔一致。
 - [GitHub main CI](https://github.com/cc100053/city2127/actions/runs/45116374931) 驗證 `c4213944a5d7e3349f92c5a634801d5abf8ab692`。Root、survey、module-swap 的測試與 build、差異空白及圖檔規格全數通過。
+
+## R10 · 船首洞口雙層銀框
+
+- 業主 cc100053 指示按 Target 右下角列車口打磨靠廣場一端的外框。工作分支 `codex/hull-facade-r10` 從 2026-11-23 已 fetch 的 `origin/main`（`3f1c0a57f41e39d3511064b0a3bc094aeab3c70f`）開獨立工作樹，包含 R9 幾何 `b0804cae` 及已通過主線 CI 的 `c4213944`。本機主工作區的 `main` 在 `2df6d8b6`，領先 0、落後 26，兩份未追蹤的 `Dev_QA.md` 和 `Presentation.md` 保留。[業主 Target](../../artifacts/hull-facade/target.jpg) · [R9 main CI](https://github.com/cc100053/city2127/actions/runs/45116374931)
+- Target 以闊銀外緣、較窄的內緣和中間暗縫交代厚度。R10 以同一組連續剖面包住洞口，上框沿靠海削口轉入端牆，下框從角肋外側返回低層船身，外緣逐步收薄並疊接相鄰銀色曲帶。試拍曾見原角肋遮住下框一段，最終把下框的折返移到角肋外側。
+- 外框依 R9 削口和兩級船身定形，是場地專用的程序幾何。各段共用現有拉絲銀、深色材質及冷白導光批次。原口面、18 × 14 m 通車包絡、9.1 m 洞深、兩條軌道及固定 Hero 沿用 R9。Target 的鏡位較正，概念圖的上下框露得較完整。遊客主鏡的前景步道和退台植栽仍會掠過局部銀框。[外框程式](../../src/hullPortal.ts)
+
+### R10 驗證
+
+- 受測程式提交 `88486657a1539f7b454c5be0dac6fd17c8db00a4`。巨構測試從固定 Hero 逐一命中兩道銀緣和中間較深的暗槽，核對內壁與遮蔽面的通視；由端牆前檢查上框轉角及下框跨過角肋。兩路原軌道每 0.02 秒套用實際頭／中／尾車 GLB，查核洞口結構和矩形包絡。原口面段最小淨距 1.84／3.75 m，延伸量測段 1.84／3.12 m。[巨構測試](../../tests/megastructures.test.ts)
+- 另一端與本輪基準的 594 個三角面逐面核對，頂點、法線、材質完全一致。現有測試繼續檢查廣場大堂、15／60／105 m 公共退台和望海通視。
+- 正式 build 在開發 Mac 的 Chrome 157.0.8103.79（Apple M6／ANGLE Metal）以 1600 × 900／DPR 1 檢查 12:00、18:00、21:25，畫布持續更新。斜前方 DEV 鏡位於 18:00 及 21:25 各記錄 168 個實時幀，頭車由口面外進入並深入遮蔽面後方。頁面例外、shader 及本機資源錯誤皆為零。記錄存於 `~/city2127-evidence/hull-facade/r10/browser.json`。
+- 巨構合批仍為 14 組。非 instanced 結構總數由 70,831 增至 72,177 個三角面。
+- 固定 Hero 沿用 18:00、場景時間 20 秒。全幅和同一裁切位置可比較 R9 與 R10，方向圖與斜前方另放在同一對照板。斜前方的 65.70、66.20、67.06 秒依序顯示接近、跨口面、深入洞腔。廣場日夜與夜間簷下的三組對照覆核外門框、簷篷及室內暖光。[固定 Hero 與 Target](../../artifacts/hull-facade/r10-hero.jpg) · [列車入洞](../../artifacts/hull-facade/r10-bow.jpg) · [入口回歸](../../artifacts/hull-facade/r10-entry.jpg)
+- 最終八張 Chrome 原圖及 sidecar 為 2400 × 1350／DPR 1，來自乾淨的 `88486657`，頁面例外皆為零。原檔存於 `~/city2127-evidence/hull-facade/r10/review/`，新拍的 R9 基準存於 `r10/baseline/`。Root `npm test`、`npm run build`、`git diff --check` 通過。
+- 業主目視驗收及展覽機驗證待完成。
