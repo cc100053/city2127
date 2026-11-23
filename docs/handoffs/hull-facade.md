@@ -242,3 +242,5 @@ R11 用同一曲面掃出外銀緣、暗槽和較細的內銀緣。端牆以橢�
 - 工作分支 `56ce7e9c4d18cd8ae0ad2e311bfb8434a6919580` 已推送。以重新 fetch 的 `e92eb4cf` 在獨立工作樹整合為 `5af2c427261037b24992d30b93dd5e1e6db6eb24`。
 - 整合版 root `npm test` 及 `npm run build` 通過。正式 build 逐檔與 Chrome 測過的 build 一致。差異空白、圖檔規格及 12 個本機文件連結通過。
 - 開發 Mac 的實體 Chrome 視窗用 1920 × 1080／DPR 1 量固定 Hero。12:00 和 21:25 各量四段 120 幀，兩次首段均為 58.5 FPS，其後三段均為 60.0 FPS。同期本機執行 root 測試。量測存於 `~/city2127-evidence/hull-facade/r11/fps.json`。
+- 工作分支 CI 驗證 `56ce7e9c4d18cd8ae0ad2e311bfb8434a6919580`，root、survey、module-swap 的測試與 build、差異空白及圖檔規格全數通過。[工作分支 CI](https://github.com/cc100053/city2127/actions/runs/45153282649)
+- 主線 CI 驗證 `3b8c1ed77766902cee6c14b4477807d7424db051`。Root、survey、module-swap 的測試與 build、差異空白及圖檔規格全數通過。[主線 CI](https://github.com/cc100053/city2127/actions/runs/45153898453)
