@@ -1,8 +1,23 @@
-# 手部操作接入來賓頁（M2、M3）
+# 手部操作接入來賓頁（M2、M3、住民の窓）
 
 - 負責：Claude（rex 指派，2026-11-23）
-- 分支：`claude/hand-m2`（基於 `claude/hand-m1` abcd1665），未合併
+- 分支：`claude/hand-ui`（M2 → M3 → 住民の窓 Phase 1、2 與 iPad 實測修正；已合併 `origin/main`），待 PR 合併
 - 前置：[手部追蹤 spike（M0、M1）](hand-spike.md)
+
+## 目前狀態（2026-11-23）
+
+`/guest?hand` 的住民登録、問題卡、確認、上望與 handoff 全部由「住民の窓」全息舞台繪製（各節見下）。rex 已在 iPad Air 完成第 1–5 頁實測與 15 分鐘連續測試，判定可用。
+
+rex 的決定（2026-11-23）：
+- 大螢幕結果卡不顯示人數比例；比例只在 iPad handoff 中手停留的聲音卡顯示（觸控時按住卡片）。
+- handoff 閒置：有手時 8 秒（移動超過 40 px/s 重新計時），只用觸控時固定 20 秒；`resultEndsAt` 保護不變。
+- 閱讀文字約為 mock 的 1.4 倍（`&tune`「文字比例」預設 1.4）。
+- 卡片上的英文狀態字（BUILD、HOLO READY、LOCK、RECORDED、SHARE、IN USE、DERES）保留。
+- 取消問題卡閱讀鎖後「須先移離卡片」的規則。
+
+15 分鐘連續測試（2026-11-23 23:17–23:31 JST，iPad Air，build `2bec2f77`，`SURVEY_DEV_HAND=1`）：一次載入、完成 3 位來賓（3 筆提案、3 次手部登記）；描畫最低 58、中位數 60 fps，每 3 分鐘平均 59.9／60／59.8（無發熱降速跡象）；手部追蹤全程 worker-gpu，推論中位數 30 Hz、推論 p95 中位數 29 ms、最高 42 ms；worker 重開 0 次、無 `hand-error`；手遺失 97 次、捏合 65 次；2 筆 `hand-stall`（「1 秒無追蹤結果」）均發生在分頁關閉時、緊接 WebSocket 斷線，非使用中。
+
+未驗證：兩站同時使用（地標停用、另一站顯示中的上望等待槽）只以單站測試；未以 WebKit 自動化測試（本機未安裝 Playwright WebKit），Safari 僅經 iPad 手動實測。
 
 ## 範圍
 

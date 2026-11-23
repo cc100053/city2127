@@ -112,7 +112,7 @@ Fresh scratch SQLite、localhost port 8788、`/guest?dev-auto`。Root City は `
 
 ## 來賓頁手部操作（M2、M3）
 
-`/guest?hand`（或 `/guest?station=A&hand`）延遲載入 `src/ui/hand/handGuest.ts`：張開手掌移動游標（手掌中心）並預覽，拇指與食指捏合才選擇（無停留選擇）；握拳或放低手為休止。歡迎畫面為「住民登録」（張開手掌掃描後捏合），每題先鎖定 1.5 秒供閱讀，選擇後自動前進，送出後引導觀看上方大螢幕；失敗時維持觸控。未加 `hand` 時頁面不變。需 HTTPS（見上節）。`&dev-hand` 為 DEV-ONLY 合成手部掛鉤；瀏覽器驗收 `npm run test:hand-browser`（需 `CITY2127_PLAYWRIGHT_PATH`，選用 `CITY2127_CHROME_PATH`、`HAND_SHOTS_DIR`）。`SURVEY_DEV_HAND=1` 時另有版面模擬 `/hand-mock`。詳見 [手部操作接入來賓頁](../docs/handoffs/hand-guest.md)。
+`/guest?hand`（或 `/guest?station=A&hand`）延遲載入 `src/ui/hand/handGuest.ts`：住民登録至 handoff 全部由「住民の窓」全息舞台繪製（`src/ui/hand/ui/`，1180x820 等比縮放）：張開手掌移動游標並預覽，拇指與食指捏合才選擇，送出、地標導覽與「はじめる画面へ」為捏住保持 0.8 秒；握拳或放低手為休止；手部追蹤只用 worker（停頓時重開兩次，失敗則轉觸控）。流程、計時與伺服器呼叫仍由 `guestDebugView.ts` 負責，舞台經頁面既有控制項操作；未加 `hand` 時頁面不變。需 HTTPS（見上節）。`&tune` 顯示調校面板（localStorage `handUiTune`），`&fps` 顯示幀數；`&dev-hand` 為 DEV-ONLY 合成手部掛鉤；瀏覽器驗收 `npm run test:hand-browser`（需 `CITY2127_PLAYWRIGHT_PATH`，選用 `CITY2127_CHROME_PATH`、`HAND_SHOTS_DIR`、`SURVEY_STATIC_DIR`）。選項卡圖片由 `scripts/buildHandCards.mjs` 預先產生並提交。`SURVEY_DEV_HAND=1` 時另有版面模擬 `/hand-mock`，並記錄停頓追蹤（`hand-stall`）、錯誤（`hand-error`）與 WebSocket 連線。詳見 [手部操作接入來賓頁](../docs/handoffs/hand-guest.md)。
 
 ## Legacy and historical records
 
