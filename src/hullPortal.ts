@@ -88,45 +88,81 @@ export function cutHullBowOpening(geometry: T.BufferGeometry) {
   if (uv) geometry.setAttribute('uv', new T.Float32BufferAttribute(texcoords, 2));
 }
 
-type Profile = { u: number; side: number; crown: number; sill: number; radius: number };
+type Profile = {
+  u: number; side: number; crown: number; sill: number; radius: number;
+  fold?: { reach: number; inset: number };
+};
 
-function outline({ u, side, crown, sill, radius }: Profile) {
-  return [[1, 1], [-1, 1], [-1, -1], [1, -1]].flatMap(([d, y], corner) =>
+const seawardShoulderDepth = -.55;
+const foldSlope = Math.tan(T.MathUtils.degToRad(35));
+
+function outline({ u, side, crown, sill, radius, fold }: Profile) {
+  const corners = [[1, 1], [-1, 1], [-1, -1], [1, -1]].map(([d, y], corner) =>
     Array.from({ length: 9 }, (_, step) => {
       const angle = (corner + step / 8) * Math.PI / 2;
       const across = d * (half + side - radius) + Math.cos(angle) * radius;
       const rise = y * (height + (y > 0 ? crown : sill) - radius) + Math.sin(angle) * radius;
-      return new T.Vector3(u, mid + rise, centre + across).applyMatrix4(root);
+      return new T.Vector3(u, mid + rise, centre + across);
     }));
+  return corners.flatMap((arc, corner) => {
+    // Sample the horizontal runs so the turned end blends into the original curve before the far jamb.
+    const points = corner % 2 === 0
+      ? [...arc, ...Array.from({ length: 11 }, (_, i) =>
+          arc[arc.length - 1].clone().lerp(corners[corner + 1][0], (i + 1) / 12))]
+      : arc;
+    return points.map(point => {
+      if (fold) {
+        const turn = 1 - T.MathUtils.smoothstep(point.z, 4, centre);
+        point.z -= fold.reach * turn;
+        // Turn the silver face toward the sea and set the guide slightly behind that plane.
+        const plane = face - .06 + (point.z - seawardShoulderDepth) * foldSlope - fold.inset;
+        point.x = T.MathUtils.lerp(u, plane, turn);
+      }
+      return point.applyMatrix4(root);
+    });
+  });
 }
 
 function band(outer: Profile, inner: Profile) {
   const a = outline(outer), b = outline(inner);
-  const uv = hullFrameUv(a.map((point, i) => [point, b[i]]));
-  const positions: number[] = [], coords: number[] = [];
-  for (let i = 0; i < a.length; i++) {
-    const j = (i + 1) % a.length;
-    for (const p of [a[i], b[i], a[j], a[j], b[i], b[j]]) positions.push(...p.toArray());
-    const end = j ? uv[j].along : uv[i].along + .5 * (a[i].distanceTo(a[j]) + b[i].distanceTo(b[j]));
-    coords.push(uv[i].along, uv[i].low, uv[i].along, uv[i].high, end, uv[j].low,
-      end, uv[j].low, uv[i].along, uv[i].high, end, uv[j].high);
+  const edges = a.map((point, i) => [point, b[i]] as const);
+  edges.push(edges[0]); // Keep the metre UV continuous across the strip's closing segment.
+  const uv = hullFrameUv(edges);
+  const positions: number[] = [], coords: number[] = [], indices: number[] = [];
+  for (const [i, [outerPoint, innerPoint]] of edges.entries()) {
+    positions.push(...outerPoint.toArray(), ...innerPoint.toArray());
+    coords.push(uv[i].along, uv[i].low, uv[i].along, uv[i].high);
+    if (i + 1 < edges.length) {
+      const start = i * 2;
+      indices.push(start, start + 1, start + 2, start + 2, start + 1, start + 3);
+    }
   }
   const geometry = new T.BufferGeometry();
   geometry.setAttribute('position', new T.Float32BufferAttribute(positions, 3));
   geometry.setAttribute('uv', new T.Float32BufferAttribute(coords, 2));
+  geometry.setIndex(indices);
   geometry.computeVertexNormals();
+
+  const normals = geometry.getAttribute('normal');
+  const normal = new T.Vector3(), endNormal = new T.Vector3();
+  for (let i = 0; i < 2; i++) {
+    const end = a.length * 2 + i;
+    normal.fromBufferAttribute(normals, i).add(endNormal.fromBufferAttribute(normals, end)).normalize();
+    normals.setXYZ(i, normal.x, normal.y, normal.z);
+    normals.setXYZ(end, normal.x, normal.y, normal.z);
+  }
   return geometry;
 }
 
 type Finish = 'frame' | 'panel' | 'guide' | 'dark';
 
 export function buildHullBowPortal(surface: (finish: Finish, geometry: T.BufferGeometry) => void) {
-  const flange = { u: face - .34, side: 2.9, crown: 3.6, sill: 2.1, radius: 3.9 };
-  const shoulder = { u: face + .83, side: 2.12, crown: 2.9, sill: 1.86, radius: 3.2 };
-  const lip = { u: face + 1.02, side: .99, crown: 1.36, sill: 1.02, radius: 2.1 };
-  const throat = { u: face + .13, side: .32, crown: .32, sill: .32, radius: .7 };
-  const guideTop = { u: face + .08, side: .40, crown: .40, sill: .40, radius: .80 };
-  const guideBottom = { u: face - .06, side: .14, crown: .14, sill: .14, radius: .39 };
+  const flange = { u: face - .34, side: 2.9, crown: 3.6, sill: 2.1, radius: 3.9, fold: { reach: 2.1, inset: 2.55 } };
+  const shoulder = { u: face + .83, side: 2.12, crown: 2.9, sill: 1.86, radius: 3.2, fold: { reach: 2.18, inset: 0 } };
+  const lip = { u: face + 1.02, side: .99, crown: 1.36, sill: 1.02, radius: 2.1, fold: { reach: 0, inset: 0 } };
+  const throat = { u: face + .13, side: .32, crown: .32, sill: .32, radius: .7, fold: { reach: .49, inset: .06 } };
+  const guideTop = { u: face + .08, side: .40, crown: .40, sill: .40, radius: .80, fold: { reach: .38, inset: .08 } };
+  const guideBottom = { u: face - .06, side: .14, crown: .14, sill: .14, radius: .39, fold: { reach: 0, inset: .08 } };
   const liner = { u: face - 1.12, side: 0, crown: 0, sill: 0, radius: 0 };
   const back = { ...liner, u: recess };
   const finishBand = (finish: Finish, outer: Profile, inner: Profile) => {
