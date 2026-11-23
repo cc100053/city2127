@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import * as T from 'three';
 import { LABEL_FADE, labelOpacity, labelScreenPosition } from '../src/voiceLabel.ts';
 

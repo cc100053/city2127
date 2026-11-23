@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import * as T from 'three';
 import { onBayPlinth } from '../src/automationBays.ts';
 import { HERO_FRAME_SLOTS, towerFamily, ladderHybrid, ladderShare, rungStep, AutomationDistrict, ConcentrationDistrict, EnvironmentDistrict, stageRanks, PULSE_SECONDS, PULSE_WAVE_GAP, SharingDistrict, SlotLevels, PRIVATE_RISE, facadeClimate, publishRoofGardens } from '../src/districtMeters.ts';

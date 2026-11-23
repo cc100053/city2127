@@ -1,5 +1,5 @@
 // Formal E4 acceptance: real questions/server/SQLite/WebSocket, no DEV energy switch.
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import { evidenceDir } from '../scripts/evidence.mjs';
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';

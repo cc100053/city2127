@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import { Box3, Group, InstancedMesh, Matrix4, Mesh, Scene, Vector3, type BufferGeometry } from 'three';
 import { MeshBVH } from 'three-mesh-bvh';
 import { CityChangeManager } from '../src/cityChangeManager.ts';

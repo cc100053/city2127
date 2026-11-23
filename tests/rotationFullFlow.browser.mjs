@@ -2,7 +2,7 @@
 // city drawn from rotation.shown (Q01 NW band, Q02 lots, Q03 drawer housing, Q08 SW vacancy), Admin Undo and reset, city reload mid-transition,
 // network drop and reduced motion. Needs a fresh rotation scratch server (survey-rotation: SURVEY_QUESTIONS=…rotation.v1.json,
 // port 8789) and the root Vite city (5173). Not part of npm test.
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import { writeFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { evidenceDir } from '../scripts/evidence.mjs';
@@ -41,7 +41,7 @@ const cityState = () => city.evaluate(() => {
   const d = document.querySelector('canvas').dataset;
   return { nw: JSON.parse(d.siteAssets).magnetEast.automationHub?.band, lots: JSON.parse(d.lots), farm: JSON.parse(d.energy).farm.visible,
     swVacant: JSON.parse(d.siteAssets).dogenzakaSouth.commonsPlaza?.vacant, card: document.querySelector('.resident-card-copy')?.textContent,
-    place: document.querySelector('.resident-place')?.textContent, share: document.querySelector('.resident-share')?.textContent };
+    place: document.querySelector('.resident-place')?.textContent };
 });
 const shot = async (page, name) => { await page.screenshot({ path: `${out}/${name}.png` }); };
 /** City back to its ambient panel (the live result's reading slot is over). */

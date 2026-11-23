@@ -1,5 +1,5 @@
 // P3 desktop timing/recovery check; fresh scratch SQLite, installed Chrome/Playwright, existing root preview.
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import { evidenceDir } from '../scripts/evidence.mjs';
 import { mkdtempSync, mkdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';

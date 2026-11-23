@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import { createWorldState } from '../src/worldState.ts';
 import { presets, type WorldState } from '../src/presets.ts';
 import { DAY_SECONDS, hourAt, daylight, moodAt, withNight, nightLighting, displayHour, isDisplayMode } from '../src/dayCycle.ts';

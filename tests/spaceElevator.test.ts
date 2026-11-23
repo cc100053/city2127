@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import { Color, Mesh, PerspectiveCamera, Raycaster, Scene, Vector3 } from 'three';
 import { changeSites, SPACE_ELEVATOR } from '../src/layout.ts';
 import { HERO_POSITION, HERO_TARGET, heroSettledCamera } from '../src/heroCamera.ts';

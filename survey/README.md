@@ -101,6 +101,19 @@ Fresh scratch SQLite、localhost port 8788、`/guest?dev-auto`。Root City は `
 
 **DEV-ONLY：展示会前に panel／endpoint／launcher を除去、または別途 Admin への移動を決定してください。旧 staff-exit lock は復活させません。** 再利用可能な tests は残します。実装履歴：[auto-tests](../docs/handoffs/archive/survey-auto-tests.md)。
 
+## M0 手部追蹤驗證頁（spike，非產品）
+
+`/hand-spike`（`handspike.html`、`src/ui/handSpike.ts`、`src/ui/hand/`）在 iPad 前鏡頭上以 MediaPipe HandLandmarker（`@mediapipe/tasks-vision`，精確版本鎖定）量測手勢選擇：食指尖游標、停留 1 秒或捏合選擇三張卡片，並顯示推論/描畫 fps、推論時間 p50/p95、delegate 等。執行環境自行託管於 `public/hand/`（git 忽略），建置前先執行 `npm run fetch:hand-model`（複製 wasm、下載 `hand_landmarker.task`）。
+
+- `SURVEY_DEV_HAND=1`：啟用 `POST /api/dev/hand-spike-log`，每 10 秒的統計追加至 `data/hand-spike.jsonl`；未設定時回 404。
+- `SURVEY_TLS_CERT`、`SURVEY_TLS_KEY`（選用 `SURVEY_TLS_PORT`，預設 8443）：另以 HTTPS 監聽同一處理器與 WebSocket；HTTP 監聽不變。iPad 相機需要安全來源，憑證以 mkcert 產生於 `data/tls/`，並將 `rootCA.pem` 安裝至 iPad 且於「憑證信任設定」啟用。
+- M1 起推論在 module worker 執行（`src/ui/hand/`：`handPointer.ts`、`handTracker.ts`、`handWorker.ts`、`landmarker.ts`），失敗時改用節流的主執行緒推論。
+- URL 參數：`?mode=worker|main`、`?delegate=cpu`、`?dwell=<ms>`、`?mincutoff=`、`?beta=`（One-Euro）、`?predict=<ms>`（固定游標外推上限；預設依更新間隔自適應）、`?hands=1|2`（預設 1）、`?maingap=<幀>`、`?vfc=0`。
+
+## 來賓頁手部操作（M2、M3）
+
+`/guest?hand`（或 `/guest?station=A&hand`）延遲載入 `src/ui/hand/handGuest.ts`：住民登録至 handoff 全部由「住民の窓」全息舞台繪製（`src/ui/hand/ui/`，1180x820 等比縮放）：張開手掌移動游標並預覽，拇指與食指捏合才選擇，送出、地標導覽與「はじめる画面へ」為捏住保持 0.8 秒；握拳或放低手為休止；手部追蹤只用 worker（停頓時重開兩次，失敗則轉觸控）。流程、計時與伺服器呼叫仍由 `guestDebugView.ts` 負責，舞台經頁面既有控制項操作；未加 `hand` 時頁面不變。需 HTTPS（見上節）。`&tune` 顯示調校面板（localStorage `handUiTune`），`&fps` 顯示幀數；`&dev-hand` 為 DEV-ONLY 合成手部掛鉤；瀏覽器驗收 `npm run test:hand-browser`（需 `CITY2127_PLAYWRIGHT_PATH`，選用 `CITY2127_CHROME_PATH`、`HAND_SHOTS_DIR`、`SURVEY_STATIC_DIR`）。選項卡圖片由 `scripts/buildHandCards.mjs` 預先產生並提交。`SURVEY_DEV_HAND=1` 時另有版面模擬 `/hand-mock`，並記錄停頓追蹤（`hand-stall`）、錯誤（`hand-error`）與 WebSocket 連線。詳見 [手部操作接入來賓頁](../docs/handoffs/hand-guest.md)。
+
 ## Legacy and historical records
 
 v1 の質問予約／trigger／加算 clamp／一人一問コードと tests は互換性のため保持します。`questions.mvp.json` を既定設定にするだけでは current v2 run は v1 に戻りません。現在の Guest は四問 UI、root との接続は実装済みです。

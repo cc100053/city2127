@@ -7,6 +7,7 @@ import { DISPLAY_MS } from '../shared/displayTiming.ts';
 import { buildProposalRequest } from './guestFlow.ts';
 import { optionIcon } from './guestIcons.ts';
 import { renderTendency, renderVoices } from './guestTendency.ts';
+import type { HandView } from './hand/ui/types.ts';
 
 const app = document.querySelector<HTMLElement>('#app')!;
 app.classList.add('guest');
@@ -22,6 +23,7 @@ type GuestRecovery = {
 };
 const stationParam = new URLSearchParams(location.search).get('station');
 const stationId = stationParam === 'A' || stationParam === 'B' ? stationParam : undefined;
+const handMode = new URLSearchParams(location.search).has('hand');
 const recoveryKey = `city2127.guest-draft.v2${stationId ? `.${stationId}` : ''}`;
 let resultReadyAt = 0;
 let resultEndsAt = 0;
@@ -192,6 +194,36 @@ function page(title: string, eyebrow: string, ...content: (HTMLElement | string)
         el('h1', { tabindex: '-1' }, title),
         ...content)),
   );
+  notifyHand();
+}
+
+/** `?hand` (住民の窓): the hand UI draws welcome and questions from this snapshot and acts through the controls above. */
+let handView: ((view: HandView) => void) | undefined;
+function notifyHand() { if (handView) handView(handSnapshot()); }
+function handSnapshot(): HandView {
+  const question = screen === 'question' && session ? session.questions[questionIndex] : undefined;
+  return {
+    screen, busy, stationId, cityGuestCount, notice, idleWarning,
+    needsPage: !!notice && ['session_expired', 'already_answered', 'unsupported_version'].includes(lastErrorCode ?? ''),
+    question: question && session ? {
+      index: questionIndex, total: session.questions.length, id: question.id, text: question.text, background: question.background,
+      options: question.options.map(option => ({ id: option.id, label: option.label })), chosen: draft.get(question.id), editing: editingFromReview,
+    } : undefined,
+    slots: session ? session.questions.map(item => ({ id: item.id, chosen: draft.get(item.id) })) : [],
+    review: (screen === 'review' || screen === 'submitting') && session ? {
+      rows: session.questions.map(item => {
+        const option = item.options.find(o => o.id === draft.get(item.id));
+        return { questionId: item.id, text: item.text, optionId: option?.id, label: option?.label };
+      }),
+      canSubmit: !busy && !pendingRequest, uncertain: pendingRequest !== undefined,
+    } : undefined,
+    result: saved ? {
+      ordinal: saved.proposal.ordinal, guestCount: saved.state.guestCount, readyAt: resultReadyAt, endsAt: resultEndsAt,
+      answers: saved.proposal.answers.map(a => ({ questionId: a.questionId, optionId: a.optionId, label: a.optionLabel })),
+      shares: saved.proposal.rotation?.shares.map(share => ({ questionId: share.questionId, percent: share.percent, total: share.total })) ?? [],
+    } : undefined,
+    exploring, othersExploring,
+  };
 }
 
 function focusTitle() {
@@ -322,6 +354,12 @@ async function restoreRecovery(recovery: GuestRecovery) {
   }
 
   if (!checked.ok && checked.error.code === 'proposal_undone') return showUndone();
+  // Hand kiosk: a draft whose session the server no longer knows (a reset or fresh run) starts over at 住民登録,
+  // since a guest using the hand cannot leave a stale draft (hand presence keeps the idle timer from abandoning it).
+  if (handMode && !checked.ok && checked.error.code === 'session_not_found' && !pendingRequest) {
+    clearRecovery(); session = undefined; draft = new Map(); conflictState = undefined; lastErrorCode = undefined; notice = undefined;
+    screen = 'welcome'; renderWelcome(); return;
+  }
   if (pendingRequest) {
     screen = 'review';
     renderReview(false);
@@ -384,6 +422,7 @@ function renderQuestion(focus = true) {
       next.disabled = false;
       persistRecovery();
       resetIdleTimer();
+      notifyHand();
     });
     const title = choiceTitles[option.id];
     const icon = optionIcon(option.id);
@@ -603,7 +642,8 @@ function renderHandoff() {
       action('はじめる画面へ', nextGuest, !exploring)));
   focusTitle();
   // While this guest looks at a landmark the screen waits for 戻る, the next Start or a new result; staff end a forgotten one.
-  if (!exploring) flowTimer = window.setTimeout(nextGuest, Math.max(EXPLORE_OFFER_MS, resultEndsAt - performance.now()));
+  // Hand mode: the 住民の窓 handoff runs its own idle rail (8 s with a hand, 20 s touch only) and calls nextGuest.
+  if (!exploring && !handMode) flowTimer = window.setTimeout(nextGuest, Math.max(EXPLORE_OFFER_MS, resultEndsAt - performance.now()));
 }
 
 async function explore(target: ExploreTarget | null) {
@@ -690,6 +730,7 @@ connectEvents(event => {
     // Update the welcome line in place; re-rendering would move focus and the Start button under a finger.
     const line = app.querySelector<HTMLElement>('.guest-city-count');
     if (line) line.textContent = cityCountText();
+    notifyHand();
   }
   if (event.type === 'explore') {
     // A null target means nobody holds the screen any more (戻る, a new result, a reset or the next Start).
@@ -716,6 +757,15 @@ if (stationId) setInterval(async () => {
     app.querySelector('.guest-lead')!.textContent = 'この草稿の体験は終了しました。提案は記録されていません。新しく開始できます。';
   }
 }, 2000);
+
+// Hand control (M2): `?hand` lazy-loads the camera hand layer, whose dwell/pinch clicks run through the handlers
+// above; touch keeps working, and without `?hand` nothing of it loads. `&dev-hand` is a DEV-ONLY synthetic-hand hook.
+if (handMode) {
+  void import('./hand/handGuest.ts').then(({ mountHandGuest }) => mountHandGuest({
+    app, onActivity: resetIdleTimer, cityGuestCount: () => cityGuestCount, dev: new URLSearchParams(location.search).has('dev-hand'),
+    subscribe: listener => { handView = listener; notifyHand(); },
+  })).catch(error => console.error('Hand control:', error));
+}
 
 // DEV-ONLY: remove this import/adapter, or move the controls to Admin before exhibition.
 // The runner uses the same radio events, form submission, draft and idempotent submit path.

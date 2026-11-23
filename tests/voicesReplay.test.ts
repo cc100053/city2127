@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import { CARD_FADE, REPLAY_FROM, REPLAY_UNTIL, VOICES_SECONDS, demoVoices, meterPoints, strongestLean, voicesCardOpacity, voicesShown, votedAxes, type VoiceRecord } from '../src/voicesReplay.ts';
 import { AttractLoop, SEGMENTS } from '../src/attractLoop.ts';
 import * as T from 'three';

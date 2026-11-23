@@ -1,5 +1,5 @@
 // Formal A acceptance: production scene, real scratch survey, fixed housing identity across recovery.
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import { evidenceDir } from '../scripts/evidence.mjs';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';

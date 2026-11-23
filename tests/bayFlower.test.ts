@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import { BAY_FLOWER, bayCruisers } from '../src/layout.ts';
 import { BAY_FLOWER_Y, bayFlower, bayFlowerPlatform, bayFlowerShown, bayFlowerWorld } from '../src/bayFlower.ts';
 import { boatPoses, HULL, routes, WATER_PERIOD } from '../src/mobility.ts';

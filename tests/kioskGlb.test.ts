@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import { readFileSync } from 'node:fs';
 
 // Parses the real kiosk.glb (asset/models/resident-kiosk): the nodes the dev shot drives, the arm chain, the triangle and material budget.

@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import { readFileSync } from 'node:fs';
 
 // Parses the real nagi.glb (asset/models/resident-nagi): rigid-part node names and hierarchy, triangle and material budget.

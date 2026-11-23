@@ -1,6 +1,6 @@
 // Optional browser acceptance: use an existing Playwright installation, not a new repo dependency.
 // Start survey `npm run dev:auto` and root Vite; this check requires a fresh scratch DB.
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import { evidenceDir } from '../scripts/evidence.mjs';
 import { pathToFileURL } from 'node:url';
 

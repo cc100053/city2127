@@ -1,6 +1,6 @@
 // Interim concept lot (owner 2026-11-20): the lattice stays inside its lot envelope, rises with the 3 s transition and fades with the fly-out,
 // and the concept shot looks at the lot.
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import { conceptPhase, conceptText, latticeGeometry } from '../src/conceptHologram.ts';
 import { CONCEPT_LOT } from '../src/layout.ts';
 import { SHOTS } from '../src/headlineCamera.ts';

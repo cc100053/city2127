@@ -1,5 +1,5 @@
 // P4 missing desktop cases. Scratch DB; real wall time except explicit server lease jumps.
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import { evidenceDir } from '../scripts/evidence.mjs';
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';

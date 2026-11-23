@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import { aoiPose } from '../src/aoiTimeline.ts';
 
 assert.deepEqual(aoiPose(0), { push: 0, lift: 0, sow: 0, seeds: 0, pullback: 0, pane: 0, beam: 0, sunlight: 0 });
