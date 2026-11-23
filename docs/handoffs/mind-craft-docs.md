@@ -4,7 +4,7 @@
 - Status: DONE
 - Branch: `codex/mind-craft-docs`
 - Base commit: `d8c1fe5794fdee63488f36179b750b7297d6ee3f`
-- Last verified revision: title and description patch on the base above, checked on 2026-11-23.
+- Last verified revision: `c8a1820e`, checked on 2026-11-23.
 
 ## Session Git state
 
@@ -16,7 +16,7 @@ Record the owner-approved title, subtitle, reading and Japanese introduction in 
 
 ## Validation
 
-Checked the exact title, reading, and Japanese introduction against the owner’s wording. Checked the nine-question description against the current exhibition specification and rotation question data. Verified the new documentation links and ran `git diff --check`. The patch contains Markdown only. See [documentation workflow](../CONTRIBUTING.md#code-and-documentation-workflow).
+Checked the exact title, reading, and Japanese introduction against the owner’s wording. Checked the nine-question description against the current exhibition specification and rotation question data. Verified the new documentation links and ran `git diff --check`. The integrated tree at `8aa6673aea18fd531885b8ec3181f9e4657062c9` matched the verified task branch and passed `git diff --check origin/main..HEAD`. The patch contains Markdown only, which skips CI. See [documentation workflow](../CONTRIBUTING.md#code-and-documentation-workflow).
 
 ## Next step
 
