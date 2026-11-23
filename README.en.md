@@ -1,6 +1,6 @@
 # Mind craft― 選択の積み重ねでつくる都市 ―
 
-> **2026-11-21: the nine-question rotation (9 questions × 3 models) is the only exhibition version.** The version4 four-question / four-Meter version is retired; Meter tools and notes below are legacy code. Start a run with `SURVEY_QUESTIONS=src/survey/questions.rotation.v1.json` (the server default is still the old file).
+> **2026-11-21: the nine-question rotation (9 questions × 3 models) is the only exhibition version.** Start a run with `SURVEY_QUESTIONS=src/survey/questions.rotation.v1.json` (the server default is still the old file).
 
 ## About the work
 
@@ -12,7 +12,7 @@ Open `https://<exhibition-PC LAN IP>:8443/guest?hand` in iPad Safari. For two st
 
 Move the cursor with an open palm and pinch your thumb and index finger to select. Hold the pinch for 0.8 seconds to submit, open a landmark tour, or return to the start screen. Touch works throughout. After the shared-screen result, hover over a voice card or press and hold it on the iPad to reveal the share for that question.
 
-## Two concurrent Guest devices — 2026-10-02
+## Two concurrent Guest devices
 
 Use one survey server on the trusted LAN. Open `http://<exhibition-PC LAN IP>:8787/guest?station=A` on one device and `http://<exhibition-PC LAN IP>:8787/guest?station=B` on the other. Use only one page per station; each station admits one active experience. With `SURVEY_HOST=0.0.0.0` the server prints the full A/B `LAN Guest:` URLs to type on the iPads; router/iPad setup is in the [LAN station handoff](docs/handoffs/lan-guest-stations.md). Bind the survey server with `SURVEY_HOST=0.0.0.0` (PowerShell: `$env:SURVEY_HOST='0.0.0.0'`). Each station has its own four-question draft/result/handoff; submissions accumulate in server arrival order and retries count once. Live City results reserve 13-second reading slots with three-second transitions and proposal/station labels. City reconnect restores the latest snapshot immediately. The existing `/guest` single-station flow remains; do not mix it with active A/B experiences.
 
@@ -103,7 +103,7 @@ To view the standalone city without survey state, open `http://127.0.0.1:5173/`;
 
 ## Current direction
 
-Odaiba is the only exhibition venue. Shibuya is a closed historical decision and will not be developed again (2026-10-02); its unfinished plans are not a future backlog. Meter choices affect both focal sites and the wider district. S5, input hardware and exhibition-day reset/recovery policy remain unaccepted.
+The exhibition city is the Odaiba waterfront in 2127. The [rotation matrix](docs/QUESTION_ROTATION_PLAN.md) tracks the question options, models and fixed lots. The [document index](docs/README.md) links to development references and historical designs.
 
 ## Project references
 

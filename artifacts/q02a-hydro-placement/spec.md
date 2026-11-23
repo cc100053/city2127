@@ -19,4 +19,4 @@
 | 岸邊步橋／堤道 | Reuse | [energyPrototype](../../src/energyPrototype.ts) 水庭 spur（步道板、欄杆、柱燈） |
 | 城市水面 | Reuse | [bayWater](../../src/bayWater.ts) |
 
-狀態表、選址驗證及 R1 驗收見 [handoff](../../docs/handoffs/q02a-hydro-placement.md)。
+狀態表、選址驗證及 R1 驗收見 [handoff](../../docs/handoffs/archive/q02a-hydro-placement.md)。

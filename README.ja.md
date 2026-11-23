@@ -1,6 +1,6 @@
 # Mind craft― 選択の積み重ねでつくる都市 ―
 
-> **2026-11-21：展示の現行版は9問の抽題輪換（9問 × 3モデル）のみです。** 旧 version4（4問・4 Meter）は退役しました。以下の Meter 関連の説明・DEV ツールは旧コードです。新しい run は `SURVEY_QUESTIONS=src/survey/questions.rotation.v1.json` で起動してください（サーバーの既定値はまだ旧ファイルです）。
+> **2026-11-21：展示の現行版は9問の抽題輪換（9問 × 3モデル）のみです。** 新しい run は `SURVEY_QUESTIONS=src/survey/questions.rotation.v1.json` で起動してください（サーバーの既定値はまだ旧ファイルです）。
 
 ## 作品について
 
@@ -16,7 +16,7 @@ iPad の Safari で `https://<展示PCのLAN IP>:8443/guest?hand` を開きま�
 
 手のひらを開いてカーソルを動かし、親指と人差し指でつまんで選びます。送信・ランドマークの案内・開始画面への移動は 0.8 秒つまみ続けます。全画面をタッチでも操作できます。大画面での表示が終わったら、iPad の声のカードにカーソルを合わせるか、指で長押しすると、その問いの割合を見られます。
 
-## 2台で同時に回答 — 2026-10-02
+## 2台で同時に回答
 
 同じ信頼できる LAN の survey server に接続し、1台で `http://<展示PCのLAN IP>:8787/guest?station=A`、もう1台で `http://<展示PCのLAN IP>:8787/guest?station=B` を開きます。各ステーション同時1体験なので、同じステーションのページを複数開かないでください。`SURVEY_HOST=0.0.0.0` で起動すると server が A/B の `LAN Guest:` URL を表示します。ルーター／iPad の設定は [LAN 2台 handoff](docs/handoffs/lan-guest-stations.md) を参照。server は `SURVEY_HOST=0.0.0.0`（PowerShell：`$env:SURVEY_HOST='0.0.0.0'`）で起動します。各ステーションの四問・草稿・結果・交代は独立し、提案は server の受信順に累積、再送は一度だけ加算します。Cityの結果は13秒以上の閲覧枠を予約し（都市転換は3秒）、提案番号と A/B を表示します。再接続は最新 snapshot に復元します。既存 `/guest` の単独モードは維持し、体験中の A/B と混在させないでください。
 
@@ -113,10 +113,4 @@ npm run dev -- --host 0.0.0.0 --port 5173
 
 ## 現在の方針
 
-展示会はお台場のみ。渋谷は終了した過去の決定で、今後は開発しません（2026-10-02）。旧計画の未完了項目は今後のタスクではありません。S5、入力機器、展示当日の reset／recovery 方針は未検証です。
-
-資料の役割と過去の記録は[文書索引](docs/README.md)、視覚方針は[CITY MASTER TASTE](docs/ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md)、実装規則は[ART](docs/ART.md)を参照してください。`module-swap` は現行 v2 CityView を受け付けません。
-
-住民P2（2026-10-02）：surveyを再build／再起動し、Guest／Cityを更新してください。四つの問いを日常の希望に改め、確認は送信前に残しています。結果は保存／待機、ステーション／暮らしの声番号、街を見る案内のみ；Cityは背景／現在の施設と記録確認を表示します。Question-set version3でもSQLiteと保存済み回答の原文は保持します。旧草稿は「新しい予約で草稿を続ける」で有効な選択を引き継ぎます；A/Bは自分の旧予約を終了してから再予約します。3秒の変化／表示間隔、result10秒／handoff5秒は維持；閲覧枠と変化の理由はP3です。[P2引き継ぎ](docs/handoffs/archive/resident-experience-p2.md)。
-
-住民P3（2026-10-02）はP2の表示間隔を更新します：surveyをbuild／再起動しGuest／Cityを更新。各回答に10秒の閲覧枠を予約（最初3秒は識別／場所／転換、残りは選んだ暮らしと街の実際の構成）。A/Bは順番を保持し、早い交代／reset／retryも元の枠を中断・延長しません。実際のcarrier配置と可視の組合せで説明し、局所の増加から街全体や人口を推論しません。再接続／Undo／reduced motionは即復元、照明は有効表示を保持。[P3引き継ぎ](docs/handoffs/archive/resident-experience-p3.md)。P4／P5は未検証。
+2127年のお台場を舞台とする展示です。[抽題輪換の一覧](docs/QUESTION_ROTATION_PLAN.md)で各選択肢のモデルと設置場所を確認できます。開発資料と旧版の記録は[文書索引](docs/README.md)にまとめています。

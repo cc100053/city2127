@@ -2,7 +2,7 @@
 
 - 負責：Claude（rex 指派，2026-11-22）
 - 分支：`claude/hand-spike`（基於 `origin/main` a0df0603），未合併
-- 範圍：`survey/` 內隔離的驗證頁 `/hand-spike`，非產品；說明見 [survey/README](../../survey/README.md#m0-手部追蹤驗證頁spike非產品)
+- 範圍：`survey/` 內隔離的驗證頁 `/hand-spike`，非產品；說明見 [survey/README](../../../survey/README.md#m0-手部追蹤驗證頁spike非產品)
 
 ## 已完成
 

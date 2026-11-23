@@ -1,6 +1,6 @@
 # E3 能源城市組合與動態
 
-2026-10-24；Owner: Codex。[能源計劃](../../docs/ENERGY_CITY_PLAN.md)／[交接](../../docs/handoffs/energy-city.md)。全部圖片為本輪實際瀏覽器畫面。
+2026-10-24；Owner: Codex。[能源計劃](../../docs/history/ENERGY_CITY_PLAN.md)／[交接](../../docs/handoffs/archive/energy-city.md)。全部圖片為本輪實際瀏覽器畫面。
 
 環境：macOS本機Codex in-app Chromium／WebGL2，1920×1080，預設quality。原hero位置`(-520,300,-620)`、target`(-40,25,-60)`、FOV42。沒有量FPS、GPU型號或展覽硬件性能；不以較早的硬件結果代替本輪測量。
 

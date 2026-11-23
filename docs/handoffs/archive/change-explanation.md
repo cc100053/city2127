@@ -20,7 +20,7 @@
 
 問題（2026-10-19 owner 提出）：觀眾唔容易知道城市變咗啲乜。而家有特效（一票旅程、掃描環、pulse 光柱、site marker）指出**邊度**變咗，但係**由乜嘢變成乜嘢**冇明確說明。
 
-做法（owner 決定）：用主畫面右上嘅文字卡片（[EXHIBITION_SPEC](../EXHIBITION_SPEC.md) 嘅 360px 右上卡）直接說明變化前後。
+做法（owner 決定）：用主畫面右上嘅文字卡片（[EXHIBITION_SPEC](../../EXHIBITION_SPEC.md) 嘅 360px 右上卡）直接說明變化前後。
 
 - **暫行版（未來城市選擇未定之前）**：用參數變動做說明內容，例如某地點嘅數量、形態由前到後點樣變（「自律サービス端口 2 → 3」「水辺の共有席 4 → 5」「形態：中間 → 高」之類）。
 - **正式版**：等未來城市嘅變化（每個選擇對應嘅具體設施／形態）訂立之後，再重新修改卡片內容，換成生活化嘅說明。
@@ -29,7 +29,7 @@
 - 每份 live 結果嘅卡片都會顯示至少一項實際發生嘅「前 → 後」，數值取自 renderer 嘅實際前後 targets（`beforeLayout`／`afterLayout` 同 `CarrierChange`），唔用答案正負票推測。
 - 冇可見變化（只有方向變／完全維持）嘅情況，照現行分開說明，唔虛構前後數字。
 - 10 秒閱讀時段、一票旅程時序、handoff、lease、A/B 排程不變；snapshot／reset／Undo／reconnect 即時替換。
-- 新文案要記入 [RESIDENT_COPY](../RESIDENT_COPY.md)。
+- 新文案要記入 [RESIDENT_COPY](../../RESIDENT_COPY.md)。
 
 ## In-scope files and dependencies
 

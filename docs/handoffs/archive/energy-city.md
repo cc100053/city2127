@@ -12,7 +12,7 @@
 - 原checkout `/Users/fatboy/city2127` main `29d12db`，保留既有未追蹤`.playwright-cli/`／截圖，沒有reset／stash／同步。fetch首次受sandbox限制，允許後兩clone fetch成功；原checkout對最新main為0 ahead／29 behind。獨立clone沒有`.codegraph/`，不借用舊index或自行索引。
 - 已讀README、PROJECT、VALIDATION、ENERGY_CITY_PLAN、本交接、CONTRIBUTING、P5實機驗收表及LAN交接。沿用E4已完成產品方向／四題／獨立counts／歷史；無新素材、部署、基建或其他chat／agent。
 - 觸及範圍：main既有120-frame diagnostics加triangles／textures；root test chain加入統計self-check；新`tests/energyE5.browser.mjs`讀正式API／原生Guest／canvas及CDP，獨立scratch DB；統計自檢及本機證據。main animation loop／renderer.info.reset／composer callers已核對，沒有改畫質或動畫行為。PROJECT／VALIDATION／SPEC／能源計劃／索引同步。
-- 方法與下一輪實機可執行步驟：[E5證據](../../artifacts/energy-city-e5/README.md)。測量中不並行跑CPU密集tests／build，避免污染性能比較。
+- 方法與下一輪實機可執行步驟：[E5證據](../../../artifacts/energy-city-e5/README.md)。測量中不並行跑CPU密集tests／build，避免污染性能比較。
 - 主要run：本機Mac mini Mac18,5／Apple M6、24GB、macOS27.0.1；headed Chrome156.0.8078.47／ANGLE Metal／WebGL2；City1920×1080／DPR1、Guest A/B1280×900、Vite DEV。2026-10-24 14:18:08–14:58:19 JST，真正長跑1801.94秒，無clock jumps／展覽DB。主Meter選中間答案，四類能源共存。
 - 量測PASS：low平均59.94FPS、p95／p99 17.9／18.6ms、max66.7ms；108,008frames，每5秒讀取的120幀renderer FPS樣本59.8–60.1，首／末12個renderer FPS樣本均值59.908／59.933。16 HTTP seed＋90份原生UI A/B＝106，權威count106，每對server displayAt相距10,000ms；renderer425 geometry／24 textures全段不變，JS heap19.2–51.8MiB（末35.5MiB）。page crash／exception／context loss均0，只有3個favicon404 console訊息。
 - 60秒場景樣本：零提案／混合default31.10／32.36FPS，low均59.94。**相機限制**：從hero起始，但OrbitControls未鎖定／未記錄軌跡，實際截圖有視角／距離偏移，來源未確定；不可稱完全固定hero benchmark或推算能源GPU增量。低畫質長跑數字仍是實際互動／日夜負載證據，非4K／所有配置／整日保證。
@@ -21,7 +21,7 @@
 - Local validation：root完整npm test（含最後E5統計self-check、舊81／新108答案及324幾何情境）／build PASS，既有>500kB chunk warning；最後欄位命名修正後完整gate再次PASS。Survey build為browser準備PASS，survey／module-swap source沒改，本機沒有另跑兩套package tests；main CI仍需核對。文件／diff／所有新source及6張保留截圖已自審；392個本機links／anchors／targets、兩輪runtime／archived runner及最終pointer probe hash全部PASS；Git紀錄待收尾。
 - Integrated validation PASS：整合前fresh fetch確認main仍`66c6adf`；`64b0887` tree與`96d35f4`完全一致。整合後root完整npm test（含E5 self-check）／npm run build、392個links／anchors／targets、committed `git diff --check origin/main..HEAD`全部PASS；之後只有本段及零提案用語等Markdown metadata，沒有runtime／runner／artifact數據差異。
 - Cleanup PASS：兩輪runner的scratch DB／HTTP／WebSocket及Chrome均在finally關閉；兩個Vite session已停止exit130，最後短probe亦關閉Chrome。原checkout及既有`.playwright-cli/`／截圖未改。
-- Next：本機範圍與整合gate已完成；2026-10-29核實紀錄commit `db772bb`（含整合`64b0887`）已在main，[main CI 40069808324](https://github.com/cc100053/city2127/actions/runs/40069808324) success。之後由owner另行安排展覽硬件／真人與整日門檻，本輪不等待或宣稱已通過；固定hero鎖鏡重量見[closeup-next](closeup-next.md) F3。
+- Next：本機範圍與整合gate已完成；2026-10-29核實紀錄commit `db772bb`（含整合`64b0887`）已在main，[main CI 40069808324](https://github.com/cc100053/city2127/actions/runs/40069808324) success。之後由owner另行安排展覽硬件／真人與整日門檻，本輪不等待或宣稱已通過；固定hero鎖鏡重量見[closeup-next](../closeup-next.md) F3。
 
 ---
 
@@ -36,7 +36,7 @@
 - Caller同步：Monitor顯示能源配置與實際變更，focal cityChanges保持原契約，能源前後在layout.energy；DEV auto獨立選能源／四類輪替，不把四類當Meter數值。凍結v3 JSON回歸fixture保留原81組；新v4另驗108組。現行README／survey README／PROJECT／SPEC／RESIDENT_COPY／能源計劃同步，歷史段落保留；P2證據改可指定資料夾，P4改驗ambient狀態而不猜載入時輪換到哪張卡。
 - PASS（開發工作樹）：focused energy.test驗真實schema7→8、原文／舊ID／舊草稿版本guard、70份新能源與超過64筆完整counts、氣候分數／EMA／刻度、重啟replay、corrupt tally拒絕、Undo與reset。focused energyPipeline驗108組正式答案→HTTP／WebSocket／嚴格parser→實際模型、精確門檻、共存、無可見變化／缺前後證據、延遲／重定向／snapshot／reduced motion，以及局部材質／geometry重用與橋高。
 - PASS（開發工作樹）：root完整npm test含舊81組與新108組；survey完整npm test；兩package build（root既有>500kB warning）；git diff --check。最後變更後與整合後仍需依下方最終紀錄重跑；不能以早期工作樹結果宣稱整合通過。
-- PASS（正式browser）：Chrome156.0.8078.47／macOS，City1920×1080預設quality／原hero、Guest1280×900，scratch真實SQLite7→8；[正式證據](../../artifacts/energy-city-e4/formal/README.md)／browser.json。驗舊草稿保留Q1／Q2／Q4且Q3重選、pre/post-commit同ID重試、第一能源票無設備差異、第二票實際一庭及結果、Undo消除模型、實際已記錄的16票混合配置、hour12／18.5／22、TCP重連、browser prefers-reduced-motion、1440×900普通resize及reset／舊ID重試。全部page exception為0；預期舊session409、favicon404及兩次刻意abort明列，另核對沒有未預期console／network失敗。11s／16s fixture clock jumps只跳過舊閱讀／seed／Undo等待，不代表訪客時間；actor為實時本機clock，未固定reviewTime。GPU／FPS／實機／OS全域motion偏好未量。
+- PASS（正式browser）：Chrome156.0.8078.47／macOS，City1920×1080預設quality／原hero、Guest1280×900，scratch真實SQLite7→8；[正式證據](../../../artifacts/energy-city-e4/formal/README.md)／browser.json。驗舊草稿保留Q1／Q2／Q4且Q3重選、pre/post-commit同ID重試、第一能源票無設備差異、第二票實際一庭及結果、Undo消除模型、實際已記錄的16票混合配置、hour12／18.5／22、TCP重連、browser prefers-reduced-motion、1440×900普通resize及reset／舊ID重試。全部page exception為0；預期舊session409、favicon404及兩次刻意abort明列，另核對沒有未預期console／network失敗。11s／16s fixture clock jumps只跳過舊閱讀／seed／Undo等待，不代表訪客時間；actor為實時本機clock，未固定reviewTime。GPU／FPS／實機／OS全域motion偏好未量。
 - PASS：既有resident P3在目前v4上回歸，Chrome1280×720／hour16，A/B閱讀間隔**10,002ms**；排隊、lost reply／reload同ID、提前交接與reset drain、照明、reduced motion／snapshot／Undo全通過。新截圖在`artifacts/energy-city-e4/p3/`，未覆寫舊證據。P4／P2亦PASS：1280×720／hour16，P4含桌面鍵盤／模擬觸控、同ID重試、繼承、真實TCP離線重連、B結果到期保留A草稿及A問卷到期／reset；P2含舊A/B草稿重新預約、有效選項／焦點／核對及結果。新證據在相鄰p4／p2資料夾，沒有覆寫原截圖。
 - 開發中曾遇sandbox loopback listen EPERM，允許localhost後重跑；browser斷言補正狀態完整文字、預期舊session409及等待resize完成。這些與最終通過結果分開，未將失敗當通過。
 - 最終本機檢查PASS：root完整npm test／build／git diff --check、survey完整npm test／build／git diff --check；Node26.0.0，允許loopback。Root仍只有既有>500kB warning。最後新增energyDistrict檢查大小翼、seed0／4242、四軸low／mixed／high共324個情境，164,088次actual mesh intersections，含完整環／渦輪掃掠及兩處水庭；使用真實程序district／fallback focal幾何，沒有另claim所有late roof／GLB、所有uint32 seeds或全城連續碰撞。324最後focused重跑PASS，整合全套亦須包含它。
@@ -59,9 +59,9 @@
 - Last verified commit: `4658c9243222e84f67d917580d596bed8005e45c`（上述root test／build與browser對應同一source tree）；已推送`origin/codex/energy-city-authority`，0／0、working tree乾淨。`origin/main`仍為b8bccad，E4未整合，沒有新的main CI結果可宣稱。後續僅補本Markdown驗證指標。
 - Preflight：先確認原`/Users/fatboy/city2127`為main29d12db，只保留既有未追蹤`.playwright-cli/`；fetch成功後0 ahead／23 behind。獨立checkout開工乾淨main b8bccad，初次fetch sandbox DNS失敗，允許網絡重跑成功，0／0。未stash／reset／改原checkout。獨立checkout沒有.codegraph，不自行索引；不拿舊checkout的index當新source。
 - 已讀使用者指定README、PROJECT、CONTRIBUTING、VALIDATION、SPEC、RESIDENT_COPY、ART、CITY MASTER TASTE、ENERGY_CITY_PLAN及本交接。追蹤questionLoader→proposalService→scoreEngine→SQLite snapshot／replay／toProposalRecord→CityView／viewOf→root parser／main→cityChangeManager→residentResult；現行question-set3／CityView2／SQLite7。唯一Owner，無並行binary／module編輯。
-- 完成：energyPrototype增加configure／getConfiguration接口，水庭0／1／2、接收翼無／小／大、環與島獨立共存；原select預設保留，沒有新geometry／materials。配電由實際儲能有無決定節拍。36組模型測試；[評審方案](../ENERGY_CITY_PLAN.md#e4評審草案四題與能源權威配置2026-10-24待產品決定)含四題協調、完整日文選項、累積門檻例、共存／互斥、氣候缺席與歷史保存、實際證據及無改變文案。
+- 完成：energyPrototype增加configure／getConfiguration接口，水庭0／1／2、接收翼無／小／大、環與島獨立共存；原select預設保留，沒有新geometry／materials。配電由實際儲能有無決定節拍。36組模型測試；[評審方案](../../history/ENERGY_CITY_PLAN.md#e4評審草案四題與能源權威配置2026-10-24待產品決定)含四題協調、完整日文選項、累積門檻例、共存／互斥、氣候缺席與歷史保存、實際證據及無改變文案。
 - PASS：root完整npm test（含真實loopback HTTP／WebSocket／81組原題），npm run build（既有>500kB warning），git diff --check。Focused能源幾何／動態test亦PASS。Survey／module-swap source未改，沒有另跑本機suite；不把原四題pipeline當新能源pipeline。
-- PASS：[準備階段browser證據](../../artifacts/energy-city-e4/README.md)：macOS in-app Chromium／WebGL2、1280×720、原hero、hour12／reviewTime50，五DEV配置及靜態閱讀；console warn／error空。未做新正式flow、migration、硬件／FPS驗收。
+- PASS：[準備階段browser證據](../../../artifacts/energy-city-e4/README.md)：macOS in-app Chromium／WebGL2、1280×720、原hero、hour12／reviewTime50，五DEV配置及靜態閱讀；console warn／error空。未做新正式flow、migration、硬件／FPS驗收。
 - 文件核對：262個本機Markdown links／anchors／targets PASS；新增source hashes與實際code一致；完整diff／new files自審，沒有改README／SPEC／RESIDENT_COPY，因正式產品行為與文案仍維持version3，候選明確只寫ENERGY_CITY_PLAN。
 - 清理：本輪Vite session正常停止exit130，5173無LISTEN；本輪in-app測試分頁已關閉，沒有新持久survey服務；原checkout與既有截圖保留。
 - 待決：使用者本次明確要求「會改變產品方向的關鍵決定先準備可review方案再問」。**是否接受只將Q3由夏日涼感改成能源四類生活取捨，另外三題不變、舊氣候保持原義且不收新票、能源獨立累積？** 已透過本chat選項詢問；沒有答案前，不自行改正式題、軸、資料／migration或合併未完成E4至main。
@@ -93,7 +93,7 @@
 - 60秒充能20／暫存20／釋能20；絕對時間計算水位、流向、環加／減速、渦輪與向岸分配。C配電不依賴不存在的儲能。36個合併／水面mesh、4個flow InstancedMesh，一次建立；沒有逐幀geometry／material分配。
 - `devEnergy`回傳現有`devFrame` callback；`reviewTime=10|30|50`可重播。系統reduced-motion或原生「靜態閱讀」固定全部新增能源動態，保留箭頭／設備／流程文字。Production guard移除工具；survey／Meter／scaleLab隔離仍保留。
 - 自審／幾何修正：第二庭最初碰轉乘泊位，移到現址；固定軸承退至旋轉平面後方；外露渦輪提高0.5 m以清下庭邊緣；新看台／步道起點移出槽緣，維持連岸端點及平順坡度。
-- 計劃／PROJECT／SPEC／VALIDATION、README及文件索引同步；[E3實際比較圖](../../artifacts/energy-city-e3/README.md)。E2歷史實測保留於下方。
+- 計劃／PROJECT／SPEC／VALIDATION、README及文件索引同步；[E3實際比較圖](../../../artifacts/energy-city-e3/README.md)。E2歷史實測保留於下方。
 
 ## E3 validation
 
@@ -140,12 +140,12 @@ E3是DEV視覺與因果節拍，不是電力／流體／容量／可靠度模擬
 
 ## Completed work
 
-- [energyPrototype.ts](../../src/energyPrototype.ts)：四組靜態幾何，一次建立，共19個共享材質batch；配置只切visibility／翼scale，rotor獨立於固定支承。無新dependency，沒有逐幀工作。
-- [devEnergy.ts](../../src/devEnergy.ts)及main的DEV dynamic import：`?energy=baseline|a|b|c|mixed`原生選單，URL保存；survey／meters／scaleLab優先，production移除整個工具。
+- [energyPrototype.ts](../../../src/energyPrototype.ts)：四組靜態幾何，一次建立，共19個共享材質batch；配置只切visibility／翼scale，rotor獨立於固定支承。無新dependency，沒有逐幀工作。
+- [devEnergy.ts](../../../src/devEnergy.ts)及main的DEV dynamic import：`?energy=baseline|a|b|c|mixed`原生選單，URL保存；survey／meters／scaleLab優先，production移除整個工具。
 - 上下水庭含落水管、渦輪室／轉子、獨立抽水回管、下庭公共看台／4 m緩坡；能源島有分段岸界、檢修橋及兩端升降井。都是量體示意，未模擬服務或工程。
 - 水平環在hero太弱、貼近立環碰到斜街；最後採海側前置環，中心`(-18,100,-24)`，半徑31 m，固定支承接既有transfer frame。實際rotor與劇場／工作翼／斜街不相交；沒有轉動劇場本體。
-- [幾何測試](../../tests/energyPrototype.test.ts)接root npm test；[計劃](../ENERGY_CITY_PLAN.md)、PROJECT／SPEC／VALIDATION、README與文件索引同步。
-- [實際截圖](../../artifacts/energy-city-e2/README.md)：五張同hero日景、M1黃昏／夜景及水庭近景。
+- [幾何測試](../../../tests/energyPrototype.test.ts)接root npm test；[計劃](../../history/ENERGY_CITY_PLAN.md)、PROJECT／SPEC／VALIDATION、README與文件索引同步。
+- [實際截圖](../../../artifacts/energy-city-e2/README.md)：五張同hero日景、M1黃昏／夜景及水庭近景。
 
 ## Actual validation results
 

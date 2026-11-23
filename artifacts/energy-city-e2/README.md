@@ -1,6 +1,6 @@
 # E2 能源城市靜態比較
 
-2026-10-24；Owner: Codex。完整範圍／限制見[能源計劃](../../docs/ENERGY_CITY_PLAN.md)與[交接](../../docs/handoffs/energy-city.md)。這些是實際瀏覽器截圖，並非生成目標圖。
+2026-10-24；Owner: Codex。完整範圍／限制見[能源計劃](../../docs/history/ENERGY_CITY_PLAN.md)與[交接](../../docs/handoffs/archive/energy-city.md)。這些是實際瀏覽器截圖，並非生成目標圖。
 
 Root Vite DEV：`http://127.0.0.1:5173/?energy=baseline&hour=12&reviewTime=20`（使用Vite實際port）。右上原生選單切換，無須重載；沒有survey server、沒有提交／保存提案。勿與`survey`、`meters`、`scaleLab`混用；那些模式優先，能源工具不啟動。Production不包含此工具。
 

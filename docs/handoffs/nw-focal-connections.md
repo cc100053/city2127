@@ -9,7 +9,7 @@
 
 實裝沿 ① 海濱大道 d 940 接出 3.8 m 陶瓷支路及藍色導線。3.1 m 人行鋪面接到既有海濱鋪面，分支斜路通至入口。中、高態平台向東到 x=57.1，低態到 x=64。上端平台以同一標高接兩組前緣，低態地台覆蓋平台末段。斜路約 10.6% 坡度，是展覽場景的地形通行設計，未按實體無障礙規格驗證。保留既有車流和行人模擬路線。新道屬靜態場景幾何。
 
-[目標與實裝對照](../../artifacts/nw-focal-connections/target-vs-build.jpg)｜[接駁斜俯視](../../artifacts/nw-focal-connections/plan.jpg)｜[NW 三態日夜](../../artifacts/change-review/index.html#NW%20focal)
+[目標與實裝對照](../../artifacts/nw-focal-connections/target-vs-build.jpg)｜[接駁斜俯視](../../artifacts/nw-focal-connections/plan.jpg)｜[NW 三態日夜](../../artifacts/change-review/index.html#Q01)
 
 ## 驗證與接續
 

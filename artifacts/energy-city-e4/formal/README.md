@@ -1,6 +1,6 @@
 # E4正式問卷與權威配置證據 — 2026-10-24
 
-這裡使用正式question-set4、真實scratch SQLite／HTTP／WebSocket及`?survey`；沒有使用DEV `?energy`代替接入驗收。[規則](../../../docs/ENERGY_CITY_PLAN.md#e4正式接入2026-10-24)／[實際commit與整合狀態](../../../docs/handoffs/energy-city.md)。
+這裡使用正式question-set4、真實scratch SQLite／HTTP／WebSocket及`?survey`；沒有使用DEV `?energy`代替接入驗收。[規則](../../../docs/history/ENERGY_CITY_PLAN.md#e4正式接入2026-10-24)／[實際commit與整合狀態](../../../docs/handoffs/archive/energy-city.md)。
 
 - macOS開發機，已安裝的Chrome **156.0.8078.47** headless／WebGL2；City1920×1080、預設quality、原hero；Guest1280×900，DPR1。Hour12／18.5／22；actor用實時本機clock，沒有固定reviewTime或另記每張圖的精確actor秒數。GPU／FPS、實際展覽硬件、Safari／iPad／Windows及訪客理解未測。
 - [browser.json](browser.json)保存實際exceptions、console與network紀錄。Page exceptions為0；預期舊session409、favicon404及兩次刻意中止proposal請求分開列出；核對沒有其他失敗。Browser reduced-motion為模擬偏好，沒有改OS全域設定。

@@ -2,7 +2,7 @@
 
 **語言 / Languages / 言語：** [繁體中文](README.md) · [English](README.en.md) · [日本語](README.ja.md)
 
-> **2026-11-21：展覽唯一現行版本係九題抽題輪換（9 題 × 3 模型）。** 舊 version4 四題／四個 Meter 版本已退役；下面講 Meter 嘅 DEV 工具同說明只屬 legacy code。開新 run 時 survey server 要用 `SURVEY_QUESTIONS=src/survey/questions.rotation.v1.json`（預設仍係舊檔）。
+> **2026-11-21：展覽唯一現行版本係九題抽題輪換（9 題 × 3 模型）。** 開新 run 時 survey server 要用 `SURVEY_QUESTIONS=src/survey/questions.rotation.v1.json`（預設仍係舊檔）。
 
 ## 作品概念
 
@@ -73,11 +73,11 @@ Admin 新增 **直前の提案を取り消す**：只可撤銷最後一份已完
 
 張開手掌移動游標、預覽卡片，用拇指同食指捏合揀選。送出、開啟地標導覽或返回開始畫面時捏住約 0.8 秒。放低手或握拳可以休止，成個流程亦可用觸控。送出後 iPad 提示抬頭睇大屏幕，交接頁停留喺聲音卡上或用手指按住卡片，即可揭示該題比例。普通 `/guest` 繼續提供原有觸控介面。
 
-### 兩部裝置同時作答（2026-10-02）
+### 兩部裝置同時作答
 
 兩部答題裝置用同一個 LAN／同一個 survey server，各開 `http://<展覽電腦 LAN IP>:8787/guest?station=A` 同 `/guest?station=B`。展覽電腦按上方 LAN 指示啟動 server；如果 City 留喺展覽電腦，root Vite 可維持 loopback。每站有獨立草稿、四題、結果同交接，一站完成唔會清掉另一站；server 按收到提交嘅順序累積，重試只計一次。每站同時只接受一個體驗；同一站唔好重複開多個頁面。Server 用 `SURVEY_HOST=0.0.0.0` 啟動時會喺 terminal 印出 `LAN Guest:` A／B 完整網址，照抄去 iPad 即可；iPad／router 現場設定見 [LAN 雙站交接](docs/handoffs/lan-guest-stations.md)。原本 `/guest` 單站流程保留，但未完成體驗期間唔可混用單站／A/B。
 
-城市live結果依記錄順序保留至少13秒觀看時段（2026-10-29 由10秒延長），動畫仍3秒，標示提案編號同 A/B；排隊嘅 Guest 顯示已保存、等待展示，再顯示自己嘅結果 13 秒。交接頁可選地標導覽。普通 Guest 提供 20 秒，住民の窓按手勢或觸控採用相應倒數。City 重新連接會直接復原最新完整狀態。A/B reset 會暫停新開始，等兩站問卷及結果／交接完成先執行；Admin 可單獨中止 **A／B の未完了の体験を終了**。離線站會喺問卷5分鐘期限，或已提交結果租期（展示開始後 18 秒）結束後釋放；Admin 無須確認離場。City reset 保留總人數，full reset 清零但保留歷史。
+城市live結果依記錄順序保留至少13秒觀看時段，動畫仍3秒，標示提案編號同 A/B；排隊嘅 Guest 顯示已保存、等待展示，再顯示自己嘅結果 13 秒。交接頁可選地標導覽。普通 Guest 提供 20 秒，住民の窓按手勢或觸控採用相應倒數。City 重新連接會直接復原最新完整狀態。A/B reset 會暫停新開始，等兩站問卷及結果／交接完成先執行；Admin 可單獨中止 **A／B の未完了の体験を終了**。離線站會喺問卷5分鐘期限，或已提交結果租期（展示開始後 18 秒）結束後釋放；Admin 無須確認離場。City reset 保留總人數，full reset 清零但保留歷史。
 
 更新後重新 build／啟動 survey server，同時刷新 Guest／City／Admin；SQLite 自動升至 schema 9，保留既有城市及歷史。實作及驗證見 [雙裝置交接](docs/handoffs/archive/two-guest-devices.md)。
 
@@ -87,42 +87,10 @@ Admin 新增 **直前の提案を取り消す**：只可撤銷最後一份已完
 
 AI agent 接手入口：[AGENTS.md](AGENTS.md) · [規格與程式結構](docs/PROJECT.md) · [驗收與交接流程](docs/VALIDATION.md) · [現行展覽規格](docs/EXHIBITION_SPEC.md)。
 
-### 能源Q3更新（2026-10-24，E4）
-
-更新後重新build／啟動survey server並刷新City／Guest／Admin；保留原SQLite，會自動由schema7升至8。正式question-set4仍一次交四題：Q1服務、Q2共享、Q4機能配置不變，Q3改選水庭儲能／富士儲能環／軌道接收翼／外海核能島的生活取捨。能源獨立累積，可共存；一票不保證立刻增加設備，結果卡會說明真的設備差異或延續配置。舊夏日氣候回答保留原義與配置，新能源回答不稀釋它；新run沿用成熟混合氣候。舊草稿選「新しい予約で草稿を続ける」保留其餘有效選項，Q3須重新選擇；已保存ID仍可重試。DEV `?energy`繼續只供比較，正式城市請用`?survey`。[完整規則／限制](docs/ENERGY_CITY_PLAN.md#e4正式接入2026-10-24)／[交接](docs/handoffs/energy-city.md)。E5硬件、性能及訪客理解另待驗收。
-
-### 開發用自動答題（DEV-ONLY，2026-09-30）
-
-在 `survey/` 執行 `npm run dev:auto`，再開 `http://127.0.0.1:8788/guest?dev-auto`；城市 Vite 保持開住，連到 `http://127.0.0.1:5173/?survey=ws://127.0.0.1:8788/ws`（Vite port 如不同請替換）。每次啟動建立新的獨立暫存 SQLite，terminal 會印出位置；不改動展覽的 `survey/data/survey.sqlite`，暫存資料保留供檢查。
-
-面板可選現行三個Meter全 −1／0／+1、輪替混合、逐 Meter 指定或 seed 隨機；能源另選一類或四類輪替，設定提案數並按 **自動回答を開始**。預設 10 份、seed 2127；沿用 Guest 草稿／確認／提交，每題 0.3 秒、結果 10 秒、交接 5 秒後返開始畫面；下一份開始時自動交接。停止或錯誤不再建立下一份；已送出的請求仍會完成，未知結果沿用原本同 ID 重試。一般 `/guest` 不顯示面板。功能只限 localhost，server 必須開 `SURVEY_DEV_AUTO=1`（launcher 已設定）；遇到其他 guest、衝突或待 reset 會停止，不會自動 reset。
-
-**展覽前須移除 DEV-ONLY 控制面板／endpoint／launcher，或另行安排移到 Admin；單站仍沿用已接受的自動交接，毋須恢復舊的離場鎖。** 程式入口與[設計書](docs/EXHIBITION_SPEC.md#開發工具與待完成驗收)已有 `DEV-ONLY` 移除／遷移註記。單獨跑 Meter 測試：`cd survey && npm run test:meters`；完整串接亦已加入 root／survey 的 `npm test`。
-
 ## 現行城市與範圍
 
 展覽唯一城市係 **2127 年台場海濱**。Shibuya 已係舊決策，未來不再開發，亦無場地切換；舊 Plan 01／02 及截圖只作歷史，未完成項目不再當 backlog。
 
-Root `src/` 以 Three.js / WebGL 2 載入 Odaiba district 地形、六棟地標 GLB、程序 civic core，以及連接周邊的安靜 backdrop。2127 skyways、潮汐邊緣及六座 waterfront islands 已在現行城市；不再使用早期 150 m 淡出成孤島的版本。三個現行 Meter 與繼承的氣候配置改變 focal site 及 district，能源以獨立配置接入；Meter保留成熟未來的 low／mixed／high，並支援 hybrid、跨軸設施與歷史種子布局。
+Root `src/` 用 Three.js / WebGL 2 呈現台場地形、地標同 2127 年城市。日夜循環一日 180 秒。展覽城市用 `?survey`，較弱嘅 GPU 可以加 `&quality=low`。展覽配置、地塊同更新時序見 [展覽規格](docs/EXHIBITION_SPEC.md) 同 [輪換模型及地塊](docs/QUESTION_ROTATION_PLAN.md)。
 
-城市自動日夜循環一日 180 秒；`?hour=22` 可固定時間。鏡頭、共享材質／InstancedMesh、3 秒變化與立即 reset/reconnect 的實作見 [PROJECT](docs/PROJECT.md)。後製包括 MSAA、GTAO、bloom、vignette、output 及 colour grade。GPU 較弱嘅電腦（例如 M1 接 4K 螢幕）可以喺城市網址加 `&quality=low`：關閉 MSAA、GTAO 同陰影，pixel ratio 上限 1；預設畫面不變（2026-10-15）。2026-10-27 起預設用半解像度 GTAO、2× MSAA，陰影每秒更新 4 次，行人同車輛唔投影（hero 距離幾乎睇唔出分別）。
-
-Live headline 先在 hero 播 2.62 秒投票旅程，再推近變化地點，13–15 秒返回 hero；能源部件停留期間以日文字幕講解一次壓縮儲能週期；無 headline 不推近，如接續近鏡先用 2 秒平滑返回；snapshot／Undo／重連／reduced motion 立即 hero。DEV `?shot=nw:focal` 可逐鏡檢查，console `cityShot()` 讀目前 pose；完整 shot list 見 [headline camera](src/headlineCamera.ts)。
-
-開發時可用 `?meters=nw:high,ne:low`（band 或 −12..12）直接 review v2 layout，console `cityMeters('ne:high')` 睇 live 過渡；`&metersTo=ne:high&metersAge=8.3` 配合 `reviewTime` 截圖。這些工具不提交提案、不改展覽資料。 DEV能源研究可用`?energy=baseline&hour=12&reviewTime=20`切換基準／A／B／C／混合城市組合，E3加入兩處沿岸水庭／配電門架及60秒儲能流程；`reviewTime=10|30|50`固定階段，面板「靜態閱讀」或系統reduced motion固定能源動態；須與`survey`、`meters`、`scaleLab`分開使用。[E3比較與限制](artifacts/energy-city-e3/README.md)。
-
-住宅已按方案A加入正式城市作固定背景：輕材住宅M、植物膜P及交換骨架U共存，U固定停泊A；不隨回答或Meter改變，亦不列為提案結果。M移至`(-165,-165)`避讓低自動化服務館，保留服務館及住宅數量／輪廓。[接入驗證與搬位對照](artifacts/housing-background/README.md)。
-
-Q03-A「車が引き出しになる住宅」以固定形態放在フジテレビ西南側 A 位；R2 街道候選以貼近正面的暖色車道繞樓，接往導軌大道 ②。投票變化留待後續設計。[變化總覽的日夜實景](artifacts/change-review/index.html#drawer-housing)
-
-住宅DEV比較另開 `?housing=mixed&hour=12&reviewTime=24`（原hero鎖定），配置可選baseline／material／membrane／mobile／mixed，`housingView=mobile|home`看搬運特寫。移除`reviewTime`會播放90秒「多年更新壓縮示意」：生活艙與完整小屋在兩處專用接駁位置之間移動，代表數年至數十年更新。面板可重播或重設／停泊，靜態閱讀／reduced motion固定停泊A；植物與藻類不動。須與survey／meters／scaleLab／energy分開使用；production只排除比較控制與90秒播放，保留正式固定住宅。[H2證據與限制](artifacts/housing-city-h2/README.md)。
-
-`?asset-preview` 可載入本機 GLB 於原點，重新整理後換另一件；production 沒有 picker。素材標準見 [BLENDER](docs/BLENDER.md)。
-
-S1–S4、Odaiba 換場及 Meter P0–P12 已整合；**S5／展覽硬件、輸入裝置、展覽日 reset／recovery 政策仍待驗收**。各 stage 實測、CI、限制及歷史來源統一由 [VALIDATION](docs/VALIDATION.md) 和 [文件索引](docs/README.md) 連入，不以舊 Shibuya FPS 證明現行效能。
-
-Google Fonts 無法連線時用系統字體；其他 runtime 資源由本機供應。
-
-2026-10-02居民P2：更新後重新build／啟動survey server並刷新Guest／City。四題改用居民日常文案；核對仍在提交前，結果只顯示保存／等待、站號／暮らしの声編號及抬頭提示。City顯示背景／當前設施與保守保存確認。Question-set升至3，既有SQLite及已保存原文保留；舊草稿選「新しい予約で草稿を続ける」接續有效答案，A/B會先結束自己的舊預約。3秒過渡／A-B間隔、result10秒／handoff5秒維持；完整閱讀時段及原因屬P3。見 [P2交接](docs/handoffs/archive/resident-experience-p2.md)。
-
-2026-10-02居民P3：重新build／啟動survey並刷新Guest／City。每份回答保留10秒閱讀（0–3秒身份／位置／城市過渡，3–10秒偏好＋實際結果）；A/B順序展示，等待／提前交接／reset及重試接續原slot。結果比較實際carrier配置，某地點增加不推論全城或人口增加。重連／Undo／reduced motion立即恢復，照明保留有效展示。詳見 [P3交接](docs/handoffs/archive/resident-experience-p3.md)；P4／P5仍待驗收。
+展覽機、雙 iPad、現場閱讀距離同長時間運作見 [驗收指引](docs/VALIDATION.md)。開發入口、原型同已退役版本見 [文件索引](docs/README.md)。

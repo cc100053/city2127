@@ -2,7 +2,7 @@
 
 2026-10-03 建立（Codex）；2026-10-13 加入7份已完成交接；2026-11-05 加入21份已完成／已整合交接（energy polish 批次已由 energy-polish-integration 整合）。返回 [現行交接](../README.md)／[文件索引](../../README.md)。
 
-以下74份交接已完成、已整合或被後續階段取代。保留原本日期、owner、commit、驗證限制與下一步歷史；舊分支／舊「待整合」或「下一步」不代表現行指示。Shibuya 已結束，不再開發。
+以下交接已完成、已整合或被後續階段取代。保留原本日期、owner、commit、驗證限制與下一步歷史；舊分支／舊「待整合」或「下一步」不代表現行指示。Shibuya 已結束，不再開發。
 
 歸檔不等於未達成的視覺目標、實機／Windows／各工作站 Blender 驗證已通過。仍待處理的台場素材、P6/S5、延後 polish、LAN 雙站、P5 實機驗收及回顧章節見現行交接；展覽機 FPS、Fuji TV 目標細節、一票旅程光點大小等限制保留喺各自交接；產品與驗證 authority 仍是 [SPEC](../../EXHIBITION_SPEC.md)／[VALIDATION](../../VALIDATION.md)。Meter截圖跟隨其交接歸檔，圖片內容不變。
 
@@ -84,3 +84,36 @@
 | [two-guest-devices](two-guest-devices.md) | two-guest-devices — Concurrent A/B Guest stations |
 
 本次整理記錄：[handoff-archive](handoff-archive.md)（2026-10-03，另計）。
+
+## 2026-11-24 整理
+
+- [Asset library — reusable 3D parts index](asset-library.md)
+- [bay-flower-placement — Q02-B 蓮花受電：選址與放置](bay-flower-placement.md)
+- [bay-flower-receiver — Q02-B bay flower space-solar receiver (draft model)](bay-flower-receiver.md)
+- [building-stories — 建築故事集](building-stories.md)
+- [capture-command — Fixed evidence capture command](capture-command.md)
+- [car-closeup-polish — 街道車輛家族（Blender）](car-closeup-polish.md)
+- [ci-headroom — Root CI test runtime headroom](ci-headroom.md)
+- [day-replay — 「今日の台場」回顧章節](day-replay.md)
+- [Q03-A — 車が引き出しになる住宅](drawer-housing-placement.md)
+- [entrance-polish — 主樓正門、環形底座、船身前庭](entrance-polish.md)
+- [guest-ui-graphite — Resident terminal UI](guest-ui-graphite.md)
+- [手部追蹤 spike（M0、M1）](hand-spike.md)
+- [iPad「住民の窓」文件同步](ipad-hand-docs.md)
+- [Local UI refinements](local-ui-refinements.md)
+- [Mind craft exhibition title and description](mind-craft-docs.md)
+- [pod-frame-tower — 混凝土格架蛋艙塔（僅模型）](pod-frame-tower.md)
+- [q02a-hydro-placement — Q02-A 水の棚田：選址與周邊環境](q02a-hydro-placement.md)
+- [q02a-hydro-terrace — Q02-A 空中の水の棚田（Blender 素材）](q02a-hydro-terrace.md)
+- [question-pool — SURVEY_V2 question pool beside the exhibition survey](question-pool.md)
+- [rectenna-building — Rectenna canopy farm as a building-only asset](rectenna-building.md)
+- [rectenna-change-review — 陸上農園變化總覽](rectenna-change-review.md)
+- [rectenna-farm-placement — Q3 large receiver and terrace farm](rectenna-farm-placement.md)
+- [se-high-blender — SE +1 tower 用 Blender 重建](se-high-blender.md)
+- [SE 塔＋pod — district close-up polish](se-stage-closeup-polish.md)
+- [train-closeup-polish — 導軌列車（Blender）](train-closeup-polish.md)
+- [change-explanation](change-explanation.md)
+- [guest-voice-experience](guest-voice-experience.md)
+- [guest-agency](guest-agency.md)
+- [energy-city](energy-city.md)
+- [housing-city](housing-city.md)

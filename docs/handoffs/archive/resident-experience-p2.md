@@ -13,7 +13,7 @@
 
 ## Goal and scope
 
-Implement [P2](../../RESIDENT_EXPERIENCE_PLAN.md) using [P1 copy](../../RESIDENT_COPY.md). Keep ids/effects, algorithm/CityView v2, schema7, 3s transitions/A-B scheduling and Guest result10s/handoff5s. Preserve history, draft recovery, same-ID retry, focus and selection. No P3 district causal inference or coordinated reading schedule, hardware/deployment/dependencies.
+Implement [P2](../../history/RESIDENT_EXPERIENCE_PLAN.md) using [P1 copy](../../RESIDENT_COPY.md). Keep ids/effects, algorithm/CityView v2, schema7, 3s transitions/A-B scheduling and Guest result10s/handoff5s. Preserve history, draft recovery, same-ID retry, focus and selection. No P3 district causal inference or coordinated reading schedule, hardware/deployment/dependencies.
 
 ## Completed work
 

@@ -1,7 +1,5 @@
 # Art rules — Odaiba runtime
 
-> **2026-11-21: the four-Meter version is retired; the nine-question rotation is the only product.** Meter colours and low/mixed/high wording below describe legacy code; for new work read "each question's A/B/C models".
-
 Current implementation rules, checked 2026-10-02. [CITY MASTER TASTE](ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md) is the visual/world authority (rewritten 2026-11-02 toward visible high technology; the palette rows below predate it, and its cool white-blue technology light is added as parts are rebuilt); this file documents materials, batching, lighting and choice semantics. [PROJECT](PROJECT.md) maps the source. Owner: cc100053; documentation: Codex.
 
 Shibuya art passes and Pic 2 are historical references; their remaining work is closed. They are not a second visual target. See the [archived rules](history/SHIBUYA_ART.md) and original [art handoff](handoffs/archive/art-direction.md) for dated evidence.
@@ -19,13 +17,13 @@ Reuse factories/materials from `cityRig`, `odaibaScene`, `civicCore` and `distri
 | Stone / pale paving | Public terraces, courts and site grounds |
 | Civic mint / warm public light | Persistent route edges, services, berth and public-space readability |
 | Saffron guest marker | Hidden (owner 2026-11-14); `createGuestMarker` and its fresh pulse remain in code |
-| Meter pulse colours | Automation blue `#3fa9ff`, sharing rose `#ff6f91`, environment green `#5fe08a`, concentration amber `#ffb347` |
+| Existing proposal pulse colours | Automation blue `#3fa9ff`, sharing rose `#ff6f91`, environment green `#5fe08a`, concentration amber `#ffb347` |
 
-Persistent civic lighting and live proposal pulses have different meanings. Meter colours are allowed semantic accents; the former “saffron is the only guest accent” rule is superseded. Shared city materials never flash for a vote.
+Persistent civic lighting and live proposal pulses have different meanings. Existing pulse colours are allowed semantic accents; the former “saffron is the only guest accent” rule is superseded. Shared city materials never flash for a vote.
 
 ## Geometry, identity and detail
 
-All low/mixed/high outcomes are complete, mature 2127 architectures. Human-led service and private space remain technologically credible; low does not mean empty or obsolete. District carriers mix deterministic design families; mixed uses hybrids and partner Meters can add facilities. Counts/selection follow the authoritative layout and seeds, not art-side rerolls.
+All A/B/C options are complete, mature 2127 architectures. Human-led service and private space remain technologically credible. Fixed district groups use their mixed background configuration.
 
 Preserve waterfront, civic-core and landmark relationships, grounded piers/access and route clearance. Odaiba is metres: prioritize detail by projected size in the authored hero and orbit view, not old Shibuya 45/90-unit thresholds. Curves, terraces and greenery must read as structure; keep support/join logic intelligible. Avoid contemporary logos and trademarked character geometry.
 
@@ -33,7 +31,7 @@ Preserve waterfront, civic-core and landmark relationships, grounded piers/acces
 
 Current renderer uses Neutral tone mapping, VSM shadows, GTAO, mild bloom, vignette and a display-space grade. A softened generated maritime sky plus HDR RoomEnvironment light cards produces PMREM reflections; it supersedes the earlier rejection of sky-colour reflections. Current sky and ground textures are local files.
 
-Glass reads through reflections by day and room bands by night. Civic light follows darkness; local district accents add slow night rhythms. Admin Day/Night/Auto and the 180 s clock change lighting independently of v2 Meter values. Compare day/dusk/night with stated camera/hour/actor time; full values and render flow belong in [PROJECT](PROJECT.md).
+Glass reads through reflections by day and room bands by night. Civic light follows darkness; local district accents add slow night rhythms. Admin Day/Night/Auto and the 180 s clock change lighting independently of rotation proposals. Compare day/dusk/night with stated camera/hour/actor time; full values and render flow belong in [PROJECT](PROJECT.md).
 
 ## Change semantics and resources
 

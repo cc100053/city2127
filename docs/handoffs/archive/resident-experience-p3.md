@@ -14,7 +14,7 @@
 
 ## Goal and scope
 
-Implement [P3](../../RESIDENT_EXPERIENCE_PLAN.md): ten-second reading slots independent of three-second city motion; actual before/after carrier evidence; own Guest identity/wait/recovery; immediate authoritative recovery. Preserve question3/algorithm2/CityView2/schema7, independent A/B answers, score algorithm, renderer resources and hero camera. No viewer acknowledgement, hardware/deployment/dependencies or module-swap changes.
+Implement [P3](../../history/RESIDENT_EXPERIENCE_PLAN.md): ten-second reading slots independent of three-second city motion; actual before/after carrier evidence; own Guest identity/wait/recovery; immediate authoritative recovery. Preserve question3/algorithm2/CityView2/schema7, independent A/B answers, score algorithm, renderer resources and hero camera. No viewer acknowledgement, hardware/deployment/dependencies or module-swap changes.
 
 ## Completed work
 
@@ -40,6 +40,6 @@ Implement [P3](../../RESIDENT_EXPERIENCE_PLAN.md): ten-second reading slots inde
 
 ## Known issues and next expected step
 
-P3 implementation is complete. Next separately assignable stage is P4 comprehensive software/two-screen validation from the [resident plan](../../RESIDENT_EXPERIENCE_PLAN.md); do not automatically start it. Before ending this publication task, verify remote main and its actual CI after push per [CONTRIBUTING](../../CONTRIBUTING.md).
+P3 implementation is complete. Next separately assignable stage is P4 comprehensive software/two-screen validation from the [resident plan](../../history/RESIDENT_EXPERIENCE_PLAN.md); do not automatically start it. Before ending this publication task, verify remote main and its actual CI after push per [CONTRIBUTING](../../CONTRIBUTING.md).
 
 The `getConfiguration()` projections mirror settled renderer transforms; update them when adding carrier geometry (`ponytail:` comments document this maintenance limit). Scheduling metadata is not a viewer acknowledgement. Hardware, Safari/iPad/Windows, real reading time/comprehension, FPS and sustained exhibition operation are unverified; P4 comprehensive software cases, P5 and S5 remain separate. No automatic P4/P5 work is authorized by this handoff.

@@ -1,12 +1,12 @@
 # 台場2127 — 建築・居住多樣性計劃
 
-> **2026-11-21：version4 四題／四個 Meter 版本已永久退役，現行唯一版本係九題抽題輪換（[SPEC](EXHIBITION_SPEC.md#抽題輪換唯一現行版本)）。** 本文件講 Meter、分數或 ladder 嘅部分只係歷史記錄。
+> **2026-11-21：version4 四題／四個 Meter 版本已永久退役，現行唯一版本係九題抽題輪換（[SPEC](../EXHIBITION_SPEC.md#抽題輪換唯一現行版本)）。** 本文件講 Meter、分數或 ladder 嘅部分只係歷史記錄。
 
-2026-10-26（H3評估更新2026-10-27）。產品決策：cc100053；規劃整理／實作 owner：Codex。狀態：**H0／H1 已簽收，H1b 靜態次設計及 H2 動態已通過軟件及 coordinator review；H3評估已通過coordinator review，方案A已由人類選定，正式固定背景已實作並通過本機驗證**。本計劃按Claude review修訂；H0的基準／候選位置／設計矩陣／預算提案及本機檢查已由cc100053於2026-10-26在實作chat確認，見 [H0證據](../artifacts/housing-city-h0/README.md)。H1／H1b 已新增隔離 DEV 住宅比較，H2 已加入90秒多年更新壓縮循環；正式問卷及展覽資料未修改。現行行為以 [EXHIBITION_SPEC](EXHIBITION_SPEC.md) 為準，實際驗證與下一步見 [任務交接](handoffs/housing-city.md)。
+2026-10-26（H3評估更新2026-10-27）。產品決策：cc100053；規劃整理／實作 owner：Codex。狀態：**H0／H1 已簽收，H1b 靜態次設計及 H2 動態已通過軟件及 coordinator review；H3評估已通過coordinator review，方案A已由人類選定，正式固定背景已實作並通過本機驗證**。本計劃按Claude review修訂；H0的基準／候選位置／設計矩陣／預算提案及本機檢查已由cc100053於2026-10-26在實作chat確認，見 [H0證據](../../artifacts/housing-city-h0/README.md)。H1／H1b 已新增隔離 DEV 住宅比較，H2 已加入90秒多年更新壓縮循環；正式問卷及展覽資料未修改。現行行為以 [EXHIBITION_SPEC](../EXHIBITION_SPEC.md) 為準，實際驗證與下一步見 [任務交接](../handoffs/archive/housing-city.md)。
 
 ## 目標與範圍
 
-延續 [能源城市計劃](ENERGY_CITY_PLAN.md#目標與範圍) 的四領域分類，處理「建築・居住」：用使用者提供的四個仮説，增加台場建築與居住形態的多樣性。新增內容與既有建築共存，延續 [CITY MASTER TASTE](ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md) 的淡色複合材料、可見支承與接點、架空空間及台場公共生活，並保留海面、天空及重要結構留白。
+延續 [能源城市計劃](ENERGY_CITY_PLAN.md#目標與範圍) 的四領域分類，處理「建築・居住」：用使用者提供的四個仮説，增加台場建築與居住形態的多樣性。新增內容與既有建築共存，延續 [CITY MASTER TASTE](../ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md) 的淡色複合材料、可見支承與接點、架空空間及台場公共生活，並保留海面、天空及重要結構留白。
 
 本輪不改四題提案、Meter、累積規則、資料庫或live結果時序。2026-10-27人類已選A正式固定背景；接入檢查發現原M與低automation服務館相交，另批准保留服務館、重新選M位置並提供對照圖。階段編號用H0–H3，避免與居民體驗P1–P5及能源E1–E5混淆。
 
@@ -58,11 +58,11 @@
 
 | 步驟 | 工作與交付 | 完成條件 | 狀態 |
 | --- | --- | --- | --- |
-| H0：位置、設計矩陣與預算 | [具體提案與本機證據](../artifacts/housing-city-h0/README.md)：三處24×18m預留框、28m高上限、基準、矩陣、夜間及性能預算 | 見下文H0；cc100053已確認，見交接 | COMPLETE |
-| H1：隔離靜態比較 | DEV入口五配置、截圖證據 | 見下文H1；[H1原圖](../artifacts/housing-city-h1/README.md)，2026-10-26人類簽收 | ACCEPTED |
-| H1b：次設計靜態比較 | 橫向共享骨架、藻類設備、完整小屋及更新軌；[本批證據](../artifacts/housing-city-h1b/README.md) | 靜態實城／預算／日暮夜及近景檢查；獨立於H2掃掠 | IMPLEMENTED / COORDINATOR VERIFIED |
-| H2：局部動態與恢復 | 生活艙交換、小屋搬遷、停泊／接駁 | 見下文H2及[本批證據](../artifacts/housing-city-h2/README.md) | IMPLEMENTED / COORDINATOR VERIFIED |
-| H3：收斂與正式接入評估 | [原圖評估與正式選項](../artifacts/housing-city-h3/README.md)；建議保留數量／位置／輪廓 | 評估已coordinator接受；人類已選A，固定背景接入見末節 | A SOFTWARE VERIFIED |
+| H0：位置、設計矩陣與預算 | [具體提案與本機證據](../../artifacts/housing-city-h0/README.md)：三處24×18m預留框、28m高上限、基準、矩陣、夜間及性能預算 | 見下文H0；cc100053已確認，見交接 | COMPLETE |
+| H1：隔離靜態比較 | DEV入口五配置、截圖證據 | 見下文H1；[H1原圖](../../artifacts/housing-city-h1/README.md)，2026-10-26人類簽收 | ACCEPTED |
+| H1b：次設計靜態比較 | 橫向共享骨架、藻類設備、完整小屋及更新軌；[本批證據](../../artifacts/housing-city-h1b/README.md) | 靜態實城／預算／日暮夜及近景檢查；獨立於H2掃掠 | IMPLEMENTED / COORDINATOR VERIFIED |
+| H2：局部動態與恢復 | 生活艙交換、小屋搬遷、停泊／接駁 | 見下文H2及[本批證據](../../artifacts/housing-city-h2/README.md) | IMPLEMENTED / COORDINATOR VERIFIED |
+| H3：收斂與正式接入評估 | [原圖評估與正式選項](../../artifacts/housing-city-h3/README.md)；建議保留數量／位置／輪廓 | 評估已coordinator接受；人類已選A，固定背景接入見末節 | A SOFTWARE VERIFIED |
 
 各實作階段都要當輪跑適用檢查並更新交接，不能延至最後才驗證。
 
@@ -85,7 +85,7 @@
 
 - **Q4區隔**：集約骨架與Concentration Tower（se／フジテレビ東）在位置、輪廓及材料語言上的分別；若無法分開，取消集約骨架。
 - **夜間表達**：藻類面板及植物膜在夜間是自發光、反射還是暗面，影響hour 21驗收。
-- **性能上限**：以H1 baseline實測為基準，訂出新增內容可用的renderer geometry／texture／draw call增量及最低FPS。參考：E5在Mac mini（Apple M6）低畫質30分鐘平均59.94 FPS、renderer 425 geometry／24 textures（[能源交接](handoffs/energy-city.md)）。上限須在H0寫成數字，不留到H3。
+- **性能上限**：以H1 baseline實測為基準，訂出新增內容可用的renderer geometry／texture／draw call增量及最低FPS。參考：E5在Mac mini（Apple M6）低畫質30分鐘平均59.94 FPS、renderer 425 geometry／24 textures（[能源交接](../handoffs/archive/energy-city.md)）。上限須在H0寫成數字，不留到H3。
 
 通過條件：仮説1–3均有可讀主設計；新增位置與原有城市關係清楚；不靠拆掉現有主要建築騰空間；基準配置、Q4區隔、夜間表達及性能上限都已寫入交接並由cc100053確認。
 
@@ -127,7 +127,7 @@
 
 2026-10-27 H2實作：沿用已選90秒循環及靜態植物，U生活艙交換至另一個socket，完整小屋沿10.4m專用軌道搬遷。0–5秒停泊A，5–8斷開，8–12抬艙，12–20抽出，20–28橫移到B，28–32送入，32–35降下，35–38接通，38–45停泊B；45–48斷開、48–52抬艙、52–60抽出、60–68返回A、68–72送入、72–75降下、75–78接通，78–90停泊A。小屋底鞋維持軌道高度，不跟隨艙的抬升；兩者只有專用橫移階段同步。面板重播／重設、靜態閱讀及系統reduced motion恢復停泊A；`reviewTime`可固定所有階段。
 
-實城固定障礙及兩組移動件以分段線性AABB掃掠／相對時間不等式檢查，涵蓋底鞋、叉架、吊索及接口；幾何採樣不截去下身。實際actor另以日／夜完整90秒每0.5秒檢查，交通曲線用≤0.5m弧長採樣加保守包絡覆蓋中間位置。[完整方法、機械修正及證據](../artifacts/housing-city-h2/README.md)。H2完成實作與軟件驗證不代表人類視覺簽收。
+實城固定障礙及兩組移動件以分段線性AABB掃掠／相對時間不等式檢查，涵蓋底鞋、叉架、吊索及接口；幾何採樣不截去下身。實際actor另以日／夜完整90秒每0.5秒檢查，交通曲線用≤0.5m弧長採樣加保守包絡覆蓋中間位置。[完整方法、機械修正及證據](../../artifacts/housing-city-h2/README.md)。H2完成實作與軟件驗證不代表人類視覺簽收。
 
 此階段仍屬DEV原型，不修改正式survey流程、資料庫或live結果時序。
 
@@ -135,7 +135,7 @@
 
 評審三類各自及混合效果，調整數量、位置與輪廓，再決定是否進入正式城市。
 
-2026-10-27 [H3評估](../artifacts/housing-city-h3/README.md)：查看24張H1／H1b／H2原PNG與R01／R06，核對H2現碼9份及原圖18張hash。保留三區及現有數量／輪廓，沒有驗收必需的模型修正；hero可定位低層新增體量，藻類循環、接駁及多年更新機理仍需近景／說明，未作訪客理解實測。現有幾何／性能證據只適用固定四軸0／seed0及全能源基準，不代表所有正式配置已通過。
+2026-10-27 [H3評估](../../artifacts/housing-city-h3/README.md)：查看24張H1／H1b／H2原PNG與R01／R06，核對H2現碼9份及原圖18張hash。保留三區及現有數量／輪廓，沒有驗收必需的模型修正；hero可定位低層新增體量，藻類循環、接駁及多年更新機理仍需近景／說明，未作訪客理解實測。現有幾何／性能證據只適用固定四軸0／seed0及全能源基準，不代表所有正式配置已通過。
 
 **H3當時待選（已由文末A決定取代）**：A把原M／P／U（含複合外皮及次設計）作正式固定背景、U停泊A、90秒循環留DEV，不稱投票結果（建議）；B繼續保留DEV，先設計獨立居住偏好與輸入來源；C另開四題替換／權威累積計劃。完整問題、取捨及各方案依賴工作見H3報告。A仍需正式狀態／轉場共存、production及實機驗證；未選定前不改正式渲染或資料接線，production住宅繼續排除。獨立DEV-only review／收尾與經指派的Git整合可先繼續。
 
@@ -167,7 +167,7 @@
 
 ## 尚未決定
 
-- H0：基準配置、性能上限、Q4區隔、夜間表達及三處候選已有[具體提案](../artifacts/housing-city-h0/README.md)，2026-10-26已由cc100053確認。
+- H0：基準配置、性能上限、Q4區隔、夜間表達及三處候選已有[具體提案](../../artifacts/housing-city-h0/README.md)，2026-10-26已由cc100053確認。
 - 生活艙／完整小屋已由cc100053於2026-10-26在實作chat選定90秒「多年更新壓縮示意」循環；詳細分段已於H2實作驗證，見本批證據。
 - 植物膜已確認保持靜態；H1主設計形態／覆蓋量已按截圖簽收；H1b次設計已coordinator驗證。
 - 候選框尺寸及高度已量化，H1主設計數量／輪廓已接受，H1b及H2已coordinator驗證；H0篩選不代替本批H2完整掃掠證據。
@@ -178,4 +178,4 @@
 
 本chat已選A，並在相交報告後明確選擇「保留服務館，重新選 M 住宅位置並提供對照圖」。M現為`(-165,-165)`；P`(45,-215)`與U`(-265,-60)`不變，住宅三類／複合層與次設計、數量／輪廓保留。正式初始化mixed及U停泊A，不讀問卷／Meter／能源或投票歷史，也不列為提案變化。90秒多年更新循環與比較面板保留DEV。
 
-[本批檢查／對照圖](../artifacts/housing-background/README.md)與[交接](handoffs/housing-city.md)記錄實際完成及驗證；上文H0–H3是當時原位置、DEV隔離及選項評估歷史，不能拿舊中值結果證明正式全配置。
+[本批檢查／對照圖](../../artifacts/housing-background/README.md)與[交接](../handoffs/archive/housing-city.md)記錄實際完成及驗證；上文H0–H3是當時原位置、DEV隔離及選項評估歷史，不能拿舊中值結果證明正式全配置。

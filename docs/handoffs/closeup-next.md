@@ -62,7 +62,7 @@ Z 已經由 Codex relay 完成（`origin/feat/closeup-polish` @ `f66cc3a`，量�
 
 - [EXHIBITION_SPEC](../EXHIBITION_SPEC.md)：住宅「正式歸屬尚未選定」改成 owner 2026-10-27 選咗 A，production 已有固定住宅。
 - [handoffs README](README.md)：住宅行改成 SOFTWARE COMPLETE A，加本文件一行，歸檔數目更新。
-- [energy-city](energy-city.md)：E5「main 發布／CI 待核對」改成已核實（`db772bb`，[CI 40069808324](https://github.com/cc100053/city2127/actions/runs/40069808324) success）。
+- [energy-city](archive/energy-city.md)：E5「main 發布／CI 待核對」改成已核實（`db772bb`，[CI 40069808324](https://github.com/cc100053/city2127/actions/runs/40069808324) success）。
 - [headline-camera](archive/headline-camera.md)：參考 source 由已刪分支改指 artifact 副本。
 - 衝突提示：`feat/closeup-polish` 都改咗 SPEC（line 82 之後）同 handoffs README 嘅近鏡行。F2 改嘅係其他行，預計 merge 唔會撞；如果撞到，兩邊都保留。
 

@@ -87,7 +87,7 @@ Keep documentation aligned with the actual working tree in the same implementati
 | Scope, visual direction, priorities, milestones or accepted design decisions | [EXHIBITION_SPEC.md](EXHIBITION_SPEC.md); [PROJECT.md](PROJECT.md) and [AGENTS.md](../AGENTS.md) when project constraints change |
 | Agent workflow or approval policy | [AGENTS.md](../AGENTS.md) and this file; [VALIDATION.md](VALIDATION.md) if handoff procedures change |
 
-Document implemented behavior separately from proposals and pending approval. Date new evidence and identify the stage it describes; never reuse old test results or screenshots as proof of a new change. Preserve closed historical Plan 01 notes in [SHIBUYA.md](SHIBUYA.md), [Plan 02](history/SHIBUYA_PLAN02.md) and earlier acceptance records; correct factual errors or add a clearly dated superseding note instead of rewriting history. Verify local Markdown links after documentation edits.
+Document implemented behavior separately from proposals and pending approval. Date new evidence and identify the stage it describes; never reuse old test results or screenshots as proof of a new change. Preserve closed historical Plan 01 notes in [SHIBUYA.md](history/SHIBUYA.md), [Plan 02](history/SHIBUYA_PLAN02.md) and earlier acceptance records; correct factual errors or add a clearly dated superseding note instead of rewriting history. Verify local Markdown links after documentation edits.
 
 ## Concurrent integration
 

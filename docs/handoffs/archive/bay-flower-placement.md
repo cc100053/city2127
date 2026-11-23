@@ -22,8 +22,8 @@
 ## In-scope files and dependencies
 
 - 模型（只讀，除非 R 輪 brief 要求改 builder）：`asset/models/bay-flower-receiver/`（`bay-flower-receiver.glb` 有光柱、`bay-flower-receiver-nobeam.glb` 無光柱；節點 `Q02B_Root` > `Q02B_Receiver`、`Q02B_SubseaLink`、`Q02B_ShoreStation`、`Q02B_LightBeam`）。
-- 預計改動：`src/layout.ts`（新常數 `BAY_FLOWER`；移動 `bayCruisers` 中 `[-700,250,1.4]` 一段）、新 `src/bayFlower.ts`（仿 [hydroTerrace](../../src/hydroTerrace.ts)）、`src/odaibaScene.ts`（載入）、`src/mobility.ts`（如遊船相位要重搜）、新 `tests/bayFlower.test.ts`。
-- 目標清單：[artifacts/bay-flower-placement/spec.md](../../artifacts/bay-flower-placement/spec.md)。
+- 預計改動：`src/layout.ts`（新常數 `BAY_FLOWER`；移動 `bayCruisers` 中 `[-700,250,1.4]` 一段）、新 `src/bayFlower.ts`（仿 [hydroTerrace](../../../src/hydroTerrace.ts)）、`src/odaibaScene.ts`（載入）、`src/mobility.ts`（如遊船相位要重搜）、新 `tests/bayFlower.test.ts`。
+- 目標清單：[artifacts/bay-flower-placement/spec.md](../../../artifacts/bay-flower-placement/spec.md)。
 - 不在範圍：Q02 投票接線（屬 `question-rotation`（handoff 在 `feat/question-rotation` 分支） 階段 2.2，該分支未 merge）、近鏡、結果卡及設施卡文案、空置態切換程式。
 
 ## Important decisions（owner 2026-11-18，本 decide session）

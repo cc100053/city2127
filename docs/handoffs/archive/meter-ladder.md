@@ -20,7 +20,7 @@
 2026-10-27 模擬顯示一份提案常常同時翻幾個 band，而每次翻轉會改晒成個 district，user 覺得浪費。目標係將每條 Meter 拆成有次序嘅格，每份提案最多推一格，再揀一個 headline 變化去展示。以下各項都已完成：
 - user 批准格表：±3 格、門檻 |D| 1.5/4/7、遲滯 2、每份最多一格、slotSeed 第一次到 ±2 先固定、環境資產維持凍結。
 - ladder 同 headline 都已實作並有測試。
-- 模擬結果已記錄喺 [VALIDATION](../../VALIDATION.md#分級階梯headline--2026-10-27)。
+- 模擬結果已記錄喺 [VALIDATION](../../history/EXHIBITION_SPEC_2026-11-24.md#累積與權威-layout)。
 - 用 scratch `dev:auto` 做咗 browser check：每份提案只變一格。
 - 分支已 push。
 
@@ -61,7 +61,7 @@
   - `survey/` `npm test` PASS、`npm run build` PASS。
   - `git diff --check` PASS。
   - module-swap 未改，所以未跑。
-- 模擬：`node --experimental-strip-types survey/scripts/ladderSim.ts`。數字見 [VALIDATION](../../VALIDATION.md#分級階梯headline--2026-10-27)：
+- 模擬：`node --experimental-strip-types survey/scripts/ladderSim.ts`。數字見 [VALIDATION](../../history/EXHIBITION_SPEC_2026-11-24.md#累積與權威-layout)：
   - 73.0% 投稿啱啱變一個 site、0% 變兩個或以上，連能源計有 10.8% 變兩項。
   - 第 1–3 位訪客平均變 0.99／1.41／1.46 項；改之前 main 係 2.38／2.38／2.81。
 - Browser check：

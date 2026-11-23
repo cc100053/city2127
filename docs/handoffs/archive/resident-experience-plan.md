@@ -15,7 +15,7 @@ P1 base `ba055d88afc1d4123f2a7f5f826848e247fe9403`, source `9273f88decbfa4ec8844
 
 ## Goal and acceptance criteria
 
-User requested repository planning and handoff for the resident-story/two-screen experience. [RESIDENT_EXPERIENCE_PLAN](../../RESIDENT_EXPERIENCE_PLAN.md) preserves P1–P5 scope, screen roles, proposed timing, causal truth requirements, validation and next step. [RESIDENT_COPY](../../RESIDENT_COPY.md) remains the sole copy source; [P1 handoff](resident-copy-p1.md) remains its dated implementation record.
+User requested repository planning and handoff for the resident-story/two-screen experience. [RESIDENT_EXPERIENCE_PLAN](../../history/RESIDENT_EXPERIENCE_PLAN.md) preserves P1–P5 scope, screen roles, proposed timing, causal truth requirements, validation and next step. [RESIDENT_COPY](../../RESIDENT_COPY.md) remains the sole copy source; [P1 handoff](resident-copy-p1.md) remains its dated implementation record.
 
 Accept this documentation task when local links/anchors/tracked paths, current-runtime facts, full diff and whitespace pass, and the task is published through [Git workflow](../../CONTRIBUTING.md). Plan completeness is not P2/P3 implementation or S5/hardware acceptance.
 

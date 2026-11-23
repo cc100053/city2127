@@ -1,7 +1,7 @@
 # pod-frame-tower — 混凝土格架蛋艙塔（僅模型）
 
 - Owner: cc100053
-- Status: ACCEPTED，已放置（業主 2026-11-18 接受 R4 並指示合併 main；2026-11-19 於 `feat/question-rotation` 放於住宅 U 舊址，作抽題輪換 Q06-B，見 [question-rotation](question-rotation.md)）
+- Status: ACCEPTED，已放置（業主 2026-11-18 接受 R4 並指示合併 main；2026-11-19 於 `feat/question-rotation` 放於住宅 U 舊址，作抽題輪換 Q06-B，見 [question-rotation](../question-rotation.md)）
 - Branch: `feat/pod-frame-tower`（由 `origin/main` `5d66cfa8` 開出；R1 於 R2 session 開始時 commit）
 - Base commit: `13f83e1566988a10e8798ec027c97ba10012654e`（R1 工作時的 HEAD，`codex/nw-focal-connections`）
 - Last verified commit: 見 `## R4` 驗證（R4 commit 於 `c742193` 之上；R3 為 `c742193`，R2 為 `c713fc9`，R1 為 `9ed3e7f6`）
@@ -316,4 +316,4 @@ R1 與目標的差距（依 `target-vs-model.jpg` 分析），已轉成下文 R2
 
 ## Next expected step
 
-Q06-B 已接道路 ③。陶板支路旁的步道接北面兩個入口及東面入口，保留原 R4 塔及門罩。固定道路及平台在 Q06 A／C 空置時仍可見。日夜、俯視及入口實景見 [question-rotation](question-rotation.md)。
+Q06-B 已接道路 ③。陶板支路旁的步道接北面兩個入口及東面入口，保留原 R4 塔及門罩。固定道路及平台在 Q06 A／C 空置時仍可見。日夜、俯視及入口實景見 [question-rotation](../question-rotation.md)。

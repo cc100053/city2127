@@ -2,7 +2,7 @@
 
 - 負責：Claude（rex 指派，2026-11-23）
 - 分支：`claude/hand-ui`（M2 → M3 → 住民の窓 Phase 1、2 與 iPad 實測修正）已於 2026-11-23 合併至 `main`（`4df3e093`）
-- 前置：[手部追蹤 spike（M0、M1）](hand-spike.md)
+- 前置：[手部追蹤 spike（M0、M1）](archive/hand-spike.md)
 
 ## 目前狀態（2026-11-23）
 

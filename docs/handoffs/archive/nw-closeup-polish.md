@@ -17,7 +17,7 @@
 
 ## Goal
 
-Owner 2026-11-03：「用新 taste 重建 NW 旗艦同佢嘅 district 載體」。用 [closeup-polish skill](../../../.claude/skills/closeup-polish/SKILL.md)（SE 樣板流程）＋ [CITY MASTER TASTE](../../ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md)。對象：
+Owner 2026-11-03：「用新 taste 重建 NW 旗艦同佢嘅 district 載體」。用 [closeup-polish skill](../../../.agents/skills/closeup-polish/SKILL.md)（SE 樣板流程）＋ [CITY MASTER TASTE](../../ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md)。對象：
 
 - 旗艦 AUTO HUB：`src/siteBuilders/automationHub.ts`（`changeSites.nw`，中心 (40, −300)，scale 3）。
 - District 載體：`AutomationDistrict`（`src/districtMeters.ts`）嘅 bay 設計——staffed 圓頂廳／雙層台、autonomous 無人機港／充電桅。

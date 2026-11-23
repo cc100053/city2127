@@ -19,7 +19,7 @@
 
 ## Goal and acceptance criteria
 
-Measure how long a "fly to the changed facility and narrate how it works" sequence needs after a live result, starting with energy. DEV-only: the exhibition keeps the fixed hero camera ([RESIDENT_EXPERIENCE_PLAN](../../RESIDENT_EXPERIENCE_PLAN.md), [PROJECT](../../PROJECT.md)) until the user changes that decision.
+Measure how long a "fly to the changed facility and narrate how it works" sequence needs after a live result, starting with energy. DEV-only: the exhibition keeps the fixed hero camera ([RESIDENT_EXPERIENCE_PLAN](../../history/RESIDENT_EXPERIENCE_PLAN.md), [PROJECT](../../PROJECT.md)) until the user changes that decision.
 
 ## In-scope files and dependencies
 

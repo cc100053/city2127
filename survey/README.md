@@ -1,6 +1,6 @@
 # Exhibition questionnaire — Odaiba v2
 
-現行 package guide、2026-10-02。展示会は **2127 年のお台場**のみ。渋谷は過去の決定で、今後は開発しません。製品仕様は[EXHIBITION_SPEC](../docs/EXHIBITION_SPEC.md)、展示会の Mac／Windows 起動と LAN 設定は[ルート README](../README.ja.md)、責務は[PROJECT](../docs/PROJECT.md)を参照してください。
+現行 package guide、2026-11-24。展示会は **2127 年のお台場**のみ。渋谷は過去の決定で、今後は開発しません。製品仕様は[EXHIBITION_SPEC](../docs/EXHIBITION_SPEC.md)、展示会の Mac／Windows 起動と LAN 設定は[ルート README](../README.ja.md)、責務は[PROJECT](../docs/PROJECT.md)を参照してください。
 
 ## 起動と設定
 
@@ -29,11 +29,7 @@ SQLite は現在 **schema 9**（`PRAGMA user_version`）、proposal algorithm / 
 
 現行の [questions.rotation.v1.json](src/survey/questions.rotation.v1.json) から、各来場者に四問を割り当てます。四つの回答を一度に送信し、問いごとに集計します。
 
-旧版の [questions.exhibition.json](src/survey/questions.exhibition.json) に automation / publicSharing / environmentalPriority / urbanConcentration の四問と各 −1／0／+1 option を定義します。Draft と review は街を変えず、全四問を一つの transaction で提出します。Effects は server の JSON から取得し、クライアントからの偽の値は採用しません。
-
-v2 state は `voteSums`、`recentVotes`、`guestCount`、`revision` と四軸 scores を保持します。旧版 E4 の三つの Meterは `sum += vote`、`recent=.75*recent+.25*vote`、`score=6*(sum/guestCount+recent)`（±12）。最新票も共同履歴も反映し、中性票は recent を衰減させます。Q3のenergyは独立累計、旧気候には投票せず、気候の計算と展示刻度は旧気候回答数を保持します。旧 v1 の加算 clamp／条件付き一人一問 trigger は展示会の仕様ではありません。
-
-[cityView.ts](src/shared/cityView.ts) が layout の唯一の authority。v2 view は layout、最新提案／最大64件の履歴、完全な active run 履歴から得た四軸 `slotSeeds` を含みます。Undo の revoked proposal は replay／counts／seeds から除外します。Root v2 は site と district を描画し、module-swap は v2 を拒否します。
+サーバーは受付時の四問をセッションに保存し、送信時に現在の街と照合します。表示の異なる選択肢があると、最後の変更から最も時間が経った一問の選択肢に切り替えます。最新状態は有効な提案を順に再生して復元されます。四つの回答は問いごとに集計され、住民の窓の交代画面で割合を確認できます。
 
 ## Guest、A/B、Reset、Undo
 
@@ -84,7 +80,7 @@ Admin は loopback、POST は同一 origin も検査します。各 command は 
 | src/server/server.ts / realtime.ts | API／static／loopback guard／WS |
 | src/ui | Guest flow/recovery、Admin、Monitor；独立スコア計算なし |
 
-## Tests and DEV-only automation
+## Tests and legacy DEV-only automation
 
 ```sh
 npm test
@@ -99,7 +95,7 @@ npm run test:auto
 npm run dev:auto
 ```
 
-Fresh scratch SQLite、localhost port 8788、`/guest?dev-auto`。Root City は `?survey=ws://127.0.0.1:8788/ws` に接続。既定 DB を変更しません。Panel はサーバーの vote map から option を選び、普通の draft/review/submit/retry を使います。停止は送信済み request を撤回せず、reset や他 Guest と衝突したら停止します。次の提案は普通の自動 Start handoff、Admin exit command は送りません。
+旧四問／Meter 互換テスト用。Fresh scratch SQLite、localhost port 8788、`/guest?dev-auto`。Root City は `?survey=ws://127.0.0.1:8788/ws` に接続。既定 DB を変更しません。Panel はサーバーの vote map から option を選び、普通の draft/review/submit/retry を使います。停止は送信済み request を撤回せず、reset や他 Guest と衝突したら停止します。次の提案は普通の自動 Start handoff、Admin exit command は送りません。
 
 **DEV-ONLY：展示会前に panel／endpoint／launcher を除去、または別途 Admin への移動を決定してください。旧 staff-exit lock は復活させません。** 再利用可能な tests は残します。実装履歴：[auto-tests](../docs/handoffs/archive/survey-auto-tests.md)。
 
@@ -142,14 +138,6 @@ Fresh scratch SQLite、localhost port 8788、`/guest?dev-auto`。Root City は `
 
 ## Legacy and historical records
 
-v1 の質問予約／trigger／加算 clamp／一人一問コードと tests は互換性のため保持します。`questions.mvp.json` を既定設定にするだけでは current v2 run は v1 に戻りません。現在の Guest は四問 UI、root との接続は実装済みです。
+v1 と四問／Meter の reducer、既存データの replay、DEV automation は互換経路として残っています。旧質問・時刻・エネルギー規則や仕様の履歴は[展覧仕様のアーカイブ](../docs/history/EXHIBITION_SPEC_2026-11-24.md)と[実装アーカイブ](../docs/history/PROJECT_2026-11-24.md)を参照してください。
 
-原 schema-1 [制作 log](docs/log/survey-state-mvp.md)、[repo import](../docs/handoffs/archive/survey-state-mvp.md)、[causal MVP](../docs/handoffs/archive/causal-city-mvp.md) は過去の基準。現行 limits は[展示会仕様](../docs/EXHIBITION_SPEC.md)、A/B evidence は[handoff](../docs/handoffs/archive/two-guest-devices.md)を参照。S5、入力機器と展示当日の recovery policy は未検証です。
-
-2026-10-02 P2：正式question-setはversion3です（algorithm／CityView v2、schema7とは別）。住民の問い／背景、送信前確認、保存／待機／街を見る案内をGuestに接続し、結果の回答／Meter／施設表はCity側の短い解説に置き換えました。旧草稿は新しい予約へ有効な選択を引き継ぎ、A/Bは自分の旧予約を既存end endpointで終了します。保存済みversion2提案は原文のまま同IDで回復でき、SQLiteを削除しません。時刻／lease／resetは変更していません。[P2 handoff](../docs/handoffs/archive/resident-experience-p2.md)。
-
-2026-10-02 P3は上記P2の時刻条件を更新します：server/root/Guestは共通10秒閲覧枠を予約し、3秒の都市転換を保持。早い交代はreleaseを枠の終わりまで待ち、resetは両stationをdrainします。retry/reloadは残り時間のみ、result leaseは開始+15秒で固定。rootはeffective carrier配置／可視pairing／seed後の実分布を比較し、個人の声と共同結果を区別。切断／再接続／Undo／reduced motion／期限切れイベントは即復元、照明のみのsnapshotは有効queueを保持。[P3 handoff](../docs/handoffs/archive/resident-experience-p3.md)。
-
-## E4 energy question (2026-10-24)
-
-Question-set4 replaces only Q3 with four independent energy preferences. Algorithm/CityView remain2; SQLite8 adds nullable snapshot energy state without rewriting old events or copy. Rebuild/restart survey and refresh City/Guest together; keep the existing database. Obsolete drafts require a fresh reservation and a new Q3 answer; valid Q1/Q2/Q4 choices and committed same-ID retries remain recoverable. Climate is absent from new proposals, retaining its historical score/EMA and original display count. Energy tallies are cumulative, independent of the three active Meters; see the [formal energy contract](../docs/ENERGY_CITY_PLAN.md#e4正式接入2026-10-24). DEV auto profiles cover three Meters; energy is selected separately or rotates over its four choices.
+原 schema-1 [制作 log](docs/log/survey-state-mvp.md) · [P2](../docs/handoffs/archive/resident-experience-p2.md) · [P3](../docs/handoffs/archive/resident-experience-p3.md) · [E4 エネルギー研究](../docs/history/ENERGY_CITY_PLAN.md)

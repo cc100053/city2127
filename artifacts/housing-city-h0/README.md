@@ -3,7 +3,7 @@
 2026-10-26；實作 owner：Codex，產品／視覺簽收：cc100053。
 狀態：**H0 已由 cc100053 於 2026-10-26 在實作 chat 確認；H1–H3 未實作。**
 
-[計劃](../../docs/HOUSING_CITY_PLAN.md)／[當前交接](../../docs/handoffs/housing-city.md)。
+[計劃](../../docs/history/HOUSING_CITY_PLAN.md)／[當前交接](../../docs/handoffs/archive/housing-city.md)。
 
 ## 同一基準
 

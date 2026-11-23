@@ -14,7 +14,7 @@
 
 ## Goal and acceptance criteria
 
-`asset/models/q02a-hydro-terrace/q02a-hydro-terrace.glb` 係靜態素材：水面、瀑布、泡沫都係單色，水車唔會轉。水流同轉動只喺 `.blend` 入面（procedural shader＋frame driver），glTF 帶唔過去。見 [素材 handoff](q02a-hydro-terrace.md)。
+`asset/models/q02a-hydro-terrace/q02a-hydro-terrace.glb` 係靜態素材：水面、瀑布、泡沫都係單色，水車唔會轉。水流同轉動只喺 `.blend` 入面（procedural shader＋frame driver），glTF 帶唔過去。見 [素材 handoff](archive/q02a-hydro-terrace.md)。
 
 如果 Q02-A 被採用，就喺 Three.js runtime 重現：
 

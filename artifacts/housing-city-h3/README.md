@@ -2,7 +2,7 @@
 
 2026-10-27（Asia/Tokyo）；worker `01a1792a-0965-73b3-bd12-e44fd9bf60ff`，dispatch `housing-h3-r1-rev16`。基線 `b27105a02ebecf66d19b4ea546b2fa8523758499`，分支 `codex/housing-city`。本批完成文件評估，待 coordinator review；正式接入方案尚未由人類選定。
 
-[穩定計劃](../../docs/HOUSING_CITY_PLAN.md)／[當前交接](../../docs/handoffs/housing-city.md)／[本批雜湊核對](evidence-check.json)／[獨立結果](result.json)。共享 handoff 由 coordinator 獨佔，本 worker 不修改或提交它。
+[穩定計劃](../../docs/history/HOUSING_CITY_PLAN.md)／[當前交接](../../docs/handoffs/archive/housing-city.md)／[本批雜湊核對](evidence-check.json)／[獨立結果](result.json)。共享 handoff 由 coordinator 獨佔，本 worker 不修改或提交它。
 
 評估結論：**保留現有三區、數量、位置及輪廓，沒有必須修改模型才能完成本批的證據。建議方案 A：正式住宅先作固定背景，U 停泊 A；90 秒更新循環留在 DEV。** 這是待討論的推薦，不是正式渲染或資料接線授權。H0／H1 的人類簽收及 H1b／H2 的軟件／coordinator 接受狀態保持；本批沒有代替 H1b／H2 人類視覺或訪客理解驗收。
 

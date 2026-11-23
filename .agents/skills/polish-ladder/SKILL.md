@@ -17,7 +17,7 @@ Roles on both rungs (owner 2026-11-11): **you advise** — diagnose, write specs
 ## Steps
 
 1. **Pick the unit.** Read the unit table. Take the unit the owner named; otherwise the first row of the suggested order whose next step is open. Done: one unit and its current rung stated to the owner in one line.
-2. **Gate rung 1.** If the table says the unit is unpolished, show the owner its current close-up (−1/0/+1, day and night, from `~/city2127-evidence/closeup-frequency-sheet/` or a fresh capture) and ask one question: polish, or good enough. Done: the owner's answer is recorded in the table.
+2. **Gate rung 1.** If the table says the unit is unpolished, show the owner the current close-up for its A/B/C option, by day and night and ask one question: polish, or good enough. Done: the owner's answer is recorded in the table.
 3. **Climb.** Run the rung's skill to its own finish. Work on one unit and one rung per task branch; a rung-2 scene starts only on a building the owner has accepted, because the set, the camera and the resident's scale all hang off the finished model.
 4. **Record.** Update the unit's row (what was accepted, link to its handoff), the handoff, and the documents in the [sync table](../../../docs/CONTRIBUTING.md#documentation-sync). Then regenerate the owner's **change sheet** (see below). Done: a reader of the table alone knows the unit's rung and next step, and the sheet's date is today.
 5. **Report and stop.** Send the owner the evidence and name the next unit. The owner picks whether to go on.
@@ -29,7 +29,7 @@ Roles on both rungs (owner 2026-11-11): **you advise** — diagnose, write specs
 - Regenerate with `node --experimental-strip-types scripts/changeSheet.ts` whenever the plan, the result or facility copy, or the question set changed.
 - When a model, camera or transition changed, first refresh the frames: start Vite and run `node scripts/closeupSheet.mjs <vite url>` (about ten minutes; it skips frames that exist, so delete the unit's `<shot>__*.jpg` in `~/city2127-evidence/stage-closeups/sheet/` first).
 - Commit the regenerated `artifacts/change-review/` with the change that caused it.
-- A new unit or resident needs one line in `UNITS` in `scripts/changeSheet.ts`; the script fails loudly when the plan and `UNITS` disagree.
+- Check the relevant resident and facility mappings in `scripts/changeSheet.ts` if a unit gains a resident or moves to another option.
 
 ## Working with the Sonnet agent
 
@@ -44,5 +44,5 @@ Roles on both rungs (owner 2026-11-11): **you advise** — diagnose, write specs
 
 - Path A: the city stays subtle; the drama is residents' lives. Every result gets a resident beat; about 20 s back to hero is acceptable.
 - Gemini target images come before any modelling, and the owner picks them. Blender GLB beats procedural three.js. Every modelled part is routed through [asset/models/LIBRARY.md](../../../asset/models/LIBRARY.md) (reuse, extend, new entry, site-only) so the next unit starts from it.
-- Voting and ladder rules may be reshaped to steer guests to polished showpieces.
+- Use the A/B/C rotation matrix and current exhibit rules when selecting the next unit.
 - Formal wiring (the 13 s reading slot, leases, A/B scheduling, iPad screens) is a product-contract change and a separate task; both rungs end at an owner-accepted DEV result.

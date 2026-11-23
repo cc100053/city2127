@@ -8,7 +8,7 @@
 
 ## 起點
 
-2026-11-16 在 `main`、`d0ad443c32826c38f178b5c04442d262bc014290` 開始。刷新遠端後，本機 0 ahead／1 behind，快轉至車輛參考資產提交 `1811cdf` 再開分支。未追蹤的 `Dev_QA.md` 已保留。已驗收基準見[農園 R3](rectenna-farm-placement.md#r3--public-garden-entrance-2026-11-15)及[變化總覽交接](rectenna-change-review.md)。
+2026-11-16 在 `main`、`d0ad443c32826c38f178b5c04442d262bc014290` 開始。刷新遠端後，本機 0 ahead／1 behind，快轉至車輛參考資產提交 `1811cdf` 再開分支。未追蹤的 `Dev_QA.md` 已保留。已驗收基準見[農園 R3](archive/rectenna-farm-placement.md#r3--public-garden-entrance-2026-11-15)及[變化總覽交接](archive/rectenna-change-review.md)。
 
 ## 實作
 
@@ -20,7 +20,7 @@
 
 ## 審閱
 
-啟動 Vite 後開啟 `/?shot=energy:aoi&orbital=3&hour=12&nopanel`。重載重播，改 `hour=22` 看夜景。可定格 `&reviewTime=20&aoiTime=5.45` 檢視落種，或以 `aoiTime=7.25` 與 `aoiTime=8.5` 配合 `aoiView=canopy` 比較同一鏡頭的日照前後。可加 `aoiView=entry|hands|canopy` 選固定構圖、`aoiNoCaption` 隱藏字幕。相片及圖說見[變化總覽](../../artifacts/change-review/index.html#rectenna-farm)。
+啟動 Vite 後開啟 `/?shot=energy:aoi&orbital=3&hour=12&nopanel`。重載重播，改 `hour=22` 看夜景。可定格 `&reviewTime=20&aoiTime=5.45` 檢視落種，或以 `aoiTime=7.25` 與 `aoiTime=8.5` 配合 `aoiView=canopy` 比較同一鏡頭的日照前後。可加 `aoiView=entry|hands|canopy` 選固定構圖、`aoiNoCaption` 隱藏字幕。相片及圖說見[變化總覽](../../artifacts/change-review/index.html#Q02-C)。
 
 ## 驗證
 
@@ -40,7 +40,7 @@
 - 按 Gemini 最新取苗架圖，把淺色前地和碎石支路合為單一連續面層，西端貼合步道斜邊，東端對準原有 4.8 m 西坡道門檻。草地上的兩段低植栽平行步道；2.38 × 0.62 m 薄木面、細金屬腳三盤架位於支路北側。DEV 開場降低鏡位，用真實鐵路、步道和天幕構圖。Gemini 把鐵路放左並畫出獨立露天坡道，本機構圖中鐵路在右，沿用既有 R3 農園和坡道。
 - **坡道淨空受既有模型阻擋。** 實景及原始 GLB 射線顯示，外圈菜槽的底板和植栽跨過西坡道入口。自坡道口起約 12 m 的三條抽樣線均投影在外圈底板範圍；起點菜槽頂約 1.05 m、坡道頂約 −0.107 m。R2 接到坡道底端，從入口走上露台仍受阻。若要打通，須先決定是否可局部修整這段外圈菜槽、底板及植栽。
 - Root `npm test`、`npm run build`、`git diff --check` 通過。實際 Chrome 場景的直行步道六個測點都有原有步道，步道接縫抽樣高差 6 mm，坡道口三點高差 0–2 mm，抽樣通行線無取苗架或收邊植栽。Production bundle 排除葵的模組和模型。
-- 1920 × 1080／DPR 1 Chrome 實景和 sidecar 在 `~/city2127-evidence/resident-aoi/r2/`，同鏡頭前後、俯視、夜景與坡道口均無頁面錯誤。[同鏡頭及俯視對照](../../artifacts/resident-aoi/r2/entrance-comparison.jpg)、[目標圖比較](../../artifacts/resident-aoi/r2/entrance-target-comparison.jpg)、[夜景](../../artifacts/resident-aoi/r2/entrance-night.jpg)及[變化總覽](../../artifacts/change-review/index.html#rectenna-farm)已更新。驗證對應本段所在的 R2 本機提交；本輪未測展場硬件或 headed FPS。
+- 1920 × 1080／DPR 1 Chrome 實景和 sidecar 在 `~/city2127-evidence/resident-aoi/r2/`，同鏡頭前後、俯視、夜景與坡道口均無頁面錯誤。[同鏡頭及俯視對照](../../artifacts/resident-aoi/r2/entrance-comparison.jpg)、[目標圖比較](../../artifacts/resident-aoi/r2/entrance-target-comparison.jpg)、[夜景](../../artifacts/resident-aoi/r2/entrance-night.jpg)及[變化總覽](../../artifacts/change-review/index.html#Q02-C)已更新。驗證對應本段所在的 R2 本機提交；本輪未測展場硬件或 headed FPS。
 
 ## R3 — 西坡道開口（2026-11-16）
 
@@ -49,20 +49,20 @@
 - Blender 5.2.2 LTS，沿用內嵌 `export_glb.py`，輸出 Y-up、無壓縮的 [GLB](../../asset/models/rectenna-farm-canopy/rectenna-farm-canopy.glb)。最終 4,842,648 bytes、13 材質、10,468 個植栽實例，Three.js 計入實例後 549,148 三角面。原模型座標界限保持 X ±32.24、Y −0.23…33.60、Z ±32.38 m。空白 Blender 場景回讀成功，亦確認 Chrome 載入新版。
 - [GLB 射線測試](../../tests/rectennaWestRamp.test.mjs)通過 43,710 點，覆蓋兩條行走帶、水平平台、內側出口，以及門檻前沿。原坡道在城市尺度長約 26.2 m、升 2.36 m，量得 9.01% 斜率。行走面高度與預期面相差小於 2 mm，抽樣的 2.25 m 垂直淨空沒有底板、菜槽、植栽或欄杆侵入。Chrome 量得碎石與坡道交界 24 點高差 2.8–2.9 mm，六個直行步道抽樣點皆有路面，取苗架及 DEV 葵正常載入。
 - 新平台與護欄通過 Blender Asset QA 的 render profile，線框及實景也已查看。接受純色無 UV、欄杆接合處的隱藏貼面和架空平台的地面高度警告。全組檢查仍有 R2 已見的主露台板／矮牆共面報告，並保留其他坡段原有反向面，本輪範圍為西坡道。
-- Root `npm test`、`npm run build`、`git diff --check` 通過。Production bundle 排除葵。靜態 Chrome 1920 × 1080／DPR 1 實景及 sidecar 位於 `~/city2127-evidence/resident-aoi/r3/`，見[變化總覽](../../artifacts/change-review/index.html#rectenna-farm)的同鏡頭前後、坡道視角、俯視與露台出口。驗證對應本段所在的 R3 本機提交。展場硬件、headed FPS 和正式投票流程未實測。
+- Root `npm test`、`npm run build`、`git diff --check` 通過。Production bundle 排除葵。靜態 Chrome 1920 × 1080／DPR 1 實景及 sidecar 位於 `~/city2127-evidence/resident-aoi/r3/`，見[變化總覽](../../artifacts/change-review/index.html#Q02-C)的同鏡頭前後、坡道視角、俯視與露台出口。驗證對應本段所在的 R3 本機提交。展場硬件、headed FPS 和正式投票流程未實測。
 
 ## 葵的日照版（2026-11-16）
 
 - 從 R3 本機提交 `5f701b6` 繼續，保留未追蹤的 `Dev_QA.md`。刷新 `origin` 後，`origin/main` 為 `1811cdf`，起點為 0 behind／3 ahead，無遠端同名分支。交付留在本機。
 - 葵向步道側微移，近鏡抬高，落種移到菜畦邊的低位。約 5.18 秒開始落種，5.68 秒落到菜畦並切至天幕與鄰樹同框。原位的單格六角板隨即亮起，約 5.83–6.65 秒把暖斜陽投在本畦。使用有陰影的聚光照亮既有菜葉與土面，鄰樹仍用城景的環境光。日文字幕為「あの日の陽ざしを借りて、この種をもう一度。」
 - 1920 × 1080／DPR 1 Chrome 固定鏡頭在 12:00 比較 5.15／7 秒（隱藏字幕）。JPEG 中菜葉取樣 x990–1031／y933–967 的平均 RGB 由 (107.7, 156.2, 76.7) 變為 (160.3, 185.8, 79.9)，鄰樹 x823–865／y737–790 每個色道變化小於 1。另留掌心、落種、22:00 夜景及擷取 sidecar。無字幕連續播放錄得 378 張 CDP 畫面，零頁面錯誤；已核對入口、落種及亮板段落。原始證據在 `~/city2127-evidence/resident-aoi/sun-final/`。
-- Root `npm test`、`npm run build`、`git diff --check` 通過；production bundle 排除葵的程式及模型。驗證對應本節所在的本機提交。交由 owner 審閱 [無字幕定格與同鏡頭對照](../../artifacts/change-review/index.html#rectenna-farm)。展場硬件及正式投票仍待獨立驗證。
+- Root `npm test`、`npm run build`、`git diff --check` 通過；production bundle 排除葵的程式及模型。驗證對應本節所在的本機提交。交由 owner 審閱 [無字幕定格與同鏡頭對照](../../artifacts/change-review/index.html#Q02-C)。展場硬件及正式投票仍待獨立驗證。
 
 ## 種子與拉遠鏡頭（2026-11-16）
 
 - 從本機 `2f4a2dc` 繼續。刷新後 `origin/main` 為 `1811cdf`，起點 0 behind／4 ahead。保留 `Dev_QA.md`，交付留在本機。
 - 17 顆細粒取代緊貼成一排的種子。各粒以不同速度散落。5.68 秒落種完成後，鏡頭連續拉遠，到 7.25 秒看清天幕、菜畦及鄰樹。接着才亮板。暖光束從板下延伸，其後聚光照亮既有菜葉。
-- 無字幕 Chrome 連續播放錄得 485 張 CDP 畫面，零頁面錯誤。另以 1920 × 1080／DPR 1 定格掌心、落種及廣角亮板前後。原始證據在 `~/city2127-evidence/resident-aoi/pullback/`。[變化總覽](../../artifacts/change-review/index.html#rectenna-farm)
+- 無字幕 Chrome 連續播放錄得 485 張 CDP 畫面，零頁面錯誤。另以 1920 × 1080／DPR 1 定格掌心、落種及廣角亮板前後。原始證據在 `~/city2127-evidence/resident-aoi/pullback/`。[變化總覽](../../artifacts/change-review/index.html#Q02-C)
 - Root `npm test`、`npm run build`、`git diff --check` 通過，production bundle 排除葵的程式及模型。驗證對應本節所在的本機提交。這輪 Chrome 審閱為日間 DEV 場景。
 
 ## 合併與正式觸發待辦（2026-11-16）

@@ -186,7 +186,7 @@ Apple M6、Chrome 157 headless（ANGLE Metal）、1920 × 1080／DPR 1，預設�
 
 ### Session Git state
 
-2026-11-21 從 `main` 的 `aee2662a2355bf8c82ee6e223ca295afc50c0eee` 開始。Fetch 後確認本機 0 ahead／7 behind，快轉至 `6239fa81` 再開分支。未追蹤的 `Dev_QA.md` 暫存後原位還原。核對 [入口交接](entrance-polish.md) 的 `ae88154e` 已在新基準內。
+2026-11-21 從 `main` 的 `aee2662a2355bf8c82ee6e223ca295afc50c0eee` 開始。Fetch 後確認本機 0 ahead／7 behind，快轉至 `6239fa81` 再開分支。未追蹤的 `Dev_QA.md` 暫存後原位還原。核對 [入口交接](archive/entrance-polish.md) 的 `ae88154e` 已在新基準內。
 
 ### 試作範圍
 

@@ -18,13 +18,13 @@ Target: the supplied [Rectenna Farm Canopy GLB](../../asset/models/rectenna-farm
 | Small offshore receiver | Reuse | [energyPrototype](../../src/energyPrototype.ts) wing |
 | Site approach tie-in | Reuse | Existing city paving and access materials; verify the tie-in from local terrain and keep the farm envelope within the probed dimensions |
 
-See the [handoff](../../docs/handoffs/rectenna-farm-placement.md) for the state table, siting verification and R1 acceptance rows.
+See the [handoff](../../docs/handoffs/archive/rectenna-farm-placement.md) for the state table, siting verification and R1 acceptance rows.
 
 
 ## R2 approved direction
 
-Reuse the same GLB at 2× on the south-edge grass (centre X −152, Z 408 m), 44 m south of the scale trial. The doubled height is 67.2 m. Face the lower ramp west toward the surveyed pavement and move the overlapping backdrop groves as whole units. The R1 camera and footprint above document the previous trial. See the [R2 handoff](../../docs/handoffs/rectenna-farm-placement.md#r2--south-edge-placement-2026-11-15).
+Reuse the same GLB at 2× on the south-edge grass (centre X −152, Z 408 m), 44 m south of the scale trial. The doubled height is 67.2 m. Face the lower ramp west toward the surveyed pavement and move the overlapping backdrop groves as whole units. The R1 camera and footprint above document the previous trial. See the [R2 handoff](../../docs/handoffs/archive/rectenna-farm-placement.md#r2--south-edge-placement-2026-11-15).
 
 ## R3 entrance landscape — approved for integration
 
-Keep the R2 shell, scale, orientation and position. Preserve the through path west of the farm; taper back its farm-facing apron and the leftover secondary paving around the column feet. A gravel spur joins the pale forecourt and lower ramp. On the north side, three roughly 2.6 × 8–9 m beds, exposed soil, an irrigation edge and three fruit trees bring cultivation outside the membrane. Keep the south side low and open for the entrance and canopy views. See the [R3 handoff](../../docs/handoffs/rectenna-farm-placement.md#r3--public-garden-entrance-2026-11-15).
+Keep the R2 shell, scale, orientation and position. Preserve the through path west of the farm; taper back its farm-facing apron and the leftover secondary paving around the column feet. A gravel spur joins the pale forecourt and lower ramp. On the north side, three roughly 2.6 × 8–9 m beds, exposed soil, an irrigation edge and three fruit trees bring cultivation outside the membrane. Keep the south side low and open for the entrance and canopy views. See the [R3 handoff](../../docs/handoffs/archive/rectenna-farm-placement.md#r3--public-garden-entrance-2026-11-15).
