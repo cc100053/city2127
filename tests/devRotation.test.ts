@@ -1,5 +1,5 @@
 // DEV `?rotation` (src/devRotation.ts): every one of the 27 options plays as a valid live result whose outcome is the pressed option.
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import { localRotationRun, ROTATION_SET } from '../src/devRotation.ts';
 import { parseSurveyEvent } from '../src/surveyView.ts';
 import { residentResult } from '../src/surveyAtmosphere.ts';

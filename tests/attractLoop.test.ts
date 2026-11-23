@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import * as T from 'three';
 import { AttractLoop, CTA_FADE, DRIFT_YAW, EASE_IN, LOOP_SECONDS, SEGMENTS, YAW_PERIOD, attractSegment, ctaOpacity, driftPosition } from '../src/attractLoop.ts';
 import { HERO_TARGET, heroSettledCamera } from '../src/heroCamera.ts';

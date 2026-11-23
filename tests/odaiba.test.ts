@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { Box3, Group, InstancedMesh, Matrix4, Mesh, Quaternion, Raycaster, Scene, Vector3 } from 'three';

@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import { Box3, Group, InstancedMesh, Matrix4, Mesh, MeshPhysicalMaterial, Raycaster, Texture, Vector3 } from 'three';
 import { MeshBVH, acceleratedRaycast } from 'three-mesh-bvh';
 import { arc, chrome, trim } from '../src/cityRig.ts';

@@ -1,5 +1,5 @@
 import { SHELF_TRANSITION_SECONDS } from '../src/siteBuilders/shelfTimeline.ts';
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import * as T from 'three';
 import { CityChangeManager } from '../src/cityChangeManager.ts';
 import { ladderShare, rungStep } from '../src/districtMeters.ts';

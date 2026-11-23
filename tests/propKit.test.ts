@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import * as T from 'three';
 import { SiteAssetLoaderCache } from '../src/siteAssets/assetLoader.ts';
 import { instanceProps, loadPropKit } from '../src/siteAssets/propKit.ts';

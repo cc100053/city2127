@@ -1,5 +1,5 @@
 // P2 desktop copy/review/focus and pre-upgrade A/B draft recovery on a real scratch SQLite.
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import { evidenceDir } from '../scripts/evidence.mjs';
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';

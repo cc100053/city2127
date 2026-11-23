@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import { Box3, BoxGeometry, Group, InstancedMesh, Matrix4, Mesh, MeshBasicMaterial, PerspectiveCamera, Scene, Vector3 } from 'three';
 import { projectShotBox, shotSamples, cityShotFrame } from '../src/devShotFrame.ts';
 import { devLayout } from '../src/devMeters.ts';

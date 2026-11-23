@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import * as T from 'three';
 import { BUILD_BEAT, BUILD_MASS, BuildChoreography, buildBeat, buildProgress } from '../src/buildTransition.ts';
 import { AutomationDistrict, ConcentrationDistrict, SharingDistrict } from '../src/districtMeters.ts';

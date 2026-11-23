@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import { Mesh, Raycaster, Scene, Vector3 } from 'three';
 import { changeSites, HOLOGRAMS } from '../src/layout.ts';
 import { heroSettledCamera } from '../src/heroCamera.ts';

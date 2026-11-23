@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import { initialLadder, ladderLayout, ladderStep } from '../survey/src/shared/cityView.ts';
 import { foldSlotSeeds } from '../survey/src/survey/scoreEngine.ts';
 import { displayScore, labLayout, replay, scaleStats, simulateVotes } from '../src/scaleLab.ts';

@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import * as T from 'three';
 import { changeSites } from '../src/layout.ts';
 import { buildAutomationHub, FOLK, HUB_PLINTH, SHARED_LOT } from '../src/siteBuilders/automationHub.ts';

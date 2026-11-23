@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import { Box3, Group, InstancedMesh, Line3, Matrix4, Mesh, Object3D, Ray, Scene, Sphere, Vector3 } from 'three';
 import { MeshBVH } from 'three-mesh-bvh';
 import { HOUSING_KEYFRAMES, housingPrototype } from '../src/housingPrototype.ts';

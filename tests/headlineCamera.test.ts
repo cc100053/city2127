@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import { Group, PerspectiveCamera, Spherical, Vector3 } from 'three';
 import { DISPLAY_MS, RESULT_LEASE_MS } from '../survey/src/shared/displayTiming.ts';
 import { emptyEnergyConfiguration, type EnergyConfiguration } from '../survey/src/shared/energy.ts';
