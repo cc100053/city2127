@@ -218,3 +218,8 @@ R4 加闊兩道斜框上緣，讓銀色折面從下層框延至樓板邊，沿�
 - 整合版 root `npm test`、`npm run build`、差異空白、圖檔規格及 12 個本機文件連結全部通過。整份 `dist/` 與 Chrome 驗證的正式 build 逐檔一致。
 - 開發 Mac 的實體 Chrome 視窗用 1920 × 1080／DPR 1 量固定 Hero。每個時段量四段 120 幀並略去首段，12:00 為 53.3–57.6 FPS，21:25 為 55.7–59.9 FPS。實測記錄在 `~/city2127-evidence/hull-facade/r10/fps.json`。
 - 主線 CI 驗證 `278815813ac3be7e82bdd3e308c01773152c567e`，工作分支 CI 驗證 `683f15c88dce67289eef43dda1b2ae2072530d97`。兩次 root、survey、module-swap 的測試與 build、差異空白及圖檔規格全部通過。[主線 CI](https://github.com/cc100053/city2127/actions/runs/45120282706) · [工作分支 CI](https://github.com/cc100053/city2127/actions/runs/45119781863)
+
+## R11 · 連續橢圓弧與船身曲帶
+
+- 業主 cc100053 指示打磨靠廣場的列車口，由 [Target](../../artifacts/hull-facade/target.jpg) 的完整橢圓感、上下展闊的銀帶及雙緣着手。以 2026-11-23 已 fetch 並核對遠端的 `origin/main`（`e92eb4cfbba56a3df8627249c2f805c36b79766c`）開獨立工作樹 `codex/hull-facade-r11`。基準含 R10 程式 `88486657`；主工作區 `main` 在 `2df6d8b6`，領先 0、落後 31，保留未追蹤的 `Dev_QA.md` 和 `Presentation.md`。
+- 用 R10 固定 Hero 和斜前方鏡位驗證。保護 R9 靠海側視線、R10 越過角肋的下框、原口面至遮蔽面的 9.1 m、18 × 14 m 包絡及兩條軌道。保留另一端、大堂及公共退台。屬船身獨有的程序曲面，沿用現有銀框、深灰襯板及導光批次。
