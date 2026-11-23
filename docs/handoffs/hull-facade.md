@@ -264,3 +264,9 @@ R12 在 Blender 用一張四邊面網格連起雙銀緣、凹槽及兩段曲帶�
 - 開發 Mac 的 Chrome 157.0.8103.79（Apple M6／ANGLE Metal）以 1600 × 900／DPR 1 核對 12:00、18:00、21:25 的正式 build。三次 GLB 請求均回傳 200，畫布持續更新。另阻擋 GLB 請求，確認程式使用 R11 外框並繼續繪製。原斜前方 DEV 鏡位在 18:00 和 21:25 記錄 168／160 個實時幀，頭車跨過口面並進到遮蔽面後。正常載入及入洞的頁面例外、shader 及本機資源錯誤為零。記錄在 `~/city2127-evidence/hull-facade/r12/browser-satin.json`。
 - 八張 2400 × 1350／DPR 1 原圖及 sidecar 均來自乾淨的 `409dffdc`，頁面例外為零，原圖在 `~/city2127-evidence/hull-facade/r12/review-satin/`。R11／R12 的 Hero 都在 18:00、場景時間 20 秒擷取，斜前方以相同鏡位核對日昏及夜間入洞。廣場對照核對日夜大堂及夜間簷下入口。Blender 材質與線框檢視在 `~/city2127-evidence/hull-facade/r12/blender/`。[固定 Hero 與 Target](../../artifacts/hull-facade/r12-hero.jpg) · [日昏及夜間入洞](../../artifacts/hull-facade/r12-bow.jpg) · [廣場入口回歸](../../artifacts/hull-facade/r12-entry.jpg)
 - 原斜前方仍可見一段柔和的頂弧反光。固定 Hero 的前景步道遮住部分下框，業主目視驗收及展覽機驗證待完成。
+
+### R12 整合
+
+- 工作分支 `8966d11f46620d975779c803ba72c2e59ee2ccb9` 已推送。以重新 fetch 的 `a49a4ff8` 在獨立工作樹整合為 `ec981f03b09ddd80c2d3766944aeda4df89b636a`。
+- 整合版 root `npm test`、`npm run build`、差異空白、圖檔規格及 14 個本機文件連結通過。正式 build 與 Chrome 驗證過的 build 逐檔一致。
+- 開發 Mac 的實體 Chrome 視窗用 1920 × 1080／DPR 1 量固定 Hero。12:00 和 21:25 各量四段 120 幀，兩次首段為 58.5 FPS，其後三段均為 60.0 FPS。同期本機執行整合檢查。記錄在 `~/city2127-evidence/hull-facade/r12/fps.json`。
