@@ -7,6 +7,7 @@ import { DISPLAY_MS } from '../shared/displayTiming.ts';
 import { buildProposalRequest } from './guestFlow.ts';
 import { optionIcon } from './guestIcons.ts';
 import { renderTendency, renderVoices } from './guestTendency.ts';
+import type { HandView } from './hand/ui/types.ts';
 
 const app = document.querySelector<HTMLElement>('#app')!;
 app.classList.add('guest');
@@ -192,6 +193,23 @@ function page(title: string, eyebrow: string, ...content: (HTMLElement | string)
         el('h1', { tabindex: '-1' }, title),
         ...content)),
   );
+  notifyHand();
+}
+
+/** `?hand` (住民の窓): the hand UI draws welcome and questions from this snapshot and acts through the controls above. */
+let handView: ((view: HandView) => void) | undefined;
+function notifyHand() { if (handView) handView(handSnapshot()); }
+function handSnapshot(): HandView {
+  const question = screen === 'question' && session ? session.questions[questionIndex] : undefined;
+  return {
+    screen, busy, stationId, cityGuestCount, notice, idleWarning,
+    needsPage: !!notice && ['session_expired', 'already_answered', 'unsupported_version'].includes(lastErrorCode ?? ''),
+    question: question && session ? {
+      index: questionIndex, total: session.questions.length, id: question.id, text: question.text, background: question.background,
+      options: question.options.map(option => ({ id: option.id, label: option.label })), chosen: draft.get(question.id), editing: editingFromReview,
+    } : undefined,
+    slots: session ? session.questions.map(item => ({ id: item.id, chosen: draft.get(item.id) })) : [],
+  };
 }
 
 function focusTitle() {
@@ -384,6 +402,7 @@ function renderQuestion(focus = true) {
       next.disabled = false;
       persistRecovery();
       resetIdleTimer();
+      notifyHand();
     });
     const title = choiceTitles[option.id];
     const icon = optionIcon(option.id);
@@ -690,6 +709,7 @@ connectEvents(event => {
     // Update the welcome line in place; re-rendering would move focus and the Start button under a finger.
     const line = app.querySelector<HTMLElement>('.guest-city-count');
     if (line) line.textContent = cityCountText();
+    notifyHand();
   }
   if (event.type === 'explore') {
     // A null target means nobody holds the screen any more (戻る, a new result, a reset or the next Start).
@@ -722,6 +742,7 @@ if (stationId) setInterval(async () => {
 if (new URLSearchParams(location.search).has('hand')) {
   void import('./hand/handGuest.ts').then(({ mountHandGuest }) => mountHandGuest({
     app, onActivity: resetIdleTimer, cityGuestCount: () => cityGuestCount, dev: new URLSearchParams(location.search).has('dev-hand'),
+    subscribe: listener => { handView = listener; notifyHand(); },
   })).catch(error => console.error('Hand control:', error));
 }
 

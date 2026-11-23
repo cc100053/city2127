@@ -190,7 +190,7 @@ body.guest-page--holo .hand-layer > :not(.hand-status):not(.hand-video) { displa
 .p2-card.is-lock .p2-brk { border-color: var(--amber); }
 .p2-card.is-lock .p2-ticks i.on { background: var(--amber); box-shadow: 0 0 6px rgba(232,184,116,.9); }
 .p2-back { position: absolute; left: 0; bottom: 70px; width: 62px; height: 430px; display: grid; place-items: center; writing-mode: vertical-rl;
-  font-size: 13px; letter-spacing: .3em; color: var(--mute); border-right: 1px solid var(--line); transition: color .2s, background .2s; }
+  font-size: 13px; letter-spacing: .3em; color: var(--mute); border-right: 1px solid var(--line); background: rgba(12,17,18,.82); transition: color .2s, background .2s; }
 .p2-back.is-hover { color: var(--teal); background: rgba(127,214,196,.06); }
 .p2-ghost { position: absolute; z-index: 13; pointer-events: none; border-radius: 12px; overflow: hidden; background-size: cover; background-position: center;
   border: 2px solid var(--amber); will-change: transform, opacity; }

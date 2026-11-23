@@ -65,10 +65,11 @@ export class RegisterPage {
   private skelTarget: { x: number; y: number }[] | undefined;
   private skelOffset = { x: 0, y: 0 };
   private thumbLeft = false;
-  private lastSeenAt = -Infinity;
   private registeredAt = 0;
   private started = false;
   private number = 0;
+  /** Registrations since load (DEV stats). */
+  registrations = 0;
 
   constructor(private stage: Stage, private actions: PageActions) {
     this.worldEl = document.createElement('div');
@@ -101,7 +102,7 @@ export class RegisterPage {
     this.q = <E extends Element>(s: string) => (this.root.querySelector<E>(s) ?? this.fxEl.querySelector<E>(s) ?? this.worldEl.querySelector<E>(s))!;
     this.ticks = all<SVGLineElement>(this.root, '.p1-ticks line');
     this.jaws = all<HTMLElement>(this.root, '.p1-jaw');
-    this.dots = all<SVGCircleElement>(this.root, '.p1-skel circle');
+    this.dots = all<SVGCircleElement>(this.root, '.p1-hand circle');
     this.bones = all<SVGLineElement>(this.root, '.p1-bone');
     this.glowBones = all<SVGLineElement>(this.root, '.p1-glow line');
     this.mems = all<SVGGElement>(this.fxEl, '.p1-fx-mem g').map(g => ({ g, c: all<SVGCircleElement>(g, 'circle') }));
@@ -111,8 +112,7 @@ export class RegisterPage {
     const rdLines = all<HTMLElement>(this.fxEl, '.p1-rd-line'), rdTexts = all<HTMLElement>(this.fxEl, '.p1-rd');
     this.rds = rdTexts.map((text, k) => { text.querySelector('b')!.textContent = NAMES[k]; return { line: rdLines[k], text, value: text.querySelector('span')! }; });
     // Data leaves from the inner rails: their layout positions in stage px (the world is unscaled when this runs).
-    this.railPoints = stage.railSpans.map((span, i) => ({ x: i < 12 ? 50 : W - 50, y: 300 + (i % 12) * 18.9 + 9.5 }));
-    this.root.addEventListener('pointerdown', () => undefined);
+    this.railPoints = stage.railSpans.map((_, i) => ({ x: i < 12 ? 50 : W - 50, y: 300 + (i % 12) * 18.9 + 9.5 }));
   }
 
   mount() {
@@ -133,6 +133,7 @@ export class RegisterPage {
   /** Back to the idle scan (new guest, failed start or abandoned pinch). */
   reset() {
     this.scan.reset();
+    this.stage.resident = undefined;
     this.started = false; this.registeredAt = 0; this.pull = 0; this.lastPhase = ''; this.lastStep = -1; this.amber = false;
     for (const g of this.glyphs) { g.live = false; g.el.style.opacity = '0'; g.line.style.opacity = '0'; }
     for (const m of this.mems) m.g.setAttribute('opacity', '0');
@@ -159,10 +160,9 @@ export class RegisterPage {
   frame(f: StageFrame) {
     const { dt, now } = f;
     const phase0 = this.scan.phase;
-    if (f.present) this.lastSeenAt = now;
     const palm = !!f.cursor && this.canStart();
     this.scan.update(dt, palm, f.present, now, T.regScanMs, T.regLockMs);
-    if (f.pinch && this.scan.pinch()) { this.registeredAt = now; this.number = (this.view?.cityGuestCount ?? 0) + 1; }
+    if (f.pinch && this.scan.pinch()) { this.registrations++; this.registeredAt = now; this.number = (this.view?.cityGuestCount ?? 0) + 1; this.stage.resident = `住民 #${String(this.number).padStart(4, '0')}`; }
     const phase = this.scan.phase;
     if (phase === 'lock' && phase0 !== 'lock') this.pullAtLock = this.pull;
     if (phase === 'release' && phase0 === 'lock') this.setVoice(true, true);

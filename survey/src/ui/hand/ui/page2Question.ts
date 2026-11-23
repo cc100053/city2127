@@ -70,6 +70,7 @@ export class QuestionPage {
   mount() {
     this.stage.page.append(this.root, this.warn);
     this.stage.root.dataset.page = 'question';
+    this.stage.hudLabel.textContent = this.stage.resident ?? '住民の声';
     this.key = '';
   }
   unmount() {
@@ -90,8 +91,8 @@ export class QuestionPage {
     if (this.warn.hidden === showWarn) { this.warn.hidden = !showWarn; this.collectTargets(); }
     this.stage.setDots(view.slots.map(s => {
       const q2 = view.question && s.id === view.question.id ? view.question : undefined;
-      const index = q2 ? q2.options.findIndex(o => o.id === s.chosen) : -1;
-      return { id: s.id, letter: s.chosen ? (index >= 0 ? letterOf(index) : s.chosen) : undefined };
+      // The current question's slot fills when its chip lands, not when the draft changes.
+      return { id: s.id, letter: s.chosen && !q2 ? s.chosen : undefined };
     }), q?.index ?? -1);
     if (!q) return;
     const key = `${q.index}:${q.id}:${q.editing}`;
@@ -135,6 +136,7 @@ export class QuestionPage {
       card.label.textContent = '';
       return card;
     });
+    this.now = performance.now();
     this.lockUntil = this.now + T.readMs;
     this.locked = true;
     this.armNeeded = false;

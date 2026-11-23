@@ -62,3 +62,27 @@ M2 的停留選擇、磁吸半徑 56 px 與 0.8 秒自動前進已由下列行�
 - 游標錨點改為手掌中心（食指與中指 MCP 的中點，`HandPointer({ anchor: 'palm' })`），捏合時不跳動；仍取 100 ms 前位置凍結。
 - 狀態提示「手のひらで操作中」／「休止中 — 手のひらを向けると操作」；第一題標題下加「手を下ろすと休止」。只捏合選擇、閱讀鎖與住民登録流程不變（登錄時同一手掌直接捏合）。
 - 驗證：`npm test`（`handPose` 測試改為手掌／握拳／放低／捏合中彎曲食指）、`npm run build`、`git diff --check` 通過；`npm run test:hand-browser` 連續兩次通過（握拳與捏合不登錄、握拳與放低無游標、手掌 2.5 秒只預覽）。
+
+## 住民の窓 production（Phase 1：第 1、2 頁，分支 `claude/hand-ui`）
+
+基於 `claude/hand-m3` 並合併 `origin/main`。`/guest` 未加 `hand` 時行為不變（瀏覽器測試確認不載入手部層、舞台與卡片圖片）。
+
+- 架構：`guestDebugView.ts` 仍擁有流程、伺服器呼叫與計時；新增 `?hand` 專用的檢視掛鉤（`page()`、選項 change、人數事件後通知），型別見 `hand/ui/types.ts`。全息介面一律經頁面既有控制項操作（點擊 `はじめる`、隱藏 radio、`form.requestSubmit()`、`前の質問へ`、`続ける`）。
+- 舞台 `hand/ui/stage.ts`：1180x820 設計畫布等比縮放置中（1180x746 時左右留黑邊）；背景、資料欄、HUD、游標、場膜與全頁唯一 rAF（文件隱藏時暫停）。每幀只寫 transform／opacity；版面座標於換畫面時以 offset 取得並快取。歡迎與問題畫面由舞台繪製，`#app` 隱藏；確認、上望、handoff 仍為 M3。發生需「新しい予約で草稿を続ける」的錯誤時改回頁面 DOM。
+- 第 1 頁 `page1Register.ts`、`scan.ts`：張開手掌任意位置集氣 4 秒（24 格機械收緊、全畫面向光環收縮、城市數據吸入最多 44 粒、生體讀數），鎖定 150 ms 琥珀色，三層場膜釋放 700 ms 後才接受捏合 → 住民番号（`cityGuestCount + 1`，僅顯示）→ 1.5 秒後點擊 `はじめる`。光環內骨架為鏡像的 MediaPipe 21 點（未見手時不顯示）。準備捏合時手離開 4 秒重來；「タッチで始める」保留。
+- 第 2 頁 `page2Question.ts`：卡片砌出（夾爪 → 連線 → 逐層列印＋文字解碼 → 字母）兼作 1 秒閱讀鎖；鎖後須先移離所有目標才顯示預覽；停留時掃描線由線框揭示圖片；捏合 → 鎖定 → 場膜 → 晶片飛入 HUD 進度格 → 表單前進。揭示用兩層相反 translate，不用 clip-path；不使用動畫 filter。
+- 卡片圖：`scripts/buildHandCards.mjs`（macOS `sips` + Homebrew `cwebp`）由參考圖產生 `hand/assets/<題>-<選項>.webp`（已烘焙灰階、對比與青色漸層）與 `-wire.webp`（Sobel 線框），輸出已提交。目前僅 Q02、Q03、Q06 有圖，其餘選項使用藍圖線稿。伺服器加入 `.webp` MIME。
+- 調整：`&tune` 顯示面板，值存於 localStorage `handUiTune`；第 1 頁鍵名加 `reg` 前綴；第 3–5 頁鍵已列入預設表但尚未使用。`&fps` 顯示描畫 fps、p95 幀時間與推論頻率。
+- 字型：專案未自帶字型，使用系統後備（Hiragino、Menlo），不依賴網路。
+
+### Phase 1 驗證（2026-11-23，Mac）
+
+- `survey/`：`npm test`（新增 `tests/handScan.test.ts`）、`npm run build`、`git diff --check` 通過。
+- `npm run test:hand-browser` 連續兩次通過：握拳與掃描中捏合不登錄 → 4 秒掃描、鎖定、釋放 → 捏合登錄 → 四題（每題閱讀鎖內捏合無效；第一題驗證移離規則、握拳無游標、停留只預覽）→ M3 確認 → 送出 → 上望 → 減光 → handoff，記錄 1 筆提案，無頁面錯誤。
+- headless Chromium（Mac，1180x820，DPR 2）rAF 幀時間 p95：第 1 頁掃描 16.7 ms、第 2 頁砌出 16.7 ms、選擇與晶片飛行 16.8 ms（最大 33.4 ms）。此數據不代表 iPad。
+- 截圖：`survey/artifacts/hand-ui/p1-*.png`、`p2-*.png` 與 `contact-sheet.png`（未提交；截圖時延長鎖定與晶片時間）。
+- 未驗證：iPad Safari 上的真實手部、效能與觸控。
+
+### 下一步
+
+rex 於 iPad 測試第 1、2 頁；之後 Phase 2 實作第 3–5 頁（確認、上望、handoff）。

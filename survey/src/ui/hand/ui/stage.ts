@@ -68,6 +68,8 @@ export class Stage {
   readonly hudLabel: HTMLElement;
   readonly dots: HTMLElement[];
   readonly pose: HTMLElement;
+  /** `住民 #0042` once registered (display only). */
+  resident?: string;
   scale = 1;
   private offX = 0;
   private offY = 0;

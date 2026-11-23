@@ -59,11 +59,6 @@ body.guest-page--hand { display: block; padding: 0; overflow: hidden; }
   border-left: 0; border-radius: 0 10px 10px 0; white-space: normal;
 }
 
-.hand-rest-hint { margin: 2px 0 0; color: #8f9a92; font-size: 14px; }
-.hand-readlock { display: flex; align-items: center; gap: 14px; margin: 4px 0 0; }
-.hand-readlock span { position: relative; width: 220px; height: 4px; overflow: hidden; border-radius: 2px; background: #33403a; }
-.hand-readlock i { position: absolute; inset: 0; background: var(--guest-muted); transform-origin: left; transform: scaleX(0); }
-.hand-readlock em { color: #8f9a92; font-size: 14px; font-style: normal; }
 
 /* ---- review: 2x2 answer cards + big submit --------------------------------------------------------------------- */
 .guest--hand[data-screen='review'] .guest-screen, .guest--hand[data-screen='submitting'] .guest-screen { display: flex; flex-direction: column; }
@@ -102,58 +97,7 @@ body.guest-page--hand { display: block; padding: 0; overflow: hidden; }
 .hand-status { position: absolute; left: 16px; bottom: 10px; margin: 0; color: #bac1bb; font-size: 13px; }
 .hand-video { position: absolute; width: 2px; height: 2px; opacity: 0; }
 
-/* ---- 住民登録 (welcome) ---------------------------------------------------------------------------------------------- */
-.hand-welcome { position: absolute; inset: 52px 0 0; background: #1b211e; background-image: radial-gradient(ellipse at 92% 0%, #2f4239, transparent 50%); }
-.hand-welcome[hidden], .hand-lookup[hidden] { display: none; }
-.hw-scan { position: absolute; inset: 0; display: grid; grid-template-columns: 470px 1fr; align-items: center; gap: 40px; padding: 0 70px; }
-.hw-scanner { position: relative; justify-self: center; width: 360px; height: 360px; }
-.hw-ring { position: absolute; inset: 0; width: 100%; height: 100%; }
-.hw-ring circle { fill: none; }
-.hw-ring-track { stroke: #2f3833; stroke-width: 10; }
-.hw-ring-arc { stroke: #94c9c2; stroke-width: 10; stroke-linecap: round; filter: drop-shadow(0 0 8px #94c9c299); }
-.hw-ring-tick { stroke: #4a554e; stroke-width: 2; }
-.hand-welcome[data-state='scanning'] .hw-ring { animation: hw-spin 6s linear infinite; }
-@keyframes hw-spin { to { transform: rotate(360deg); } }
-.hw-palm { position: absolute; left: 50%; top: 50%; width: 150px; height: 180px; transform: translate(-50%, -50%); }
-.hw-palm rect { fill: none; stroke: #6d7d74; stroke-width: 3; stroke-dasharray: 7 6; }
-.hand-welcome[data-state='idle'] .hw-palm { animation: hw-breathe 2.4s ease-in-out infinite; }
-@keyframes hw-breathe { 50% { opacity: .55; } }
-.hand-welcome:not([data-state='idle']) .hw-palm rect { stroke: #94c9c2; stroke-dasharray: none; fill: #94c9c214; }
-.hw-scanline { position: absolute; left: 70px; right: 70px; top: 80px; height: 3px; display: none; background: linear-gradient(90deg, transparent, #94c9c2, transparent);
-  box-shadow: 0 0 18px 4px #94c9c266; animation: hw-scan 1.5s ease-in-out infinite alternate; }
-.hand-welcome[data-state='scanning'] .hw-scanline { display: block; }
-@keyframes hw-scan { to { top: 270px; } }
-.hw-pinch { position: absolute; left: 50%; bottom: -8px; display: none; width: 150px; transform: translateX(-50%); }
-.hand-welcome[data-state='pinch'] .hw-pinch { display: block; }
-.hw-pinch path { fill: none; stroke: #dfbd85; stroke-width: 7; stroke-linecap: round; }
-.hw-pinch-thumb { animation: hw-pa 1.2s ease-in-out infinite; }
-.hw-pinch-index { animation: hw-pb 1.2s ease-in-out infinite; }
-.hw-pinch-spark { fill: #dfbd85; opacity: 0; animation: hw-spark 1.2s ease-in-out infinite; }
-@keyframes hw-pa { 50% { transform: translate(5px, -4px); } }
-@keyframes hw-pb { 50% { transform: translate(-5px, 4px); } }
-@keyframes hw-spark { 45%, 60% { opacity: 1; } }
-.hw-copy { display: grid; gap: 18px; }
-.hw-eyebrow { margin: 0; color: #dfbd85; font-size: 14px; font-weight: 500; letter-spacing: 3px; }
-.hw-title { margin: 0; font-size: 40px; font-weight: 500; line-height: 1.35; }
-.hand-welcome[data-state='pinch'] .hw-title { color: #dfbd85; }
-.hw-lead { margin: 0; color: #d8ddd5; font-size: 19px; line-height: 1.7; }
-.hw-steps { display: flex; gap: 10px; margin: 8px 0 0; padding: 0; list-style: none; }
-.hw-steps li { display: flex; align-items: center; gap: 10px; padding: 10px 16px; color: #bac1bb; font-size: 15px; border: 1px solid #3d4841; border-radius: 6px; background: #232a27; }
-.hw-steps b { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; color: #1b211e; background: #4a554e; font-size: 13px; }
-.hw-steps li.now { color: #f0eee6; border-color: #94c9c2; }
-.hw-steps li.now b { background: #94c9c2; }
-.hw-steps li.done b { background: #637b70; }
-.hw-privacy { margin: 6px 0 0; color: #8f9a92; font-size: 13px; }
-.hw-registered { position: absolute; inset: 0; display: none; place-content: center; justify-items: center; gap: 16px; text-align: center; }
-.hand-welcome[data-state='registered'] .hw-scan, .hand-welcome[data-state='done'] .hw-scan { display: none; }
-.hand-welcome[data-state='registered'] .hw-registered, .hand-welcome[data-state='done'] .hw-registered { display: grid; }
-.hw-registered .hw-lead { margin-top: 10px; }
-.hw-number-label { margin: 18px 0 0; color: #bac1bb; font-size: 16px; letter-spacing: 2px; }
-.hw-number { margin: 0; font: 500 120px/1 ui-monospace, Menlo, monospace; letter-spacing: 8px; text-shadow: 0 0 30px #94c9c255; animation: hw-number .9s ease-out both; }
-@keyframes hw-number { from { opacity: 0; letter-spacing: 40px; } }
-.hw-touch { position: absolute; right: 28px; bottom: 22px; min-height: 48px; padding: 0 22px; color: #bac1bb; font: inherit; font-size: 14px;
-  border: 1px solid #59675f; border-radius: 6px; background: transparent; pointer-events: auto; }
-
+.hand-lookup[hidden] { display: none; }
 /* ---- look up at the city display, then dim ------------------------------------------------------------------------------ */
 .hand-lookup { position: absolute; inset: 0; overflow: hidden; background: radial-gradient(ellipse at 50% 0%, #2e4a41 0%, #1b211e 60%); }
 .hand-lookup::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 6px; background: linear-gradient(90deg, transparent, #94c9c2, transparent); box-shadow: 0 0 30px 10px #94c9c288; }
