@@ -314,4 +314,11 @@ R12 在 Blender 用一張四邊面網格連起雙銀緣、凹槽及兩段曲帶�
 - 最終程式 `d68c96e638a5d836778e7391ff9077aa82f0600e` 的 root `npm test`（含 `assertGuard`）、`npm run build` 及差異空白檢查通過。使用船首 GLB 時，巨構維持 17 組合批，非 instanced 三角面由 76,309 增至 76,311。
 - 八張 2400 × 1350／DPR 1 原圖及 sidecar 取自乾淨的 `d68c96e6`，頁面例外為零，存於 `~/city2127-evidence/hull-facade/r14/review/`。固定 Hero 用 18:00、場景時間 20 秒。同一斜前方以 65.70／66.20／67.06 秒核對接近、跨口面及深入，另以 21:25 的 66.20 秒核對原圈選區。廣場及簷下同鏡保有入口門框、簷篷及暖光大堂，少量陰影有差異。[固定 Hero 全幅與等位局部](../../artifacts/hull-facade/r14-hero.jpg) · [黃昏、夜間與原圈選區](../../artifacts/hull-facade/r14-bow.jpg) · [列車入洞三時點](../../artifacts/hull-facade/r14-train.jpg) · [廣場及大堂入口](../../artifacts/hull-facade/r14-entry.jpg)
 
+- 開發 Mac Chrome 157.0.8103.79（Apple M6／ANGLE Metal）以 1600 × 900／DPR 1 驗證最終 build 的 12:00、18:00 和 21:25，畫布持續更新，三次 GLB 載入均為 200。阻擋 GLB 時程序外框仍繪製。在 18:00 和 21:25 的斜前方實時測試各記錄 168 幀，頭車由船身局部 X > 94 m 進至 X < 77 m，越過 9.1 m 咽口。頁面、shader 和本機資源錯誤為零。記錄在 `~/city2127-evidence/hull-facade/r14/browser-final.json`，保護區射線核對在同目錄的 `hull-r14-protected.json`。
+
 原斜前方仍可辨認靠海側的深色回折邊及底部的細小暖色亮點。業主目視驗收及展覽機驗證待完成。
+
+### R14 整合
+
+- 工作分支提交 `65e01741` 已推送。從重新 fetch 的 `3a1503ef` 在獨立工作樹整合為 `11d7ae724f6820236b4229cc2e2f1b0bcd90a278`。
+- 整合版 root `npm test`、`npm run build`、差異空白、圖檔規格及本機文件連結通過。整份 `dist/` 與 Chrome 驗證的 build 逐檔 SHA-256 一致。
