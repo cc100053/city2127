@@ -2,7 +2,6 @@
 // layer print + text decode → letter pop; the build-in doubles as the 1 s read lock), idles as a wireframe and boots
 // into the picture while an open palm dwells on it. A pinch locks the card (page-1 mechanical lock, amber), releases
 // field membranes, compresses it into a data chip that flies into its HUD slot, then the page's own form advances.
-// Hover is suppressed after the read lock until the cursor has left every target once (must-move-off rule).
 import { nearestBox } from '../handTargets.ts';
 import type { Point } from '../handPointer.ts';
 import { BLUEPRINTS, cardArt } from './cardArt.ts';
@@ -52,7 +51,6 @@ export class QuestionPage {
   private hover: Target | null = null;
   private lockUntil = 0;
   private locked = true;
-  private armNeeded = false;
   private busy = false;
   private gen = 0;
   private cooldownUntil = 0;
@@ -102,7 +100,7 @@ export class QuestionPage {
 
   debug() {
     return { question: this.question?.id, locked: this.locked, built: this.cards.length > 0 && this.cards.every(c => c.built), busy: this.busy,
-      hover: this.hover ? `${this.hover.act}${this.hover.card ? `:${this.hover.card.i}` : ''}` : undefined, armNeeded: this.armNeeded };
+      hover: this.hover ? `${this.hover.act}${this.hover.card ? `:${this.hover.card.i}` : ''}` : undefined };
   }
 
   // ---- screen ---------------------------------------------------------------------------------------------
@@ -139,7 +137,6 @@ export class QuestionPage {
     this.now = performance.now();
     this.lockUntil = this.now + T.readMs;
     this.locked = true;
-    this.armNeeded = false;
     this.collectTargets();
   }
 
@@ -195,15 +192,10 @@ export class QuestionPage {
   frame(f: StageFrame) {
     const { dt, now } = f;
     this.now = now;
-    if (this.locked && now >= this.lockUntil && this.cards.length) {
-      this.locked = false;
-      this.armNeeded = true;
-    }
+    if (this.locked && now >= this.lockUntil && this.cards.length) this.locked = false;
     // Cursor, hover and pinch.
     const cursor = this.busy ? undefined : f.cursor;
-    let target = cursor ? this.hit(cursor) : null;
-    if (this.armNeeded) { if (target) target = null; else if (cursor) this.armNeeded = false; }
-    if (!cursor && !this.busy) target = null;
+    const target = cursor ? this.hit(cursor) : null;
     this.setHover(target);
     if (f.pinch && cursor && this.hover) this.activate(this.hover);
     this.stage.setCursor(cursor, f.pinchClosed ? 'pinch' : this.hover ? 'over' : '');

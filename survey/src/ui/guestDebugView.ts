@@ -23,6 +23,7 @@ type GuestRecovery = {
 };
 const stationParam = new URLSearchParams(location.search).get('station');
 const stationId = stationParam === 'A' || stationParam === 'B' ? stationParam : undefined;
+const handMode = new URLSearchParams(location.search).has('hand');
 const recoveryKey = `city2127.guest-draft.v2${stationId ? `.${stationId}` : ''}`;
 let resultReadyAt = 0;
 let resultEndsAt = 0;
@@ -340,6 +341,12 @@ async function restoreRecovery(recovery: GuestRecovery) {
   }
 
   if (!checked.ok && checked.error.code === 'proposal_undone') return showUndone();
+  // Hand kiosk: a draft whose session the server no longer knows (a reset or fresh run) starts over at 住民登録,
+  // since a guest using the hand cannot leave a stale draft (hand presence keeps the idle timer from abandoning it).
+  if (handMode && !checked.ok && checked.error.code === 'session_not_found' && !pendingRequest) {
+    clearRecovery(); session = undefined; draft = new Map(); conflictState = undefined; lastErrorCode = undefined; notice = undefined;
+    screen = 'welcome'; renderWelcome(); return;
+  }
   if (pendingRequest) {
     screen = 'review';
     renderReview(false);
@@ -739,7 +746,7 @@ if (stationId) setInterval(async () => {
 
 // Hand control (M2): `?hand` lazy-loads the camera hand layer, whose dwell/pinch clicks run through the handlers
 // above; touch keeps working, and without `?hand` nothing of it loads. `&dev-hand` is a DEV-ONLY synthetic-hand hook.
-if (new URLSearchParams(location.search).has('hand')) {
+if (handMode) {
   void import('./hand/handGuest.ts').then(({ mountHandGuest }) => mountHandGuest({
     app, onActivity: resetIdleTimer, cityGuestCount: () => cityGuestCount, dev: new URLSearchParams(location.search).has('dev-hand'),
     subscribe: listener => { handView = listener; notifyHand(); },

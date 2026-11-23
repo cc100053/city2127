@@ -46,6 +46,14 @@ try {
   assert.equal(await page.locator('.hand-layer, .holo').count(), 0, 'no hand layer or stage without ?hand');
   assert.deepEqual(images, [], 'no card images without ?hand');
 
+  // A stale draft from an earlier run (its session unknown to this server) must not trap the hand kiosk: back to 住民登録.
+  await page.evaluate(() => {
+    const q = id => ({ id, text: id, options: [{ id: 'A', label: 'a' }, { id: 'B', label: 'b' }, { id: 'C', label: 'c' }] });
+    localStorage.setItem('city2127.guest-draft.v2.A', JSON.stringify({
+      session: { session: { id: 'gone-session' }, questions: ['Q01', 'Q02', 'Q03', 'Q04'].map(q),
+        state: { revision: 0, scores: { automation: 0, publicSharing: 0, environmentalPriority: 0, urbanConcentration: 0 } } },
+      choices: [['Q01', 'A']], questionIndex: 1, screen: 'question' }));
+  });
   await page.goto(`${base}/guest?station=A&hand&dev-hand`);
   await page.waitForFunction(() => document.querySelector('#app')?.dataset.screen === 'welcome' && '__handDev' in window);
   const screen = () => page.evaluate(() => document.querySelector('#app').dataset.screen);
@@ -63,7 +71,7 @@ try {
   };
   /** Open palm on p, then close the pinch (a fresh closing edge) and open again. */
   const pinchAt = async p => { await hold(p, 'palm'); await sleep(300); await hold(p, 'palm', true); await sleep(150); await hold(p, 'palm'); };
-  const ring = await fromStage(320, 410), textZone = await fromStage(590, 150);
+  const ring = await fromStage(320, 410);
 
   // Page 1 住民登録: a fist or a pinch before the scan does nothing; a 4 s open palm scans, locks and releases, then a pinch registers.
   await waitFor(async () => (await holo()).page === 'register' && (await holo()).phase === 'idle', 'registration stage');
@@ -97,18 +105,15 @@ try {
     assert.equal(await input.isChecked(), false, 'pinch during the read lock ignored');
     await waitFor(async () => (await holo()).locked === false, 'read lock end', 3000);
     if (q === 0) {
-      // Must move off: a palm already on a card when the lock ends previews nothing until it has left every target.
+      // A palm already on a card previews it as soon as the read lock ends (no move-off rule, rex 2026-11-23).
       await sleep(300);
-      assert.equal((await holo()).hover, undefined, 'no preview until the cursor moves off');
+      assert.equal((await holo()).hover, `pick:${index}`, 'preview right after the read lock');
       await hold(p, 'rest'); await sleep(600);
       assert.equal(await page.locator('.hs-cursor.is-gone').count(), 1, 'fist = rest, no cursor');
-      await hold(textZone, 'palm'); await sleep(500);
       await hold(p, 'palm'); await sleep(1500);
       assert.equal((await holo()).hover, `pick:${index}`, 'an open palm previews the card');
       assert.equal(await input.isChecked(), false, 'hovering never selects');
       await shot('07-card-hover');
-    } else {
-      await hold(textZone, 'palm'); await sleep(300);
     }
     await pinchAt(p);
     await waitFor(() => input.isChecked(), `question ${q + 1} pick`, 2000);
