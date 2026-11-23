@@ -131,12 +131,15 @@ export function buildHullFacade({ tier, from, to, height, entrance, point, surfa
       const centre = T.MathUtils.lerp(fromHeight, toHeight, rise) * vertical;
       const u = T.MathUtils.lerp(a, b, t);
       const entry = isLobby ? 1 - T.MathUtils.smoothstep(Math.abs(u - entrance), 2.45, 6.5) : 0;
+      // Extend the head of the last screen and the lobby sill into the rail portal's rolled rim.
+      const bow = T.MathUtils.smoothstep(u, 73, 82);
       return {
         u,
         lower: T.MathUtils.lerp(Math.max(toe + .48, centre - below * vertical * taper * (1.26 - .52 * t)), toe + .08, entry),
         upper: Math.min(crown - .48, centre + above * vertical * taper * (.68 + .64 * t)),
-        sillRim: tipRim + 1.16 * taper * (1 - t),
-        headRim: tipRim + (rake ? (3.8 + 1.65 * t) * Math.sin(Math.PI * t) : 1.71 * taper * t),
+        sillRim: tipRim + 1.16 * taper * (1 - t) + (tier === 0 && isLobby ? 1.65 * bow : 0),
+        headRim: tipRim + (rake ? (3.8 + 1.65 * t) * Math.sin(Math.PI * t) : 1.71 * taper * t)
+          + (tier === 1 && kind === 'screen' ? 1.85 * bow : 0),
       };
     };
     const samples = Array.from({ length: segments + 1 }, (_, i) => profile(i / segments));

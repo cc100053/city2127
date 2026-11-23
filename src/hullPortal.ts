@@ -133,7 +133,7 @@ type Profile = {
 const seawardShoulderDepth = -.55;
 const foldSlope = Math.tan(T.MathUtils.degToRad(35));
 
-function outline({ u, side, crown, sill, radius, fold }: Profile, inlandOnly = false) {
+function outline({ u, side, crown, sill, radius, fold }: Profile) {
   const corners = [[1, 1], [-1, 1], [-1, -1], [1, -1]].map(([d, y], corner) =>
     Array.from({ length: 9 }, (_, step) => {
       const angle = (corner + step / 8) * Math.PI / 2;
@@ -141,10 +141,6 @@ function outline({ u, side, crown, sill, radius, fold }: Profile, inlandOnly = f
       const rise = y * (height + (y > 0 ? crown : sill) - radius) + Math.sin(angle) * radius;
       return new T.Vector3(u, mid + rise, centre + across);
     }));
-  if (inlandOnly) {
-    const top = corners[0].reverse(), bottom = corners[3].reverse();
-    return [top[0].clone().setZ(centre), ...top, ...bottom, bottom[bottom.length - 1].clone().setZ(centre)];
-  }
   return corners.flatMap((arc, corner) => {
     // Sample the horizontal runs so the turned end blends into the original curve before the far jamb.
     const points = corner % 2 === 0
@@ -193,7 +189,7 @@ function loft(rows: T.Vector3[][]) {
     normals.setXYZ(i, normal.x, normal.y, normal.z);
     normals.setXYZ(end, normal.x, normal.y, normal.z);
   }
-  return geometry.applyMatrix4(root);
+  return { geometry: geometry.applyMatrix4(root), indices };
 }
 
 type Finish = 'frame' | 'panel' | 'guide' | 'dark';
@@ -207,56 +203,75 @@ function buildBowFrame(surface: (finish: Finish, geometry: T.BufferGeometry) => 
     return setbacks.map(setback => ({ x, y, setback, outward }));
   });
 
-  // Match each column on the flank to the same part of the rolled section on the end wall.
-  type Section = readonly [width: number, relief: number, axialSpread: number, advance: number];
-  const inner: Section[] = [[0, 0, 0, .13], [.19, .16, .14, .40], [.37, .56, .30, .73],
-    [.69, .75, .52, .98], [.98, .68, .72, 1], [1.12, .42, .89, .76]];
-  const groove: Section[] = [inner[inner.length - 1], [1.29, .25, 1.04, .63], [1.52, .28, 1.16, .69]];
-  const outer: Section[] = [groove[groove.length - 1], [1.66, .73, 1.29, 1.02], [1.91, 1.08, 1.48, 1.27],
-    [2.34, 1.16, 1.78, 1.30], [2.95, .96, 2.14, 1.14], [3.6, .54, 2.43, .79],
-    [4.12, .18, 2.68, .22], [4.45, -.13, 2.85, -.45]];
-  // Keep the crown and sill outside the R9 cut as the loft turns onto the end wall.
-  const turn = (from: T.Vector3[][], to: T.Vector3[][]) => {
-    const start = from[from.length - 1], end = to[0];
-    const curves = start.map((point, j) => {
-      const reach = Math.min(2.4, point.distanceTo(end[j]) * .38);
-      const outgoing = point.clone().sub(from[from.length - 2][j]).normalize();
-      const incoming = end[j].clone().sub(to[1][j]).normalize();
-      return new T.CubicBezierCurve3(point, point.clone().addScaledVector(outgoing, reach),
-        end[j].clone().addScaledVector(incoming, reach), end[j]);
-    });
-    return Array.from({ length: 7 }, (_, i) => curves.map(path => path.getPoint((i + 1) / 8)));
-  };
-  const sweep = (finish: Finish, section: Section[]) => {
-    const side = stations.map(({ x, y, setback, outward }) => section.map(([width, relief]) => {
-      const shoulder = Math.exp(-((y - 22) ** 2) / 5) + .6 * Math.exp(-((y - 11.5) ** 2) / 3);
-      const spread = width * (1 + .25 * shoulder);
-      const u = x + outward.x * spread, rise = y + outward.y * spread;
+  // Sample both silver lips and the recessed gasket in the same rolled section.
+  // Shared vertex normals carry the shoulders across the material boundaries.
+  const section: [width: number, relief: number, advance: number][] = [
+    [0, 0, .13], [.23, .24, .43], [.50, .55, .72], [.80, .56, .81],
+    [1.05, .39, .72], [1.24, .23, .58], [1.48, .27, .61],
+    [1.69, .55, .84], [2.04, .81, 1.05], [2.60, .90, 1.13],
+    [3.22, .76, 1.01], [3.86, .46, .69], [4.42, .13, .17], [4.72, -.05, -.20],
+  ];
+  const side = stations.map(({ x, y, setback, outward }) => {
+    const upper = Math.exp(-(((y - 22.2) / 2.5) ** 2));
+    const lower = Math.exp(-(((y - 10.3) / 1.75) ** 2));
+    const crown = T.MathUtils.smoothstep(y, 22.2, 25.05);
+    return section.map(([width, relief]) => {
+      const spread = T.MathUtils.smoothstep(width, 1.65, 4.72);
+      const u = x + outward.x * width - spread * (3.8 * upper + 2.9 * lower);
+      const rise = y + outward.y * width * (1 - .39 * crown) + .035 * setback
+        + spread * (1.25 * upper - 1.05 * lower);
       const skin = T.MathUtils.lerp(hullFront(0, u), hullFront(1, u), setback) - .88;
-      return new T.Vector3(u, rise + .035 * setback, skin - relief);
-    }));
-    const profiles = section.map(([, , spread, advance]) => outline({
-      u: face + advance, side: .32 + 1.08 * spread, crown: .32 + 1.28 * spread,
-      sill: .32 + .83 * spread, radius: .7 + 1.46 * spread,
-    }, true));
-    const end = profiles[0].map((_, i) => profiles.map(profile => profile[i]));
-    // Carry the sill around the outside of the corner stiffener before turning back onto the flank.
-    const elbow = end[end.length - 1].map((point, j) =>
-      new T.Vector3(point.x + .92, T.MathUtils.lerp(point.y, side[0][j].y, .2), -.58));
-    const elbowTangent = new T.Vector3(-.8, 0, -.6);
-    const pastElbow = elbow.map(point => point.clone().add(elbowTangent));
-    const beforeElbow = elbow.map(point => point.clone().sub(elbowTangent));
-    const geometry = loft([...side, ...turn(side, end), ...end, ...turn(end, [elbow, pastElbow]),
-      elbow, ...turn([beforeElbow, elbow], side)]);
+      return new T.Vector3(u, rise, skin - relief);
+    });
+  });
+  // The near side stays swept into the seaward cut. The end-wall half follows an ellipse,
+  // sized to put the new visible shoulders outside the original rectangular opening.
+  const end = Array.from({ length: 33 }, (_, i) => {
+    const angle = Math.PI * i / 32;
+    return section.map(([width, , advance], j) => {
+      const crown = side[side.length - 1][j].y + .22;
+      const sill = 8.48 - .52 * width;
+      const d = centre + (13.8 + .87 * width) * Math.sin(angle);
+      const y = mid + Math.cos(angle) * (angle < Math.PI / 2 ? crown - mid : mid - sill);
+      // Keep the crest skimming the outside of the end wall as it leaves the flank.
+      const crest = 1 - T.MathUtils.smoothstep(angle, 0, Math.PI / 4);
+      return new T.Vector3(face + T.MathUtils.lerp(advance, Math.max(advance, .05), crest), y, d);
+    });
+  });
+  // Pass outside the upper bulkhead corner before sweeping across its face.
+  const lastSide = side[side.length - 1];
+  const bulkheadCorner = hullFront(1, HULL.length / 2);
+  const shoulder = end[0].map((point, j) => new T.Vector3(
+    point.x + .22, T.MathUtils.lerp(lastSide[j].y, point.y, .3), Math.min(bulkheadCorner - .28, lastSide[j].z + .23),
+  ));
+  // Carry the sill around the outside of the corner stiffener before turning back onto the flank.
+  const elbow = end[end.length - 1].map((point, j) =>
+    new T.Vector3(point.x + .92, T.MathUtils.lerp(point.y, side[0][j].y, .12), -.78));
+
+  const columns = section.map((_, j) => new T.CatmullRomCurve3([
+    ...side.map(row => row[j]), shoulder[j], ...end.map(row => row[j]), elbow[j],
+  ], true));
+  const samples = (side.length + end.length + 2) * 3;
+  const rows = Array.from({ length: samples }, (_, i) => columns.map(curve => curve.getPoint(i / samples)));
+  const { geometry, indices } = loft(rows);
+  const bands = [
+    { finish: 'frame', from: 0, to: 5 },
+    { finish: 'dark', from: 5, to: 6 },
+    { finish: 'frame', from: 6, to: section.length - 1 },
+  ] satisfies { finish: Finish; from: number; to: number }[];
+  const stride = (section.length - 1) * 6;
+  for (const { finish, from, to } of bands) {
+    const strip: number[] = [];
+    for (let i = 0; i < indices.length; i += stride) {
+      strip.push(...indices.slice(i + from * 6, i + to * 6));
+    }
+    geometry.setIndex(strip);
     const flat = geometry.toNonIndexed();
     subtract(flat, axialCut);
     surface(finish, flat);
     flat.dispose();
-    geometry.dispose();
-  };
-  sweep('frame', inner);
-  sweep('dark', groove);
-  sweep('frame', outer);
+  }
+  geometry.dispose();
 }
 
 function buildFlankLining(surface: (finish: Finish, geometry: T.BufferGeometry) => void) {
@@ -328,7 +343,7 @@ export function buildHullBowPortal(surface: (finish: Finish, geometry: T.BufferG
   const back = { ...liner, u: recess };
   const finishBand = (finish: Finish, outer: Profile, inner: Profile) => {
     const a = outline(outer), b = outline(inner);
-    const geometry = loft(a.map((point, i) => [point, b[i]]));
+    const { geometry } = loft(a.map((point, i) => [point, b[i]]));
     const flat = geometry.toNonIndexed();
     subtract(flat, flankCut);
     surface(finish, flat);
