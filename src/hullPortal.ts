@@ -133,7 +133,7 @@ type Profile = {
 const seawardShoulderDepth = -.55;
 const foldSlope = Math.tan(T.MathUtils.degToRad(35));
 
-function outline({ u, side, crown, sill, radius, fold }: Profile) {
+function outline({ u, side, crown, sill, radius, fold }: Profile, inlandOnly = false) {
   const corners = [[1, 1], [-1, 1], [-1, -1], [1, -1]].map(([d, y], corner) =>
     Array.from({ length: 9 }, (_, step) => {
       const angle = (corner + step / 8) * Math.PI / 2;
@@ -141,6 +141,10 @@ function outline({ u, side, crown, sill, radius, fold }: Profile) {
       const rise = y * (height + (y > 0 ? crown : sill) - radius) + Math.sin(angle) * radius;
       return new T.Vector3(u, mid + rise, centre + across);
     }));
+  if (inlandOnly) {
+    const top = corners[0].reverse(), bottom = corners[3].reverse();
+    return [top[0].clone().setZ(centre), ...top, ...bottom, bottom[bottom.length - 1].clone().setZ(centre)];
+  }
   return corners.flatMap((arc, corner) => {
     // Sample the horizontal runs so the turned end blends into the original curve before the far jamb.
     const points = corner % 2 === 0
@@ -155,23 +159,24 @@ function outline({ u, side, crown, sill, radius, fold }: Profile) {
         const plane = face - .06 + (point.z - seawardShoulderDepth) * foldSlope - fold.inset;
         point.x = T.MathUtils.lerp(u, plane, turn);
       }
-      return point.applyMatrix4(root);
+      return point;
     });
   });
 }
 
-function band(outer: Profile, inner: Profile) {
-  const a = outline(outer), b = outline(inner);
-  const edges = a.map((point, i) => [point, b[i]] as const);
-  edges.push(edges[0]); // Keep the metre UV continuous across the strip's closing segment.
-  const uv = hullFrameUv(edges);
+function loft(rows: T.Vector3[][]) {
+  const stride = rows[0].length;
+  const strips = [...rows, rows[0]];
+  const grain = hullFrameUv(strips.map(row => [row[0], row[stride - 1]]));
   const positions: number[] = [], coords: number[] = [], indices: number[] = [];
-  for (const [i, [outerPoint, innerPoint]] of edges.entries()) {
-    positions.push(...outerPoint.toArray(), ...innerPoint.toArray());
-    coords.push(uv[i].along, uv[i].low, uv[i].along, uv[i].high);
-    if (i + 1 < edges.length) {
-      const start = i * 2;
-      indices.push(start, start + 1, start + 2, start + 2, start + 1, start + 3);
+  for (const [i, row] of strips.entries()) {
+    const { along, low, high } = grain[i];
+    for (const [j, point] of row.entries()) {
+      positions.push(...point.toArray());
+      coords.push(along, T.MathUtils.lerp(low, high, j / (stride - 1)));
+      if (i === 0 || j === 0) continue;
+      const d = i * stride + j, c = d - 1, b = d - stride, a = b - 1;
+      indices.push(a, b, c, c, b, d);
     }
   }
   const geometry = new T.BufferGeometry();
@@ -182,16 +187,77 @@ function band(outer: Profile, inner: Profile) {
 
   const normals = geometry.getAttribute('normal');
   const normal = new T.Vector3(), endNormal = new T.Vector3();
-  for (let i = 0; i < 2; i++) {
-    const end = a.length * 2 + i;
+  for (let i = 0; i < stride; i++) {
+    const end = rows.length * stride + i;
     normal.fromBufferAttribute(normals, i).add(endNormal.fromBufferAttribute(normals, end)).normalize();
     normals.setXYZ(i, normal.x, normal.y, normal.z);
     normals.setXYZ(end, normal.x, normal.y, normal.z);
   }
-  return geometry;
+  return geometry.applyMatrix4(root);
 }
 
 type Finish = 'frame' | 'panel' | 'guide' | 'dark';
+
+function buildBowFrame(surface: (finish: Finish, geometry: T.BufferGeometry) => void) {
+  const stations = flank.flatMap(({ x, y }, i) => {
+    const before = flank[Math.max(0, i - 1)], after = flank[Math.min(i + 1, flank.length - 1)];
+    const outward = new T.Vector2(before.y - after.y, after.x - before.x).normalize();
+    // Return across the exposed deck nose before continuing up the upper skin.
+    const setbacks = y === 15 ? [0, .12, .42, .72, .93, 1] : [y < 15 ? 0 : 1];
+    return setbacks.map(setback => ({ x, y, setback, outward }));
+  });
+
+  // Match each column on the flank to the same part of the rolled section on the end wall.
+  type Section = readonly [width: number, relief: number, axialSpread: number, advance: number];
+  const inner: Section[] = [[0, 0, 0, .13], [.19, .16, .14, .40], [.37, .56, .30, .73],
+    [.69, .75, .52, .98], [.98, .68, .72, 1], [1.12, .42, .89, .76]];
+  const groove: Section[] = [inner[inner.length - 1], [1.29, .25, 1.04, .63], [1.52, .28, 1.16, .69]];
+  const outer: Section[] = [groove[groove.length - 1], [1.66, .73, 1.29, 1.02], [1.91, 1.08, 1.48, 1.27],
+    [2.34, 1.16, 1.78, 1.30], [2.95, .96, 2.14, 1.14], [3.6, .54, 2.43, .79],
+    [4.12, .18, 2.68, .22], [4.45, -.13, 2.85, -.45]];
+  // Keep the crown and sill outside the R9 cut as the loft turns onto the end wall.
+  const turn = (from: T.Vector3[][], to: T.Vector3[][]) => {
+    const start = from[from.length - 1], end = to[0];
+    const curves = start.map((point, j) => {
+      const reach = Math.min(2.4, point.distanceTo(end[j]) * .38);
+      const outgoing = point.clone().sub(from[from.length - 2][j]).normalize();
+      const incoming = end[j].clone().sub(to[1][j]).normalize();
+      return new T.CubicBezierCurve3(point, point.clone().addScaledVector(outgoing, reach),
+        end[j].clone().addScaledVector(incoming, reach), end[j]);
+    });
+    return Array.from({ length: 7 }, (_, i) => curves.map(path => path.getPoint((i + 1) / 8)));
+  };
+  const sweep = (finish: Finish, section: Section[]) => {
+    const side = stations.map(({ x, y, setback, outward }) => section.map(([width, relief]) => {
+      const shoulder = Math.exp(-((y - 22) ** 2) / 5) + .6 * Math.exp(-((y - 11.5) ** 2) / 3);
+      const spread = width * (1 + .25 * shoulder);
+      const u = x + outward.x * spread, rise = y + outward.y * spread;
+      const skin = T.MathUtils.lerp(hullFront(0, u), hullFront(1, u), setback) - .88;
+      return new T.Vector3(u, rise + .035 * setback, skin - relief);
+    }));
+    const profiles = section.map(([, , spread, advance]) => outline({
+      u: face + advance, side: .32 + 1.08 * spread, crown: .32 + 1.28 * spread,
+      sill: .32 + .83 * spread, radius: .7 + 1.46 * spread,
+    }, true));
+    const end = profiles[0].map((_, i) => profiles.map(profile => profile[i]));
+    // Carry the sill around the outside of the corner stiffener before turning back onto the flank.
+    const elbow = end[end.length - 1].map((point, j) =>
+      new T.Vector3(point.x + .92, T.MathUtils.lerp(point.y, side[0][j].y, .2), -.58));
+    const elbowTangent = new T.Vector3(-.8, 0, -.6);
+    const pastElbow = elbow.map(point => point.clone().add(elbowTangent));
+    const beforeElbow = elbow.map(point => point.clone().sub(elbowTangent));
+    const geometry = loft([...side, ...turn(side, end), ...end, ...turn(end, [elbow, pastElbow]),
+      elbow, ...turn([beforeElbow, elbow], side)]);
+    const flat = geometry.toNonIndexed();
+    subtract(flat, axialCut);
+    surface(finish, flat);
+    flat.dispose();
+    geometry.dispose();
+  };
+  sweep('frame', inner);
+  sweep('dark', groove);
+  sweep('frame', outer);
+}
 
 function buildFlankLining(surface: (finish: Finish, geometry: T.BufferGeometry) => void) {
   const point = (u: number, y: number, d: number) => new T.Vector3(u, y, d).applyMatrix4(root);
@@ -222,9 +288,6 @@ function buildFlankLining(surface: (finish: Finish, geometry: T.BufferGeometry) 
     strip('panel', edge.map(({ x, y }) => [
       point(x, y, flankDepth), point(x, y, skin(x)),
     ]));
-    strip('frame', edge.map(({ x, y }) => [
-      point(x, y, rim(x)), point(x - .74, y, rim(x - .74)),
-    ]));
     strip('guide', edge.map(({ x, y }) => [
       point(x + .17, y, skin(x) + .12), point(x - .09, y, rim(x)),
     ]));
@@ -232,7 +295,6 @@ function buildFlankLining(surface: (finish: Finish, geometry: T.BufferGeometry) 
 
   const deck = lower[lower.length - 1];
   const deckEnds = [hullFront(0, deck.x), hullFront(1, deck.x)].map(d => d - 1.12);
-  strip('frame', deckEnds.map(d => [point(deck.x, deck.y + .02, d), point(deck.x - .74, deck.y + .02, d)]));
   strip('guide', deckEnds.map(d => [point(deck.x + .17, deck.y + .05, d), point(deck.x - .09, deck.y + .05, d)]));
 
   // Line the part of the soffit and sill that is now exposed from the side.
@@ -259,31 +321,27 @@ function buildFlankLining(surface: (finish: Finish, geometry: T.BufferGeometry) 
 }
 
 export function buildHullBowPortal(surface: (finish: Finish, geometry: T.BufferGeometry) => void) {
-  const flange = { u: face - .34, side: 2.9, crown: 3.6, sill: 2.1, radius: 3.9, fold: { reach: 2.1, inset: 2.55 } };
-  const shoulder = { u: face + .83, side: 2.12, crown: 2.9, sill: 1.86, radius: 3.2, fold: { reach: 2.18, inset: 0 } };
-  const lip = { u: face + 1.02, side: .99, crown: 1.36, sill: 1.02, radius: 2.1, fold: { reach: 0, inset: 0 } };
   const throat = { u: face + .13, side: .32, crown: .32, sill: .32, radius: .7, fold: { reach: .49, inset: .06 } };
   const guideTop = { u: face + .08, side: .40, crown: .40, sill: .40, radius: .80, fold: { reach: .38, inset: .08 } };
   const guideBottom = { u: face - .06, side: .14, crown: .14, sill: .14, radius: .39, fold: { reach: 0, inset: .08 } };
   const liner = { u: face - 1.12, side: 0, crown: 0, sill: 0, radius: 0 };
   const back = { ...liner, u: recess };
   const finishBand = (finish: Finish, outer: Profile, inner: Profile) => {
-    const geometry = band(outer, inner);
+    const a = outline(outer), b = outline(inner);
+    const geometry = loft(a.map((point, i) => [point, b[i]]));
     const flat = geometry.toNonIndexed();
     subtract(flat, flankCut);
     surface(finish, flat);
     flat.dispose();
     geometry.dispose();
   };
-  finishBand('panel', flange, shoulder);
-  finishBand('frame', shoulder, lip);
-  finishBand('frame', lip, throat);
   finishBand('panel', throat, guideTop);
   finishBand('guide', guideTop, guideBottom);
   finishBand('frame', guideBottom, liner);
   finishBand('panel', liner, back);
 
   buildFlankLining(surface);
+  buildBowFrame(surface);
 
   // The deep end disappears into the unmodelled hull interior beyond this entrance.
   const shadow = new T.PlaneGeometry(width, height * 2).rotateY(Math.PI / 2)
