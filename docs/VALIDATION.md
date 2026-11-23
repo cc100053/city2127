@@ -145,6 +145,8 @@ ANGLE Metal), Vite DEV, 1920×1080 viewport, deviceScaleFactor 1 (renderer pixel
 
 階梯巨構 R12（2026-11-23）以正式 Blender GLB 建造船身後再測雙緣、銀帶銜接、洞腔和下框包角。兩路實際列車的延伸段最小淨距為 1.84／3.12 m。另一端、大堂及三處退台通過 R11 區域網格比對。[巨構測試](../tests/megastructures.test.ts) · [Blender QA 和 Chrome 對照](handoffs/hull-facade.md#r12--blender-船首洞口)。
 
+階梯巨構 R13（2026-11-23）重驗 18 × 14 m 包絡、9.1 m 洞深、靠海通視、兩道導光及兩處支座落點。兩路實際頭／中／尾車 GLB 的延伸段最小淨距為 1.84／3.12 m，原口面段為 1.84／3.75 m。另一端、大堂及 15／60／105 m 公共退台通過與 R12 的逐面比對。[巨構測試](../tests/megastructures.test.ts) · [日昏夜、固定 Hero 及廣場對照](handoffs/hull-facade.md#r13--洞腔層次與軌道支座)。
+
 直立環形巨構 R6（2026-11-21，main 整合 `ca3b8663`）：根目錄測試、build、差異及圖檔檢查通過。合併後重新擷取原 Hero 日夜，覆核居民接駁門牌視線與正式 GLB 載入／R2 回退。展覽機未測。[整合記錄](handoffs/ring-glb-pilot.md)
 
 直立環形巨構 R6 候選 `dadffcc2`（2026-11-21）：根目錄 `npm test`、`npm run build`、`git diff --check` 通過。實際種植面測試覆蓋四個載入版本、四道下環種植帶及道路 ①／Yurikamome 淨空。Chrome 日夜共 1,116 條居民視線均先命中門牌，正式 build 的日夜載入及夜間 R2 回退通過。開發 Mac 1080p／DPR 1 的三個 120 幀窗口為 60.0 FPS。展覽機未測。[Gemini 目標、日夜對照及完整驗證](handoffs/ring-glb-pilot.md#round-6)

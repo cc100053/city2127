@@ -74,6 +74,58 @@ def collar():
     return rows, lips
 
 
+def rail_bearings(material):
+    """Two swept brackets from the bulkhead to the guideway deck undersides."""
+    # (u, upper, lower, half-width, depth of each track). Keep the upper edge
+    # below 9 m until beyond the extended entrance at u = 97.6 m.
+    stations = [
+        (91.95, 7.58, 3.65, 1.13, 9.45, 16.08),
+        (93.10, 7.83, 4.03, 1.07, 9.25, 15.75),
+        (95.45, 8.39, 5.44, .90, 8.87, 15.26),
+        (97.55, 8.81, 7.11, .75, 8.46, 14.81),
+        (98.26, 9.43, 7.81, .71, 8.35, 14.64),
+        (99.40, 11.01, 8.94, .72, 8.17, 14.43),
+        (100.65, 13.24, 10.53, .80, 7.97, 14.16),
+        (101.49, 14.18, 12.36, .85, 7.84, 13.98),
+        (102.12, 14.18, 13.27, .85, 7.74, 13.85),
+        (103.00, 14.18, 13.83, .77, 7.60, 13.65),
+    ]
+    for track in range(2):
+        rows = []
+        for u, top, low, half, *depths in stations:
+            d = depths[track]
+            corner = min(.20, (top - low) * .26)
+            rows.append([(u, y, z) for y, z in [
+                (top, d - half + corner), (top, d + half - corner),
+                (top - corner, d + half), (low + corner, d + half),
+                (low, d + half - corner), (low, d - half + corner),
+                (low + corner, d - half), (top - corner, d - half),
+            ]])
+        vertices = [point for row in rows for point in row]
+        sides = [(8*i+j, 8*i+(j+1)%8, 8*(i+1)+(j+1)%8, 8*(i+1)+j)
+                 for i in range(len(rows)-1) for j in range(8)]
+        faces = sides + [tuple(range(7, -1, -1)), tuple(range(len(vertices)-8, len(vertices)))]
+        name = ('Bow_Bearing_Seaward', 'Bow_Bearing_Inland')[track]
+        mesh = bpy.data.meshes.new(name)
+        mesh.from_pydata([(x, -z, y) for x, y, z in vertices], [], faces)
+        mesh.update()
+        mesh.materials.append(material)
+        uv = mesh.uv_layers.new(name='Brushed_Metres')
+        for edge in mesh.edges:
+            edge.use_edge_sharp = edge.vertices[0] % 8 == edge.vertices[1] % 8
+        for face in mesh.polygons:
+            side = face.index < len(sides)
+            face.use_smooth = side
+            if side:
+                width = (Vector(vertices[face.vertices[1]]) - Vector(vertices[face.vertices[0]])).length
+            for j, loop in enumerate(face.loop_indices):
+                x, y, z = vertices[mesh.loops[loop].vertex_index]
+                uv.uv[loop].vector = (x, width if j in (1, 2) else 0.) if side else (y, z)
+        obj = bpy.data.objects.new(name, mesh)
+        bpy.context.collection.objects.link(obj)
+        obj.select_set(True)
+
+
 def build():
     bpy.ops.wm.read_factory_settings(use_empty=True)
     bpy.context.scene.unit_settings.system = 'METRIC'
@@ -153,6 +205,7 @@ def build():
     fair = obj.modifiers.new('Fair silver across the crown and ribbon junctions', 'SUBSURF')
     fair.levels = fair.render_levels = 1
     fair.uv_smooth = 'PRESERVE_BOUNDARIES'
+    rail_bearings(mesh.materials[0])
     bpy.context.preferences.filepaths.save_version = 0
     bpy.ops.wm.save_as_mainfile(filepath=str(HERE / 'hull-bow-2127.blend'))
 
