@@ -292,3 +292,9 @@ R12 在 Blender 用一張四邊面網格連起雙銀緣、凹槽及兩段曲帶�
 - 最終程式版本的 root npm test、npm run build 及差異空白檢查通過。
 
 固定 Hero 的前景步道掠過下框，斜前方仍可見深處遮蔽板的窄弧邊。業主目視驗收及展覽機驗證待完成。
+
+### R13 整合
+
+- 工作分支最新已推送提交 dcfabdad。從重新 fetch 的 926a2eea 於獨立工作樹整合為 e6c5ef66352f0ee037afa50eeda63265c4567f1f。
+- 整合版 root npm test、npm run build、差異空白、圖檔規格及 12 個本機 Markdown 連結與錨點通過。整份 dist 與 Chrome 驗證過的正式 build 逐檔一致。
+- 開發 Mac 的實體 Chrome 視窗在 1920 × 1080／DPR 1 量固定 Hero。12:00／21:25 各量四段 120 幀，兩次首段都是 58.5 FPS，其後三段在兩個時段均為 59.9–60.0 FPS。記錄在 ~/city2127-evidence/hull-facade/r13/fps-final.json。
