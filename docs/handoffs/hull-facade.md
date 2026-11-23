@@ -116,6 +116,7 @@ R4 加闊兩道斜框上緣，讓銀色折面從下層框延至樓板邊，沿�
 - 開發 Mac Chrome 157.0.8103.79 沿 R5 sidecar 的鏡位與固定場景時間 20 秒，解析度 2400×1350／DPR 1。R5／R6 原圖與 sidecar 在 `~/city2127-evidence/hull-facade/{r5,r6}/after/`。R6 在工作分支提交前擷取，sidecar 記錄基準及 dirty 狀態。
 - 正式 build 在同一 Chrome 以 1600×900／DPR 1 檢查 12:00、18:00、21:25。三個時段都有畫布輸出，頁面例外、shader 及本機資源錯誤為零。另在 18:00 慢速水平移動主鏡，九張原尺寸取樣未見新規律條紋。記錄在 `~/city2127-evidence/hull-facade/r6/preview.json` 及 `orbit/`。
 - Root `npm test`、`npm run build`、`git diff --check` 通過。
+- 開發 Mac（Apple M6／ANGLE Metal）在同一 Chrome 實體視窗測 1920×1080／DPR 1 的正式 build。每個版本各時段量四段 120 幀，略去首段。12:00 的 R5 為 46.5–48.0 FPS、R6 為 44.4–49.0 FPS，21:25 的 R5 為 46.1–49.6 FPS、R6 為 45.0–50.4 FPS。原始量測在 `~/city2127-evidence/hull-facade/r6/fps-compare.json`。
 
 業主視覺驗收及展覽機驗證待完成。
 
@@ -123,3 +124,4 @@ R4 加闊兩道斜框上緣，讓銀色折面從下層框延至樓板邊，沿�
 
 - 工作分支提交 `2caa4e6a` 已推送。由已 fetch 的 `origin/main`（`5b5ef75e`）在獨立工作樹整合為 `014f2008`。
 - 整合版 root `npm test`、`npm run build`、差異空白、圖檔規格及 R6 連結檢查全數通過。整份 `dist/` 與 Chrome 實測的 build 逐檔一致。
+- [GitHub main CI](https://github.com/cc100053/city2127/actions/runs/45091927011) 驗證 `74b69ede`。Root、survey、module-swap 測試和 build、差異空白及圖檔規格全數通過。[工作分支 CI](https://github.com/cc100053/city2127/actions/runs/45091490804) 驗證 `2caa4e6a`，亦已通過。
