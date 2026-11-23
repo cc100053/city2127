@@ -18,7 +18,7 @@ const letterOf = (i: number) => String.fromCharCode(65 + i);
 const lines = (text: string) => {
   const out: string[] = [];
   let cur = '';
-  for (const part of text.split(/(?<=[、。？])/)) { if ((cur + part).length > 20 && cur) { out.push(cur); cur = part; } else cur += part; }
+  for (const part of text.match(/[^、。？]+[、。？]?|[、。？]/g) ?? []) { if ((cur + part).length > 20 && cur) { out.push(cur); cur = part; } else cur += part; }
   if (cur) out.push(cur);
   return out.map(s => `<span class="ln"><span>${esc(s)}</span></span>`).join('');
 };

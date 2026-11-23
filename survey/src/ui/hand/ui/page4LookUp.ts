@@ -109,7 +109,8 @@ export class LookUpPage {
     this.gen++;
     this.stage.page.append(this.root);
     this.stage.root.dataset.page = 'lookup';
-    this.root.style.opacity = '';
+    // The closing fade of the previous guest holds (fill: forwards) until cancelled; the root is reused per guest.
+    this.root.getAnimations().forEach(a => a.cancel());
     this.root.innerHTML = `<div class="hx-lkt"><p class="p2-eyebrow hx-eye"></p><h1 class="hx-lkh"></h1><p class="hx-lkp"></p></div>`;
     this.up = new Uplink(this.stage, this.root);
     this.up.setCells([['受信', 'RX'], ['反映中', 'BUILD'], ['完了', 'DONE']]);
@@ -131,6 +132,7 @@ export class LookUpPage {
     this.gen++;
     this.up?.remove(); this.up = undefined;
     this.packet?.el.remove(); this.packet = undefined;
+    this.root.getAnimations().forEach(a => a.cancel());
     this.root.remove(); this.root.replaceChildren();
   }
   tap() { /* nothing to press: the guest looks up */ }

@@ -64,6 +64,15 @@ try {
   const release = () => page.evaluate(() => window.__handDev.release());
   const state = () => page.evaluate(() => window.__handDev.state());
   const holo = async () => (await state()).holo ?? {};
+  /** Effective opacity of an element (product up to the stage) above 0.5, and inside the viewport. */
+  const shown = selector => page.evaluate(sel => {
+    const el = document.querySelector(sel);
+    if (!el) return false;
+    let op = 1;
+    for (let n = el; n && n !== document.body; n = n.parentElement) op *= Number(getComputedStyle(n).opacity);
+    const r = el.getBoundingClientRect();
+    return op > 0.5 && r.width > 0 && r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth;
+  }, selector);
   const shot = async name => { if (shots) await page.screenshot({ path: join(shots, `${name}.png`) }); };
   const waitFor = async (check, what, timeout = 6000) => {
     for (const end = Date.now() + timeout; Date.now() < end; await sleep(50)) if (await check()) return;
@@ -145,6 +154,7 @@ try {
   await hold(sendAt, 'palm'); await release();
   await waitFor(async () => (await holo()).page === 'lookup', 'look-up stage', 10_000);
   await waitFor(async () => (await holo()).phase === 'show', 'uplink show', 6000);
+  assert.ok(await shown('.hx-lkh'), 'look-up text visible');
   await sleep(800); await shot('12-look-up');
   await waitFor(async () => (await holo()).dimmed === true, 'dimmed', 6000);
   await sleep(1000); await shot('13-dimmed');
@@ -152,6 +162,7 @@ try {
   // Page 5 handoff: the share shows only on the card under the hand; an idle hand returns to 住民登録 after 8 s.
   await waitFor(async () => (await screen()) === 'handoff' && (await holo()).page === 'handoff', 'handoff', 25_000);
   await waitFor(async () => (await holo()).locked === false, 'handoff cards built', 6000);
+  assert.ok(await shown('.hx-hh'), 'handoff text visible');
   await hold(await center('.hx-vc[data-i="0"]'), 'palm'); await sleep(1200);
   assert.deepEqual((await holo()).shown, [0], 'share on the hovered card only');
   await shot('14-handoff-share');
@@ -174,13 +185,38 @@ try {
   await sleep(700); await shot('17-de-res');
   await release();
   await waitFor(async () => (await screen()) === 'welcome' && (await holo()).page === 'register', 'back to 住民登録', 8000);
+  // A second guest (touch start, four pinches, hold send): the reused look-up and handoff pages must show again.
+  await page.click('.p1-touch');
+  for (let q = 0; q < 4; q++) {
+    await waitFor(async () => (await holo()).page === 'question' && (await holo()).locked === false, `guest 2 question ${q + 1}`, 8000);
+    const before2 = await title();
+    await pinchAt(await center(`.p2-card[data-i="${q % 3}"]`));
+    await waitFor(async () => (await screen()) === 'review' || (await title()) !== before2, `guest 2 advance ${q + 1}`, 4000);
+  }
+  await waitFor(async () => (await holo()).page === 'review' && (await holo()).locked === false, 'guest 2 review', 8000);
+  const send2 = await center('.hx-submit');
+  await hold(send2, 'palm'); await sleep(300); await hold(send2, 'palm', true);
+  await waitFor(async () => (await holo()).sending === true, 'guest 2 send', 3000);
+  await hold(send2, 'palm'); await release();
+  await waitFor(async () => (await holo()).page === 'lookup' && (await holo()).phase === 'show', 'guest 2 look-up', 10_000);
+  await sleep(500);
+  assert.ok(await shown('.hx-lkh'), 'guest 2 look-up text visible (the previous fade must not linger)');
+  await shot('18-guest2-look-up');
+  await waitFor(async () => (await holo()).page === 'handoff' && (await holo()).locked === false, 'guest 2 handoff', 25_000);
+  assert.ok(await shown('.hx-hh'), 'guest 2 handoff text visible');
+  // A stage error never strands a guest: the page's own handoff takes over, and the next welcome returns to the stage.
+  await page.evaluate(() => window.__handDev.failStage());
+  assert.equal(await page.locator('.holo').isHidden(), true, 'stage hidden after an error');
+  assert.equal(await page.locator('#app').evaluate(el => getComputedStyle(el).visibility), 'visible', 'page handoff shown');
+  await page.locator('#app button', { hasText: 'はじめる画面へ' }).click();
+  await waitFor(async () => (await screen()) === 'welcome' && (await holo()).page === 'register', 'stage back for the next guest', 8000);
   const stats = await state();
-  assert.equal(stats.registered, 1);
+  assert.equal(stats.registered, 1, 'one hand registration (the second guest started by touch)');
   assert.ok(stats.pinch >= 12, `pinch actions ${stats.pinch}`);
   const city = await (await fetch(`${base}/api/city-state`)).json();
-  assert.equal(city.data.guestCount, 1, 'one proposal recorded');
+  assert.equal(city.data.guestCount, 2, 'two proposals recorded');
   assert.deepEqual(errors, []);
-  console.log(`PASS hand guest run: 住民登録 scan -> pinch register -> 4 hologram questions (pinch) -> review -> edit -> hold send -> look-up -> dim -> handoff share -> idle exit (pinch ${stats.pinch})`);
+  console.log(`PASS hand guest run: 住民登録 scan -> pinch register -> 4 hologram questions (pinch) -> review -> edit -> hold send -> look-up -> dim -> handoff share -> idle exit -> guest 2 look-up/handoff visible (pinch ${stats.pinch})`);
 } finally {
   await browser.close();
   server.kill();

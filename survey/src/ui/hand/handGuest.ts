@@ -77,16 +77,41 @@ export function mountHandGuest({ app, onActivity, subscribe, dev = false }: Hand
   let view: HandView | undefined, current: Page | undefined;
   const pageFor = (screen: string): Page => screen === 'question' ? questions : screen === 'review' || screen === 'submitting' ? review
     : screen === 'waiting' || screen === 'result' ? lookUp : screen === 'handoff' ? handoff : register;
-  const holoOn = () => !!view && HOLO_SCREENS.has(view.screen) && !view.needsPage;
-  subscribe(next => {
-    view = next;
+  /** A stage page threw: this guest finishes on the page's own (M3) screens; the next guest's welcome retries the stage. */
+  let broken = false;
+  /** The DEV log endpoint answered 404 (SURVEY_DEV_HAND unset): stop posting. */
+  let logOff = false;
+  const holoOn = () => !broken && !!view && HOLO_SCREENS.has(view.screen) && !view.needsPage;
+  function apply(next: HandView) {
     const on = holoOn();
     const want = on ? pageFor(next.screen) : undefined;
     if (want !== current) { current?.unmount(); current = want; current?.mount(); }
     stage.show(on);
     document.body.classList.toggle('guest-page--holo', on);
     current?.update(next);
+  }
+  function stageFailed(where: string, error: unknown) {
+    if (broken) return;
+    broken = true;
+    console.error('[hand] stage', where, error);
+    postLog({ kind: 'hand-error', where, page: current?.name, screen: view?.screen, message: String((error as Error)?.message ?? error).slice(0, 300),
+      stack: String((error as Error)?.stack ?? '').slice(0, 1500) });
+    try { current?.unmount(); } catch { /* already failing */ }
+    current = undefined;
+    stage.show(false);
+    document.body.classList.remove('guest-page--holo');
+    // Hand mode leaves the handoff timeout to the stage; on the page's own handoff screen, keep its 20 s offer.
+    setTimeout(() => { if (broken && view?.screen === 'handoff' && !view.exploring) pageActions.nextGuest(); }, 20_000);
+  }
+  subscribe(next => {
+    if (broken && next.screen === 'welcome' && view?.screen !== 'welcome') broken = false;
+    view = next;
+    try { apply(next); } catch (error) { stageFailed(`update ${next.screen}`, error); }
   });
+  addEventListener('error', event => postLog({ kind: 'hand-error', where: 'window', screen: view?.screen, message: String(event.message).slice(0, 300),
+    stack: `${event.filename}:${event.lineno}:${event.colno} ${String((event.error as Error)?.stack ?? '').slice(0, 1200)}` }));
+  addEventListener('unhandledrejection', event => postLog({ kind: 'hand-error', where: 'promise', screen: view?.screen,
+    message: String((event.reason as Error)?.message ?? event.reason).slice(0, 300), stack: String((event.reason as Error)?.stack ?? '').slice(0, 1500) }));
   stage.root.addEventListener('pointerdown', event => {
     onActivity();
     const el = (event.target as HTMLElement).closest<HTMLElement>('[data-act]');
@@ -95,6 +120,12 @@ export function mountHandGuest({ app, onActivity, subscribe, dev = false }: Hand
   for (const type of ['pointerup', 'pointercancel'] as const) addEventListener(type, () => { if (current && 'release' in current) current.release(); });
   if (params.has('tune')) mountTunePanel(stage.root);
   if (params.has('fps')) { stage.enableFps(); stage.fpsExtra = () => ` · infer ${inferFps.toFixed(0)} Hz`; }
+
+  function postLog(body: Record<string, unknown>) {
+    if (logOff || dev) return;
+    fetch('/api/dev/hand-spike-log', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) })
+      .then(r => { if (r.status === 404) logOff = true; }).catch(() => { /* offline */ });
+  }
 
   const pointer = new HandPointer({ anchor: 'palm' });
   const poses = new PoseFilter(150);
@@ -163,11 +194,13 @@ export function mountHandGuest({ app, onActivity, subscribe, dev = false }: Hand
     const holo = holoOn() && !!current;
     if (holo) {
       if (edge && controlling) { stats.pinch++; onActivity(); }
-      current!.frame({
-        now, dt, cursor: cursor && stage.toStage(cursor), present: active && pointer.present,
-        pinch: edge && controlling && pinchAt ? stage.toStage(pinchAt) : undefined, pinchClosed: pointer.pinch.closed,
-        landmarks: active ? landmarks : undefined, frameW: frameSize.w, frameH: frameSize.h, tracking: active,
-      });
+      try {
+        current!.frame({
+          now, dt, cursor: cursor && stage.toStage(cursor), present: active && pointer.present,
+          pinch: edge && controlling && pinchAt ? stage.toStage(pinchAt) : undefined, pinchClosed: pointer.pinch.closed,
+          landmarks: active ? landmarks : undefined, frameW: frameSize.w, frameH: frameSize.h, tracking: active,
+        });
+      } catch (error) { stageFailed(`frame ${current?.name}`, error); }
       stage.setPose(controlling);
     }
 
@@ -236,6 +269,8 @@ export function mountHandGuest({ app, onActivity, subscribe, dev = false }: Hand
     (window as unknown as { __handDev: unknown }).__handDev = {
       hold(x: number, y: number, options: { pose?: Pose; pinch?: boolean } = {}) { held = { x, y, pose: options.pose ?? 'palm', pinch: options.pinch ?? false }; },
       release() { held = undefined; },
+      /** Simulate a stage page error (the guest then finishes on the page's own screens). */
+      failStage() { stageFailed('dev test', new Error('simulated stage error')); },
       /** Viewport point of a stage point (the stage is letterboxed and scaled). */
       fromStage(x: number, y: number) { const r = stage.el.getBoundingClientRect(); return { x: r.left + x * stage.scale, y: r.top + y * stage.scale }; },
       state: () => ({ screen: app.dataset.screen, present: pointer.present, pose, pinch: stats.pinch, registered: stats.registered,
@@ -259,12 +294,7 @@ export function mountHandGuest({ app, onActivity, subscribe, dev = false }: Hand
   stage.start(frame);
 
   // ---- optional dev stats (endpoint exists only with SURVEY_DEV_HAND=1) -------------------------------------
-  let sentUserAgent = false, logOff = false;
-  const postLog = (body: Record<string, unknown>) => {
-    if (logOff || dev) return;
-    fetch('/api/dev/hand-spike-log', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) })
-      .then(r => { if (r.status === 404) logOff = true; }).catch(() => { /* offline */ });
-  };
+  let sentUserAgent = false;
   postLog({ kind: 'hand-event', event: 'load', build: 'holo2', screen: app.dataset.screen, screenSize: `${innerWidth}x${innerHeight}@${devicePixelRatio}`, userAgent: navigator.userAgent });
 
   // ---- stall trace: the last 30 s at 100 ms, posted as `hand-stall` the moment a freeze-like state shows ------------

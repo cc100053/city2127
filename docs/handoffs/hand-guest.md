@@ -116,3 +116,10 @@ rex 於 iPad 走完第 1–5 頁：整體可以，但途中一至兩次凍結、
 - 停頓追蹤（僅 `SURVEY_DEV_HAND=1`，同既有統計端點）：iPad 保留最近 30 秒、每 100 ms 一筆的狀態（畫面、頁面狀態、原始與過濾後姿勢、是否見到手、捏合比例、游標、追蹤模式、在途影格時間、距上次結果時間、最長 rAF 幀），於 rAF 停頓超過 500 ms（延後 1 秒送出）、追蹤器超過 1 秒無結果、見到手但休止超過 5 秒、頁面 busy 超過 4 秒時，以 `kind: "hand-stall"` 立即送出（15 秒內最多一次）；頁面載入與追蹤模式變更以 `kind: "hand-event"` 立即回報；伺服器將 WebSocket 連線與斷線以 `kind: "ws"` 寫入同一 jsonl。端點本文上限 256 KB（其他 API 仍為 16 KB）。
 - 文字（約 1 米觀看）：只放大需閱讀的文字，約 1.3–1.5 倍（題目 48 px、選項 28 px、確認卡答案 22 px、比例數字 40 px、說明 20–22 px、提示 15–18 px、按鈕 32 px），裝飾性數據字不變；確認卡與聲音卡改為文字優先。`&tune` 新增「文字比例」（`textScale`，1.0–1.8，預設 1.4＝上述大小；1.0 約等於 mock 原尺寸）。
 - 驗證：`npm test`、型別檢查、`git diff --check` 通過；`test:hand-browser` 通過（以暫存目錄建置，未執行 `npm run build`）；本機以 `SURVEY_DEV_HAND=1` 確認 `hand-event`、`ws` 紀錄與 rAF 停頓觸發的 `hand-stall`（含 30 秒環形資料）。截圖 `survey/artifacts/hand-ui/text14/`（1180x746，未提交）。iPad 伺服器仍為前一版，待 rex 指示再建置。
+
+### 送出後上望／handoff 不顯示（2026-11-23 22:57 iPad 實測）
+
+- 原因：第 4 頁結束時以 `fill: 'forwards'` 把頁面根元素淡出到透明，而各頁根元素在來賓之間重複使用；下一位來賓再進入上望頁時，該淡出仍然生效，上望頁整頁透明（handoff 頁會在重建時取消動畫，所以只有第二位起的上望頁受影響；iPad 記錄的畫面流程 result → handoff → welcome 正常，僅舞台不可見）。headless Chromium 以兩位來賓可重現。
+- 修正：上望頁掛載與卸載時取消根元素上殘留的動畫。瀏覽器測試新增第二位來賓（觸控開始、四題、捏住送出），檢查上望與 handoff 文字實際可見（累計不透明度 > 0.5 且在視窗內）；舊版建置會在此失敗。
+- 防止再卡住：舞台頁面在更新或每幀出錯時，記錄 `kind: "hand-error"`（含 stack，僅 `SURVEY_DEV_HAND=1`），本位來賓改用頁面原本的 M3 畫面完成（handoff 保留 20 秒自動返回），下一位的 welcome 重新使用舞台；視窗層級的錯誤與未處理的 Promise 拒絕亦記錄。DEV 掛鉤 `__handDev.failStage()` 供測試。
+- 題目分行改用不依賴 regex lookbehind 的寫法（舊版 Safari 相容）。
