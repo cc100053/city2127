@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { Box3, BufferGeometry, Float32BufferAttribute, Group, Matrix4, Mesh, MeshStandardMaterial, InstancedMesh, Raycaster, Triangle, Vector3 } from 'three';
+import { Box3, BufferGeometry, Float32BufferAttribute, Group, Matrix4, Mesh, MeshStandardMaterial, InstancedMesh, LinearMipmapLinearFilter, Raycaster, Triangle, Vector3 } from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { MeshBVH } from 'three-mesh-bvh';
 import { ConcentrationDistrict } from '../src/districtMeters.ts';
@@ -19,9 +19,29 @@ group.updateMatrixWorld(true);
 group.traverse(o => { if (o instanceof Mesh && !(o instanceof InstancedMesh)) { o.geometry.computeBoundingBox(); parts.set(`${o.material.color.getHexString()}${parts.size}`, box.copy(o.geometry.boundingBox!).clone()); } });
 const shell =[...parts.entries()].find(([k]) => k.startsWith('f3f2ec'))![1];
 const structureBatches = group.children.filter(part => part instanceof Mesh && !(part instanceof InstancedMesh));
+const facadeNames = ['hull-frame-metal', 'hull-glass', 'hull-panel-metal', 'hull-room-cove'];
 const facadeBatches = structureBatches.filter(part => part.material instanceof MeshStandardMaterial
-  && ['hull-glass', 'hull-room-cove'].includes(part.material.name));
-assert.deepEqual(facadeBatches.map(part => part.material.name).sort(), ['hull-glass', 'hull-room-cove']);
+  && facadeNames.includes(part.material.name));
+assert.deepEqual(facadeBatches.map(part => part.material.name).sort(), facadeNames);
+const silver = facadeBatches.find(part => part.material.name === 'hull-frame-metal');
+const panel = facadeBatches.find(part => part.material.name === 'hull-panel-metal');
+assert.ok(silver && panel);
+for (const { geometry, material } of [silver, panel]) {
+  const uv = geometry.getAttribute('uv'), positions = geometry.getAttribute('position');
+  assert.equal(uv.count, positions.count, 'merged metal batch retains UVs for every vertex');
+  for (let i = 0; i < uv.count; i += 3) {
+    const a = new Vector3().fromBufferAttribute(positions, i);
+    const b = new Vector3().fromBufferAttribute(positions, i + 1);
+    const c = new Vector3().fromBufferAttribute(positions, i + 2);
+    if (b.sub(a).cross(c.sub(a)).lengthSq() < 1e-8) continue;
+    const area = (uv.getX(i + 1) - uv.getX(i)) * (uv.getY(i + 2) - uv.getY(i))
+      - (uv.getY(i + 1) - uv.getY(i)) * (uv.getX(i + 2) - uv.getX(i));
+    assert.ok(Math.abs(area) > 1e-6, 'visible metal triangles have a usable bump-map basis');
+  }
+  assert.ok(material.roughnessMap && material.roughnessMap === material.bumpMap);
+  assert.ok(material.roughnessMap.generateMipmaps, 'grain is mipmapped for the city camera');
+  assert.equal(material.roughnessMap.minFilter, LinearMipmapLinearFilter);
+}
 const sharedBatchCount = structureBatches.length - facadeBatches.length;
 assert.ok(sharedBatchCount >= 4 && sharedBatchCount <= 12, `shared structure draws ${sharedBatchCount}`);
 // Heights: the hoop's top, the arch apex and the hull top all lie inside the shell batch's bounds.
@@ -111,6 +131,9 @@ within(RING.outer * 2, 210, 'ring diameter'); within(Math.hypot(ARCH.b[0] - ARCH
     const [column] = new Raycaster(localPoint(u, 2.25, front(0, u) + 5), inward, 0, 5).intersectObjects(structureBatches, false);
     assert.ok(column && Math.abs(column.distance - 2.23) < .25, `column behind the pane at ${u}`);
   }
+  const [outerPanel] = new Raycaster(localPoint(-1, 37, front(2, -1) - 4), inward, 0, 6)
+    .intersectObjects(structureBatches, false);
+  assert.equal(outerPanel?.object, panel, 'the dark fascia uses its own metal batch');
   // The middle deck remains open from the walking surface to the water above the existing guardrail.
   for (let u = -37; u <= 7; u++) {
     if (u === -35 || u === -15) continue; // Existing canopy posts.
@@ -120,9 +143,6 @@ within(RING.outer * 2, 210, 'ring diameter'); within(Math.hypot(ARCH.b[0] - ARCH
     }
   }
   // Each cross-tier fold covers the slab nose and meets the upper frame without raising the public deck.
-  const silver = structureBatches.find(part => part.material instanceof MeshStandardMaterial
-    && part.material.color.getHexString() === 'dde1e2');
-  assert.ok(silver);
   for (const [tier, head, foot] of [[2, -59.4, -59.12], [2, -2.7, -2.64], [3, 14.32, 14.376], [5, -.074, .368], [6, 24.368, 24.65]]) {
     const { deck } = hullTiers[tier];
     const setback = front(tier + 1, foot) - front(tier, foot);

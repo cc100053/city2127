@@ -1,6 +1,7 @@
 import * as T from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { buildHullFacade, hullFrameReturns, hullFront, hullLobby, hullRear, hullTiers } from './hullFacade.ts';
+import { hullFrameMetal, hullFrameUv, hullPanelMetal } from './hullMetals.ts';
 import { hash, plantCanopy, plantShrubs } from './coastalCanopy.ts';
 import { bodyFootprints, inRect } from './megaFootprints.ts';
 import { addCityModel } from './modelAssets.ts';
@@ -73,7 +74,7 @@ hullCove.onBeforeCompile = shader => {
       totalEmissiveRadiance *= mix(rooms, focus, step(.5, hullRoom.x));`);
 };
 hullCove.customProgramCacheKey = () => 'hull-room-cove';
-const hullFinishes = { shell: megaShell, silver: megaRib, shadow: megaJoint, glass: hullGlass, cove: hullCove };
+const hullFinishes = { shell: megaShell, silver: megaRib, shadow: megaJoint, glass: hullGlass, cove: hullCove, frame: hullFrameMetal, panel: hullPanelMetal };
 const transferCove = gateLight.clone();
 transferCove.color.set('#f1cf9d'); transferCove.emissive.set('#ffc77d');
 const ringFinishes = new Map([
@@ -112,7 +113,7 @@ type Batch = Map<T.Material, T.BufferGeometry[]>;
 /** Queue a geometry (placed by `m`) under a material; everything is normalised so per-material merging always succeeds. */
 function put(batch: Batch, material: T.Material, g: T.BufferGeometry, m?: T.Matrix4) {
   const flat = g.index ? g.toNonIndexed() : g.clone();
-  if (material !== hullCove) flat.deleteAttribute('uv');
+  if (material !== hullCove && material !== hullFrameMetal && material !== hullPanelMetal) flat.deleteAttribute('uv');
   if (m) flat.applyMatrix4(m);
   (batch.get(material) ?? batch.set(material, []).get(material)!).push(flat);
 }
@@ -486,18 +487,23 @@ function hull(batch: Batch, trees: Plant[], shrubs: Shrub[]) {
         );
       } else sections.push([end + .49, 1.84, .1, .9]);
 
-      const edges = sections.map(([u, inset, rise, halfWidth]) => [
+      const edges = sections.map(([u, inset, rise, halfWidth]): [T.Vector3, T.Vector3] => [
         deckPoint(u - halfWidth, inset, rise), deckPoint(u + halfWidth, inset, rise),
       ]);
-      const positions: number[] = [];
+      const grain = hullFrameUv(edges);
+      const positions: number[] = [], uv: number[] = [];
       for (let i = 1; i < edges.length; i++) {
         const [a, b] = edges[i - 1], [c, d] = edges[i];
         for (const p of [a, c, b, b, c, d]) positions.push(p.x, p.y, p.z);
+        const [first, next] = [grain[i - 1], grain[i]];
+        uv.push(first.along, first.low, next.along, next.low, first.along, first.high,
+          first.along, first.high, next.along, next.low, next.along, next.high);
       }
       const frame = new T.BufferGeometry();
       frame.setAttribute('position', new T.Float32BufferAttribute(positions, 3));
+      frame.setAttribute('uv', new T.Float32BufferAttribute(uv, 2));
       frame.computeVertexNormals();
-      put(batch, megaRib, frame);
+      put(batch, hullFrameMetal, frame);
       frame.dispose();
     }
     const clearForPlanting = (u: number, radius: number) =>

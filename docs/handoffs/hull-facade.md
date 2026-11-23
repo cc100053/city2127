@@ -102,3 +102,20 @@ R4 加闊兩道斜框上緣，讓銀色折面從下層框延至樓板邊，沿�
 - 在整合提交重跑 root `npm test`、`npm run build`、`git diff --check origin/main..HEAD` 和圖檔規格檢查，全部通過。
 - 正式 build 在開發 Mac 的桌面 Chrome 157.0.8103.79（Apple M6／ANGLE Metal）以 1600×900、DPR 1 檢查 12:00、18:00、21:25。三個時段皆有畫布診斷，未收到頁面例外、shader 或本機資源載入錯誤。原始記錄在 `~/city2127-evidence/hull-facade/r5/preview.json`。
 - [GitHub main CI](https://github.com/cc100053/city2127/actions/runs/45050847919) 驗證 `2480a948`。Root、survey、module-swap 測試和 build、差異空白及圖檔規格全數通過。[工作分支 CI](https://github.com/cc100053/city2127/actions/runs/45050385398) 驗證 `0ff434b0`，亦已通過。
+
+## R6 · 曲框與深灰金屬
+
+- 業主 cc100053 要求銀色曲框有金屬反光和細紋，深色位置留灰調和表面質感。工作分支 `codex/hull-facade-r6` 由已 fetch 的 `origin/main`（`5b5ef75eef3ccacfc62b2a8f9914a4f8bfefc32b`）開獨立工作樹，基準含 R5 整合 `e675a8f6`、[R5 main CI](https://github.com/cc100053/city2127/actions/runs/45050847919) 所驗證的 `2480a948` 及交接提交。起步時本機 `main` 領先 0、落後 4，未追蹤的 `Dev_QA.md` 保留。
+- 與[方向圖](../../artifacts/hull-facade/target.jpg)比較，R5 正午的銀框在斜邊有高光，向外的大面接近單一灰度。黃昏與夜間，銀框大面與深色板都少有變化，深板尤其接近藍黑。簷篷下的夜景以玻璃後暖色天花及夾層燈線為焦點。
+- [船身金屬](../../src/hullMetals.ts) 把外露曲框和深色板各合成一批。曲框 UV 順着弧線、窗洞邊及跨退台的折面，使用帶方向的細拉絲和較集中的環境反光。深灰板以船身座標連續投影，配較寬的反光和細微的色調及粗糙度變化。每種材質用一張 256² 貼圖儲存粗糙度、色調和凹凸，遠景由 mipmap 收細。玻璃、入口門楣、室內背牆、兩側列車口及暖光沿用 R5 材質和調光。
+- 對 `5b5ef75e` 的程序巨構逐三角比較，70,376 個結構三角面頂點和法線完全相同。8,052 個銀色三角面及 5,444 個深色三角面進入新金屬批次，其餘三角面的材質記錄一致。[巨構測試](../../tests/megastructures.test.ts) 核對兩個批次、完整 UV、mipmap、五處跨層折面及深色面板，並重驗公共退台和入口通行。
+
+### R6 實景及驗證
+
+- [城市主鏡](../../artifacts/hull-facade/r6-hero.jpg)和[立面近鏡](../../artifacts/hull-facade/r6-close.jpg)對照 12:00、18:00、21:25。[銀框和深灰板原尺寸局部](../../artifacts/hull-facade/r6-detail.jpg)由三個時段的近鏡各以同一矩形裁出。[入口回歸](../../artifacts/hull-facade/r6-entry.jpg)比對日夜廣場入口及夜間簷篷下的大堂。
+- 開發 Mac Chrome 157.0.8103.79 沿 R5 sidecar 的鏡位與固定場景時間 20 秒，解析度 2400×1350／DPR 1。R5／R6 原圖與 sidecar 在 `~/city2127-evidence/hull-facade/{r5,r6}/after/`。R6 在工作分支提交前擷取，sidecar 記錄基準及 dirty 狀態。
+
+- 正式 build 在同一 Chrome 以 1600×900／DPR 1 檢查 12:00、18:00、21:25。三個時段都有畫布輸出，頁面例外、shader 及本機資源錯誤為零。另在 18:00 慢速水平移動主鏡，九張原尺寸取樣未見新規律條紋。記錄在 `~/city2127-evidence/hull-facade/r6/preview.json` 及 `orbit/`。
+- Root `npm test`、`npm run build`、`git diff --check` 通過。
+
+業主視覺驗收及展覽機驗證待完成。

@@ -1,5 +1,6 @@
 import * as T from 'three';
 import { HULL } from './megaFootprints.ts';
+import { hullFrameUv } from './hullMetals.ts';
 
 const end = HULL.length / 2;
 /** Tier bounds in hull-local metres. The lower decks keep the plaza, rail and public-floor elevations. */
@@ -61,7 +62,7 @@ export function hullFrameReturns(tier: number) {
   });
 }
 
-type Finish = 'shell' | 'silver' | 'shadow' | 'glass' | 'cove';
+type Finish = 'shell' | 'silver' | 'shadow' | 'glass' | 'cove' | 'frame' | 'panel';
 type Tier = {
   tier: number;
   from: number;
@@ -76,19 +77,26 @@ type Tier = {
 
 /** Swept frames, recessed glazing and shallow interior rooms specific to the hull's eight-tier elevation. */
 export function buildHullFacade({ tier, from, to, height, entrance, point, surface, bar }: Tier) {
+  const right = new T.Vector3(1, 0, .45).applyAxisAngle(new T.Vector3(0, 1, 0), HULL.yaw);
   const toe = .72, crown = height - .5, skin = -.85, vertical = height / 15;
   const strip = (finish: Finish, lower: T.Vector3[], upper: T.Vector3[], lighting: 'room' | 'focus' | 'soffit' | 'bounce' | 'lobby-back' = 'room') => {
     const light = { room: 0, focus: 1, soffit: 2, bounce: 3, 'lobby-back': 4 }[lighting];
     const positions: number[] = [], uv: number[] = [];
+    const frameUv = finish === 'frame' ? hullFrameUv(lower.map((p, i) => [p, upper[i]])) : undefined;
     for (let i = 1; i < lower.length; i++) {
       for (const p of [lower[i - 1], upper[i - 1], lower[i], lower[i], upper[i - 1], upper[i]]) {
         positions.push(p.x, p.y, p.z);
+        if (finish === 'panel') uv.push(p.dot(right), p.y);
       }
       if (finish === 'cove') uv.push(light, 0, light, 1, light, 0, light, 0, light, 1, light, 1);
+      if (frameUv) {
+        const [a, b] = [frameUv[i - 1], frameUv[i]];
+        uv.push(a.along, a.low, a.along, a.high, b.along, b.low, b.along, b.low, a.along, a.high, b.along, b.high);
+      }
     }
     const mesh = new T.BufferGeometry();
     mesh.setAttribute('position', new T.Float32BufferAttribute(positions, 3));
-    if (finish === 'cove') mesh.setAttribute('uv', new T.Float32BufferAttribute(uv, 2));
+    if (uv.length) mesh.setAttribute('uv', new T.Float32BufferAttribute(uv, 2));
     mesh.computeVertexNormals();
     surface(finish, mesh);
     mesh.dispose();
@@ -102,9 +110,9 @@ export function buildHullFacade({ tier, from, to, height, entrance, point, surfa
     });
     const sill = samples.map(([u, y]) => point(u, Math.max(toe, y - tipRim), skin));
     const head = samples.map(([u, y]) => point(u, Math.min(crown, y + tipRim), skin));
-    strip('shadow', samples.map(([u]) => point(u, toe, skin)), sill);
-    strip('silver', sill, head);
-    strip('shadow', head, samples.map(([u]) => point(u, crown, skin)));
+    strip('panel', samples.map(([u]) => point(u, toe, skin)), sill);
+    strip('frame', sill, head);
+    strip('panel', head, samples.map(([u]) => point(u, crown, skin)));
   };
   let last = from, lastHeight = tier < 2 ? 4.1 : 8.8;
   for (const [start, end, fromHeight, toHeight, below, above, kind] of openings[tier]) {
@@ -139,12 +147,12 @@ export function buildHullFacade({ tier, from, to, height, entrance, point, surfa
     const innerBottom = samples.map(({ u, lower, upper }) => point(u, Math.min(lower + .13, (upper + lower) / 2), glassDepth));
     const innerTop = samples.map(({ u, lower, upper }) => point(u, Math.max(upper - .13, (upper + lower) / 2), glassDepth));
 
-    strip('shadow', samples.map(({ u }) => point(u, toe, skin)), lowerRim);
-    strip('shadow', upperRim, samples.map(({ u }) => point(u, crown, skin)));
-    strip('silver', lowerRim, bottom);
-    strip('silver', top, upperRim);
+    strip('panel', samples.map(({ u }) => point(u, toe, skin)), lowerRim);
+    strip('panel', upperRim, samples.map(({ u }) => point(u, crown, skin)));
+    strip('frame', lowerRim, bottom);
+    strip('frame', top, upperRim);
     strip('shell', bottom, innerBottom);
-    strip('silver', innerTop, top);
+    strip('frame', innerTop, top);
     if (isLobby) {
       let firstDoorSegment = 0, lastDoorSegment = segments;
       while (samples[firstDoorSegment].u < entrance - 2.45) firstDoorSegment++;
