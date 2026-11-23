@@ -17,6 +17,7 @@ import { contextFacades } from './contextFacades';
 import { bake } from './cityRig';
 import { CONCEPT_LOT, changeSites, DISTRICT, inDistrict, LOTS, PLAZA, promenades, SEAWARD_GLSL, URBAN_FILL } from './layout';
 import { HERO_CLEAR } from './megaFootprints';
+import { shadeBowGuideway } from './hullPortal.ts';
 import { fillWorld, type FillCell } from './urbanFill';
 import { bayContext, recedeBeyondDistrict } from './bayContext';
 import { inWater, publishDoorways, publishEntrances, routes, waterGLSL } from './mobility';
@@ -191,6 +192,13 @@ export async function loadOdaiba(scene: T.Scene, water?: T.Material) {
   // After finishes: shared materials are re-tuned once per mesh above, which would drop an earlier wrap.
   environment.traverse(object => { if (object instanceof T.Mesh && object.material !== water) receded.add(object.material); });
   receded.forEach(material => { if (wetGround.has(material.name)) openBay(material, cutGround.has(material.name)); recedeBeyondDistrict(material); });
+  const guideway = environment.getObjectByName('YURIKAMOME_GUIDEWAY');
+  if (guideway instanceof T.Mesh && guideway.material instanceof T.MeshStandardMaterial) {
+    const material = guideway.material.clone();
+    recedeBeyondDistrict(material);
+    shadeBowGuideway(material);
+    guideway.material = material;
+  }
   const revetment = environment.getObjectByName('COAST_REVETMENT');
   if (revetment instanceof T.Mesh) cutUnderPlatform(revetment.material);
   carveContext(environment);

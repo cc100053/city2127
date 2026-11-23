@@ -5,6 +5,7 @@ import { routes } from './mobility.ts';
 import { tidalEdge } from './amphibiousShore.ts';
 import { laneBeaconSites } from './waterRooms.ts';
 import { skyways } from './skyways.ts';
+import { shadeBowGuideway } from './hullPortal.ts';
 
 /** What 2127 added around the existing landmarks: sky bridges, the sphere berth, the shore interchange, lane beacons and guideway light lines. */
 export function build2127(scene: T.Scene) {
@@ -56,12 +57,14 @@ export function build2127(scene: T.Scene) {
   }
   // Guideway light trails along both deck edges (the same blue-white as the 2127 skyways).
   const guideway = routes().guideway, up = new T.Vector3(0, 1, 0);
+  const guidewayLight = trail.clone();
+  shadeBowGuideway(guidewayLight);
   for (const offset of [-6.8, 6.8]) {
     const points = Array.from({ length: 160 }, (_, i) => {
       const u = i / 159, p = guideway.getPointAt(u), side = new T.Vector3().crossVectors(up, guideway.getTangentAt(u)).normalize();
       return p.addScaledVector(side, offset).setY(14.45);
     });
-    root.add(new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3(points), 320, .5, 5), trail));
+    root.add(new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3(points), 320, .5, 5), guidewayLight));
   }
   scene.add(...bake(root),tidalEdge(),skyways());
 }

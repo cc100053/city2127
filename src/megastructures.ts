@@ -48,14 +48,21 @@ const megaJoint = new T.MeshStandardMaterial({ color: '#4b5258', roughness: .6, 
 /** The dark mouth of the hull's Yurikamome tunnel, faintly lit from inside. */
 const megaPortal = new T.MeshStandardMaterial({ color: '#141b20', emissive: '#30485a', emissiveIntensity: .35, roughness: .8 });
 const hullPortalLiner = new T.MeshStandardMaterial({
-  name: 'hull-portal-liner', color: '#78828a', emissive: '#879da8', emissiveIntensity: .14, roughness: .82,
-});
-const hullPortalBaffle = new T.MeshStandardMaterial({
-  name: 'hull-portal-baffle', color: '#67757c', emissive: '#62727b', emissiveIntensity: .24, roughness: .92, vertexColors: true,
+  name: 'hull-portal-liner', color: '#65737d', emissive: '#778b98', emissiveIntensity: .14, roughness: .88, vertexColors: true,
 });
 const hullPortalGuide = new T.MeshStandardMaterial({
   name: 'hull-portal-guide', color: '#9daeb8', emissive: '#d2e8f1', emissiveIntensity: .12, roughness: .5,
 });
+const hullPortalCove = new T.MeshStandardMaterial({
+  name: 'hull-portal-cove', color: '#9daeb8', emissive: '#d2e8f1', emissiveIntensity: .12, roughness: .64, vertexColors: true,
+});
+// The baked interior falloff also attenuates the day/night emissive term.
+for (const material of [hullPortalLiner, hullPortalCove]) {
+  material.onBeforeCompile = shader => {
+    shader.fragmentShader = shader.fragmentShader.replace('#include <emissivemap_fragment>',
+      '#include <emissivemap_fragment>\ntotalEmissiveRadiance *= vColor.rgb;');
+  };
+}
 /** Tunnel lights in the ring's road gate (outside the carve, so its own finish). */
 const gateLight = new T.MeshStandardMaterial({ color: '#fff4dc', emissive: '#fff1d0', emissiveIntensity: .8, roughness: .4 });
 const ringGlazing = new T.MeshStandardMaterial({ color: '#6c8895', emissive: '#c59262', emissiveIntensity: .06, roughness: .22, metalness: .26 });
@@ -115,6 +122,7 @@ export const updateMegastructures = (night: number) => {
   transferCove.emissiveIntensity = .62 + night * 1.3;
   hullCove.emissiveIntensity = .02 + night * 1.21;
   hullPortalGuide.emissiveIntensity = .12 + night * .85;
+  hullPortalCove.emissiveIntensity = .12 + night * .65;
   hullPortalLiner.emissiveIntensity = .14 + night * .14;
   lightSlopePlants(night);
 };
@@ -645,7 +653,7 @@ export function megastructures(ringModels?: { entrance: T.Group; body?: T.Group;
     if (existing) existing.push(...parts);
     else batch.set(material, parts);
   }
-  const portalFinishes = { frame: hullFrameMetal, bow: hullBowMetal, panel: hullPanelMetal, guide: hullPortalGuide, dark: megaPortal, liner: hullPortalLiner, baffle: hullPortalBaffle };
+  const portalFinishes = { frame: hullFrameMetal, bow: hullBowMetal, panel: hullPanelMetal, guide: hullPortalGuide, dark: megaPortal, liner: hullPortalLiner, cove: hullPortalCove };
   buildHullBowPortal((finish, geometry) => put(batch, portalFinishes[finish], geometry), bowModel);
   for (const [material, list] of batch) {
     const mesh = new T.Mesh(mergeGeometries(list), carved.get(material) ?? material);
