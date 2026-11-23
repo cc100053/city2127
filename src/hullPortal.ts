@@ -405,31 +405,16 @@ export function buildHullBowPortal(surface: (finish: Finish, geometry: T.BufferG
   buildFlankLining(surface);
   if (!model || !buildBlenderBowFrame(model, surface)) buildBowFrame(surface);
 
-  // Roll the exposed seaward edge back into the existing flank cut. The
-  // joint follows both skins and steps across the 15 m deck between them.
-  const backEdge: [number, number, number][] = [
-    [9, 84.5, 0], [10.5, 81.8, 0], [12.45, 80.55, 0], [15, 80, 0],
-    [15, 80, 1], [18.6, 80, 1], [20.8, 80.6, 1], [22.2, 81.35, 1], [23, 82.85, 1],
-  ];
-  const outerEdge = centre - half + .08;
-  const fold = [0, .19, .46, .71, 1];
-  const turned = backEdge.map(([y, cut, tier]) => fold.map(t => {
-    const u = Math.min(cut - .17, recess - .7);
-    const skin = hullFront(tier, u) - .4;
-    const depth = tier === 0
-      ? T.MathUtils.lerp(outerEdge, skin, Math.sin(t * Math.PI / 2))
-      : T.MathUtils.lerp(outerEdge, skin, t * t) - 3.2 * Math.sin(t * Math.PI);
-    return new T.Vector3(T.MathUtils.lerp(recess - .08, u, Math.sqrt(t)), y, depth);
-  }));
-  // The two deck stations share their first vertex. Start the deck return at
-  // the second point to avoid a zero-area face on the baffle seam.
-  for (let i = 1; i < turned.length; i++) {
-    const start = turned[i][0].equals(turned[i - 1][0]) ? 1 : 0;
-    const sides = turned[i].slice(start).map((point, j): [T.Vector3, T.Vector3] => [point, turned[i - 1][j + start]]);
-    const geometry = liningStrip(sides).applyMatrix4(root);
-    surface('liner', geometry);
-    geometry.dispose();
-  }
+  // Hem the seaward edge behind the mask, clear of the swept flank and glazing.
+  const hem = Array.from({ length: 6 }, (_, i): [T.Vector3, T.Vector3] => {
+    const angle = i * Math.PI / 10;
+    const u = recess - .08 - 1.04 * (1 - Math.cos(angle));
+    const d = centre - half + .08 - .64 * Math.sin(angle);
+    return [new T.Vector3(u, top, d), new T.Vector3(u, bottom, d)];
+  });
+  const cheek = liningStrip(hem).applyMatrix4(root);
+  surface('liner', cheek);
+  cheek.dispose();
 
   // The fixed mask stays at the original depth. Soft pools from the soffit
   // leave a darker track zone without flattening the whole tunnel to black.
