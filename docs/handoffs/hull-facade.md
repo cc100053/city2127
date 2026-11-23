@@ -174,3 +174,18 @@ R4 加闊兩道斜框上緣，讓銀色折面從下層框延至樓板邊，沿�
 - 工作分支 `06feed99` 已推送。從最新 `origin/main`（`c685f823`）在獨立工作樹整合為 `105abb0952204b4ea7a43b75bb010f43d788d9a0`。
 - 整合版 root `npm test`、`npm run build`、差異空白、圖檔規格及新文件連結全數通過。整份 `dist/` 與 Chrome 驗證的 build 逐檔一致。
 - [GitHub main CI](https://github.com/cc100053/city2127/actions/runs/45112366858) 驗證 `abbe1c87dcae4d1fccc035800f6220ed56d1abf8`。Root、survey、module-swap 的測試與 build、差異空白及圖檔規格全數通過。
+
+## R9 · 削開船首近側牆
+
+- 業主 cc100053 確認依橙色虛線示意削去遮住洞口的近側牆。工作分支 `codex/hull-facade-r9` 由已 fetch 的 `origin/main`（`a142d27fc811f19a7e922c7b453ac1e1f27ae256`）建立。原工作區的本機 `main` 領先 0、落後 21，未追蹤的 `Dev_QA.md` 和 `Presentation.md` 保留。[R8 main CI](https://github.com/cc100053/city2127/actions/runs/45112366858) 已驗證 `abbe1c87`。
+- 船首靠海側的最低兩級裙樓削成向外張開的凹口。切口沿原船身的高差轉接，以深灰金屬襯板封合，薄拉絲銀邊和原冷白日夜導光延至切口。少量角落灌木移回有樓板承托的範圍。構件是船身本體的場地專用幾何，沿用現有材質批次。固定 Hero、兩條軌道、18 × 14 m 通車包絡、既有口面至遮蔽面 9.1 m 深度及大堂與公共退台沿用 R8。
+
+### R9 驗證
+
+- [巨構測試](../../tests/megastructures.test.ts) 從固定 Hero 驗證靠海導光，以及穿過削口看見深灰內壁和深處的遮蔽。從正面驗證原口深及靠內陸側的導光。兩條實際軌道以每 0.02 秒取樣頭／中／尾車 GLB，延伸段的淨空為 1.84／3.12 m，原口面段為 1.84／3.75 m。另一端的 594 個三角面與 R8 的頂點、法線和材質逐面一致。
+- [R8／R9 固定 Hero 黃昏對照](../../artifacts/hull-facade/r9-hero.jpg) 以 18:00、固定場景時間 20 秒、2400 × 1350／DPR 1 擷取全幅及放大局部。兩條亮軌伸入同一個深灰洞腔。前景廣場步道仍從洞口下緣前方掠過。
+- Root `npm test`、`npm run build`、`git diff --check` 通過。程式提交為 `b0804cae09e8edcab98e2bc62dc653e752300341`。最終 Hero sidecar 記錄此提交及擷取時的文件改動。
+- 開發 Mac 的 Chrome 157.0.8103.79（Apple M6／ANGLE Metal）以 1600 × 900／DPR 1 驗證最終正式 bundle，12:00、18:00、21:25 三個時段持續更新畫布。斜前方 DEV 鏡位在 18:00／21:25 分別記錄 124／168 個實時幀，頭車由口面外進入，並深入至遮蔽面後方。頁面例外、shader 及本機資源錯誤為零。原始記錄為 `~/city2127-evidence/hull-facade/r9/{production-final,browser}.json`。
+- [黃昏及夜間入洞](../../artifacts/hull-facade/r9-bow.jpg) 沿用 R8 斜前方鏡位，在場景時間 66.20 秒核對頭車越過口面。[廣場及簷下入口](../../artifacts/hull-facade/r9-entry.jpg) 比對 R8 和 R9 在廣場日夜及夜間簷下的三個鏡位，入口門框、簷篷及暖光大堂皆通過回歸。最終八張 2400 × 1350／DPR 1 原圖及 sidecar 在 `~/city2127-evidence/hull-facade/r9/final/`，頁面例外為零。
+
+業主目視驗收及展覽機驗證待完成。

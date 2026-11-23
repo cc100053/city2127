@@ -217,7 +217,7 @@ for (const walk of plazaWalks) for (const [i, [x, y, z]] of walk.entries()) {
 }
 
 const loader = new GLTFLoader();
-// The new lining leaves R6's full rectangular mouth open through the recess, including the planted hull edge.
+// The seaward cut opens the side view while keeping the axial clearance and recess.
 {
   const { face, recess, centre, width, bottom, top } = HULL_BOW_PORTAL;
   assert.deepEqual([face, centre, width, bottom, top], [92.6, 12.75, 18, 9, 23]);
@@ -252,28 +252,25 @@ const loader = new GLTFLoader();
   const guides = structureBatches.filter(part => part.material instanceof MeshStandardMaterial &&
     part.material.name === 'hull-portal-guide');
   assert.equal(guides.length, 1, 'the recessed guide runs in one batch');
-  for (const [y, d] of [[bottom - .25, centre], [top + .25, centre], [16, southEdge - .25], [16, northEdge + .25]]) {
-    ray.ray.origin.set(face + 4, y, d).applyAxisAngle(up, HULL.yaw).add(origin);
-    const [light] = ray.intersectObjects(structureBatches, false);
-    assert.equal(light?.object, guides[0], `guide visible in front of the old bulkhead at ${y}, ${d}`);
-  }
-  const foldRay = new Raycaster(new Vector3(face + 6, 18, 1.5).applyAxisAngle(up, HULL.yaw).add(origin),
-    ray.ray.direction);
-  const [fold] = foldRay.intersectObjects(structureBatches, false);
-  assert.ok(fold?.object === silver && fold.face, 'the seaward fold uses the brushed silver frame');
-  const normal = fold.face.normal.clone().transformDirection(toLocal);
-  const turn = Math.atan2(-normal.z, normal.x) * 180 / Math.PI;
-  assert.ok(Math.abs(turn - 35) < .01, 'the silver fold faces toward the fixed city Hero');
+  ray.ray.origin.set(face + 4, 16, northEdge + .25).applyAxisAngle(up, HULL.yaw).add(origin);
+  assert.equal(ray.intersectObjects(structureBatches, false)[0]?.object, guides[0], 'the inland jamb keeps its guide');
 
   const hero = new Vector3(...HERO_SETTLED_POSITION);
-  for (const y of [11, 16, 21]) {
-    ray.ray.origin.set(face + 6, y, southEdge - .4).applyAxisAngle(up, HULL.yaw).add(origin);
-    const [guide] = ray.intersectObjects(structureBatches, false);
-    assert.equal(guide?.object, guides[0], 'the light follows the seaward jamb');
-    const lineOfSight = new Raycaster(hero, guide.point.clone().sub(hero).normalize());
-    assert.equal(lineOfSight.intersectObjects(structureBatches, false)[0]?.object, guides[0],
-      'the guide is visible from the unchanged Hero camera');
+  const fromHero = (u: number, y: number, d: number) => {
+    const point = new Vector3(u, y, d).applyAxisAngle(up, HULL.yaw).add(origin);
+    return new Raycaster(hero, point.sub(hero).normalize()).intersectObjects(structureBatches, false)[0];
+  };
+  for (const y of [10.7, 14, 17.5, 19.6]) {
+    for (const u of [84.5, 87]) {
+      const hit = fromHero(u, y, northEdge);
+      assert.equal(hit?.object, panel, 'Hero looks through the cut across the rail cavity to the inland liner');
+      assert.ok(Math.abs(hit.point.clone().applyMatrix4(toLocal).z - northEdge) < .03);
+    }
+    assert.equal(fromHero(82.4, y, northEdge)?.object, rear.object,
+      'Hero sees the dark return where the flank meets the original recess');
   }
+  assert.equal(fromHero(80.04, 17, hullFront(1, 80) - .88)?.object, guides[0],
+    'the light on the new seaward rim is visible from Hero');
   updateMegastructures(0);
   const dayGuide = guides[0].material.emissiveIntensity;
   updateMegastructures(1);
@@ -322,7 +319,7 @@ const loader = new GLTFLoader();
     minGaps.push(gap);
     mouthGaps.push(mouthGap);
   }
-  console.log(`hull bow portal ok (fold clearance: ${minGaps.map(gap => gap.toFixed(2)).join(' / ')} m; `
+  console.log(`hull bow portal ok (approach clearance: ${minGaps.map(gap => gap.toFixed(2)).join(' / ')} m; `
     + `R7 mouth clearance: ${mouthGaps.map(gap => gap.toFixed(2)).join(' / ')} m)`);
 }
 // The enlarged upper tiers stay at least 1.5 m off the actual Grand Nikko GLB, including its outlying roof edges.

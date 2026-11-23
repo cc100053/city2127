@@ -2,7 +2,7 @@ import * as T from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { buildHullFacade, hullFrameReturns, hullFront, hullLobby, hullRear, hullTiers } from './hullFacade.ts';
 import { hullFrameMetal, hullFrameUv, hullPanelMetal } from './hullMetals.ts';
-import { buildHullBowPortal, cutHullBowOpening, HULL_BOW_PORTAL } from './hullPortal.ts';
+import { buildHullBowPortal, cutHullBowOpening, HULL_BOW_FLANK_AT_DECK, HULL_BOW_PORTAL } from './hullPortal.ts';
 import { hash, plantCanopy, plantShrubs } from './coastalCanopy.ts';
 import { bodyFootprints, inRect } from './megaFootprints.ts';
 import { addCityModel } from './modelAssets.ts';
@@ -532,10 +532,11 @@ function hull(batch: Batch, trees: Plant[], shrubs: Shrub[]) {
       for (let u = u0 + 2, i = 0; u < u1 - 2; u += gap, i++) {
         const radius = r + hash(k * 99 + i + off) * .7;
         if (!clearForPlanting(u, radius * 1.2)) continue;
-        // The last shrub on the inner row straddled the new reveal. Keep it on the seaward planter.
-        const besideBow = k === 0 && off === 5.2 && u > HULL_BOW_PORTAL.recess;
-        const p = deckPoint(u, besideBow ? 1.8 : off, .5);
-        shrubs.push([p.x, p.y, p.z, besideBow ? 1.65 : radius, 1.4 + hash(k * 99 + i + 4) * .5]);
+        // Keep the planting row beside the cut on the supported part of the lowest deck.
+        const besideBow = k === 0 && u + radius > HULL_BOW_FLANK_AT_DECK;
+        const plantedU = besideBow ? HULL_BOW_FLANK_AT_DECK - 1.75 - Math.max(0, u - HULL_BOW_FLANK_AT_DECK) * .42 : u;
+        const p = deckPoint(plantedU, besideBow ? off + 1.2 : off, .5);
+        shrubs.push([p.x, p.y, p.z, besideBow ? 1.1 : radius, 1.4 + hash(k * 99 + i + 4) * .5]);
       }
     }
     for (let u = u0 + 8 + hash(k) * 12, c = 0; u < u1 - 8; u += 24 + hash(k * 7 + c) * 16, c++) {
