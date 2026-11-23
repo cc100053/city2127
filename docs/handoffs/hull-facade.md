@@ -217,3 +217,4 @@ R4 加闊兩道斜框上緣，讓銀色折面從下層框延至樓板邊，沿�
 - 工作分支 `683f15c8` 已推送。從最新 `origin/main`（`3f1c0a57`）在獨立工作樹整合為 `50663a18663f26178a191d779c9ea202bc40bab1`。
 - 整合版 root `npm test`、`npm run build`、差異空白、圖檔規格及 12 個本機文件連結全部通過。整份 `dist/` 與 Chrome 驗證的正式 build 逐檔一致。
 - 開發 Mac 的實體 Chrome 視窗用 1920 × 1080／DPR 1 量固定 Hero。每個時段量四段 120 幀並略去首段，12:00 為 53.3–57.6 FPS，21:25 為 55.7–59.9 FPS。實測記錄在 `~/city2127-evidence/hull-facade/r10/fps.json`。
+- 主線 CI 驗證 `278815813ac3be7e82bdd3e308c01773152c567e`，工作分支 CI 驗證 `683f15c88dce67289eef43dda1b2ae2072530d97`。兩次 root、survey、module-swap 的測試與 build、差異空白及圖檔規格全部通過。[主線 CI](https://github.com/cc100053/city2127/actions/runs/45120282706) · [工作分支 CI](https://github.com/cc100053/city2127/actions/runs/45119781863)
