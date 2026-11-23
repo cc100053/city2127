@@ -1,4 +1,5 @@
 import * as T from 'three';
+import { hullFront } from './hullFacade.ts';
 import { HULL } from './megaFootprints.ts';
 import { hullFrameUv } from './hullMetals.ts';
 
@@ -17,18 +18,54 @@ const opening = new T.Box3(
   new T.Vector3(face + 2, top, centre + half),
 );
 
-const worldBounds = opening.clone().applyMatrix4(root);
+// The second cut opens the seaward flank, while the axial opening retains its full clearance.
+const flank = [
+  new T.Vector2(90.5, 8.3),
+  new T.Vector2(86.1, 8.65),
+  new T.Vector2(83.6, 9.2),
+  new T.Vector2(81.8, 10.5),
+  new T.Vector2(80.55, 12.45),
+  new T.Vector2(80, 15),
+  new T.Vector2(80, 18.6),
+  new T.Vector2(80.6, 20.8),
+  new T.Vector2(81.35, 22.2),
+  new T.Vector2(82.85, 23.2),
+  new T.Vector2(85.4, 24.1),
+  new T.Vector2(88.6, 24.75),
+  new T.Vector2(92, 25.05),
+];
+const cutEnd = face + 5, flankDepth = centre + half - .01;
+const flankBottom = flank[0].y, flankTop = flank[flank.length - 1].y;
+export const HULL_BOW_FLANK_AT_DECK = Math.min(...flank.map(point => point.x));
+const flankBounds = new T.Box3(new T.Vector3(HULL_BOW_FLANK_AT_DECK, flankBottom, -8), new T.Vector3(cutEnd, flankTop, flankDepth));
 
 type Vertex = { point: T.Vector3; normal: T.Vector3; uv: T.Vector2 | undefined };
+type HalfSpace = (point: T.Vector3) => number;
 
-const sides: ((p: T.Vector3) => number)[] = [
-  p => p.x - opening.min.x, p => opening.max.x - p.x,
-  p => p.y - opening.min.y, p => opening.max.y - p.y,
-  p => p.z - opening.min.z, p => opening.max.z - p.z,
-];
+function cutVolume(bounds: T.Box3, extraSides: HalfSpace[] = []) {
+  const { min, max } = bounds;
+  const sides: HalfSpace[] = [
+    p => p.x - min.x, p => max.x - p.x,
+    p => p.y - min.y, p => max.y - p.y,
+    p => p.z - min.z, p => max.z - p.z,
+    ...extraSides,
+  ];
+  return { bounds, worldBounds: bounds.clone().applyMatrix4(root), sides };
+}
 
-/** Cut the nominal opening through the old bulkhead and deck edges, keeping the original faces and UVs around it. */
+const axialCut = cutVolume(opening);
+const flankCut = cutVolume(flankBounds, flank.slice(1).map((end, i) => {
+  const start = flank[i], slope = (end.x - start.x) / (end.y - start.y);
+  return p => p.x - start.x - (p.y - start.y) * slope;
+}));
+
+/** Keep the original faces and UVs around the opening and its seaward cut. */
 export function cutHullBowOpening(geometry: T.BufferGeometry) {
+  subtract(geometry, axialCut);
+  subtract(geometry, flankCut);
+}
+
+function subtract(geometry: T.BufferGeometry, { bounds, worldBounds, sides }: ReturnType<typeof cutVolume>) {
   geometry.computeBoundingBox();
   if (!geometry.boundingBox?.intersectsBox(worldBounds)) return;
   const position = geometry.getAttribute('position'), normal = geometry.getAttribute('normal'), uv = geometry.getAttribute('uv');
@@ -39,7 +76,7 @@ export function cutHullBowOpening(geometry: T.BufferGeometry) {
 
   for (let i = 0; i < position.count; i += 3) {
     for (const [j, p] of local.entries()) p.fromBufferAttribute(position, i + j).applyMatrix4(inverse);
-    if (!opening.intersectsTriangle(triangle)) {
+    if (!bounds.intersectsTriangle(triangle) || sides.some(side => local.every(point => side(point) < 0))) {
       for (let j = i; j < i + 3; j++) {
         points.push(position.getX(j), position.getY(j), position.getZ(j));
         normals.push(normal.getX(j), normal.getY(j), normal.getZ(j));
@@ -156,6 +193,71 @@ function band(outer: Profile, inner: Profile) {
 
 type Finish = 'frame' | 'panel' | 'guide' | 'dark';
 
+function buildFlankLining(surface: (finish: Finish, geometry: T.BufferGeometry) => void) {
+  const point = (u: number, y: number, d: number) => new T.Vector3(u, y, d).applyMatrix4(root);
+  const strip = (finish: Finish, edges: [T.Vector3, T.Vector3][]) => {
+    const grain = hullFrameUv(edges);
+    const positions: number[] = [], uv: number[] = [];
+    for (let i = 1; i < edges.length; i++) {
+      const [a, b] = edges[i - 1], [c, d] = edges[i];
+      for (const vertex of [a, b, c, c, b, d]) positions.push(...vertex.toArray());
+      const [first, next] = [grain[i - 1], grain[i]];
+      uv.push(first.along, first.low, first.along, first.high, next.along, next.low,
+        next.along, next.low, first.along, first.high, next.along, next.high);
+    }
+    const geometry = new T.BufferGeometry();
+    geometry.setAttribute('position', new T.Float32BufferAttribute(positions, 3));
+    geometry.setAttribute('uv', new T.Float32BufferAttribute(uv, 2));
+    geometry.computeVertexNormals();
+    subtract(geometry, axialCut);
+    surface(finish, geometry);
+    geometry.dispose();
+  };
+  // Finish the exposed cut itself. Split at the 15 m step so the edge meets each skin.
+  const lower = flank.filter(({ y }) => y <= 15);
+  const upper = flank.filter(({ y }) => y >= 15);
+  for (const [tier, edge] of [lower, upper].entries()) {
+    const skin = (u: number) => hullFront(tier, u) - .88;
+    const rim = (u: number) => skin(u) - .24;
+    strip('panel', edge.map(({ x, y }) => [
+      point(x, y, flankDepth), point(x, y, skin(x)),
+    ]));
+    strip('frame', edge.map(({ x, y }) => [
+      point(x, y, rim(x)), point(x - .74, y, rim(x - .74)),
+    ]));
+    strip('guide', edge.map(({ x, y }) => [
+      point(x + .17, y, skin(x) + .12), point(x - .09, y, rim(x)),
+    ]));
+  }
+
+  const deck = lower[lower.length - 1];
+  const deckEnds = [hullFront(0, deck.x), hullFront(1, deck.x)].map(d => d - 1.12);
+  strip('frame', deckEnds.map(d => [point(deck.x, deck.y + .02, d), point(deck.x - .74, deck.y + .02, d)]));
+  strip('guide', deckEnds.map(d => [point(deck.x + .17, deck.y + .05, d), point(deck.x - .09, deck.y + .05, d)]));
+
+  // Line the part of the soffit and sill that is now exposed from the side.
+  for (const [tier, edge] of [flank[0], flank[flank.length - 1]].entries()) {
+    const edges: [T.Vector3, T.Vector3][] = [edge.x, face].map(u => {
+      const seaward = point(u, edge.y, hullFront(tier, u) - .88), inland = point(u, edge.y, flankDepth);
+      return tier === 0 ? [seaward, inland] : [inland, seaward];
+    });
+    strip('panel', edges);
+  }
+
+  // Close the deep return beside the axial liner, where the flank extends behind it.
+  const returnWall = new T.Shape();
+  returnWall.moveTo(-face, flankBottom);
+  for (const { x, y } of flank) returnWall.lineTo(-x, y);
+  returnWall.lineTo(-face, flankTop);
+  returnWall.closePath();
+  const shape = new T.ShapeGeometry(returnWall);
+  const lining = shape.toNonIndexed().rotateY(Math.PI).translate(0, 0, flankDepth).applyMatrix4(root);
+  subtract(lining, axialCut);
+  surface('dark', lining);
+  lining.dispose();
+  shape.dispose();
+}
+
 export function buildHullBowPortal(surface: (finish: Finish, geometry: T.BufferGeometry) => void) {
   const flange = { u: face - .34, side: 2.9, crown: 3.6, sill: 2.1, radius: 3.9, fold: { reach: 2.1, inset: 2.55 } };
   const shoulder = { u: face + .83, side: 2.12, crown: 2.9, sill: 1.86, radius: 3.2, fold: { reach: 2.18, inset: 0 } };
@@ -167,7 +269,10 @@ export function buildHullBowPortal(surface: (finish: Finish, geometry: T.BufferG
   const back = { ...liner, u: recess };
   const finishBand = (finish: Finish, outer: Profile, inner: Profile) => {
     const geometry = band(outer, inner);
-    surface(finish, geometry);
+    const flat = geometry.toNonIndexed();
+    subtract(flat, flankCut);
+    surface(finish, flat);
+    flat.dispose();
     geometry.dispose();
   };
   finishBand('panel', flange, shoulder);
@@ -177,6 +282,8 @@ export function buildHullBowPortal(surface: (finish: Finish, geometry: T.BufferG
   finishBand('guide', guideTop, guideBottom);
   finishBand('frame', guideBottom, liner);
   finishBand('panel', liner, back);
+
+  buildFlankLining(surface);
 
   // The deep end disappears into the unmodelled hull interior beyond this entrance.
   const shadow = new T.PlaneGeometry(width, height * 2).rotateY(Math.PI / 2)
