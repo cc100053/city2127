@@ -150,3 +150,4 @@ R4 加闊兩道斜框上緣，讓銀色折面從下層框延至樓板邊，沿�
 
 - 工作分支 `2eb07029` 已推送。整合工作樹快轉至最新的 `origin/main`（`ea3e72ac`，含展覽名稱文件更新），合併為 `1edcc3e5`。
 - 在整合提交重跑 root `npm test`、`npm run build`、差異空白及圖檔規格檢查，全部通過。整份 `dist/` 與 Chrome 已驗證的版本逐檔一致。
+- [GitHub main CI](https://github.com/cc100053/city2127/actions/runs/45096108330) 驗證 `20df13be`。Root、survey、module-swap 測試和 build、差異空白及圖檔規格全數通過。[工作分支 CI](https://github.com/cc100053/city2127/actions/runs/45095704364) 驗證 `2eb07029`，亦已通過。
