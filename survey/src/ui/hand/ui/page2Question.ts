@@ -5,6 +5,7 @@
 import { nearestBox } from '../handTargets.ts';
 import type { Point } from '../handPointer.ts';
 import { BLUEPRINTS, cardArt } from './cardArt.ts';
+import { DIRS, buildStep, easeOut, esc, finishBuild, setLit, setReadout, type Rect } from './cards.ts';
 import { H, W, type Stage, type StageFrame } from './stage.ts';
 import { T } from './tune.ts';
 import type { HandQuestion, HandView } from './types.ts';
@@ -12,12 +13,7 @@ import type { HandQuestion, HandView } from './types.ts';
 export type QuestionActions = { choose(optionId: string): void; advance(): void; prev(): void; keepAlive(): void };
 
 const SNAP_PX = 48, COOLDOWN_MS = 600;
-const GLYPHS = 'アイウエオカキクケコサシスセソタチツテト01#%&*<>=/▮▯ﾊﾋﾌﾍﾎ';
-const DIRS = [[-1, -1], [1, -1], [-1, 1], [1, 1]];
-const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
-const easeOut = (t: number) => 1 - (1 - t) ** 3;
 const letterOf = (i: number) => String.fromCharCode(65 + i);
-const esc = (s: string) => s.replace(/[&<>"]/g, c => `&#${c.charCodeAt(0)};`);
 /** Question text in masked lines of about 20 characters, broken after 、 and 。. */
 const lines = (text: string) => {
   const out: string[] = [];
@@ -26,7 +22,6 @@ const lines = (text: string) => {
   if (cur) out.push(cur);
   return out.map(s => `<span class="ln"><span>${esc(s)}</span></span>`).join('');
 };
-type Rect = { left: number; top: number; right: number; bottom: number; w: number; h: number };
 
 type Card = {
   el: HTMLElement; i: number; optionId: string; full: string; image: boolean;
@@ -223,7 +218,7 @@ export class QuestionPage {
 
   private stepCard(o: Card, dt: number, nx: number, ny: number) {
     const over = this.hover?.card === o;
-    if (!o.built) this.buildStep(o, dt);
+    if (!o.built) buildStep(o, dt);
     if (!o.forced) o.b = over ? Math.min(1, o.b + dt / T.bootMs) : Math.max(0, o.b - dt / (T.bootMs * 0.6));
     if (!o.built) o.b = 0;
     const b = easeOut(o.b), off = (1 - b) * o.clipH;
@@ -236,8 +231,8 @@ export class QuestionPage {
     o.band.style.transform = `translate3d(0,${((1 - b) * o.rect.h).toFixed(1)}px,0)`;
     o.band.style.opacity = o.b > 0 && o.b < 1 ? '1' : '0';
     if (o.built) {
-      this.setLit(o, Math.floor(o.b * 20));
-      this.setText(o, 'ro', o.readout, o.b >= 1 ? (o.forced ? 'LOCK' : 'HOLO READY') : `HOLO ${String(Math.floor(o.b * 100)).padStart(2, '0')}%`);
+      setLit(o, Math.floor(o.b * 20));
+      setReadout(o, o.b >= 1 ? (o.forced ? 'LOCK' : 'HOLO READY') : `HOLO ${String(Math.floor(o.b * 100)).padStart(2, '0')}%`);
       if (!o.forced) this.setText(o, 'hintText', o.hint, over ? (o.b >= 1 ? 'つまんで選ぶ' : '起動中…') : ' ');
       // Brackets close in discrete steps, each snapping.
       const step = Math.floor(o.b * T.steps + 1e-6) / T.steps, target = T.gapFar - (T.gapFar - 4) * step;
@@ -252,61 +247,10 @@ export class QuestionPage {
       if (over) o.glare.style.transform = `translate3d(${((lx * 0.5 + 0.5) * o.rect.w).toFixed(1)}px,${((ly * 0.5 + 0.5) * o.rect.h).toFixed(1)}px,0)`;
     }
   }
-  private setLit(o: Card, lit: number) {
-    if (lit === o.lit) return;
-    o.lit = lit;
-    o.ticks.forEach((t, j) => t.classList.toggle('on', j < lit));
-  }
-  private setText(o: Card, key: 'ro' | 'hintText', el: HTMLElement, text: string) {
+  private setText(o: Card, key: 'hintText', el: HTMLElement, text: string) {
     if (o[key] === text) return;
     o[key] = text;
     el.textContent = text;
-  }
-
-  /** Build-in: ① brackets snap → ② corner lines → ③ layer print + ④ text decode → letter pop. */
-  private buildStep(o: Card, dt: number) {
-    o.bt += dt;
-    const t = o.bt;
-    if (t < 0) return;
-    const tL = T.brkMs, tP = T.brkMs + T.lineMs * 0.5, popAt = tP + Math.max(T.printMs, T.decodeMs), end = popAt + 160;
-    const p1 = clamp01(t / T.brkMs), e1 = easeOut(p1), click = p1 >= 1 ? 1 + 0.25 * Math.max(0, 1 - (t - T.brkMs) / 90) : 1;
-    o.brks.forEach((el, j) => {
-      const [dx, dy] = DIRS[j], off = 1 - e1;
-      el.style.opacity = (t < end + 250 ? Math.min(1, p1 * 3) : Math.max(0, 1 - (t - end - 250) / 250)).toFixed(3);
-      el.classList.toggle('is-snap', p1 >= 1 && t - T.brkMs < 90);
-      el.style.transform = `translate3d(${(dx * (o.gap + off * 130)).toFixed(1)}px,${(dy * (o.gap + off * 90)).toFixed(1)}px,0) scale(${click.toFixed(3)})`;
-    });
-    const p2 = clamp01((t - tL) / T.lineMs), lineOpacity = t < end ? (p2 > 0 ? '1' : '0') : Math.max(0, 1 - (t - end) / 300).toFixed(3);
-    o.frm.forEach((el, j) => { el.style.opacity = lineOpacity; el.style.transform = j < 4 ? `scaleX(${p2.toFixed(3)})` : `scaleY(${p2.toFixed(3)})`; });
-    const p3 = clamp01((t - tP) / T.printMs), steps = Math.floor(p3 * 28) / 28, off = (1 - steps) * o.rect.h;
-    o.face.style.opacity = p3 > 0 ? '1' : '0';
-    o.face.style.transform = `translate3d(0,${off.toFixed(1)}px,0)`;
-    o.faceIn.style.transform = `translate3d(0,${(-off).toFixed(1)}px,0)`;
-    o.pband.style.transform = `translate3d(0,${((1 - steps) * o.rect.h).toFixed(1)}px,0)`;
-    o.pband.style.opacity = p3 > 0 && p3 < 1 ? '1' : '0';
-    this.setLit(o, Math.floor(p3 * 20));
-    this.setText(o, 'ro', o.readout, p3 < 1 ? `BUILD ${String(Math.floor(p3 * 100)).padStart(2, '0')}%` : 'BUILD OK');
-    const p4 = clamp01((t - tP) / T.decodeMs), n = o.full.length, done = Math.floor(p4 * n);
-    o.glyphT += dt;
-    if (o.glyphT > 45 || p4 >= 1) {
-      o.glyphT = 0;
-      let s = o.full.slice(0, done);
-      if (p4 > 0) for (let j = done; j < n; j++) { const ch = o.full[j]; s += ch === '。' || ch === '、' ? ch : GLYPHS[(Math.random() * GLYPHS.length) | 0]; }
-      if (o.label.textContent !== s) o.label.textContent = s;
-    }
-    const p5 = clamp01((t - popAt) / 160);
-    o.letter.style.transform = p5 <= 0 ? 'scale(0)' : `scale(${(p5 < 0.6 ? p5 / 0.6 * 1.18 : 1.18 - (p5 - 0.6) / 0.4 * 0.18).toFixed(3)})`;
-    if (t >= end + 300) this.finishBuild(o);
-  }
-  private finishBuild(o: Card) {
-    o.built = true;
-    o.face.style.opacity = '1'; o.face.style.transform = ''; o.faceIn.style.transform = '';
-    o.pband.style.opacity = '0';
-    o.frm.forEach(el => { el.style.opacity = '0'; });
-    o.brks.forEach(el => { el.style.opacity = ''; el.classList.remove('is-snap'); });
-    this.setLit(o, 0);
-    o.label.textContent = o.full;
-    o.letter.style.transform = '';
   }
 
   // ---- pick: lock → membrane → chip → HUD slot → the page's own advance -----------------------------------
@@ -317,7 +261,7 @@ export class QuestionPage {
     this.setHover(null);
     card.forced = true;
     this.actions.choose(card.optionId);
-    if (!card.built) this.finishBuild(card);
+    if (!card.built) finishBuild(card);
     card.el.classList.add('is-hover');
     const b0 = card.b, t0 = performance.now();
     while (card.b < 1) {

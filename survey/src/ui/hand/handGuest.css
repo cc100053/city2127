@@ -96,25 +96,3 @@ body.guest-page--hand { display: block; padding: 0; overflow: hidden; }
 .hand-state.is-point .hand-state-dot { border: 0; background: #94c9c2; box-shadow: 0 0 10px #94c9c2; }
 .hand-status { position: absolute; left: 16px; bottom: 10px; margin: 0; color: #bac1bb; font-size: 13px; }
 .hand-video { position: absolute; width: 2px; height: 2px; opacity: 0; }
-
-.hand-lookup[hidden] { display: none; }
-/* ---- look up at the city display, then dim ------------------------------------------------------------------------------ */
-.hand-lookup { position: absolute; inset: 0; overflow: hidden; background: radial-gradient(ellipse at 50% 0%, #2e4a41 0%, #1b211e 60%); }
-.hand-lookup::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 6px; background: linear-gradient(90deg, transparent, #94c9c2, transparent); box-shadow: 0 0 30px 10px #94c9c288; }
-.hl-beam { position: absolute; left: 50%; top: 0; width: 360px; height: 100%; transform: translateX(-50%); clip-path: polygon(30% 100%, 70% 100%, 100% 0, 0 0);
-  background: linear-gradient(to top, #94c9c200 10%, #94c9c233 60%, #94c9c299 100%); animation: hl-beam 2.4s ease-in-out infinite; }
-@keyframes hl-beam { 50% { opacity: .55; } }
-.hl-chevrons { position: absolute; left: 50%; top: 40px; bottom: 260px; width: 120px; transform: translateX(-50%); }
-.hl-chevrons span { position: absolute; left: 50%; width: 70px; height: 70px; margin-left: -35px; border-left: 6px solid #94c9c2; border-top: 6px solid #94c9c2; opacity: 0;
-  transform: rotate(45deg); filter: drop-shadow(0 0 8px #94c9c2); animation: hl-chevron 1.8s linear infinite; animation-delay: calc(var(--i) * .36s); }
-@keyframes hl-chevron { 0% { top: 100%; opacity: 0; } 20%, 80% { opacity: 1; } 100% { top: 0%; opacity: 0; } }
-.hl-copy { position: absolute; left: 0; right: 0; bottom: 70px; display: grid; justify-items: center; gap: 14px; text-align: center; transition: opacity 1.2s; }
-.hl-eyebrow { margin: 0; color: #dfbd85; font-size: 14px; letter-spacing: 3px; }
-.hl-copy h2 { margin: 0; font-size: 46px; font-weight: 500; }
-.hl-lead { margin: 0; color: #94c9c2; font-size: 24px; letter-spacing: 4px; }
-.hl-dim-note { position: absolute; left: 0; right: 0; bottom: 60px; margin: 0; color: #59675f; font-size: 16px; text-align: center; opacity: 0; transition: opacity 1.2s; }
-.hand-lookup.is-dim { background: #0b0e0d; }
-.hand-lookup.is-dim::before, .hand-lookup.is-dim .hl-chevrons { display: none; }
-.hand-lookup.is-dim .hl-beam { opacity: .2; animation: none; }
-.hand-lookup.is-dim .hl-copy { opacity: 0; }
-.hand-lookup.is-dim .hl-dim-note { opacity: 1; }

@@ -210,6 +210,19 @@ function handSnapshot(): HandView {
       options: question.options.map(option => ({ id: option.id, label: option.label })), chosen: draft.get(question.id), editing: editingFromReview,
     } : undefined,
     slots: session ? session.questions.map(item => ({ id: item.id, chosen: draft.get(item.id) })) : [],
+    review: (screen === 'review' || screen === 'submitting') && session ? {
+      rows: session.questions.map(item => {
+        const option = item.options.find(o => o.id === draft.get(item.id));
+        return { questionId: item.id, text: item.text, optionId: option?.id, label: option?.label };
+      }),
+      canSubmit: !busy && !pendingRequest, uncertain: pendingRequest !== undefined,
+    } : undefined,
+    result: saved ? {
+      ordinal: saved.proposal.ordinal, guestCount: saved.state.guestCount, readyAt: resultReadyAt, endsAt: resultEndsAt,
+      answers: saved.proposal.answers.map(a => ({ questionId: a.questionId, optionId: a.optionId, label: a.optionLabel })),
+      shares: saved.proposal.rotation?.shares.map(share => ({ questionId: share.questionId, percent: share.percent, total: share.total })) ?? [],
+    } : undefined,
+    exploring, othersExploring,
   };
 }
 
@@ -629,7 +642,8 @@ function renderHandoff() {
       action('はじめる画面へ', nextGuest, !exploring)));
   focusTitle();
   // While this guest looks at a landmark the screen waits for 戻る, the next Start or a new result; staff end a forgotten one.
-  if (!exploring) flowTimer = window.setTimeout(nextGuest, Math.max(EXPLORE_OFFER_MS, resultEndsAt - performance.now()));
+  // Hand mode: the 住民の窓 handoff runs its own idle rail (8 s with a hand, 20 s touch only) and calls nextGuest.
+  if (!exploring && !handMode) flowTimer = window.setTimeout(nextGuest, Math.max(EXPLORE_OFFER_MS, resultEndsAt - performance.now()));
 }
 
 async function explore(target: ExploreTarget | null) {

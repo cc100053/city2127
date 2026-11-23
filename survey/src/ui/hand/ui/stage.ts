@@ -45,6 +45,8 @@ export type StageFrame = {
   /** A pinch closed this frame at this stage point (the pointer's frozen position). */
   pinch?: Point;
   pinchClosed: boolean;
+  /** Camera hand tracking runs (false = touch only). */
+  tracking: boolean;
   /** Raw MediaPipe landmarks of the controlling hand (normalized camera space, not mirrored). */
   landmarks?: { x: number; y: number }[];
   frameW: number;
@@ -68,6 +70,8 @@ export class Stage {
   readonly hudLabel: HTMLElement;
   readonly dots: HTMLElement[];
   readonly pose: HTMLElement;
+  /** The sent packet, handed from page 3 to page 4 (stage px, already on screen). */
+  packet?: { el: HTMLElement; x: number; y: number; w: number; h: number };
   /** `住民 #0042` once registered (display only). */
   resident?: string;
   scale = 1;

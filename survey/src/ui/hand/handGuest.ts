@@ -1,8 +1,8 @@
 // Hand control layer for the guest page, lazy-loaded by guestDebugView.ts for `/guest?hand`.
 // Pinch-only: an open palm moves the cursor (palm centre) and previews what is under it; a thumb-index pinch selects.
-// Fist, lowered hand or no hand = rest (no cursor, nothing fires). Welcome (住民登録) and the questions are drawn by
-// the 住民の窓 hologram stage (./ui/); review, look-up and handoff still use the M3 skin over the page's own DOM.
-// Either way the page's own controls do the work (start button, radios, form submit), so flow, timers and server
+// Fist, lowered hand or no hand = rest (no cursor, nothing fires). Every screen from 住民登録 to the handoff is drawn by
+// the 住民の窓 hologram stage (./ui/); only the abandoned screen and session errors fall back to the M3 skin over the
+// page's own DOM. Either way the page's own controls do the work (start button, radios, form submit), so flow, timers and server
 // calls stay in guestDebugView.ts. Touch keeps working; failures fall back to touch-only. `&dev-hand` (DEV-ONLY)
 // feeds synthetic hands for tests; `&tune` shows the tuning panel, `&fps` a frame meter.
 import './handGuest.css';
@@ -13,6 +13,9 @@ import type { HandFrame, HandTracker } from './handTracker.ts';
 import { Stage } from './ui/stage.ts';
 import { RegisterPage } from './ui/page1Register.ts';
 import { QuestionPage } from './ui/page2Question.ts';
+import { ReviewPage } from './ui/page3Review.ts';
+import { LookUpPage } from './ui/page4LookUp.ts';
+import { HandoffPage } from './ui/page5Handoff.ts';
 import { mountTunePanel } from './ui/tune.ts';
 import type { HandView } from './ui/types.ts';
 
@@ -28,9 +31,9 @@ export type HandGuestOptions = {
   dev?: boolean;
 };
 
-const COOLDOWN_MS = 600, PICK_MS = 500, LOOK_UP_MS = 4000, SNAP_PX = 48, ACTIVITY_MS = 1000, LOG_EVERY_MS = 10_000;
+const COOLDOWN_MS = 600, PICK_MS = 500, SNAP_PX = 48, ACTIVITY_MS = 1000, LOG_EVERY_MS = 10_000;
 const TARGETS = 'button, label.guest-choice, .guest-review-row';
-const HOLO_SCREENS = new Set(['welcome', 'starting', 'question']);
+const HOLO_SCREENS = new Set(['welcome', 'starting', 'question', 'review', 'submitting', 'waiting', 'result', 'handoff']);
 
 export function mountHandGuest({ app, onActivity, subscribe, dev = false }: HandGuestOptions) {
   app.classList.add('guest--hand');
@@ -39,19 +42,13 @@ export function mountHandGuest({ app, onActivity, subscribe, dev = false }: Hand
   const layer = document.createElement('div');
   layer.className = 'hand-layer';
   layer.innerHTML = `
-<section class="hand-lookup" hidden>
-  <div class="hl-beam"></div>
-  <div class="hl-chevrons">${[0, 1, 2, 3, 4].map(i => `<span style="--i:${i}"></span>`).join('')}</div>
-  <div class="hl-copy"><p class="hl-eyebrow"></p><h2>上の画面をご覧ください</h2><p class="hl-lead">あなたの声が街へ</p></div>
-  <p class="hl-dim-note">上の画面で、あなたの声が街に届いています。</p>
-</section>
 <div class="hand-cursor" aria-hidden="true"></div>
 <p class="hand-state" role="status"><span class="hand-state-dot"></span><span class="hand-state-text"></span></p>
 <p class="hand-status" role="status" hidden></p>`;
   document.body.append(layer);
   const $ = <T extends Element>(selector: string) => layer.querySelector<T>(selector)!;
   const cursorEl = $<HTMLElement>('.hand-cursor'), stateEl = $<HTMLElement>('.hand-state'), stateText = $<HTMLElement>('.hand-state-text');
-  const statusEl = $<HTMLElement>('.hand-status'), lookupEl = $<HTMLElement>('.hand-lookup');
+  const statusEl = $<HTMLElement>('.hand-status');
   const setStatus = (text: string) => { statusEl.textContent = text; statusEl.hidden = !text; };
 
   // ---- 住民の窓 stage: acts through the page's own controls ------------------------------------------------
@@ -68,14 +65,23 @@ export function mountHandGuest({ app, onActivity, subscribe, dev = false }: Hand
     },
     advance: () => { const f = form(); if (f?.querySelector('input:checked')) f.requestSubmit(); },
     prev: () => click(Array.from(app.querySelectorAll<HTMLButtonElement>('.guest-form .guest-actions button')).find(b => b.textContent === '前の質問へ')),
+    edit: (index: number) => click(app.querySelectorAll<HTMLElement>('.guest-review-row button:not(:disabled)')[index]),
+    submit: () => click(app.querySelector<HTMLElement>('[data-auto-action="submit"]:not(:disabled)')),
+    explore: (target: 'sky-ring' | 'space-elevator' | null) => click(Array.from(app.querySelectorAll<HTMLButtonElement>('.guest-actions button'))
+      .find(b => b.textContent === (target === 'sky-ring' ? '空の環を見る' : target === 'space-elevator' ? '軌道エレベーターを見る' : '戻る'))),
+    nextGuest: () => click(Array.from(app.querySelectorAll<HTMLButtonElement>('.guest-actions button')).find(b => b.textContent === 'はじめる画面へ')),
   };
-  const register = new RegisterPage(stage, pageActions), questions = new QuestionPage(stage, pageActions);
-  let view: HandView | undefined, current: RegisterPage | QuestionPage | undefined;
+  const register = new RegisterPage(stage, pageActions), questions = new QuestionPage(stage, pageActions), review = new ReviewPage(stage, pageActions);
+  const lookUp = new LookUpPage(stage), handoff = new HandoffPage(stage, pageActions);
+  type Page = RegisterPage | QuestionPage | ReviewPage | LookUpPage | HandoffPage;
+  let view: HandView | undefined, current: Page | undefined;
+  const pageFor = (screen: string): Page => screen === 'question' ? questions : screen === 'review' || screen === 'submitting' ? review
+    : screen === 'waiting' || screen === 'result' ? lookUp : screen === 'handoff' ? handoff : register;
   const holoOn = () => !!view && HOLO_SCREENS.has(view.screen) && !view.needsPage;
   subscribe(next => {
     view = next;
     const on = holoOn();
-    const want = !on ? undefined : next.screen === 'question' ? questions : register;
+    const want = on ? pageFor(next.screen) : undefined;
     if (want !== current) { current?.unmount(); current = want; current?.mount(); }
     stage.show(on);
     document.body.classList.toggle('guest-page--holo', on);
@@ -86,6 +92,7 @@ export function mountHandGuest({ app, onActivity, subscribe, dev = false }: Hand
     const el = (event.target as HTMLElement).closest<HTMLElement>('[data-act]');
     if (el && current) current.tap(el);
   });
+  for (const type of ['pointerup', 'pointercancel'] as const) addEventListener(type, () => { if (current && 'release' in current) current.release(); });
   if (params.has('tune')) mountTunePanel(stage.root);
   if (params.has('fps')) { stage.enableFps(); stage.fpsExtra = () => ` · infer ${inferFps.toFixed(0)} Hz`; }
 
@@ -93,7 +100,7 @@ export function mountHandGuest({ app, onActivity, subscribe, dev = false }: Hand
   const poses = new PoseFilter(150);
   const gate = new TargetGate<HTMLElement>(Infinity, COOLDOWN_MS); // pinch-only: hovering never fires
   let landmarks: Landmark[] | undefined, frameSize = { w: 640, h: 480 }, pendingPinch: Point | undefined, pinchEdge = false;
-  let pose: Pose = 'rest', lastActivity = 0, screenKey = '', hovered: HTMLElement | null = null, resultShownAt = 0, pickedAt = 0;
+  let pose: Pose = 'rest', lastActivity = 0, screenKey = '', hovered: HTMLElement | null = null, pickedAt = 0;
   const stats = { pinch: 0, handLost: 0, frames: 0, get registered() { return register.registrations; } };
 
   // ---- M3 targets (review, handoff and other page screens) ---------------------------------------------------
@@ -139,7 +146,7 @@ export function mountHandGuest({ app, onActivity, subscribe, dev = false }: Hand
     renderCount++;
     const screen = app.dataset.screen ?? '';
     const key = `${screen}|${app.querySelector('h1')?.textContent ?? ''}`;
-    if (key !== screenKey) { screenKey = key; if (screen === 'result') resultShownAt = now; pickedAt = 0; }
+    if (key !== screenKey) { screenKey = key; pickedAt = 0; }
     // Pose: a pinch keeps the palm in control; everything else is filtered with 150 ms hysteresis.
     const raw = pointer.present ? classifyPose(landmarks, frameSize.w, frameSize.h) : 'rest';
     pose = poses.update(pointer.pinch.closed && pose === 'palm' ? 'palm' : raw, now);
@@ -155,25 +162,16 @@ export function mountHandGuest({ app, onActivity, subscribe, dev = false }: Hand
       current!.frame({
         now, dt, cursor: cursor && stage.toStage(cursor), present: active && pointer.present,
         pinch: edge && controlling && pinchAt ? stage.toStage(pinchAt) : undefined, pinchClosed: pointer.pinch.closed,
-        landmarks: active ? landmarks : undefined, frameW: frameSize.w, frameH: frameSize.h,
+        landmarks: active ? landmarks : undefined, frameW: frameSize.w, frameH: frameSize.h, tracking: active,
       });
       stage.setPose(controlling);
     }
 
-    // Look-up when the city display of this proposal starts, dimmed after LOOK_UP_MS.
-    const lookupOn = screen === 'result';
-    lookupEl.hidden = !lookupOn;
-    if (lookupOn) {
-      lookupEl.classList.toggle('is-dim', now - resultShownAt > LOOK_UP_MS);
-      const number = app.querySelector('.guest-result-number')?.textContent ?? '';
-      $<HTMLElement>('.hl-eyebrow').textContent = number ? `${number} の声を記録しました` : '';
-    }
-
     // M3 pointing cursor, preview and pinch over the page's DOM (never on holo screens: hidden buttons stay inert).
-    const domCursor = !holo && !lookupOn ? cursor : undefined;
+    const domCursor = !holo ? cursor : undefined;
     const target = domCursor ? targetAt(domCursor) : null;
     gate.hover(target, now);
-    if (!holo && !lookupOn && edge && controlling && pinchAt) { const fired = gate.pinch(targetAt(pinchAt), now); if (fired) activate(fired, now); }
+    if (!holo && edge && controlling && pinchAt) { const fired = gate.pinch(targetAt(pinchAt), now); if (fired) activate(fired, now); }
     if (pickedAt && now - pickedAt > PICK_MS) { pickedAt = 0; const f = form(); if (f?.querySelector('input:checked')) f.requestSubmit(); }
     if (target !== hovered) { hovered?.classList.remove('is-hand-hover'); target?.classList.add('is-hand-hover'); hovered = target; }
     layer.classList.toggle('has-cursor', !!domCursor);
@@ -181,7 +179,7 @@ export function mountHandGuest({ app, onActivity, subscribe, dev = false }: Hand
       cursorEl.style.transform = `translate3d(${domCursor.x}px,${domCursor.y}px,0)`;
       cursorEl.classList.toggle('is-pinched', pointer.pinch.closed);
     }
-    const handOn = active && !holo && !lookupOn;
+    const handOn = active && !holo;
     stateEl.hidden = !handOn;
     stateEl.classList.toggle('is-point', controlling);
     stateText.textContent = controlling ? '手のひらで操作中' : '休止中 — 手のひらを向けると操作';
@@ -236,8 +234,7 @@ export function mountHandGuest({ app, onActivity, subscribe, dev = false }: Hand
       /** Viewport point of a stage point (the stage is letterboxed and scaled). */
       fromStage(x: number, y: number) { const r = stage.el.getBoundingClientRect(); return { x: r.left + x * stage.scale, y: r.top + y * stage.scale }; },
       state: () => ({ screen: app.dataset.screen, present: pointer.present, pose, pinch: stats.pinch, registered: stats.registered,
-        holo: holoOn() && current ? { page: current.name, ...current.debug() } : undefined,
-        lookup: lookupEl.hidden ? undefined : lookupEl.classList.contains('is-dim') ? 'dim' : 'look-up' }),
+        holo: holoOn() && current ? { page: current.name, ...current.debug() } : undefined }),
     };
     active = true;
   } else if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) {

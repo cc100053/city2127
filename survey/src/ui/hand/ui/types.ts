@@ -30,4 +30,18 @@ export type HandView = {
   question?: HandQuestion;
   /** The drawn questions in order with each draft answer (HUD progress slots). */
   slots: { id: string; chosen?: string }[];
+  /** Review: one row per drawn question. */
+  review?: { rows: { questionId: string; text: string; optionId?: string; label?: string }[]; canSubmit: boolean; uncertain: boolean };
+  /** The recorded proposal (waiting, result, handoff). Times are on the performance.now() clock. */
+  result?: {
+    ordinal: number; guestCount: number;
+    /** The city screen starts this proposal (end of displayWaitMs) and ends its reading slot. */
+    readyAt: number; endsAt: number;
+    answers: { questionId: string; optionId: string; label: string }[];
+    /** Crowd share per answer; `percent` is absent below the vote threshold. */
+    shares: { questionId: string; percent?: number; total: number }[];
+  };
+  /** This guest has turned the shared screen to a landmark / the other station holds it. */
+  exploring: boolean;
+  othersExploring: boolean;
 };
