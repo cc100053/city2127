@@ -244,3 +244,9 @@ R11 用同一曲面掃出外銀緣、暗槽和較細的內銀緣。端牆以橢�
 - 開發 Mac 的實體 Chrome 視窗用 1920 × 1080／DPR 1 量固定 Hero。12:00 和 21:25 各量四段 120 幀，兩次首段均為 58.5 FPS，其後三段均為 60.0 FPS。同期本機執行 root 測試。量測存於 `~/city2127-evidence/hull-facade/r11/fps.json`。
 - 工作分支 CI 驗證 `56ce7e9c4d18cd8ae0ad2e311bfb8434a6919580`，root、survey、module-swap 的測試與 build、差異空白及圖檔規格全數通過。[工作分支 CI](https://github.com/cc100053/city2127/actions/runs/45153282649)
 - 主線 CI 驗證 `3b8c1ed77766902cee6c14b4477807d7424db051`。Root、survey、module-swap 的測試與 build、差異空白及圖檔規格全數通過。[主線 CI](https://github.com/cc100053/city2127/actions/runs/45153898453)
+
+## R12 · Blender 船首洞口
+
+- 業主 cc100053 指定用 Blender 打磨靠廣場的列車口。從已 fetch 並核對的 `origin/main`（`a49a4ff831eb624fbbbc79c201548a016f1722b5`）開獨立工作樹 `codex/hull-facade-r12`。基準為 R11 的 `2817636a` 幾何和主線 CI 45153898453。原工作區 `main` 在 `2df6d8b6`，領先 0、落後 37，保留 `Dev_QA.md` 和 `Presentation.md`。
+- [Target](../../artifacts/hull-facade/target.jpg) 的銀帶逐步加闊並接入外緣，頂弧反光沿弧面延伸。R12 集中打磨端牆轉角及最低兩級曲帶的接點，保留雙銀緣、凹入暗槽、靠海視線、原軌道、18 × 14 m 包絡及 9.1 m 洞深。這是場地專用的船身外殼，須貼合既有端牆與退台。
+- 沿用 R11 的固定 Hero、斜前方日昏夜、廣場及退台回歸鏡位。由 Blender 5.2.2 匯出 GLB，以城市畫面及實際列車 GLB 核對。
