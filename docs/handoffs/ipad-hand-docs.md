@@ -14,3 +14,7 @@
 ## 驗證與剩餘工作
 
 本次範圍為 Markdown。2026-11-24 核對 base 原始碼、42 個新增本機連結及錨點、完整差異同 `git diff --check`，均通過。CI 設定略過純 Markdown push。實機及瀏覽器紀錄沿用 2026-11-23 來源，今次無重新量測。雙站真機、展覽閱讀距離同長時間穩定性繼續跟 [驗收紀錄](../VALIDATION.md#ipad住民の窓實測與回歸)。
+
+## 整合
+
+文件 commit `99c5cd7e` 已推到 `origin/codex/ipad-hand-docs`。整合 commit `914233b486b400a616a32916e25f19b032df35c1` 重跑 42 個本機連結及錨點、來源事實同 `git diff --check`，均通過。之後只補本段整合紀錄。
