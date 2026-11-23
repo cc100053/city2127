@@ -192,7 +192,7 @@ function loft(rows: T.Vector3[][]) {
   return { geometry: geometry.applyMatrix4(root), indices };
 }
 
-type Finish = 'frame' | 'panel' | 'guide' | 'dark';
+type Finish = 'frame' | 'bow' | 'panel' | 'guide' | 'dark';
 
 function buildBowFrame(surface: (finish: Finish, geometry: T.BufferGeometry) => void) {
   const stations = flank.flatMap(({ x, y }, i) => {
@@ -335,7 +335,30 @@ function buildFlankLining(surface: (finish: Finish, geometry: T.BufferGeometry) 
   shape.dispose();
 }
 
-export function buildHullBowPortal(surface: (finish: Finish, geometry: T.BufferGeometry) => void) {
+/** Batch the editable Blender skin with the existing silver and dark hull finishes. */
+function buildBlenderBowFrame(model: T.Group, surface: (finish: Finish, geometry: T.BufferGeometry) => void) {
+  const parts: { mesh: T.Mesh; finish: 'bow' | 'dark' }[] = [];
+  model.updateWorldMatrix(true, true);
+  model.traverse(part => {
+    if (!(part instanceof T.Mesh) || Array.isArray(part.material)) return;
+    const name = part.material.name;
+    if (name === 'bow_silver' || name === 'bow_recess') {
+      parts.push({ mesh: part, finish: name === 'bow_silver' ? 'bow' : 'dark' });
+    }
+  });
+  if (!parts.some(({ finish }) => finish === 'bow') || !parts.some(({ finish }) => finish === 'dark')) return false;
+
+  for (const { mesh, finish } of parts) {
+    const flat = mesh.geometry.index ? mesh.geometry.toNonIndexed() : mesh.geometry.clone();
+    flat.applyMatrix4(root.clone().multiply(mesh.matrixWorld));
+    subtract(flat, axialCut);
+    surface(finish, flat);
+    flat.dispose();
+  }
+  return true;
+}
+
+export function buildHullBowPortal(surface: (finish: Finish, geometry: T.BufferGeometry) => void, model?: T.Group) {
   const throat = { u: face + .13, side: .32, crown: .32, sill: .32, radius: .7, fold: { reach: .49, inset: .06 } };
   const guideTop = { u: face + .08, side: .40, crown: .40, sill: .40, radius: .80, fold: { reach: .38, inset: .08 } };
   const guideBottom = { u: face - .06, side: .14, crown: .14, sill: .14, radius: .39, fold: { reach: 0, inset: .08 } };
@@ -356,7 +379,7 @@ export function buildHullBowPortal(surface: (finish: Finish, geometry: T.BufferG
   finishBand('panel', liner, back);
 
   buildFlankLining(surface);
-  buildBowFrame(surface);
+  if (!model || !buildBlenderBowFrame(model, surface)) buildBowFrame(surface);
 
   // The deep end disappears into the unmodelled hull interior beyond this entrance.
   const shadow = new T.PlaneGeometry(width, height * 2).rotateY(Math.PI / 2)

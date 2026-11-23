@@ -1,7 +1,7 @@
 import * as T from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { buildHullFacade, hullFrameReturns, hullFront, hullLobby, hullRear, hullTiers } from './hullFacade.ts';
-import { hullFrameMetal, hullFrameUv, hullPanelMetal } from './hullMetals.ts';
+import { hullBowMetal, hullFrameMetal, hullFrameUv, hullPanelMetal } from './hullMetals.ts';
 import { buildHullBowPortal, cutHullBowOpening, HULL_BOW_FLANK_AT_DECK, HULL_BOW_PORTAL } from './hullPortal.ts';
 import { hash, plantCanopy, plantShrubs } from './coastalCanopy.ts';
 import { bodyFootprints, inRect } from './megaFootprints.ts';
@@ -118,7 +118,7 @@ type Batch = Map<T.Material, T.BufferGeometry[]>;
 /** Queue a geometry (placed by `m`) under a material; everything is normalised so per-material merging always succeeds. */
 function put(batch: Batch, material: T.Material, g: T.BufferGeometry, m?: T.Matrix4) {
   const flat = g.index ? g.toNonIndexed() : g.clone();
-  if (material !== hullCove && material !== hullFrameMetal && material !== hullPanelMetal) flat.deleteAttribute('uv');
+  if (material !== hullCove && material !== hullFrameMetal && material !== hullBowMetal && material !== hullPanelMetal) flat.deleteAttribute('uv');
   if (m) flat.applyMatrix4(m);
   (batch.get(material) ?? batch.set(material, []).get(material)!).push(flat);
 }
@@ -622,8 +622,8 @@ export function carveContext(environment: T.Object3D) {
   });
 }
 
-/** The three megastructures, with the optional Blender ring exterior. */
-export function megastructures(ringModels?: { entrance: T.Group; body?: T.Group; hasTransfer?: boolean }): T.Group {
+/** The three megastructures, with available Blender exterior parts. */
+export function megastructures(ringModels?: { entrance: T.Group; body?: T.Group; hasTransfer?: boolean }, bowModel?: T.Group): T.Group {
   const root = new T.Group(); root.name = 'megastructures';
   const batch: Batch = new Map(), trees: Plant[] = [], shrubs: Shrub[] = [], plants: SlopePlant[] = [], tops: [number, number][] = [];
   ring(batch, plants, Boolean(ringModels), Boolean(ringModels?.body), Boolean(ringModels?.hasTransfer)); arch(batch, tops);
@@ -635,8 +635,8 @@ export function megastructures(ringModels?: { entrance: T.Group; body?: T.Group;
     if (existing) existing.push(...parts);
     else batch.set(material, parts);
   }
-  const portalFinishes = { frame: hullFrameMetal, panel: hullPanelMetal, guide: hullPortalGuide, dark: megaPortal };
-  buildHullBowPortal((finish, geometry) => put(batch, portalFinishes[finish], geometry));
+  const portalFinishes = { frame: hullFrameMetal, bow: hullBowMetal, panel: hullPanelMetal, guide: hullPortalGuide, dark: megaPortal };
+  buildHullBowPortal((finish, geometry) => put(batch, portalFinishes[finish], geometry), bowModel);
   for (const [material, list] of batch) {
     const mesh = new T.Mesh(mergeGeometries(list), carved.get(material) ?? material);
     mesh.castShadow = material !== hullGlass;
@@ -680,7 +680,8 @@ export async function loadMegastructures(): Promise<T.Group> {
 
   const body = new T.Group();
   body.name = 'ring-body-2127';
-  const [entrance, sections] = await Promise.allSettled([
+  const bowUrl = new URL('../asset/models/hull-bow-2127/hull-bow-2127.glb', import.meta.url).href;
+  const [entrance, sections, bow] = await Promise.allSettled([
     loadRingPart(entranceUrl, new T.Group()),
     Promise.all([
       loadRingPart(transferUrl, body).catch(error => {
@@ -689,15 +690,18 @@ export async function loadMegastructures(): Promise<T.Group> {
       }),
       ...ringUpperUrls.map(url => loadRingPart(url, body)),
     ]),
+    addCityModel(new T.Group(), bowUrl, [0, 0, 0]),
   ]);
+  const bowModel = bow.status === 'fulfilled' ? bow.value : undefined;
+  if (bow.status === 'rejected') console.warn('Hull bow model could not load. Using the procedural collar.', bow.reason);
   if (entrance.status === 'rejected') {
     console.warn('Ring entrance model could not load. Using the procedural ring and entrance.', entrance.reason);
-    return megastructures();
+    return megastructures(undefined, bowModel);
   }
   entrance.value.name = 'ring-gate-2127';
   if (sections.status === 'rejected') {
     console.warn('Ring shell could not load. Using the procedural shell with the Blender entrance.', sections.reason);
-    return megastructures({ entrance: entrance.value });
+    return megastructures({ entrance: entrance.value }, bowModel);
   }
   const [lower] = sections.value;
   const transfer = lower.getObjectByName('Concourse_floor') ? lower : undefined;
@@ -715,5 +719,5 @@ export async function loadMegastructures(): Promise<T.Group> {
       transfer.add(panel);
     }
   }
-  return megastructures({ entrance: entrance.value, body, hasTransfer: Boolean(transfer) });
+  return megastructures({ entrance: entrance.value, body, hasTransfer: Boolean(transfer) }, bowModel);
 }

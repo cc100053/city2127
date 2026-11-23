@@ -63,6 +63,14 @@ function makeHullMetal(finish: MetalFinish, parameters: T.MeshStandardMaterialPa
 export const hullFrameMetal = makeHullMetal('frame', {
   color: '#dadddf', metalness: .69, roughness: .54, bumpScale: .017,
 });
+// Keep the same brushed texture where the satin-finished bow meets the original brightwork.
+export const hullBowMetal = hullFrameMetal.clone();
+hullBowMetal.name = 'hull-bow-metal';
+hullBowMetal.roughness = .68;
+hullBowMetal.bumpScale = .012;
+hullBowMetal.onBeforeCompile = hullFrameMetal.onBeforeCompile;
+hullBowMetal.customProgramCacheKey = hullFrameMetal.customProgramCacheKey;
+
 export const hullPanelMetal = makeHullMetal('panel', {
   color: '#6b6d6e', metalness: .55, roughness: .83, bumpScale: .026,
 });

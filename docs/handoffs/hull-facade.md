@@ -244,3 +244,23 @@ R11 用同一曲面掃出外銀緣、暗槽和較細的內銀緣。端牆以橢�
 - 開發 Mac 的實體 Chrome 視窗用 1920 × 1080／DPR 1 量固定 Hero。12:00 和 21:25 各量四段 120 幀，兩次首段均為 58.5 FPS，其後三段均為 60.0 FPS。同期本機執行 root 測試。量測存於 `~/city2127-evidence/hull-facade/r11/fps.json`。
 - 工作分支 CI 驗證 `56ce7e9c4d18cd8ae0ad2e311bfb8434a6919580`，root、survey、module-swap 的測試與 build、差異空白及圖檔規格全數通過。[工作分支 CI](https://github.com/cc100053/city2127/actions/runs/45153282649)
 - 主線 CI 驗證 `3b8c1ed77766902cee6c14b4477807d7424db051`。Root、survey、module-swap 的測試與 build、差異空白及圖檔規格全數通過。[主線 CI](https://github.com/cc100053/city2127/actions/runs/45153898453)
+
+## R12 · Blender 船首洞口
+
+- 業主 cc100053 指定用 Blender 打磨靠廣場的列車口。從已 fetch 並核對的 `origin/main`（`a49a4ff831eb624fbbbc79c201548a016f1722b5`）開獨立工作樹 `codex/hull-facade-r12`。基準為 R11 的 `2817636a` 幾何和主線 CI 45153898453。原工作區 `main` 在 `2df6d8b6`，領先 0、落後 37，保留 `Dev_QA.md` 和 `Presentation.md`。
+- [Target](../../artifacts/hull-facade/target.jpg) 的銀帶逐步加闊並接入外緣，頂弧反光沿弧面延伸。R12 集中打磨端牆轉角及最低兩級曲帶的接點，保留雙銀緣、凹入暗槽、靠海視線、原軌道、18 × 14 m 包絡及 9.1 m 洞深。這是場地專用的船身外殼，須貼合既有端牆與退台。
+- 沿用 R11 的固定 Hero、斜前方日昏夜、廣場及退台回歸鏡位。由 Blender 5.2.2 匯出 GLB，以城市畫面及實際列車 GLB 核對。
+
+R12 在 Blender 用一張四邊面網格連起雙銀緣、凹槽及兩段曲帶。頂弧補了端牆轉角的控制線，下框加了包住原角肋的細分支撐。曲帶末端收入原立面銀框。城市端共用原有拉絲紋理，洞口銀面用 0.68 粗糙度，並在匯入時套用原通車裁切。
+
+### R12 模型及驗證
+
+- 幾何與城市接線提交 `9e03dad1d8ddc51b1fe04075afcf7904f49f95d1`。[Blender 原檔](../../asset/models/hull-bow-2127/hull-bow-2127.blend) · [GLB](../../asset/models/hull-bow-2127/hull-bow-2127.glb) · [重建腳本](../../asset/models/hull-bow-2127/build_bow.py)。
+- Blender 5.2.2 LTS／Apple M6 Metal。實米與船身共用原點，長軸 +X，Blender Z-up，GLB Y-up。以 `blender -b --factory-startup --python-exit-code 1 -P asset/models/hull-bow-2127/build_bow.py` 重建原檔。開啟原檔，選 `Bow_Collar`，以 glTF 2.0 Binary、Y-up、評估細分修改器、關閉動畫及壓縮匯出。使用專案 Blender 技能的 `gltf` preset。模型用自製幾何，兩個材質角色映射到城市的霧面銀和原有暗槽。
+- 空場景重匯入是一個網格、4,696 三角面、兩個材質角色、121,248 bytes。GLB 局部 X／Y／Z 邊界為 73.250…94.652／2.721…28.560／−3.703…30.650 m。Blender 資產 QA 及 Web 預算檢查通過。四邊面線框與材質圖亦已檢視。UV 採重複的實米座標供拉絲紋理取樣，外殼在船身上方安裝，兩項 QA 提示均屬這個用法。外殼邊界沿內外覆板開放。
+- [巨構測試](../../tests/megastructures.test.ts) 用實際 GLB 組裝船身。Hero 射線通過雙緣與凹槽、內壁、導光和深處遮蔽。原斜前方核對頂弧、兩道銀帶接點及下框繞角。18 × 14 m 包絡及 9.1 m 洞深通過。兩路實際頭／中／尾車每 0.02 秒取樣，原口面段最小淨距 1.84／3.75 m，延伸段 1.84／3.12 m。
+- 另一端洞口 594 面、大堂 1,208 面、15／60／105 m 公共退台 556／1,286／1,062 面的材質和頂點屬性與 R11 逐面一致。三處退台鋪面與望海通視亦通過射線檢查。霧面銀多一組合批，巨構由 14 增至 15 組，非 instanced 結構由 74,592 增至 75,201 三角面。
+- 最終霧面銀提交 `409dffdc4cf2e1fccf1b32d82cde9525b71b5830` 的 root `npm test`、`npm run build` 及 `git diff --check` 通過。
+- 開發 Mac 的 Chrome 157.0.8103.79（Apple M6／ANGLE Metal）以 1600 × 900／DPR 1 核對 12:00、18:00、21:25 的正式 build。三次 GLB 請求均回傳 200，畫布持續更新。另阻擋 GLB 請求，確認程式使用 R11 外框並繼續繪製。原斜前方 DEV 鏡位在 18:00 和 21:25 記錄 168／160 個實時幀，頭車跨過口面並進到遮蔽面後。正常載入及入洞的頁面例外、shader 及本機資源錯誤為零。記錄在 `~/city2127-evidence/hull-facade/r12/browser-satin.json`。
+- 八張 2400 × 1350／DPR 1 原圖及 sidecar 均來自乾淨的 `409dffdc`，頁面例外為零，原圖在 `~/city2127-evidence/hull-facade/r12/review-satin/`。R11／R12 的 Hero 都在 18:00、場景時間 20 秒擷取，斜前方以相同鏡位核對日昏及夜間入洞。廣場對照核對日夜大堂及夜間簷下入口。Blender 材質與線框檢視在 `~/city2127-evidence/hull-facade/r12/blender/`。[固定 Hero 與 Target](../../artifacts/hull-facade/r12-hero.jpg) · [日昏及夜間入洞](../../artifacts/hull-facade/r12-bow.jpg) · [廣場入口回歸](../../artifacts/hull-facade/r12-entry.jpg)
+- 原斜前方仍可見一段柔和的頂弧反光。固定 Hero 的前景步道遮住部分下框，業主目視驗收及展覽機驗證待完成。
