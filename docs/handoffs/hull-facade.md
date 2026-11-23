@@ -236,3 +236,9 @@ R11 用同一曲面掃出外銀緣、暗槽和較細的內銀緣。端牆以橢�
 - 八張 2400 × 1350／DPR 1 Chrome 原圖及 sidecar 在 `~/city2127-evidence/hull-facade/r11/review/`，取自乾淨的 `2817636a`，頁面例外為零。固定 Hero 在 18:00、場景時間 20 秒比對兩輪全幅和等位局部。斜前方圖在相同鏡位比較日昏及夜間的入洞，廣場圖核對日夜大堂、門框及簷底。[固定 Hero 與 Target](../../artifacts/hull-facade/r11-hero.jpg) · [日昏及夜間入洞](../../artifacts/hull-facade/r11-bow.jpg) · [廣場入口回歸](../../artifacts/hull-facade/r11-entry.jpg)
 
 業主目視驗收及展覽機驗證待完成。
+
+### R11 整合
+
+- 工作分支 `56ce7e9c4d18cd8ae0ad2e311bfb8434a6919580` 已推送。以重新 fetch 的 `e92eb4cf` 在獨立工作樹整合為 `5af2c427261037b24992d30b93dd5e1e6db6eb24`。
+- 整合版 root `npm test` 及 `npm run build` 通過。正式 build 逐檔與 Chrome 測過的 build 一致。差異空白、圖檔規格及 12 個本機文件連結通過。
+- 開發 Mac 的實體 Chrome 視窗用 1920 × 1080／DPR 1 量固定 Hero。12:00 和 21:25 各量四段 120 幀，兩次首段均為 58.5 FPS，其後三段均為 60.0 FPS。同期本機執行 root 測試。量測存於 `~/city2127-evidence/hull-facade/r11/fps.json`。
