@@ -270,3 +270,5 @@ R12 在 Blender 用一張四邊面網格連起雙銀緣、凹槽及兩段曲帶�
 - 工作分支 `8966d11f46620d975779c803ba72c2e59ee2ccb9` 已推送。以重新 fetch 的 `a49a4ff8` 在獨立工作樹整合為 `ec981f03b09ddd80c2d3766944aeda4df89b636a`。
 - 整合版 root `npm test`、`npm run build`、差異空白、圖檔規格及 14 個本機文件連結通過。正式 build 與 Chrome 驗證過的 build 逐檔一致。
 - 開發 Mac 的實體 Chrome 視窗用 1920 × 1080／DPR 1 量固定 Hero。12:00 和 21:25 各量四段 120 幀，兩次首段為 58.5 FPS，其後三段均為 60.0 FPS。同期本機執行整合檢查。記錄在 `~/city2127-evidence/hull-facade/r12/fps.json`。
+- 工作分支 CI 驗證 `8966d11f46620d975779c803ba72c2e59ee2ccb9`。Root、survey、module-swap 的測試與 build、差異空白及圖檔規格通過。[工作分支 CI](https://github.com/cc100053/city2127/actions/runs/45161455590)
+- 主線 CI 驗證 `bfe3e7bdfe971684834f84b070c14f8ce328be1a`。Root、survey、module-swap 的測試與 build、差異空白及圖檔規格通過。[主線 CI](https://github.com/cc100053/city2127/actions/runs/45162168047)
