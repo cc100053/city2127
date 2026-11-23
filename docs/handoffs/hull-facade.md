@@ -151,3 +151,20 @@ R4 加闊兩道斜框上緣，讓銀色折面從下層框延至樓板邊，沿�
 - 工作分支 `2eb07029` 已推送。整合工作樹快轉至最新的 `origin/main`（`ea3e72ac`，含展覽名稱文件更新），合併為 `1edcc3e5`。
 - 在整合提交重跑 root `npm test`、`npm run build`、差異空白及圖檔規格檢查，全部通過。整份 `dist/` 與 Chrome 已驗證的版本逐檔一致。
 - [GitHub main CI](https://github.com/cc100053/city2127/actions/runs/45096108330) 驗證 `20df13be`。Root、survey、module-swap 測試和 build、差異空白及圖檔規格全數通過。[工作分支 CI](https://github.com/cc100053/city2127/actions/runs/45095704364) 驗證 `2eb07029`，亦已通過。
+
+## R8 · 船首門套向主鏡折返
+
+- 業主 cc100053。工作分支 `codex/hull-facade-r8` 從 2026-11-23 已 fetch 的 `origin/main`（`c685f8238fed22d81f9f463ce604207d8f7161d0`）開獨立工作樹。基準含 R7 整合 `1edcc3e5` 及 [R7 main CI](https://github.com/cc100053/city2127/actions/runs/45096108330) 所驗證的 `20df13be`。原工作區在本機 `main` 的 `2df6d8b6`，領先 0、落後 16，未追蹤的 `Dev_QA.md` 和 `Presentation.md` 保留。
+- R7 門套與 Hero 在平面上相差約 88°。R8 把靠廣場一端的靠海銀框折面向 Hero 轉 35°，外側接回船身曲框，冷白燈槽跟着折面收進洞口。靠海段加闊燈槽的可見表面，沿用原有燈值、拉絲銀和深灰金屬批次。新幾何留在原 18 × 14 m 通車包絡之外，洞深仍為 9.1 m。兩條列車路線、另一端、船身主體、大堂、公共退台及固定 Hero 鏡位沿用 R7。
+- [固定 Hero 黃昏 A/B](../../artifacts/hull-facade/r8-hero-ab.jpg) 採用 18:00、場景時間 20 秒、2400×1350／DPR 1。25° 已可見冷白邊，35° 的冷白邊在軌道上下較容易連起來看，和旁邊銀面分隔也較清楚。斜前方仍可看見列車進入口面和深灰內襯，採用 35°。
+
+### R8 驗證
+
+- [巨構測試](../../tests/megastructures.test.ts) 以射線核對銀面折角、Hero 對靠海導光的通視、四邊導光、原口徑和深處遮蔽面。從凹口末段至 R7 口面外 5 m 查核三角面，通車包絡內部無結構面。沿兩條原軌道每 0.02 秒套用頭／中／尾車 GLB；R7 量測段距名義口徑四邊的最小淨距仍為 1.84／3.75 m，抽樣段延至新門套前方則為 1.84／3.12 m。另一端與 R7 局部掃描盒比對，594 個三角面的頂點、法線及材質逐面一致。
+- [黃昏及夜間入洞圖集](../../artifacts/hull-facade/r8-bow.jpg) 沿用 R7 斜前方鏡位和 65.70、66.20、67.06 秒。三格依次為車頭接近、越過口面及前車進入凹口。[廣場及大堂入口](../../artifacts/hull-facade/r8-entry.jpg) 保留 R7 的廣場日夜及夜間簷下三個鏡位。原圖及 sidecar 在 `~/city2127-evidence/hull-facade/r8/`。
+- 開發 Mac Chrome 157.0.8103.79（Apple M6／ANGLE Metal），正式 build 1600×900／DPR 1 在 12:00、18:00、21:25 均有持續畫布輸出。同一瀏覽器用 DEV 斜前方鏡位實時追蹤頭車，18:00／21:25 分別記錄 169／144 幀跨越口面、深入遮蔽面後方。頁面例外、shader 和本機資源錯誤為零。紀錄在 `~/city2127-evidence/hull-facade/r8/browser.json`。
+- Root `npm test`、`npm run build`、`git diff --check` 通過。
+
+受測程式提交為 `37d487b7c66d160101e4b518fd2955e1bb435504`。A/B 與選定版本的擷取批次均在程式提交前開始。Sidecar 記錄基準 `c685f823` 及 dirty 狀態。
+
+業主目視驗收及展覽機驗證待完成。

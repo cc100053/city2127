@@ -5,6 +5,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { MeshBVH } from 'three-mesh-bvh';
 import { ConcentrationDistrict } from '../src/districtMeters.ts';
 import { changeSites, guideway, PLAZA, plazaAt, plazaWalks } from '../src/layout.ts';
+import { HERO_SETTLED_POSITION } from '../src/heroCamera.ts';
 import { hullFront, hullTiers } from '../src/hullFacade.ts';
 import { HULL_BOW_PORTAL } from '../src/hullPortal.ts';
 import { ARCH, FOOTPRINTS, groundContacts, HULL, inMega, inRect, megastructures, RING, RING_GATE, updateMegastructures } from '../src/megastructures.ts';
@@ -224,7 +225,7 @@ const loader = new GLTFLoader();
   const toLocal = new Matrix4().makeRotationY(-HULL.yaw).multiply(new Matrix4().makeTranslation(-HULL.x, 0, -HULL.z));
   const southEdge = centre - width / 2, northEdge = centre + width / 2;
   const envelope = new Box3(new Vector3(recess + .025, bottom + .025, southEdge + .025),
-    new Vector3(face + 1.05, top - .025, northEdge - .025));
+    new Vector3(face + 5, top - .025, northEdge - .025));
   const triangle = new Triangle(), instance = new Matrix4();
   group.traverse(part => {
     if (!(part instanceof Mesh)) return;
@@ -256,6 +257,23 @@ const loader = new GLTFLoader();
     const [light] = ray.intersectObjects(structureBatches, false);
     assert.equal(light?.object, guides[0], `guide visible in front of the old bulkhead at ${y}, ${d}`);
   }
+  const foldRay = new Raycaster(new Vector3(face + 6, 18, 1.5).applyAxisAngle(up, HULL.yaw).add(origin),
+    ray.ray.direction);
+  const [fold] = foldRay.intersectObjects(structureBatches, false);
+  assert.ok(fold?.object === silver && fold.face, 'the seaward fold uses the brushed silver frame');
+  const normal = fold.face.normal.clone().transformDirection(toLocal);
+  const turn = Math.atan2(-normal.z, normal.x) * 180 / Math.PI;
+  assert.ok(Math.abs(turn - 35) < .01, 'the silver fold faces toward the fixed city Hero');
+
+  const hero = new Vector3(...HERO_SETTLED_POSITION);
+  for (const y of [11, 16, 21]) {
+    ray.ray.origin.set(face + 6, y, southEdge - .4).applyAxisAngle(up, HULL.yaw).add(origin);
+    const [guide] = ray.intersectObjects(structureBatches, false);
+    assert.equal(guide?.object, guides[0], 'the light follows the seaward jamb');
+    const lineOfSight = new Raycaster(hero, guide.point.clone().sub(hero).normalize());
+    assert.equal(lineOfSight.intersectObjects(structureBatches, false)[0]?.object, guides[0],
+      'the guide is visible from the unchanged Hero camera');
+  }
   updateMegastructures(0);
   const dayGuide = guides[0].material.emissiveIntensity;
   updateMegastructures(1);
@@ -282,10 +300,10 @@ const loader = new GLTFLoader();
   }
 
   const rolled = new Vector3();
-  const minGaps: number[] = [];
+  const minGaps: number[] = [], mouthGaps: number[] = [];
   for (const track of routes().tracks) {
     const length = track.getLength();
-    let gap = Infinity;
+    let gap = Infinity, mouthGap = Infinity;
     for (let time = 0; time < length / TRAIN_SPEED; time += .02) {
       const { u, visible } = trainPose(time, 0, 2, 0, length);
       const p = track.getPointAt(u).applyMatrix4(toLocal);
@@ -294,13 +312,18 @@ const loader = new GLTFLoader();
       for (const v of vertices) {
         rolled.set(p.x + v.x * heading.z + v.z * heading.x, p.y + v.y, p.z - v.x * heading.x + v.z * heading.z);
         if (rolled.x < envelope.min.x || rolled.x > envelope.max.x) continue;
-        gap = Math.min(gap, rolled.y - bottom, top - rolled.y, rolled.z - southEdge, northEdge - rolled.z);
+        const clearance = Math.min(rolled.y - bottom, top - rolled.y, rolled.z - southEdge, northEdge - rolled.z);
+        gap = Math.min(gap, clearance);
+        if (rolled.x <= face + 1.05) mouthGap = Math.min(mouthGap, clearance);
       }
     }
     assert.ok(Number.isFinite(gap) && gap > 1.5, `each train clears the real bow recess on its track, got ${gap.toFixed(2)} m`);
+    assert.ok(Number.isFinite(mouthGap) && mouthGap > 1.5, 'each train crosses the original R7 mouth');
     minGaps.push(gap);
+    mouthGaps.push(mouthGap);
   }
-  console.log(`hull bow portal ok (track clearance: ${minGaps.map(gap => gap.toFixed(2)).join(' / ')} m)`);
+  console.log(`hull bow portal ok (fold clearance: ${minGaps.map(gap => gap.toFixed(2)).join(' / ')} m; `
+    + `R7 mouth clearance: ${mouthGaps.map(gap => gap.toFixed(2)).join(' / ')} m)`);
 }
 // The enlarged upper tiers stay at least 1.5 m off the actual Grand Nikko GLB, including its outlying roof edges.
 {
