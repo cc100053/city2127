@@ -1,6 +1,6 @@
 // asset/models/LIBRARY.md is the single index of reusable parts: every prop, module and model folder has a row,
 // every row has its code, and every link in the index resolves.
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';

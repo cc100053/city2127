@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import { readFileSync } from 'node:fs';
 import { Raycaster, Vector3 } from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';

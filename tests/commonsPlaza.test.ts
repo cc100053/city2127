@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import test from 'node:test';
 import * as T from 'three';
 import { buildCommonsPlaza } from '../src/siteBuilders/commonsPlaza.ts';

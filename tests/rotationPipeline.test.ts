@@ -1,6 +1,6 @@
 // Question rotation reaches the city (QUESTION_ROTATION_PLAN phase 1): the real survey services' events
 // parse on the root side; rotation proposals keep the Meter layout, and the city draws Q01 on NW (phase 2, src/rotationLayout.ts).
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';

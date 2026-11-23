@@ -2,7 +2,7 @@
 // city drawn from rotation.shown (Q01 NW band, Q02 lots, Q03 drawer housing, Q08 SW vacancy), Admin Undo and reset, city reload mid-transition,
 // network drop and reduced motion. Needs a fresh rotation scratch server (survey-rotation: SURVEY_QUESTIONS=…rotation.v1.json,
 // port 8789) and the root Vite city (5173). Not part of npm test.
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import { writeFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { evidenceDir } from '../scripts/evidence.mjs';

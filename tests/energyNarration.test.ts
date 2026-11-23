@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import { DISPLAY_MS } from '../survey/src/shared/displayTiming.ts';
 import { emptyEnergyConfiguration } from '../survey/src/shared/energy.ts';
 import { ENERGY_PHASES } from '../src/devEnergy.ts';

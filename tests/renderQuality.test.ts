@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import { renderQuality } from '../src/renderQuality.ts';
 
 // The default and unknown values keep the full exhibition look; only `quality=low` drops the costly passes.

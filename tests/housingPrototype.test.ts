@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import { Box3, InstancedMesh, Matrix4, Mesh, Vector3 } from 'three';
 import { leaf } from '../src/cityRig.ts';
 import { HOUSING_HOME_ROUTE, HOUSING_KEYFRAMES, HOUSING_OPTIONS, HOUSING_SITES, housingPrototype } from '../src/housingPrototype.ts';

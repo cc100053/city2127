@@ -1,6 +1,6 @@
 // Question rotation, city side (QUESTION_ROTATION_PLAN phase 2, Q01 only): Q01's shown option drives the NW focal rung,
 // version4 views pass through untouched, and a Q01 swap reads the NW focal copy.
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import { ladderLayout } from '../survey/src/shared/cityView.ts';
 import { conceptVisit, q01Swap, q02Swap, rotationLayout, rotationVisit, withQ01, Q01_NW_TIERS, ROTATION_VISITS } from '../src/rotationLayout.ts';
 import { loadRotationSetFile } from '../survey/src/survey/questionLoader.ts';

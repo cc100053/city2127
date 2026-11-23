@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import * as T from 'three';
 import { CHANGE_CATALOG, SITE_IDS, selectExhibitionSiteVariants, siteLayerDefinition, type EnvironmentParkTarget, type SiteLayerDefinition, type SiteLayerId } from '../src/changeCatalog.ts';
 import { AutomationDistrict } from '../src/districtMeters.ts';

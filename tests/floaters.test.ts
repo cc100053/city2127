@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import { FLOATER, floaters, updateFloaters } from '../src/floaters.ts';
 import { inMega } from '../src/megastructures.ts';
 import { SKY_RING, SPACE_ELEVATOR, SPHERE_DOCK } from '../src/layout.ts';

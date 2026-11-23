@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import { MINATO_LOOP, minatoPose } from '../src/minatoTimeline.ts';
 
 const start = minatoPose(0), done = minatoPose(8);

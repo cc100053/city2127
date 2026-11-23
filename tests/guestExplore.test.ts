@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import { EARTH } from '../src/bayContext.ts';
 import { ELEVATOR_COPY, EXPLORE_COPY, EXPLORE_CYCLE, EXPLORE_SHOTS, podPose, ringWeight } from '../src/guestExplore.ts';
 import { berthPark, EXPLORE_BERTH } from '../src/skyRing.ts';

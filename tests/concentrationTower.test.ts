@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import * as T from 'three';
 import type { Kit } from '../src/cityRig.ts';
 import { changeSites } from '../src/layout.ts';

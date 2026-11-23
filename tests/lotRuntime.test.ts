@@ -1,6 +1,6 @@
 // Question rotation lot runtime (QUESTION_ROTATION_PLAN 2.1/2.2, Q02): every Q02 option shows exactly one of its three models, the
 // lots sit in LOTS, version4 runs are never touched, and a live swap fades over the shared 3-second transition.
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import { readFileSync } from 'node:fs';
 import { Group, Mesh, MeshStandardMaterial, BoxGeometry, Scene } from 'three';
 import { LOTS } from '../src/layout.ts';

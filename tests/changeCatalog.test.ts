@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import { environmentParkTarget, selectSiteVariants, siteLayerDefinition, variantLayers } from '../src/changeCatalog.ts';
 import type { Layout } from '../src/surveyView.ts';
 

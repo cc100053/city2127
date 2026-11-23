@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import { createHash } from 'node:crypto';
 import * as T from 'three';
 import { DISPLAY_MS } from '../survey/src/shared/displayTiming.ts';

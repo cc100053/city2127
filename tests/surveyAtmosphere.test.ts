@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import { cityText, residentResult, residentCards, RESIDENT_CARDS, residentIdentity, exhibitionFeedback, exhibitionScoresText, exhibitionVoteMarks, policyText, scoresToWorldState } from '../src/surveyAtmosphere.ts';
 import { presets } from '../src/presets.ts';
 import { connectSurvey, isExhibitionView, parseSurveyEvent, supersedes, type CityView } from '../src/surveyView.ts';

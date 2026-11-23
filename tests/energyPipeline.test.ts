@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import { Scene, Group, Mesh, MeshStandardMaterial, Box3, PlaneGeometry, Raycaster, Vector3 } from 'three';
 import { boatPoses, routes, WATER_PERIOD, HULL } from '../src/mobility.ts';
 import { publicLight } from '../src/cityRig.ts';

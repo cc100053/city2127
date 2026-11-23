@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict';
+import assert from './assert.ts';
 import { Box3 } from 'three';
 import { HYDRO_TERRACE, northShore } from '../src/layout.ts';
 import { HYDRO_WALK, hydroTerrace } from '../src/hydroTerrace.ts';
