@@ -30,14 +30,17 @@ group.updateMatrixWorld(true);
 group.traverse(o => { if (o instanceof Mesh && !(o instanceof InstancedMesh)) { o.geometry.computeBoundingBox(); parts.set(`${o.material.color.getHexString()}${parts.size}`, box.copy(o.geometry.boundingBox!).clone()); } });
 const shell =[...parts.entries()].find(([k]) => k.startsWith('f3f2ec'))![1];
 const structureBatches = group.children.filter(part => part instanceof Mesh && !(part instanceof InstancedMesh));
-const facadeNames = ['hull-frame-metal', 'hull-glass', 'hull-panel-metal', 'hull-room-cove'];
+const facadeNames = ['hull-bow-metal', 'hull-frame-metal', 'hull-glass', 'hull-panel-metal', 'hull-room-cove'];
 const facadeBatches = structureBatches.filter(part => part.material instanceof MeshStandardMaterial
   && facadeNames.includes(part.material.name));
 assert.deepEqual(facadeBatches.map(part => part.material.name).sort(), facadeNames);
 const silver = facadeBatches.find(part => part.material.name === 'hull-frame-metal');
+const bowSilver = facadeBatches.find(part => part.material.name === 'hull-bow-metal');
 const panel = facadeBatches.find(part => part.material.name === 'hull-panel-metal');
-assert.ok(silver && panel);
-for (const { geometry, material } of [silver, panel]) {
+assert.ok(silver && bowSilver && panel);
+assert.ok(bowSilver.material.roughness > silver.material.roughness);
+assert.equal(bowSilver.material.roughnessMap, silver.material.roughnessMap);
+for (const { geometry, material } of [silver, bowSilver, panel]) {
   const uv = geometry.getAttribute('uv'), positions = geometry.getAttribute('position');
   assert.equal(uv.count, positions.count, 'merged metal batch retains UVs for every vertex');
   for (let i = 0; i < uv.count; i += 3) {
@@ -282,7 +285,7 @@ for (const walk of plazaWalks) for (const [i, [x, y, z]] of walk.entries()) {
   for (const [y, outer, groove, inner] of [[13, 77.8, 79.2, 79.8], [19, 77.4, 78.9, 79.55], [22, 77.8, 79.6, 80.4]]) {
     const depth = hullFront(y < 15 ? 0 : 1, 80) - 2;
     const a = fromHero(outer, y, depth), seam = fromHero(groove, y, depth), b = fromHero(inner, y, depth);
-    assert.ok(a?.object === silver && seam?.object === rear.object && b?.object === silver,
+    assert.ok(a?.object === bowSilver && seam?.object === rear.object && b?.object === bowSilver,
       `Hero sees both silver rims and the shadow seam at ${y} m`);
     const seamDepth = seam.point.clone().applyMatrix4(toLocal).z;
     assert.ok(seamDepth - a.point.clone().applyMatrix4(toLocal).z > .65, 'the softened outer bevel still shadows the gasket');
@@ -291,14 +294,14 @@ for (const walk of plazaWalks) for (const [i, [x, y, z]] of walk.entries()) {
   for (const [depth, y] of [[8, 26.7], [11, 26.7], [14, 26.7], [17, 26], [20, 25.5], [23, 24.5], [25, 23.8]]) {
     ray.ray.origin.set(face + 4, y, depth).applyAxisAngle(up, HULL.yaw).add(origin);
     const hit = ray.intersectObjects(structureBatches, false)[0];
-    assert.ok(hit?.object === silver && hit.point.clone().applyMatrix4(toLocal).x > face - .75,
+    assert.ok(hit?.object === bowSilver && hit.point.clone().applyMatrix4(toLocal).x > face - .75,
       `the arched crown remains visible as it turns down the inland jamb at ${depth} m`);
   }
   const oblique = new Vector3(-126.6, 29, -30.1);
   for (const depth of [8.5, 9.1, 9.7, 10.4, 11]) {
     const target = new Vector3(face + .6, 28.15, depth).applyAxisAngle(up, HULL.yaw).add(origin);
     const [hit] = new Raycaster(oblique, target.sub(oblique).normalize()).intersectObjects(structureBatches, false);
-    assert.ok(hit?.object === silver, `the bulkhead corner stays behind the crown at ${depth} m`);
+    assert.ok(hit?.object === bowSilver, `the bulkhead corner stays behind the crown at ${depth} m`);
   }
   const ribbonPaths = [
     [[73, 2.7], [75, 2.95], [77, 3.4], [79, 4.2], [81, 5.25], [83, 6.2], [85, 7.1]],
@@ -308,16 +311,16 @@ for (const walk of plazaWalks) for (const [i, [x, y, z]] of walk.entries()) {
   for (const [tier, path] of ribbonPaths.entries()) for (const [u, y] of path) {
     const from = new Vector3(u, y, hullFront(tier, u) - 8).applyAxisAngle(up, HULL.yaw).add(origin);
     const [hit] = new Raycaster(from, inwards, 0, 8).intersectObjects(structureBatches, false);
-    assert.ok(hit?.object === silver, `tier ${tier}: silver ribbon reaches the portal at ${u}, ${y}`);
+    assert.ok((hit?.object === silver || hit?.object === bowSilver), `tier ${tier}: silver ribbon reaches the portal at ${u}, ${y}`);
   }
   const ribbonOrigin = new Vector3(77, 3.4, hullFront(0, 77) - 8).applyAxisAngle(up, HULL.yaw).add(origin);
   const [ribbon] = new Raycaster(ribbonOrigin, inwards, 0, 8).intersectObjects(structureBatches, false);
-  assert.ok(ribbon?.object === silver && ribbon.point.clone().applyMatrix4(toLocal).z < -3.30,
+  assert.ok(ribbon?.object === bowSilver && ribbon.point.clone().applyMatrix4(toLocal).z < -3.30,
     'the Blender return exposes a rolled surface in front of the original lobby sill');
   for (const depth of [-.7, 0, 1, 3, 5]) {
     ray.ray.origin.set(face + 4, 7, depth).applyAxisAngle(up, HULL.yaw).add(origin);
     const hit = ray.intersectObjects(structureBatches, false)[0];
-    assert.ok(hit?.object === silver && hit.point.clone().applyMatrix4(toLocal).x > face + .5,
+    assert.ok(hit?.object === bowSilver && hit.point.clone().applyMatrix4(toLocal).x > face + .5,
       `the rolled sill covers the bow's corner stiffener at ${depth} m`);
   }
   updateMegastructures(0);

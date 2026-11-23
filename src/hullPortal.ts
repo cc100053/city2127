@@ -192,7 +192,7 @@ function loft(rows: T.Vector3[][]) {
   return { geometry: geometry.applyMatrix4(root), indices };
 }
 
-type Finish = 'frame' | 'panel' | 'guide' | 'dark';
+type Finish = 'frame' | 'bow' | 'panel' | 'guide' | 'dark';
 
 function buildBowFrame(surface: (finish: Finish, geometry: T.BufferGeometry) => void) {
   const stations = flank.flatMap(({ x, y }, i) => {
@@ -337,16 +337,16 @@ function buildFlankLining(surface: (finish: Finish, geometry: T.BufferGeometry) 
 
 /** Batch the editable Blender skin with the existing silver and dark hull finishes. */
 function buildBlenderBowFrame(model: T.Group, surface: (finish: Finish, geometry: T.BufferGeometry) => void) {
-  const parts: { mesh: T.Mesh; finish: 'frame' | 'dark' }[] = [];
+  const parts: { mesh: T.Mesh; finish: 'bow' | 'dark' }[] = [];
   model.updateWorldMatrix(true, true);
   model.traverse(part => {
     if (!(part instanceof T.Mesh) || Array.isArray(part.material)) return;
     const name = part.material.name;
     if (name === 'bow_silver' || name === 'bow_recess') {
-      parts.push({ mesh: part, finish: name === 'bow_silver' ? 'frame' : 'dark' });
+      parts.push({ mesh: part, finish: name === 'bow_silver' ? 'bow' : 'dark' });
     }
   });
-  if (!parts.some(({ finish }) => finish === 'frame') || !parts.some(({ finish }) => finish === 'dark')) return false;
+  if (!parts.some(({ finish }) => finish === 'bow') || !parts.some(({ finish }) => finish === 'dark')) return false;
 
   for (const { mesh, finish } of parts) {
     const flat = mesh.geometry.index ? mesh.geometry.toNonIndexed() : mesh.geometry.clone();

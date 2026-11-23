@@ -130,7 +130,7 @@ def build():
     mesh.from_pydata([(p.x, -p.z, p.y) for p in vertices], [], faces)
     mesh.update()
     for name, color, metal, roughness in [
-        ('bow_silver', (.70, .73, .76, 1), .69, .52),
+        ('bow_silver', (.70, .73, .76, 1), .69, .68),
         ('bow_recess', (.035, .048, .06, 1), .35, .73),
     ]:
         mat = bpy.data.materials.new(name)

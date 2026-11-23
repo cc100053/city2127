@@ -1,7 +1,7 @@
 import * as T from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { buildHullFacade, hullFrameReturns, hullFront, hullLobby, hullRear, hullTiers } from './hullFacade.ts';
-import { hullFrameMetal, hullFrameUv, hullPanelMetal } from './hullMetals.ts';
+import { hullBowMetal, hullFrameMetal, hullFrameUv, hullPanelMetal } from './hullMetals.ts';
 import { buildHullBowPortal, cutHullBowOpening, HULL_BOW_FLANK_AT_DECK, HULL_BOW_PORTAL } from './hullPortal.ts';
 import { hash, plantCanopy, plantShrubs } from './coastalCanopy.ts';
 import { bodyFootprints, inRect } from './megaFootprints.ts';
@@ -118,7 +118,7 @@ type Batch = Map<T.Material, T.BufferGeometry[]>;
 /** Queue a geometry (placed by `m`) under a material; everything is normalised so per-material merging always succeeds. */
 function put(batch: Batch, material: T.Material, g: T.BufferGeometry, m?: T.Matrix4) {
   const flat = g.index ? g.toNonIndexed() : g.clone();
-  if (material !== hullCove && material !== hullFrameMetal && material !== hullPanelMetal) flat.deleteAttribute('uv');
+  if (material !== hullCove && material !== hullFrameMetal && material !== hullBowMetal && material !== hullPanelMetal) flat.deleteAttribute('uv');
   if (m) flat.applyMatrix4(m);
   (batch.get(material) ?? batch.set(material, []).get(material)!).push(flat);
 }
@@ -635,7 +635,7 @@ export function megastructures(ringModels?: { entrance: T.Group; body?: T.Group;
     if (existing) existing.push(...parts);
     else batch.set(material, parts);
   }
-  const portalFinishes = { frame: hullFrameMetal, panel: hullPanelMetal, guide: hullPortalGuide, dark: megaPortal };
+  const portalFinishes = { frame: hullFrameMetal, bow: hullBowMetal, panel: hullPanelMetal, guide: hullPortalGuide, dark: megaPortal };
   buildHullBowPortal((finish, geometry) => put(batch, portalFinishes[finish], geometry), bowModel);
   for (const [material, list] of batch) {
     const mesh = new T.Mesh(mergeGeometries(list), carved.get(material) ?? material);
