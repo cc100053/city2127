@@ -9,7 +9,7 @@ Node.js 24+。この `survey/` ディレクトリで実行します。
 ```sh
 npm ci
 npm run build
-npm run server
+SURVEY_QUESTIONS=src/survey/questions.rotation.v1.json npm run server
 ```
 
 Guest／Monitor／Admin は同じ HTTP server の `dist` から配信します。Vite dev server だけでは API は動きません。既定 SQLite を保持して再起動すると既存の街と履歴を復元します。
@@ -19,27 +19,29 @@ Guest／Monitor／Admin は同じ HTTP server の `dist` から配信します�
 | SURVEY_PORT | 8787 | HTTP／WebSocket port |
 | SURVEY_HOST | 127.0.0.1 | LAN Guest を使う場合のみ 0.0.0.0；Admin は loopback 限定 |
 | SURVEY_DB_PATH | data/survey.sqlite | cwd 基準の DB。削除せず既存データで再起動 |
-| SURVEY_QUESTIONS | src/survey/questions.exhibition.json | 四問の v2 JSON；起動時検証。`src/survey/questions.rotation.v1.json`（`kind: "rotation"`）で抽題輪換（9 問から 4 問、draft）。切り替え後は Admin で街をリセットして新しい run を始める |
+| SURVEY_QUESTIONS | src/survey/questions.exhibition.json | 四問の v2 JSON；起動時検証。`src/survey/questions.rotation.v1.json`（`kind: "rotation"`）が現行の展示用抽題輪換（9 問から 4 問）。切り替え後は Admin で街をリセットして新しい run を始める |
 | SURVEY_STATIC_DIR | dist | build 済み Guest／Monitor／Admin |
 | SURVEY_DEV_AUTO | 未設定 | `1` の場合だけ localhost DEV-auto endpoint を有効化 |
 
-SQLite は現在 **schema 8**（`PRAGMA user_version`）、proposal algorithm / CityView は **version 2**です。Schema 番号と API version は別です。Schema 3 は旧 v1 run を終了して v2 run を開始し履歴を残しました。Schema 7 は既存 v2 状態／履歴を保ち A/B station を追加します。`migrations.ts` は append-only；適用済み migration を書き換えません。
+SQLite は現在 **schema 9**（`PRAGMA user_version`）、proposal algorithm / CityView は **version 2**です。Schema 番号と API version は別です。Schema 3 は旧 v1 run を終了して v2 run を開始し履歴を残しました。Schema 7 は既存 v2 状態／履歴を保ち A/B station を追加します。Schema 9 は抽題輪換用の `question_kind` を追加します。`migrations.ts` は append-only；適用済み migration を書き換えません。
 
 ## 四問、一つの提案
 
-[questions.exhibition.json](src/survey/questions.exhibition.json) に automation / publicSharing / environmentalPriority / urbanConcentration の四問と各 −1／0／+1 option を定義します。Draft と review は街を変えず、全四問を一つの transaction で提出します。Effects は server の JSON から取得し、クライアントからの偽の値は採用しません。
+現行の [questions.rotation.v1.json](src/survey/questions.rotation.v1.json) から、各来場者に四問を割り当てます。四つの回答を一度に送信し、問いごとに集計します。
 
-v2 state は `voteSums`、`recentVotes`、`guestCount`、`revision` と四軸 scores を保持します。E4の三つの現行Meterは `sum += vote`、`recent=.75*recent+.25*vote`、`score=6*(sum/guestCount+recent)`（±12）。最新票も共同履歴も反映し、中性票は recent を衰減させます。Q3のenergyは独立累計、旧気候には投票せず、気候の計算と展示刻度は旧気候回答数を保持します。旧 v1 の加算 clamp／条件付き一人一問 trigger は展示会の仕様ではありません。
+旧版の [questions.exhibition.json](src/survey/questions.exhibition.json) に automation / publicSharing / environmentalPriority / urbanConcentration の四問と各 −1／0／+1 option を定義します。Draft と review は街を変えず、全四問を一つの transaction で提出します。Effects は server の JSON から取得し、クライアントからの偽の値は採用しません。
+
+v2 state は `voteSums`、`recentVotes`、`guestCount`、`revision` と四軸 scores を保持します。旧版 E4 の三つの Meterは `sum += vote`、`recent=.75*recent+.25*vote`、`score=6*(sum/guestCount+recent)`（±12）。最新票も共同履歴も反映し、中性票は recent を衰減させます。Q3のenergyは独立累計、旧気候には投票せず、気候の計算と展示刻度は旧気候回答数を保持します。旧 v1 の加算 clamp／条件付き一人一問 trigger は展示会の仕様ではありません。
 
 [cityView.ts](src/shared/cityView.ts) が layout の唯一の authority。v2 view は layout、最新提案／最大64件の履歴、完全な active run 履歴から得た四軸 `slotSeeds` を含みます。Undo の revoked proposal は replay／counts／seeds から除外します。Root v2 は site と district を描画し、module-swap は v2 を拒否します。
 
 ## Guest、A/B、Reset、Undo
 
-単独 `/guest` は Start → 四問 → review → submit → result 10 秒／handoff 5 秒。10秒閲覧枠が終わると次のStartが完了済み体験を自動終了し、保留resetを適用します。早い交代操作も表示を中断しません。Admin の離場確認は不要で、未完了問卷の中止は可能です。
+単独 `/guest` は Start → 四問 → review → submit → 13 秒の結果表示 → 交代。通常のタッチ画面で案内を選べる時間は20秒です。13秒の閲覧枠が終わると次のStartが完了済み体験を自動終了し、保留resetを適用します。早い交代操作も表示を中断しません。Admin の離場確認は不要で、未完了問卷の中止は可能です。
 
 `/guest?station=A` と `B` は独立した session／recovery key／draft／result。各 station は一体験、活躍中は単独と A/B を混在できません。A/B は古い city revision でも最新 state に順次累積し、未来 revision は拒否；単独は一致必須。Submission ID と session uniqueness で retry は一回だけ計数します。未知の送信結果には同じ ID で再送します。
 
-City display を commit order で最低10秒間隔（都市転換は3秒）に予約し、Guest は保存済み／表示待ちの後、自分の結果を表示します。A/B reset は新開始を止め、両 station の問卷／result／handoff を排出して実行。指定 session のみ中止可能。問卷期限は5分、result lease は display start +15秒；server の1秒 sweep は離線 station も解放します。
+City display を commit order で最低13秒間隔（都市転換は3秒）に予約し、Guest は保存済み／表示待ちの後、自分の結果を表示します。A/B reset は新開始を止め、両 station の問卷／result／handoff を排出して実行。指定 session のみ中止可能。問卷期限は5分、result lease は display start +18秒。server の1秒 sweep は離線 station も解放します。
 
 City reset は新しい街にして総人数を保持、full reset は表示計数をゼロにして immutable history を保持。Undo は最後の完了提案だけ、次の開始前に使用；新しい draft が後で中止されても旧 Undo は復活しません。独立 display setting は Day 12:00／Night 22:00／Auto、reset 後も保持します。
 
@@ -51,7 +53,7 @@ v1 endpoint は互換コードで、既定の v2 run を v1 に変換しませ�
 | `POST /api/proposal-sessions` | v2：単独は `{}`、2台は `{ "stationId": "A" }` または `B`。四問を予約（201）、同じステーションの体験中・mode混在・reset保留中のA/B開始は409 |
 | `GET /api/proposal-sessions/:id` | v2：割当四問、session、現在状態。草稿復元／期限確認 |
 | `POST /api/proposals` | v2：`submissionId`、`guestSessionId`、`expectedRevision`、四組のanswers。新規201、同一IDの成功再送200。A/Bは旧revision可、未来revision不可；単独は完全一致 |
-| `POST /api/proposal-sessions/:id/end` | A/Bのみ：指定sessionを終了。提出済み提案は保持し、予定展示の10秒閲覧枠が終わる前は409 |
+| `POST /api/proposal-sessions/:id/end` | A/Bのみ：指定sessionを終了。提出済み提案は保持し、予定展示の13秒閲覧枠が終わる前は409 |
 | `POST /api/guest-sessions` | legacy v1：session 作成と質問予約（201）。質問なしは 409 `no_question_available` |
 | `GET /api/guest-sessions/:id/question` | legacy v1：割り当てられた質問と現在状態。期限切れは 410、回答済みは `status: "answered"` |
 | `POST /api/answers` | legacy v1：回答（新規 201、再送 200）。400 不明な question/option・別の質問の option、404 不明な session、409 revision 競合・回答済み・answer ID 競合・未割り当て質問、410 期限切れ |
@@ -64,7 +66,7 @@ v1 endpoint は互換コードで、既定の v2 run を v1 に変換しませ�
 | `POST /api/admin/lifecycle` | `{command, expectedRevision, confirmation?, proposalId?, guestSessionId?}`。command は `reset-city`（`RESET`）、`full-reset`（`FULL RESET`）、`cancel-reset`、`guest-left`、`undo-proposal`。A/B の `guest-left` は未完了の `guestSessionId` 必須、Undo は `proposalId` 必須。古い revision は 409 `lifecycle_conflict`、状態に合わない操作は 409 `lifecycle_blocked`（loopback のみ） |
 | `POST /api/admin/display-mode` | `{mode: "auto" / "day" / "night"}`。独立した保存設定（loopback / same-origin） |
 
-v2 の `city-state-updated` は `submissionId`、`proposal`、`state`、`view` を含み、単独／A-Bとも `displayWaitMs`／`displayRemainingMs` とproposal内の `displayAt` を追加します（旧記録では省略可能）；`stationId`はA/Bのみ。サーバー通知はcommit後に即配信され、rootが表示を10秒以上離します。時刻は予定でありviewerの再生確認ではありません。retryは元の閲覧枠の残り時間だけを返し、leaseを延長しません。再送では再通知しません。Monitor は最新記録を表示し、root の表示待ち列とは別です。
+v2 の `city-state-updated` は `submissionId`、`proposal`、`state`、`view` を含み、単独／A-Bとも `displayWaitMs`／`displayRemainingMs` とproposal内の `displayAt` を追加します（旧記録では省略可能）；`stationId`はA/Bのみ。サーバー通知はcommit後に即配信され、rootが表示を13秒以上離します。時刻は予定でありviewerの再生確認ではありません。retryは元の閲覧枠の残り時間だけを返し、leaseを延長しません。再送では再通知しません。Monitor は最新記録を表示し、root の表示待ち列とは別です。
 
 v1 WebSocket の `city-state-updated` には、仕様の `answerId` と `state` に加えて、モニター表示用に `answer`（AnswerEvent）、`questionText`、`optionLabel`、`change`（clamp 後の実際の変化）が入ります。回答の再送では通知しません。
 
@@ -78,7 +80,7 @@ Admin は loopback、POST は同一 origin も検査します。各 command は 
 | src/survey | JSON validation、reducer、replay/history |
 | src/server/proposalService.ts | session、canonical proposal、atomic accumulation／idempotency、station lease |
 | src/server/adminService.ts | lifecycle/reset/Undo/display setting |
-| src/server/runStore.ts / migrations.ts | schema 8、restoration、active history／slotSeeds |
+| src/server/runStore.ts / migrations.ts | schema 9、restoration、active history／slotSeeds |
 | src/server/server.ts / realtime.ts | API／static／loopback guard／WS |
 | src/ui | Guest flow/recovery、Admin、Monitor；独立スコア計算なし |
 
@@ -101,6 +103,28 @@ Fresh scratch SQLite、localhost port 8788、`/guest?dev-auto`。Root City は `
 
 **DEV-ONLY：展示会前に panel／endpoint／launcher を除去、または別途 Admin への移動を決定してください。旧 staff-exit lock は復活させません。** 再利用可能な tests は残します。実装履歴：[auto-tests](../docs/handoffs/archive/survey-auto-tests.md)。
 
+## iPad「住民の窓」與手勢操作
+
+1. 喺可信展覽 LAN 用固定主機 IP，準備涵蓋該 IP 嘅 HTTPS 憑證同私鑰。若用 mkcert，將簽發憑證嘅 `rootCA.pem` 安裝到每部 iPad，並喺 iPadOS「憑證信任設定」啟用完整信任。
+2. 喺 `survey/` 執行以下指令。模型同 WASM 會放入 git 忽略嘅 `public/hand/`，由 build 收錄並由 survey server 本機供應。將例子嘅憑證路徑換成實際檔案。沿用原有 SQLite；舊題組嘅 run 需要經 Admin 重設城市，先會開始輪換 run。
+
+   ```sh
+   npm ci
+   npm run fetch:hand-model
+   npm run build
+   SURVEY_HOST=0.0.0.0 \
+     SURVEY_QUESTIONS=src/survey/questions.rotation.v1.json \
+     SURVEY_TLS_CERT=data/tls/ipad.pem \
+     SURVEY_TLS_KEY=data/tls/ipad-key.pem \
+     npm run server
+   ```
+
+3. 用 iPad Safari 開 `https://<展覽電腦 LAN IP>:8443/guest?hand`，允許使用前鏡頭。雙站各開同一 HTTPS origin 嘅 `/guest?station=A&hand`、`/guest?station=B&hand`。`SURVEY_TLS_PORT` 可改 HTTPS port（預設 8443）。HTTPS 同 HTTP 共用同一 survey server、資料及 WebSocket handler，City 與 Admin 可沿用主機原本嘅 loopback 網址。
+
+張開手掌控制游標。住民登錄要先掃描約 4 秒，等提示後捏合。問題卡砌出期間約 1 秒供閱讀，之後指向只預覽，捏合即選擇並自動前進。確認頁可以逐題改答案。送出、地標導覽同「はじめる画面へ」捏住 0.8 秒。上望頁按自己的展示時段引導睇大屏幕，交接後停留喺聲音卡或用手指按住卡片顯示同題比例。
+
+握拳或放低手會暫停控制。觸控全程可用，相機／辨識失敗時會提示改用觸控。要直接開普通觸控介面，可以用同一個網址並移除 `hand`。現場流程見 [展覽規格](../docs/EXHIBITION_SPEC.md#ipad住民の窓)，雙站網絡見 [LAN 交接](../docs/handoffs/lan-guest-stations.md)。
+
 ## M0 手部追蹤驗證頁（spike，非產品）
 
 `/hand-spike`（`handspike.html`、`src/ui/handSpike.ts`、`src/ui/hand/`）在 iPad 前鏡頭上以 MediaPipe HandLandmarker（`@mediapipe/tasks-vision`，精確版本鎖定）量測手勢選擇：食指尖游標、停留 1 秒或捏合選擇三張卡片，並顯示推論/描畫 fps、推論時間 p50/p95、delegate 等。執行環境自行託管於 `public/hand/`（git 忽略），建置前先執行 `npm run fetch:hand-model`（複製 wasm、下載 `hand_landmarker.task`）。
@@ -110,9 +134,11 @@ Fresh scratch SQLite、localhost port 8788、`/guest?dev-auto`。Root City は `
 - M1 起推論在 module worker 執行（`src/ui/hand/`：`handPointer.ts`、`handTracker.ts`、`handWorker.ts`、`landmarker.ts`），失敗時改用節流的主執行緒推論。
 - URL 參數：`?mode=worker|main`、`?delegate=cpu`、`?dwell=<ms>`、`?mincutoff=`、`?beta=`（One-Euro）、`?predict=<ms>`（固定游標外推上限；預設依更新間隔自適應）、`?hands=1|2`（預設 1）、`?maingap=<幀>`、`?vfc=0`。
 
-## 來賓頁手部操作（M2、M3）
+## 手勢介面實作與開發工具
 
-`/guest?hand`（或 `/guest?station=A&hand`）延遲載入 `src/ui/hand/handGuest.ts`：住民登録至 handoff 全部由「住民の窓」全息舞台繪製（`src/ui/hand/ui/`，1180x820 等比縮放）：張開手掌移動游標並預覽，拇指與食指捏合才選擇，送出、地標導覽與「はじめる画面へ」為捏住保持 0.8 秒；握拳或放低手為休止；手部追蹤只用 worker（停頓時重開兩次，失敗則轉觸控）。流程、計時與伺服器呼叫仍由 `guestDebugView.ts` 負責，舞台經頁面既有控制項操作；未加 `hand` 時頁面不變。需 HTTPS（見上節）。`&tune` 顯示調校面板（localStorage `handUiTune`），`&fps` 顯示幀數；`&dev-hand` 為 DEV-ONLY 合成手部掛鉤；瀏覽器驗收 `npm run test:hand-browser`（需 `CITY2127_PLAYWRIGHT_PATH`，選用 `CITY2127_CHROME_PATH`、`HAND_SHOTS_DIR`、`SURVEY_STATIC_DIR`）。選項卡圖片由 `scripts/buildHandCards.mjs` 預先產生並提交。`SURVEY_DEV_HAND=1` 時另有版面模擬 `/hand-mock`，並記錄停頓追蹤（`hand-stall`）、錯誤（`hand-error`）與 WebSocket 連線。詳見 [手部操作接入來賓頁](../docs/handoffs/hand-guest.md)。
+`guestDebugView.ts` 經原有控制項管理問卷、伺服器呼叫及展示時段。`src/ui/hand/handGuest.ts` 延遲載入 1180 × 820 等比縮放舞台。手部追蹤用 worker，停頓或崩潰時最多重開兩次，連續正常 30 秒後恢復重開額度，用盡後轉觸控。選項圖由 `scripts/buildHandCards.mjs` 預先產生並提交。
+
+`&tune` 顯示調校面板（localStorage `handUiTune`），`&fps` 顯示幀數。`&dev-hand` 為 DEV-ONLY 合成手部掛鉤。`npm run test:hand-browser` 需要 `CITY2127_PLAYWRIGHT_PATH`，可選 `CITY2127_CHROME_PATH`、`HAND_SHOTS_DIR`、`SURVEY_STATIC_DIR`。`SURVEY_DEV_HAND=1` 時另啟用版面模擬 `/hand-mock`，並記錄追蹤停頓（`hand-stall`）、錯誤（`hand-error`）與 WebSocket 連線。詳見 [手部操作接入來賓頁](../docs/handoffs/hand-guest.md)。
 
 ## Legacy and historical records
 

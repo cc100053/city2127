@@ -53,19 +53,19 @@ Owner decision 2026-11-03: screenshots and round evidence are two layers.
 
 ## Browser regression checks for the current prototype
 
-Start the services and use their printed ports as described in [README](../README.md). Use scratch SQLite for destructive reset/Undo checks; preserve the exhibition DB. Desktop only. Record actual viewport, browser/GPU/device, commit, hour/actor time and console/network results. Reuse project previews; do not kill unrelated processes.
+Start the services and use their printed ports as described in [README](../README.md). Use scratch SQLite for destructive reset/Undo checks; preserve the exhibition DB. Use desktop for City and iPad Safari for the guest hardware check. Record actual viewport, browser/GPU/device, commit, hour/actor time and console/network results. Reuse project previews; do not kill unrelated processes.
 
 | Check | Expected result |
 | --- | --- |
 | Standalone `/` | Odaiba landmarks/civic core, connected backdrop, bay, six waterfront islands and base mobility load without errors; no survey-dependent district layer |
 | Day/dusk/night | Review `?hour=12`, `18.5`, `22`; structure, public paths and windows remain readable; automatic clock wraps in 180 s |
 | Camera/resize | Initial authored desktop hero; orbit/zoom/pan limits and ordinary renderer resize work; no adaptive camera or mobile requirement |
-| Four-question Guest | One complete proposal after review; partial answers do not change city; scheduled result10s / handoff5s; reload resumes remaining time without renewing leases; IDs survive unknown-result retry without a duplicate vote |
+| Four-question Guest | One complete proposal after review; partial answers do not change city; scheduled 13 s result, followed by the guest UI’s handoff timer; reload resumes remaining time without renewing leases; IDs survive unknown-result retry without a duplicate vote |
 | Low/mixed/high | All four focal sites and district carriers are complete future alternatives; continuous quantities, hybrids, pairings and seed layout agree with authoritative view |
 | Live transition | Changed targets retarget over 3 s with local pulses; duplicate/no-op events do not replay; late assets/roof publication use latest target |
 | Immediate recovery | Snapshot/reset/Undo/reconnect/reduced motion settle immediately, clear pulses/queued display, restore latest state; lighting-only snapshots do not skip live queue |
 | Single station | Next Start automatically ends completed experience; queued reset applies before new answers; no Admin exit confirmation; Admin can end unfinished questionnaire |
-| A/B | Independent draft/result/recovery; both accumulate in commit order; displays ≥10 s apart with separate3s city motion; each Guest sees its own queued result; newer starts close old Undo |
+| A/B | Independent draft/result/recovery; both accumulate in commit order; displays ≥13 s apart with separate3s city motion; each Guest sees its own queued result; newer starts close old Undo |
 | A/B reset/cancel/expiry | New starts stop during reset; both sessions drain; named unfinished cancellation affects one; questionnaire/result leases release abandoned stations |
 | Undo | Latest completed proposal only, before next start; restore scores/counts/seeds; original event preserved; cancelled newer draft cannot reopen prior Undo |
 | Admin display | Day 12:00 / Night 22:00 / Auto saved across reset/restart; explicit City `?hour` wins; LAN access to Admin denied |
@@ -92,6 +92,12 @@ static city geometry and all existing person/robot fleets at low/mixed/high, hou
 service actor size, platform support and counter/facade clearance, human/assisted/autonomous use, live handover, immediate
 recovery and hidden frontage. Review entrance stages and service scenes in the browser, keeping the original hero day/dusk/night;
 use explicit `nw:-12/0/12` for 0/3/6 automated ports (band shorthand `low/high` maps to scores −7.5/+7.5, not the endpoints).
+
+### iPad「住民の窓」實測與回歸
+
+- **實機紀錄（2026-11-23）。** rex 喺 iPad Air Safari 用 `2bec2f77` 走完五頁。約 15 分鐘連續測試一次載入、完成 3 位來賓及 3 筆提案。描畫最低 58 fps、中位 60 fps。推論全程 worker-gpu，中位 30 Hz，worker 重開 0 次。兩筆停頓診斷出現喺關閉分頁時。詳見[原始交接](handoffs/hand-guest.md#目前狀態2026-11-23)。
+- **可重跑嘅軟件檢查。** 安裝 Playwright 後喺 `survey/` 設定 `CITY2127_PLAYWRIGHT_PATH`，以項目嘅 Chrome 執行 `npm run test:hand-browser`。測試用獨立 SQLite 同合成手勢，涵蓋登錄、閱讀鎖、四題、編輯、捏住送出、上望、比例、導覽同交接。亦檢查下一位來賓嘅上望頁會再次顯示，以及舞台錯誤時可以用原頁面接續。入口見[瀏覽器測試](../survey/tests/handGuest.browser.mjs)同[survey 指引](../survey/README.md#手勢介面實作與開發工具)。
+- **仍待現場驗收。** 以兩部 iPad 喺現場可信 HTTPS LAN 跑 A/B。核對相機權限、觸控後備、兩站排隊與地標互斥，再檢查休眠或斷線後復原、實際閱讀距離同長時間穩定性。單站實測未覆蓋雙站手勢，亦未執行 Playwright WebKit。參考 [P5 驗收](handoffs/resident-experience-p5.md)及 [LAN 雙站交接](handoffs/lan-guest-stations.md)。
 
 ## Performance evidence
 

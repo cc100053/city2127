@@ -10,6 +10,7 @@
 | [台場換場 P6/S5](odaiba-venue.md) | P0–P5已整合；P6/S5展覽驗收未完成，與P5實機表協調 | cc100053 |
 | [台場 Dream Loop r2](odaiba-dream-loop-2.md) | 已整合，target未達；視覺polish延後，待owner指定再開新任務分支 | cc100053 |
 | [LAN 雙站 iPad](lan-guest-stations.md) | IN_PROGRESS；軟件已整合，單機 station A 經 LAN PASS；雙機／瞓機待第二部裝置 | cc100053 |
+| [iPad「住民の窓」](hand-guest.md) | 已整合 main；五頁單站 iPad Air 試用通過，兩站同時用手勢及展覽現場待驗 | cc100053 |
 | [居民體驗 P5](resident-experience-p5.md) | IN_PROGRESS；文件準備已發布，D0–D10／理解程度／長跑實機NOT RUN。先提供輸出方案及可測硬件 | Codex；展覽決策cc100053，現場操作人待指定 |
 | [描畫品質](render-quality.md) | `?quality=low` 已實作；TODO：自動品質調整（按實測 FPS 逐級降低） | cc100053 |
 | [閒置吸引循環](attract-loop.md) | IN_PROGRESS；Step A（漂移鏡頭＋呼籲）已實作待驗收，Step B「声の灯」未開始 | cc100053 |

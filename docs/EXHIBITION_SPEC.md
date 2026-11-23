@@ -81,7 +81,7 @@
 
 Root 用固定360px右上卡片（2026-10-04由左移右，避免遮住focal site），2026-11-02起用HUD外觀（深色煙燻玻璃、青色發光邊、角標、側刻度；日夜同一深色以保對比；能源旁白及空の環說明框共用同一外觀）顯示背景、當前實際 focal 設施及位置；一個標題、最多兩句。開場先顯示 `intro.origin`（2026-10-19：過去街由行政／大企業決定，住民決定會點樣），再顯示 identity（取 P1 內文首兩句）。日常卡本機每12秒輪換；[P3](handoffs/archive/resident-experience-p3.md) 的每份live結果保留10秒，0–3秒身份／位置／原有過渡，3–10秒一項個人偏好＋一項共同城市實際結果，再恢復日常卡。Root比較實際effective carrier targets／可見配對及slot分布；同分不同配置、只有方向改變、完全維持分開處理，seed本身或隱藏配對不算可見變化。Focal count只描述該地點，district-only用實際區域及配置調整文案；沒有前後證據只確認保存，不將個人答案當共同城市變化方向。Snapshot/reset/Undo即時替換，reload不重播舊結果；照明-only snapshot不打斷有效queue。
 
-完整 [P1–P5計劃](RESIDENT_EXPERIENCE_PLAN.md) 保留；P1–P3已實作，P3軟件排程檢查不代表10秒足夠閱讀。[P4全面軟件流程](handoffs/archive/resident-experience-p4.md) 已通過 native／scratch Chrome browser 驗證；P5與S5、實際iPad／理解程度／閱讀時間仍待驗收。
+完整 [P1–P5計劃](RESIDENT_EXPERIENCE_PLAN.md) 保留；P1–P3已實作，P3軟件排程檢查不代表10秒足夠閱讀。[P4全面軟件流程](handoffs/archive/resident-experience-p4.md) 已通過 native／scratch Chrome browser 驗證；「住民の窓」已完成單站 iPad Air 試用。P5／S5 嘅雙站、觀眾理解同閱讀時間仍待驗收。
 
 每位觀眾回答同一組四題，核對後提交**一份完整提案**。四題沒有逐題改城；下一位繼承累積結果。問題／option ids 與 effects 由 [正式 JSON](../survey/src/survey/questions.exhibition.json) 定義；保留日文產品文案。
 
@@ -113,8 +113,8 @@ Owner 2026-11-18 批准，2026-11-20 城市端接入（main），2026-11-21 定�
 - **題目：** 以 [SURVEY_V2](planning-team/SURVEY_V2.md) 9 題取代現行 4 題。展覽題目以居民日常角度書寫，並在題目中直接指出該設施；SURVEY_V2 原文不改，展覽文面另存。九題（包括 Q04）全部參與輪換。
 - **抽題：** 每位訪客答 4 題，從九題中選最久未變的 4 題，平手按題目固定次序。抽中的題目於預約時決定並保存。A/B 雙站各自抽題，可以抽中相同問題。
 - **變化：** 每份提案最多切換一個模型。在答案與目前選項不同的題目中，選最久未變的一題，直接換成所選選項的模型；優先略過本訪客預約之後已被另一站換過的題。選項不作 −1/0/+1 排序。城市狀態由有效提案依次重算，Undo、snapshot、重新連線同樣重算。
-- **群眾比例：** 結果卡及 hologram「住民の声」顯示所選選項在本 run 該題全部回答中的百分比（含本人）；少數選項的文案保持中性。該題回答數未達門檻（建議 10 票，待 owner 確認）時不顯示百分比，改用不含數字的文案。
-- **保底：** 沒有可換的題目時，鏡頭推近其中一題的地塊並播放該模型的活動動畫，結果卡寫「あなたの選んだ暮らしは、すでにここにあります」及群眾比例。出現頻率隨答案一致程度變化（玩具模擬約 1.5%–24%），owner 2026-11-20 改為不另做活動動畫，只用模型本身已有的動態。實作見[計劃 3.4](QUESTION_ROTATION_PLAN.md#34-保底owner-2026-11-18-批准)：同一處理亦用於換了未有模型的題或空置換空置；沒有可探訪地塊時留 hero 並說明設施日後加入。
+- **群眾比例：** 本 run 每題各自統計同一選項嘅百分比，包含觀眾本人。手勢版 iPad 交接頁有四張聲音卡，游標停留或觸控按住邊張，就揭示邊題嘅比例。大屏幕結果卡已移除比例（owner 2026-11-23）。程式暫定每題至少 10 份回答，低於門檻顯示「まだ集まり始めたところです」。
+- **保底：** 沒有可換的題目時，鏡頭推近其中一題的地塊並播放該模型的活動動畫，結果卡寫「あなたの選んだ暮らしは、すでにここにあります」。出現頻率隨答案一致程度變化（玩具模擬約 1.5%–24%），owner 2026-11-20 改為不另做活動動畫，只用模型本身已有的動態。實作見[計劃 3.4](QUESTION_ROTATION_PLAN.md#34-保底owner-2026-11-18-批准)：同一處理亦用於換了未有模型的題或空置換空置；沒有可探訪地塊時，鏡頭轉到構想地展示「構想中」。
 - **地塊與道路：** 三個模型地形相近者同地輪換；地形不同者（Q02）各有地塊，未輪到時顯示空置態。道路網固定，每塊地塊有固定支路及入口平台，模型主入口必須落在平台上，前庭細節隨模型更換。Q06 地塊由道路 ③ 接駁，北、東兩側的入口鋪面與支路在 A／C 空置時保留。Q08 地塊由道路 ④ 的過街位接駁，兩條地軌的共用平台及大堂步道在 A／B 空置時保留。
 - **資產歸屬：** Q01＝AUTO HUB 三態；Q02＝水の棚田（A，由固定背景改為隨投票）／蓮花受電（B）／受電テラス農園（C）；Q03-A＝車抽屜住宅；Q06-B＝蛋艙塔；Q08-C＝SW 活動模組棚。SE 塔與 pod、SW COMMONS、district 舞台不再隨投票，轉為固定背景。水庭、儲能環、核能島及離岸受電翼亦不再隨投票，逐件保留為背景或刪除**未定**，未得 owner 對該件同意前不刪除。
 - **敘事原則改變：** 直接換模型代表一位訪客的答案決定他看到的那一個變化，「眾人之一」改由群眾比例表達。Owner 已接受；AGENTS.md 已同步（2026-11-21），G1 ladder 原則退役。
@@ -190,16 +190,26 @@ Live 使用可重新定向的 **3 秒**過渡（SW 進／出 mixed 為 5 秒，�
 
 ## Guest、單站與 A/B
 
-Guest 首頁顯示四題主題與目前城市的累積參與人數。選項以圖示輔助辨識，提交後顯示本人選擇，交接頁顯示目前城市傾向。大螢幕有地點特寫時，在對應地點上方顯示該筆「暮らしの声」編號。
-
-流程：Start → 四題 → review → submit → result 13 秒（owner 2026-10-29 由 10 秒延長）→ handoff 5 秒 → Start。未知提交結果用同一 submission ID 重試；不新建一票猜測成功。
+兩款 Guest 介面共用流程，由開始、四題、核對到一次提交，然後按順序顯示 13 秒結果，再交接。普通 `/guest` 提供觸控，交接頁嘅地標導覽邀請維持 20 秒。未知提交結果沿用同一 submission ID 重試。大屏幕近鏡標示該筆「暮らしの声」編號。
 
 | 模式 | 開始／交接 | Reset |
 | --- | --- | --- |
 | 單站 `/guest` | 下一位 Start 自動結束已提交體驗，毋須 Admin 確認離場 | 保留中的 reset 在下一位 Start 套用；Admin 可中止未完成問卷 |
 | `/guest?station=A`／`B` | 獨立 session／草稿／結果；同一站一個體驗。不能混用活躍單站與 A/B | 停止新開始，等兩站問卷及結果／交接排出；Admin 中止必須指定一個未完成 session |
 
-A/B 按 server transaction 提交順序累積，容許舊 city revision、拒絕未來 revision；單站仍要求完全一致。單站／A-B City 顯示起點相隔至少 13 秒，城市動畫保持3秒；Guest 排隊顯示已保存／等待展示，再顯示自己的結果。提前Guest交接不截斷已排定展示；server拒絕在10秒閱讀結束前release／下一單站Start，reset遵守drain。問卷5分鐘期限、已提交result lease固定於展示開始後15秒釋放離線站；同ID retry／reload只接續剩餘時段，不延長lease；重連／斷線／過期late事件／reduced motion直接恢復最新完整城市並清掉舊字幕timer，不重播漏掉的過渡。`displayWaitMs`／`displayAt`只表示排程，不確認viewer在線或播放；不新增viewer-ack服務。
+A/B 按 server transaction 提交順序累積，容許舊 city revision、拒絕未來 revision；單站仍要求完全一致。單站／A-B City 顯示起點相隔至少 13 秒，城市動畫保持3秒；Guest 排隊顯示已保存／等待展示，再顯示自己的結果。提前Guest交接不截斷已排定展示；server 拒絕喺 13 秒閱讀結束前 release／下一單站 Start，reset遵守drain。問卷5分鐘期限、已提交result lease固定於展示開始後 18 秒釋放離線站；同ID retry／reload只接續剩餘時段，不延長lease；重連／斷線／過期late事件／reduced motion直接恢復最新完整城市並清掉舊字幕timer，不重播漏掉的過渡。`displayWaitMs`／`displayAt`只表示排程，不確認viewer在線或播放；不新增viewer-ack服務。
+
+### iPad「住民の窓」
+
+2026-11-23 整合到 main。iPad Safari 由可信 HTTPS 網址開 `/guest?hand`，雙站加 `station=A` 或 `station=B`。張開手掌控制游標，拇指與食指捏合揀選。握拳或放低手會休止。全程可觸控，相機或辨識失敗時會提示切換觸控。啟動步驟見 [survey 指引](../survey/README.md#ipad住民の窓與手勢操作)。
+
+1. **住民登録。** 手掌掃描約 4 秒，等光環釋放後捏合登錄，短暫顯示住民番号。「タッチで始める」可以直接開始。
+2. **四題。** 問題卡砌出時留約 1 秒閱讀。解鎖後可即時預覽，捏合選擇後自動前進。
+3. **確認。** 揀其中一張答案卡可以改該題，再回到確認。捏住「この声を街へ届ける」0.8 秒送出。
+4. **上望。** 如果要排隊，iPad 先顯示等候倒數。到自己嘅 13 秒展示時段，光束引導抬頭，iPad 隨後調暗。
+5. **交接。** 四張聲音卡可以逐張揭示比例。捏住 0.8 秒可開始「空の環」或「軌道エレベーター」導覽，亦可返回開始畫面。另一站正在導覽時，地標卡停用。手勢追蹤啟用時預設閒置 8 秒返回，游標移動超過 40 px/s 重新計時。純觸控模式為固定 20 秒。導覽期間暫停交接倒數。
+
+單站 iPad Air 已走完整五頁及約 15 分鐘連續試用。雙站及展覽現場仍待驗收。[驗收紀錄](VALIDATION.md#ipad住民の窓實測與回歸)
 
 ## Admin、資料與照明
 
@@ -213,7 +223,7 @@ Admin Day／Night／Auto 保存為獨立 display setting：12:00／22:00／180 �
 
 在 `survey/` 執行 `npm run dev:auto`提供 fresh scratch DB 及 localhost `/guest?dev-auto`；Meter tests 可重用。DEV-ONLY panel／endpoint／launcher 須在展覽前移除或另行安排；普通 Guest 自動交接規則不因移走開發工具而回復舊 staff-exit lock。詳見 [survey guide](../survey/README.md)。
 
-**S5／Odaiba P6 尚待展覽驗收**：完整 Guest → City 流程、實際輸入 hardware、展覽日 reset／recovery 政策與長時間穩定性。既有 stage checks／CI／Mac 測量分別見 [VALIDATION](VALIDATION.md)，不等於 S5 已通過。尚未達成的 Dream Loop target 亦不能因程式已整合而宣稱視覺目標通過。
+**S5／Odaiba P6 尚待展覽驗收**：現場完整 Guest → City 流程、兩部 iPad 同時運作、場地閱讀與理解、展覽日 reset／recovery 同長時間穩定性。既有 stage checks／CI／Mac 測量分別見 [VALIDATION](VALIDATION.md)，不等於 S5 已通過。尚未達成的 Dream Loop target 亦不能因程式已整合而宣稱視覺目標通過。
 
 ## 已完成階段與歷史
 

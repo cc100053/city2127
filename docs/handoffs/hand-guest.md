@@ -1,7 +1,7 @@
 # 手部操作接入來賓頁（M2、M3、住民の窓）
 
 - 負責：Claude（rex 指派，2026-11-23）
-- 分支：`claude/hand-ui`（M2 → M3 → 住民の窓 Phase 1、2 與 iPad 實測修正；已合併 `origin/main`），待 PR 合併
+- 分支：`claude/hand-ui`（M2 → M3 → 住民の窓 Phase 1、2 與 iPad 實測修正）已於 2026-11-23 合併至 `main`（`4df3e093`）
 - 前置：[手部追蹤 spike（M0、M1）](hand-spike.md)
 
 ## 目前狀態（2026-11-23）
@@ -19,7 +19,9 @@ rex 的決定（2026-11-23）：
 
 未驗證：兩站同時使用（地標停用、另一站顯示中的上望等待槽）只以單站測試；未以 WebKit 自動化測試（本機未安裝 Playwright WebKit），Safari 僅經 iPad 手動實測。
 
-## 範圍
+現行操作：[展覽規格](../EXHIBITION_SPEC.md#ipad住民の窓) · [HTTPS 啟動](../../survey/README.md#ipad住民の窓與手勢操作) · [驗收紀錄](../VALIDATION.md#ipad住民の窓實測與回歸)。
+
+## M2 開發紀錄
 
 `/guest?hand`（亦可 `/guest?station=A&hand`）由 `guestDebugView.ts` 延遲載入 `survey/src/ui/hand/handGuest.ts`；未加 `hand` 時頁面與既有 bundle 行為不變，觸控流程不變，伺服器業務邏輯未改。
 
@@ -40,7 +42,7 @@ rex 的決定（2026-11-23）：
 - `npm run test:hand-browser`（`tests/handGuest.browser.mjs`，使用既有 Playwright，`CITY2127_PLAYWRIGHT_PATH`）：自行啟動輪換題組（`questions.rotation.v1.json`）與暫存 DB 的伺服器，確認未加 `hand` 時不載入手部層，再以合成手部完成 歡迎 → 四題（兩題停留、兩題捏合）→ 確認 → 送出 → 結果，記錄 1 筆提案，無頁面錯誤。截圖存於 `artifacts/hand-m2/`（未提交）。
 - 未驗證：iPad Safari 上的實際相機操作、真實手部的磁吸與捏合手感。
 
-## 下一步
+### M2 當時嘅下一步
 
 rex 於 iPad 開啟 `https://<Mac LAN IP>:8443/guest?station=A&hand` 完成數輪真實操作；依手感調整停留時間、磁吸半徑與自動前進延遲。全息風格屬 M3。
 

@@ -10,6 +10,10 @@
 - Last verified commit: `8399a2601de3824b8fa58d50fc2b3e26328e5e79`（文件檢查PASS）；另有本交接的publication metadata更新，實機 NOT RUN
 - Remote availability: 準備source `8399a2601de3824b8fa58d50fc2b3e26328e5e79` 及publication closure `92a97c117b06cd76adb1e293374a39c1ef3f45a5` 均在 `origin/main`；原P5分支已退休，實機工作仍待接續。
 
+## 2026-11-23 iPad「住民の窓」單站實測
+
+單部 iPad Air Safari 已走完整五頁，完成約 15 分鐘試用及三筆提案。雙站 P5 驗收用新介面時，兩部 iPad 需要信任展覽主機嘅 HTTPS 憑證並允許相機。A/B 同時操作、現場閱讀及復原測試仍待執行。[HTTPS 啟動](../../survey/README.md#ipad住民の窓與手勢操作) · [實測紀錄](../VALIDATION.md#ipad住民の窓實測與回歸)
+
 ## 2026-10-24能源E5本機續作
 
 使用者限定「test this mac mini only」。目前Mac mini M6／24GB已做1080p、DPR1、low真實30分鐘A/B長跑，數據與相機限制見[能源E5紀錄](../../artifacts/energy-city-e5/README.md)及[交接](energy-city.md)。這是目前主機的本機證據，不填成D0–D10的65吋HDMI／iPad／專用router或真人結果；展覽日完整時長／門檻及P5／S5仍待owner安排。
