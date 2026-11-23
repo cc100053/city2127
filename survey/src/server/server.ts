@@ -34,7 +34,7 @@ const statusFor: Record<ErrorCode, number> = {
 const MAX_BODY = 16 * 1024;
 const mime: Record<string, string> = {
   '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8',
-  '.json': 'application/json', '.glb': 'model/gltf-binary', '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml',
+  '.json': 'application/json', '.glb': 'model/gltf-binary', '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml', '.webp': 'image/webp',
   '.wasm': 'application/wasm', '.task': 'application/octet-stream',
 };
 /** Debug pages from the Vite build. /admin is loopback-only like the admin API. */
