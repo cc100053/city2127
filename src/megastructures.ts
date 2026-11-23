@@ -1,5 +1,8 @@
 import * as T from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { buildHullFacade, hullFrameReturns, hullFront, hullLobby, hullRear, hullTiers } from './hullFacade.ts';
+import { hullFrameMetal, hullFrameUv, hullPanelMetal } from './hullMetals.ts';
+import { buildHullBowPortal, cutHullBowOpening, HULL_BOW_PORTAL } from './hullPortal.ts';
 import { hash, plantCanopy, plantShrubs } from './coastalCanopy.ts';
 import { bodyFootprints, inRect } from './megaFootprints.ts';
 import { addCityModel } from './modelAssets.ts';
@@ -44,9 +47,38 @@ megaFace.customProgramCacheKey = () => 'mega-face';
 const megaJoint = new T.MeshStandardMaterial({ color: '#4b5258', roughness: .6, metalness: .3 });
 /** The dark mouth of the hull's Yurikamome tunnel, faintly lit from inside. */
 const megaPortal = new T.MeshStandardMaterial({ color: '#141b20', emissive: '#30485a', emissiveIntensity: .35, roughness: .8 });
+const hullPortalGuide = new T.MeshStandardMaterial({
+  name: 'hull-portal-guide', color: '#9daeb8', emissive: '#d2e8f1', emissiveIntensity: .12, roughness: .5,
+});
 /** Tunnel lights in the ring's road gate (outside the carve, so its own finish). */
 const gateLight = new T.MeshStandardMaterial({ color: '#fff4dc', emissive: '#fff1d0', emissiveIntensity: .8, roughness: .4 });
 const ringGlazing = new T.MeshStandardMaterial({ color: '#6c8895', emissive: '#c59262', emissiveIntensity: .06, roughness: .22, metalness: .26 });
+// The hull's single pane layer reveals the built recesses behind it.
+const hullGlass = new T.MeshPhysicalMaterial({
+  name: 'hull-glass', color: '#789bac', transparent: true, opacity: .32, depthWrite: false,
+  roughness: .15, metalness: .26, clearcoat: .65, clearcoatRoughness: .13,
+});
+const hullCove = new T.MeshStandardMaterial({
+  name: 'hull-room-cove', color: '#b9afa1', emissive: '#ffd29b', emissiveIntensity: .02, roughness: .64,
+});
+hullCove.onBeforeCompile = shader => {
+  shader.vertexShader = shader.vertexShader
+    .replace('#include <common>', '#include <common>\nvarying vec2 hullRoom;')
+    .replace('#include <project_vertex>', '#include <project_vertex>\nhullRoom = uv;');
+  shader.fragmentShader = shader.fragmentShader
+    .replace('#include <common>', '#include <common>\nvarying vec2 hullRoom;')
+    .replace('#include <color_fragment>', `#include <color_fragment>
+      diffuseColor.rgb *= mix(vec3(1.), vec3(1.12, .92, .73), step(.5, hullRoom.x));`)
+    .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
+      float cove = smoothstep(.685, .76, hullRoom.y) * (1. - smoothstep(.845, .94, hullRoom.y));
+      float rooms = .13 + .28 * hullRoom.y + .71 * cove;
+      float focus = mix(.41 + .48 * hullRoom.y, 1.28, step(1.5, hullRoom.x));
+      focus = mix(focus, .24, step(2.5, hullRoom.x));
+      focus = mix(focus, .23 + .47 * smoothstep(.1, 1., hullRoom.y), step(3.5, hullRoom.x));
+      totalEmissiveRadiance *= mix(rooms, focus, step(.5, hullRoom.x));`);
+};
+hullCove.customProgramCacheKey = () => 'hull-room-cove';
+const hullFinishes = { shell: megaShell, silver: megaRib, shadow: megaJoint, glass: hullGlass, cove: hullCove, frame: hullFrameMetal, panel: hullPanelMetal };
 const transferCove = gateLight.clone();
 transferCove.color.set('#f1cf9d'); transferCove.emissive.set('#ffc77d');
 const ringFinishes = new Map([
@@ -75,6 +107,8 @@ export const updateMegastructures = (night: number) => {
   gateLight.emissiveIntensity = .8 + night * 1.4; roomGlow.value = night;
   ringGlazing.emissiveIntensity = .06 + night * 1.05;
   transferCove.emissiveIntensity = .62 + night * 1.3;
+  hullCove.emissiveIntensity = .02 + night * 1.21;
+  hullPortalGuide.emissiveIntensity = .12 + night * .85;
   lightSlopePlants(night);
 };
 
@@ -84,7 +118,8 @@ type Batch = Map<T.Material, T.BufferGeometry[]>;
 /** Queue a geometry (placed by `m`) under a material; everything is normalised so per-material merging always succeeds. */
 function put(batch: Batch, material: T.Material, g: T.BufferGeometry, m?: T.Matrix4) {
   const flat = g.index ? g.toNonIndexed() : g.clone();
-  flat.deleteAttribute('uv'); if (m) flat.applyMatrix4(m);
+  if (material !== hullCove && material !== hullFrameMetal && material !== hullPanelMetal) flat.deleteAttribute('uv');
+  if (m) flat.applyMatrix4(m);
   (batch.get(material) ?? batch.set(material, []).get(material)!).push(flat);
 }
 /** Turn a surface inside out (inner faces of the ring). */
@@ -289,29 +324,96 @@ function arch(batch: Batch, tops: [number, number][]) {
   tops.push([point(.5).x, point(.5).z]);
 }
 
-// ---- C. Stepped terraced mega-hull; local depth 0 is the camera-facing front, +depth the back, +u runs toward the low left end.
+// ---- C. Stepped terraced mega-hull; +depth runs inland, +u toward the tall shoulder.
 function hull(batch: Batch, trees: Plant[], shrubs: Shrub[]) {
-  const { length, depth, steps, step, recede } = HULL, q = new T.Quaternion().setFromAxisAngle(new T.Vector3(0, 1, 0), HULL.yaw);
-  const root = new T.Matrix4().compose(new T.Vector3(HULL.x, 0, HULL.z), q, new T.Vector3(1, 1, 1)), L2 = length / 2;
+  const q = new T.Quaternion().setFromAxisAngle(new T.Vector3(0, 1, 0), HULL.yaw);
+  const root = new T.Matrix4().compose(new T.Vector3(HULL.x, 0, HULL.z), q, new T.Vector3(1, 1, 1)), L2 = HULL.length / 2;
   const world = (u: number, d: number, y: number) => new T.Vector3(u, y, d).applyQuaternion(q).add(new T.Vector3(HULL.x, 0, HULL.z));
-  const left = (k: number) => -L2 + (k > 2 ? (k - 2) * length * .75 / (steps - 3) : 0); // terraces 0-2 run the full length, then the left end steps in
-  const dAt = (k: number, u: number, grow: number) => k * recede - grow - 8 * (1 - (u / L2) ** 2);
-  const front = (k: number, grow: number, n = 24) => Array.from({ length: n + 1 }, (_, i) => { const u = left(k) - grow + (L2 - left(k) + 2 * grow) * i / n; return [u, dAt(k, u, grow)] as [number, number]; });
-  const slab = (k: number, y: number, h: number, grow: number, material: T.Material) => {
-    const f = front(k, grow), shape = new T.Shape(); shape.moveTo(f[0][0], -f[0][1]); f.forEach(([u, d]) => shape.lineTo(u, -d));
-    shape.lineTo(f[f.length - 1][0], -depth); shape.lineTo(f[0][0], -depth);
-    put(batch, material, new T.ExtrudeGeometry(shape, { depth: h, bevelEnabled: false }).rotateX(-Math.PI / 2), root.clone().multiply(new T.Matrix4().makeTranslation(0, y, 0)));
+  const front = (k: number, grow: number) => {
+    const { from, to, bow } = hullTiers[k];
+    const edge = Array.from({ length: 25 }, (_, i) => T.MathUtils.lerp(from - grow, to + grow, i / 24));
+    if (bow) {
+      for (const fraction of [.015, .05, .12, .25, .5, .75, 1]) {
+        const u = from + fraction * bow;
+        if (u > from - grow && u < to + grow) edge.push(u);
+      }
+      edge.sort((a, b) => a - b);
+    }
+    return edge.map(u => ({ u, d: hullFront(k, u, grow) }));
+  };
+  const lobby = { start: T.MathUtils.lerp(-L2, L2, hullLobby.start), end: T.MathUtils.lerp(-L2, L2, hullLobby.end) };
+  const tierElevation = (k: number, u: number, y: number) => {
+    const { from, to, base, deck } = hullTiers[k];
+    if (k !== hullTiers.length - 1) return y;
+    const drop = 3.6 * (1 - T.MathUtils.smoothstep(u, from, from + 16)) + 4.2 * T.MathUtils.smoothstep(u, to - 17, to);
+    return y - drop * T.MathUtils.smoothstep(y, base + 8, deck);
+  };
+  const slab = (k: number, y: number, h: number, grow: number, material: T.Material, recessLobby = false) => {
+    const f = front(k, grow);
+    if (k === hullTiers.length - 1) {
+      // Section the curved crown across its width so the roof, glass and planting share the same profile.
+      const sections = f.map(({ u, d }) => [
+        world(u, d, tierElevation(k, u, y)), world(u, hullRear(k, u), tierElevation(k, u, y)),
+        world(u, d, tierElevation(k, u, y + h)), world(u, hullRear(k, u), tierElevation(k, u, y + h)),
+      ]);
+      const positions: number[] = [];
+      const face = (a: T.Vector3, b: T.Vector3, c: T.Vector3, d: T.Vector3) => {
+        for (const p of [a, b, c, c, b, d]) positions.push(p.x, p.y, p.z);
+      };
+      const [start, ...rest] = sections;
+      face(start[0], start[1], start[2], start[3]);
+      let a = start;
+      for (const b of rest) {
+        face(a[0], a[2], b[0], b[2]);
+        face(a[1], b[1], a[3], b[3]);
+        face(a[0], b[0], a[1], b[1]);
+        face(a[2], a[3], b[2], b[3]);
+        a = b;
+      }
+      face(a[0], a[2], a[1], a[3]);
+      const geometry = new T.BufferGeometry();
+      geometry.setAttribute('position', new T.Float32BufferAttribute(positions, 3));
+      geometry.computeVertexNormals();
+      put(batch, material, geometry);
+      geometry.dispose();
+      return;
+    }
+    const shape = new T.Shape();
+    const rimEnd = f[f.length - 1].u, start = lobby.start, end = Math.min(lobby.end, rimEnd);
+    const back = (u: number) => hullFront(k, u) + hullLobby.back + .3;
+    const outline = recessLobby ? [
+      ...f.filter(({ u }) => u < start), { u: start, d: hullFront(k, start, grow) }, { u: start, d: back(start) },
+      ...f.filter(({ u }) => u > start && u < end).map(({ u }) => ({ u, d: back(u) })),
+      { u: end, d: back(end) }, ...(end < rimEnd ? [{ u: end, d: hullFront(k, end, grow) }, ...f.filter(({ u }) => u > end)] : []),
+    ] : f;
+    shape.moveTo(f[0].u, -f[0].d);
+    for (const { u, d } of outline) shape.lineTo(u, -d);
+    const rear = k < 2 ? [rimEnd, f[0].u] : f.map(({ u }) => u).reverse();
+    for (const u of rear) shape.lineTo(u, -hullRear(k, u));
+    const geometry = new T.ExtrudeGeometry(shape, { depth: h, bevelEnabled: false }).rotateX(-Math.PI / 2);
+    put(batch, material, geometry, root.clone().multiply(new T.Matrix4().makeTranslation(0, y, 0)));
+    geometry.dispose();
   };
   const at = (u: number, d: number, y: number) => new T.Matrix4().compose(world(u, d, y), q, new T.Vector3(1, 1, 1));
   // Road fix A (owner 2026-11-20): both Yurikamome tracks (deck 14.2 m) pass through the hull's end bulkheads, so each end gets a lit tunnel
   // mouth over them: [end sign, centre d, width] from where the tracks cross u = ±L2 (east d 9.7-15.8, west d 43.7-54.8).
-  const portals = [[1, 12.75, 18], [-1, 49.25, 22]] as const, portalY = [9, 23] as const;
+  const portals = [[1, HULL_BOW_PORTAL.centre, HULL_BOW_PORTAL.width], [-1, 49.25, 22]] as const;
+  const portalY = [HULL_BOW_PORTAL.bottom, HULL_BOW_PORTAL.top] as const;
   const inPortal = (sgn: number, d: number, k: number) => k < 2 && portals.some(([s, c, w]) => s === sgn && Math.abs(d - c) < w / 2 + 1);
   for (const [sgn, c, w] of portals) {
+    if (sgn > 0) continue;
     const u = sgn * (L2 + 2.6), h = portalY[1] - portalY[0], y = (portalY[0] + portalY[1]) / 2;
     put(batch, megaPortal, new T.BoxGeometry(.3, h, w), at(u, c, y));
     for (const [dy, dd, bh, bw] of [[h / 2, 0, .7, w + 1.4], [-h / 2, 0, .7, w + 1.4], [0, w / 2 + .35, h, .7], [0, -w / 2 - .35, h, .7]])
       put(batch, megaSeam, new T.BoxGeometry(.9, bh, bw), at(u + sgn * .3, c + dd, y + dy));
+    // A rounded metal collar stays outside the original rectangular train envelope.
+    const collar = new T.Shape(), outerHalf = w / 2 + 1.85, outerTop = h / 2 + 1.85;
+    for (const [side, rise, start] of [[1, 1, 0], [-1, 1, 1], [-1, -1, 2], [1, -1, 3]]) {
+      collar.absarc(side * (outerHalf - 2.1), rise * (outerTop - 2.1), 2.1, start * Math.PI / 2, (start + 1) * Math.PI / 2, false);
+    }
+    collar.closePath();
+    const edge = collar.getPoints(5).map(({ x, y: rise }) => world(u + sgn * .24, c + x, y + rise));
+    for (let i = 1; i < edge.length; i++) bar(batch, megaRib, edge[i - 1], edge[i], .8, .8);
   }
   const entrance = 53; // Existing plaza walk lands here.
   const publicTerraces = new Map([
@@ -319,38 +421,103 @@ function hull(batch: Batch, trees: Plant[], shrubs: Shrub[]) {
     [3, { start: -39, end: 9 }],
     [6, { start: 31, end: 67 }],
   ]);
-  for (let k = 0; k < steps; k++) {
-    const y0 = k * step, f = front(k, 0), u0 = left(k);
-    slab(k, y0, 1.2, 1.6, megaSeam); // glowing lip at the foot of each face
-    // polish2: the white slab carries the read (target: white terraced hull), one recessed glass storey under the next lip.
-    const g0 = 9.5;
-    if (k === 0) { // Entrance polish (owner 2026-11-20): the street storey is a glazed shopfront, set 1.5 m back under a white fascia on columns every 6 m
-      slab(k, y0 + 1.2, 5.4, -1.5, megaGlass);
-      slab(k, y0 + 6.6, g0 - 6.6, 1.2, megaShell);
-      const column = new T.BoxGeometry(.9, 5.4, .9);
-      for (let u = u0 + 3; u < L2 - 1; u += 6) put(batch, megaRib, column, at(u, dAt(k, u, 0) - .6, y0 + 3.9));
-      // Main door where the plaza walk lands (u 53): a deep canopy with a lit front edge over the forecourt.
-      const dd = dAt(k, entrance, 0);
+  for (const [k, { from: u0, to: u1, base: y0, deck: deckY, bow }] of hullTiers.entries()) {
+    const height = deckY - y0, f = front(k, 0);
+    slab(k, y0, .72, 1.6, megaRib);
+    if (k < 2) slab(k, y0 + .14, .17, 1.62, megaSeam);
+    slab(k, y0 + .72, height - 1.22, -8.35, megaShell, k === 0);
+    if (k === hullTiers.length - 1) slab(k, deckY - 1.15, 1.15, 1.25, megaRib);
+    else slab(k, deckY - .5, .5, .85, megaShell);
+    buildHullFacade({
+      tier: k, from: u0, to: u1, height, entrance,
+      point: (u, rise, inset) => world(u, Math.min(hullFront(k, u) + inset, hullRear(k, u) - .18), tierElevation(k, u, y0 + rise)),
+      surface: (finish, geometry) => put(batch, hullFinishes[finish], geometry),
+      bar: (finish, a, b, width, height) => bar(batch, hullFinishes[finish], a, b, width, height),
+    });
+
+    if (k === 0) {
+      // Match the existing plaza walk and keep its projecting entrance canopy.
+      const dd = hullFront(k, entrance);
       put(batch, megaShell, new T.BoxGeometry(18, .5, 7), at(entrance, dd - 4.7, y0 + 6.9));
       put(batch, megaSeam, new T.BoxGeometry(18.2, .3, .3), at(entrance, dd - 8.2, y0 + 6.75));
-    } else slab(k, y0 + 1.2, g0 - 1.2, 1.2, megaShell);
-    slab(k, y0 + g0 - .5, .35, 1.5, megaSeam); // cool seam line along the top of the white slab
-    slab(k, y0 + g0, step - g0, -.8, megaGlass); // glass set 0.8 m back under the slab
-    const fin = new T.BoxGeometry(.5, step - g0 - .3, .7);
-    for (let u = u0 + 3; u < L2 - 1; u += 6) put(batch, megaRib, fin, at(u, dAt(k, u, 0) + .5, y0 + g0 + (step - g0) / 2));
+    }
     // end bulkheads: white walls with fins every 8 m and one vertical seam at the front corner
-    for (const [u, sgn] of [[L2, 1], [u0, -1]] as const) {
-      const d0 = dAt(k, u, 0), len = depth - d0, wall = new T.BoxGeometry(2.4, step, len);
-      put(batch, megaShell, wall, at(u + sgn * 1.2, d0 + len / 2, y0 + step / 2));
-      for (let d = d0 + 6; d < depth - 2; d += 8) if (!inPortal(sgn, d, k)) put(batch, megaRib, new T.BoxGeometry(1.1, step - 1, .8), at(u + sgn * 2.6, d, y0 + step / 2));
-      if (!inPortal(sgn, d0 + 1, k)) put(batch, megaSeam, new T.BoxGeometry(.6, step, .6), at(u + sgn * 2.6, d0 + 1, y0 + step / 2));
+    for (const [u, sgn] of [[u1, 1], [u0, -1]] as const) {
+      const d0 = hullFront(k, u), back = hullRear(k, u), len = back - d0;
+      const curvedBow = sgn < 0 && bow > 0;
+      const edgeHeight = tierElevation(k, u, deckY) - y0;
+      const wall = new T.BoxGeometry(curvedBow ? .8 : 2.4, edgeHeight, len);
+      put(batch, curvedBow ? megaJoint : megaShell, wall, at(u + sgn * (curvedBow ? .4 : 1.2), d0 + len / 2, y0 + edgeHeight / 2));
+      if (curvedBow) {
+        // Carry the silver window sill around the prow and back into the sloping roof edge.
+        const run = Math.min(11, len - .4);
+        const points = [[d0 - .7, 8.8], [d0 + run * .18, 9.4], [d0 + run * .45, 11.1],
+          [d0 + run * .73, 13.1], [d0 + run, 14.35]];
+        for (let i = 1; i < points.length; i++) {
+          const [a, lo] = points[i - 1], [b, hi] = points[i];
+          bar(batch, megaRib, world(u - .83, a, tierElevation(k, u, y0 + height * lo / 15)),
+            world(u - .83, b, tierElevation(k, u, y0 + height * hi / 15)), .84, 2.3 - .31 * i);
+        }
+        continue;
+      }
+      for (let d = d0 + 6; d < back - 2; d += 8) if (!inPortal(sgn, d, k)) put(batch, megaRib, new T.BoxGeometry(1.1, edgeHeight - 1, .8), at(u + sgn * 2.6, d, y0 + edgeHeight / 2));
+      if (k < 2 && !inPortal(sgn, d0 + 1, k)) put(batch, megaSeam, new T.BoxGeometry(.6, height, .6), at(u + sgn * 2.6, d0 + 1, y0 + height / 2));
     }
     const terrace = publicTerraces.get(k);
-    const deckY = y0 + step;
-    const deckPoint = (u: number, inset: number, rise: number) => world(u, dAt(k, u, 0) + inset, deckY + rise);
-    const clearOfTerrace = (u: number, radius: number) => !terrace || u + radius <= terrace.start || u - radius >= terrace.end;
+    const deckPoint = (u: number, inset: number, rise: number) => world(u, hullFront(k, u) + inset, tierElevation(k, u, deckY) + rise);
+    // One skin wraps the slab nose and returns across the deck to the next tier's frame foot.
+    const folds = hullFrameReturns(k).map(({ head, foot }) => {
+      const start = T.MathUtils.lerp(u0, u1, head), next = hullTiers[k + 1];
+      const end = foot === undefined ? start : T.MathUtils.lerp(next.from, next.to, foot);
+      return { start, end, crossesDeck: foot !== undefined };
+    });
+    for (const { start, end, crossesDeck } of folds) {
+      const sections = [
+        [start - 2.65, -.94, -4.1, .3],
+        [start - 1.45, -1.1, -2.5, 1.14],
+        [start - .35, -1.68, -.8, 1.84],
+        [start + .26, -1.82, .12, 2.12],
+        [start + .52, -1.58, .69, 2.02],
+        [start + .65, -.96, 1.03, 1.82],
+        [start + .65, .2, 1.06, 1.63],
+        [start + .49, 1.51, .78, 1.38],
+      ];
+      if (crossesDeck) {
+        const recede = hullFront(k + 1, end) - hullFront(k, end);
+        sections.push(
+          [end, 2.4, .09, 1.12],
+          [end - .28, recede - 1.73, .09, 1.12],
+          [end - .19, recede - 1.73, .65, 1.12],
+          [end + .18, recede - 1.13, 1.25, 1.29],
+          [end + .9, recede - .98, 2.53, .94],
+          [end + 2.3, recede - .94, 3.65, .22],
+        );
+      } else sections.push([end + .49, 1.84, .1, .9]);
+
+      const edges = sections.map(([u, inset, rise, halfWidth]): [T.Vector3, T.Vector3] => [
+        deckPoint(u - halfWidth, inset, rise), deckPoint(u + halfWidth, inset, rise),
+      ]);
+      const grain = hullFrameUv(edges);
+      const positions: number[] = [], uv: number[] = [];
+      for (let i = 1; i < edges.length; i++) {
+        const [a, b] = edges[i - 1], [c, d] = edges[i];
+        for (const p of [a, c, b, b, c, d]) positions.push(p.x, p.y, p.z);
+        const [first, next] = [grain[i - 1], grain[i]];
+        uv.push(first.along, first.low, next.along, next.low, first.along, first.high,
+          first.along, first.high, next.along, next.low, next.along, next.high);
+      }
+      const frame = new T.BufferGeometry();
+      frame.setAttribute('position', new T.Float32BufferAttribute(positions, 3));
+      frame.setAttribute('uv', new T.Float32BufferAttribute(uv, 2));
+      frame.computeVertexNormals();
+      put(batch, hullFrameMetal, frame);
+      frame.dispose();
+    }
+    const clearForPlanting = (u: number, radius: number) =>
+      (!terrace || u + radius <= terrace.start || u - radius >= terrace.end)
+      && folds.every(({ start, end }) => u + radius < Math.min(start, end) - 2.1 || u - radius > Math.max(start, end) + 2.1);
     for (let i = 0; i < f.length - 1; i++) {
-      const a = f[i][0], b = f[i + 1][0];
+      const a = f[i].u, b = f[i + 1].u;
       bar(batch, megaShell, deckPoint(a, .75, .25), deckPoint(b, .75, .25), 1.5, .5);
       // Each planter follows the main curve and terminates at the actual edge of the opening.
       const spans = terrace ? [[a, Math.min(b, terrace.start)], [Math.max(a, terrace.end), b]] : [[a, b]];
@@ -362,29 +529,31 @@ function hull(batch: Batch, trees: Plant[], shrubs: Shrub[]) {
     }
     // Keep crowns out of the public floor, including their overhang past the trunk.
     for (const [off, gap, r] of [[1.1, 4.2, 3], [5.2, 7, 2.6]] as const) {
-      for (let u = u0 + 2, i = 0; u < L2 - 2; u += gap, i++) {
+      for (let u = u0 + 2, i = 0; u < u1 - 2; u += gap, i++) {
         const radius = r + hash(k * 99 + i + off) * .7;
-        if (!clearOfTerrace(u, radius * 1.2)) continue;
-        const p = deckPoint(u, off, .5);
-        shrubs.push([p.x, p.y, p.z, radius, 1.4 + hash(k * 99 + i + 4) * .5]);
+        if (!clearForPlanting(u, radius * 1.2)) continue;
+        // The last shrub on the inner row straddled the new reveal. Keep it on the seaward planter.
+        const besideBow = k === 0 && off === 5.2 && u > HULL_BOW_PORTAL.recess;
+        const p = deckPoint(u, besideBow ? 1.8 : off, .5);
+        shrubs.push([p.x, p.y, p.z, besideBow ? 1.65 : radius, 1.4 + hash(k * 99 + i + 4) * .5]);
       }
     }
-    for (let u = u0 + 8 + hash(k) * 12, c = 0; u < L2 - 8; u += 24 + hash(k * 7 + c) * 16, c++) {
+    for (let u = u0 + 8 + hash(k) * 12, c = 0; u < u1 - 8; u += 24 + hash(k * 7 + c) * 16, c++) {
       for (let j = 0, n = 4 + Math.floor(hash(k * 13 + c) * 3); j < n; j++) {
         const uj = u + (hash(k * 31 + c * 5 + j) - .5) * 9;
         const scale = .5 + hash(k * 3 + c * 11 + j) * .3;
-        if (!clearOfTerrace(uj, 5.5 * scale)) continue;
+        if (!clearForPlanting(uj, 5.5 * scale)) continue;
         const p = deckPoint(uj, 4 + hash(k * 17 + c * 3 + j) * 3.5, .5);
         trees.push({ position: [p.x, -p.z, p.y], scale, type: j === 1 ? 'columnar' : 'broadleaf' });
       }
     }
     if (terrace) {
       const { start, end } = terrace;
-      const edge = [start, ...f.map(([u]) => u).filter(u => u > start && u < end), end];
+      const edge = [start, ...f.map(({ u }) => u).filter(u => u > start && u < end), end];
       const paving = new T.Shape();
-      paving.moveTo(start, -dAt(k, start, 0) - 1.5);
-      for (const u of edge.slice(1)) paving.lineTo(u, -dAt(k, u, 0) - 1.5);
-      for (let i = edge.length - 1; i >= 0; i--) paving.lineTo(edge[i], -dAt(k, edge[i], 0) - 7.25);
+      paving.moveTo(start, -hullFront(k, start) - 1.5);
+      for (const u of edge.slice(1)) paving.lineTo(u, -hullFront(k, u) - 1.5);
+      for (let i = edge.length - 1; i >= 0; i--) paving.lineTo(edge[i], -hullFront(k, edge[i]) - 7.25);
       put(batch, megaRib, new T.ExtrudeGeometry(paving, { depth: .18, bevelEnabled: false }).rotateX(-Math.PI / 2),
         root.clone().multiply(new T.Matrix4().makeTranslation(0, deckY, 0)));
 
@@ -396,20 +565,25 @@ function hull(batch: Batch, trees: Plant[], shrubs: Shrub[]) {
       }
       for (let i = 0, n = Math.ceil((end - start) / 2.4); i <= n; i++) {
         const u = T.MathUtils.lerp(start, end, i / n);
-        put(batch, megaJoint, new T.BoxGeometry(.15, .73, .15), at(u, dAt(k, u, 0) + .78, deckY + .845));
+        put(batch, megaJoint, new T.BoxGeometry(.15, .73, .15), at(u, hullFront(k, u) + .78, deckY + .845));
       }
 
       // Broad shade panels keep the middle garden readable from the city camera.
       if (k === 3) {
         const a = start + 4, b = start + 24;
         for (const u of [a, b]) for (const inset of [2.1, 7.2]) {
-          put(batch, megaRib, new T.BoxGeometry(.45, 3.8, .45), at(u, dAt(k, u, 0) + inset, deckY + 1.95));
+          put(batch, megaRib, new T.BoxGeometry(.45, 3.8, .45), at(u, hullFront(k, u) + inset, deckY + 1.95));
         }
         for (const inset of [2.1, 7.2]) {
           bar(batch, megaRib, deckPoint(a, inset, 3.85), deckPoint(b, inset, 3.85), .5, .5);
         }
         for (const off of [3, 10, 17]) {
           bar(batch, megaShell, deckPoint(a + off, 1.7, 4.18), deckPoint(a + off, 7.6, 4.18), 6.1, .42);
+          const soffit = new T.PlaneGeometry(4.65, 4.9).rotateX(Math.PI / 2);
+          const uv = soffit.getAttribute('uv');
+          for (let i = 0; i < uv.count; i++) uv.setX(i, 2);
+          put(batch, hullCove, soffit, at(a + off, hullFront(k, a + off) + 4.65, deckY + 3.96));
+          soffit.dispose();
         }
       }
       if (k === 6) {
@@ -421,8 +595,8 @@ function hull(batch: Batch, trees: Plant[], shrubs: Shrub[]) {
     }
     if (k === 2) { // service rail along this lip with two static pods
       const fl = front(k, 2);
-      for (let i = 0; i < fl.length - 1; i++) bar(batch, megaRib, world(fl[i][0], fl[i][1] - .8, y0 + 6), world(fl[i + 1][0], fl[i + 1][1] - .8, y0 + 6), .7, .5);
-      for (const u of [-30, 40]) put(batch, megaShell, new T.BoxGeometry(6, 2.4, 3.4), at(u, dAt(k, u, 2) - .8, y0 + 7.4));
+      for (let i = 0; i < fl.length - 1; i++) bar(batch, megaRib, world(fl[i].u, fl[i].d - .8, y0 + 6), world(fl[i + 1].u, fl[i + 1].d - .8, y0 + 6), .7, .5);
+      for (const u of [-30, 40]) put(batch, megaShell, new T.BoxGeometry(6, 2.4, 3.4), at(u, hullFront(k, u, 2) - .8, y0 + 7.4));
     }
   }
 }
@@ -451,9 +625,24 @@ export function carveContext(environment: T.Object3D) {
 export function megastructures(ringModels?: { entrance: T.Group; body?: T.Group; hasTransfer?: boolean }): T.Group {
   const root = new T.Group(); root.name = 'megastructures';
   const batch: Batch = new Map(), trees: Plant[] = [], shrubs: Shrub[] = [], plants: SlopePlant[] = [], tops: [number, number][] = [];
-  ring(batch, plants, Boolean(ringModels), Boolean(ringModels?.body), Boolean(ringModels?.hasTransfer)); arch(batch, tops); hull(batch, trees, shrubs);
+  ring(batch, plants, Boolean(ringModels), Boolean(ringModels?.body), Boolean(ringModels?.hasTransfer)); arch(batch, tops);
+  const hullBatch: Batch = new Map();
+  hull(hullBatch, trees, shrubs);
+  for (const [material, parts] of hullBatch) {
+    for (const part of parts) cutHullBowOpening(part);
+    const existing = batch.get(material);
+    if (existing) existing.push(...parts);
+    else batch.set(material, parts);
+  }
+  const portalFinishes = { frame: hullFrameMetal, panel: hullPanelMetal, guide: hullPortalGuide, dark: megaPortal };
+  buildHullBowPortal((finish, geometry) => put(batch, portalFinishes[finish], geometry));
   for (const [material, list] of batch) {
-    const mesh = new T.Mesh(mergeGeometries(list), carved.get(material) ?? material); mesh.castShadow = mesh.receiveShadow = true; mesh.name = 'megastructure'; root.add(mesh); list.forEach(g => g.dispose());
+    const mesh = new T.Mesh(mergeGeometries(list), carved.get(material) ?? material);
+    mesh.castShadow = material !== hullGlass;
+    mesh.receiveShadow = true;
+    mesh.name = 'megastructure';
+    root.add(mesh);
+    list.forEach(g => g.dispose());
   }
   // R5 seeded hull planting after these ring instances. Retain its poses and pigments after removing the ring from the shared batches.
   const treeOffset = ringModels?.hasTransfer ? 82 : 87;

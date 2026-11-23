@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
-import { Group, PerspectiveCamera, Vector3 } from 'three';
+import { Group, PerspectiveCamera, Spherical, Vector3 } from 'three';
 import { DISPLAY_MS, RESULT_LEASE_MS } from '../survey/src/shared/displayTiming.ts';
 import { emptyEnergyConfiguration, type EnergyConfiguration } from '../survey/src/shared/energy.ts';
 import { deriveExhibitionLayout } from '../survey/src/shared/cityView.ts';
 import { HeadlineCamera, SHOTS, VIEWPOINT_COVERAGE, headlineShot, shotStage, shotTimeline, type ShotId } from '../src/headlineCamera.ts';
-import { HERO_POSITION, HERO_TARGET } from '../src/heroCamera.ts';
+import { HERO_SETTLED_POSITION, HERO_TARGET } from '../src/heroCamera.ts';
 import { ARRIVAL_SECONDS } from '../src/voteJourney.ts';
 import { SHELF_TRANSITION_SECONDS, headlineTransitionSeconds } from '../src/siteBuilders/shelfTimeline.ts';
 import { reasonDelayMs } from '../src/resultTimeline.ts';
@@ -72,10 +72,10 @@ for (const [id, pose] of Object.entries(SHOTS)) {
   if(id.endsWith(':district')) assert.ok(p.distanceTo(target)<=260,id);
 }
 const camera=new PerspectiveCamera(42),controls={target:new Vector3(...HERO_TARGET),enabled:true,update(){}};
-camera.position.set(...HERO_POSITION);
+camera.position.set(...HERO_SETTLED_POSITION);
 const controller=new HeadlineCamera(camera,controls),first={socketId:'ne' as const,focal:true,district:false};
 controller.play([first],10);assert.equal(controller.active,true);assert.equal(controls.enabled,false);
-controller.update(10);assert.deepEqual(camera.position.toArray(),HERO_POSITION);
+controller.update(10);assert.deepEqual(camera.position.toArray(),HERO_SETTLED_POSITION);
 controller.update(10+t.hold);assert.deepEqual(camera.position.toArray(),SHOTS['ne:focal'].position);
 controller.update(10+t.flyOut);
 const pushed=new Vector3(...SHOTS['ne:focal'].position).lerp(new Vector3(...SHOTS['ne:focal'].target),.07);
@@ -84,15 +84,15 @@ controller.update(10+t.flyOut+1e-6);assert.ok(camera.position.distanceTo(pushed)
 const interrupted=camera.position.clone(),aim=controls.target.clone();
 controller.play([{socketId:'sw',focal:false,district:true}],20);controller.update(20);
 assert.ok(camera.position.equals(interrupted));assert.ok(controls.target.equals(aim));
-controller.update(20+2);assert.deepEqual(camera.position.toArray(),HERO_POSITION);
+controller.update(20+2);assert.deepEqual(camera.position.toArray(),HERO_SETTLED_POSITION);
 controller.update(20+t.hold);assert.deepEqual(camera.position.toArray(),SHOTS['sw:district'].position);
-controller.cancel();assert.deepEqual(camera.position.toArray(),HERO_POSITION);assert.deepEqual(controls.target.toArray(),HERO_TARGET);assert.equal(controls.enabled,true);
+controller.cancel();assert.deepEqual(camera.position.toArray(),HERO_SETTLED_POSITION);assert.deepEqual(controls.target.toArray(),HERO_TARGET);assert.equal(controls.enabled,true);
 for (const changes of [[],[first]]) {
   controller.play(changes,30,DISPLAY_MS-101);assert.equal(controller.active,false);
 }
 assert.equal(shotTimeline(9950).flyOut,9.95);
 controller.play([first],35,9950);controller.update(35+9.96);assert.notDeepEqual(camera.position.toArray(),SHOTS['ne:focal'].position,'fly-out follows the actual remaining card slot');
-controller.play([first],40);controller.update(40+t.done);assert.equal(controller.active,false);assert.deepEqual(camera.position.toArray(),HERO_POSITION);
+controller.play([first],40);controller.update(40+t.done);assert.equal(controller.active,false);assert.deepEqual(camera.position.toArray(),HERO_SETTLED_POSITION);
 console.log('PASS: 13 headline shots, card location priority, timing, interruption, catch-up and immediate cancel.');
 
 // Any next live result returns smoothly, even when its proposal has no headline.
@@ -102,13 +102,28 @@ for (const interruptedAt of [t.hold, t.flyOut + .5]) {
   controller.play([],20);controller.update(20);
   assert.ok(camera.position.equals(before));assert.ok(controls.target.equals(target));
   assert.equal(controller.active,true);assert.equal(controls.enabled,false);
-  controller.update(21);assert.ok(camera.position.distanceTo(before.clone().lerp(new Vector3(...HERO_POSITION),.5))<1e-8);
-  controller.update(22);assert.deepEqual(camera.position.toArray(),HERO_POSITION);assert.deepEqual(controls.target.toArray(),HERO_TARGET);
+  controller.update(21);assert.ok(camera.position.distanceTo(before.clone().lerp(new Vector3(...HERO_SETTLED_POSITION),.5))<1e-8);
+  controller.update(22);assert.deepEqual(camera.position.toArray(),HERO_SETTLED_POSITION);assert.deepEqual(controls.target.toArray(),HERO_TARGET);
   assert.equal(controller.active,false);assert.equal(controls.enabled,true);
-  controller.update(20+t.hold);assert.deepEqual(camera.position.toArray(),HERO_POSITION,'no fly-in after a no-headline return');
+  controller.update(20+t.hold);assert.deepEqual(camera.position.toArray(),HERO_SETTLED_POSITION,'no fly-in after a no-headline return');
 }
-controller.play([],30);assert.equal(controller.active,false);assert.deepEqual(camera.position.toArray(),HERO_POSITION);
-controller.play([first],40);controller.update(40+t.hold);controller.play([],50,5000);assert.deepEqual(camera.position.toArray(),HERO_POSITION,'catch-up still cuts immediately');
+controller.play([],30);assert.equal(controller.active,false);assert.deepEqual(camera.position.toArray(),HERO_SETTLED_POSITION);
+controller.play([first],40);controller.update(40+t.hold);const caught=camera.position.clone();controller.play([],50,5000);
+assert.ok(camera.position.equals(caught)&&controller.active,'catch-up eases back instead of cutting');
+controller.update(50+1);assert.ok(camera.position.distanceTo(caught.clone().lerp(new Vector3(...HERO_SETTLED_POSITION),.5))<1e-8);
+controller.update(50+2);assert.deepEqual(camera.position.toArray(),HERO_SETTLED_POSITION);assert.equal(controller.active,false);
+// A snapshot, reset or Undo off hero (attract drift, staff orbit) eases back too; at hero it settles at once.
+camera.position.set(-300,160,-470);controls.target.set(0,60,0);const drifted=camera.position.clone();
+controller.returnHome(60);controller.update(60);assert.ok(camera.position.equals(drifted)&&controller.active&&!controls.enabled);
+controller.update(62);assert.deepEqual(camera.position.toArray(),HERO_SETTLED_POSITION);assert.deepEqual(controls.target.toArray(),HERO_TARGET);assert.equal(controls.enabled,true);
+controller.returnHome(70);assert.equal(controller.active,false,'already at hero: no flight');
+// The landing pose is the one OrbitControls keeps (maxPolarAngle 1.42 in main.ts), so the next controls.update() cannot lift the camera.
+{
+  const cam=new PerspectiveCamera(42),ctl={target:new Vector3(...HERO_TARGET),enabled:true,update(){const s=new Spherical().setFromVector3(cam.position.clone().sub(ctl.target));s.phi=Math.min(s.phi,1.42);cam.position.copy(ctl.target).add(new Vector3().setFromSpherical(s));}};
+  ctl.update();const flight=new HeadlineCamera(cam,ctl);flight.play([first],0);
+  for(let f=0;f<=t.done*60+2;f++){const before=cam.position.clone();ctl.update();flight.update(f/60);assert.ok(cam.position.distanceTo(before)<12,`frame ${f} moves ${cam.position.distanceTo(before).toFixed(2)} m`);}
+  const landed=cam.position.clone();ctl.update();assert.ok(cam.position.distanceTo(landed)<1e-6,'no lift after landing');
+}
 console.log('PASS: no-headline interruptions preserve the first frame in hold/fly-out and return without another fly-in.');
 
 // Live district positions choose a covered authored shot; ties rotate, and missing positions fall back.
@@ -148,16 +163,16 @@ assert.equal(picker.play([{socketId:'nw' as const,focal:false,district:true,poin
 // SE stage flights clear the foreground with an arc while preserving the endpoints and timing.
 for (const [stage, slot, lift] of [['se:stage-east', 'se:pod4', 140], ['se:stage-south', 'se:tower3', 100]] as const) {
   const cam = new PerspectiveCamera(42), ctl = { target: new Vector3(...HERO_TARGET), enabled: true, update() {} };
-  cam.position.set(...HERO_POSITION); const flight = new HeadlineCamera(cam, ctl);
+  cam.position.set(...HERO_SETTLED_POSITION); const flight = new HeadlineCamera(cam, ctl);
   assert.equal(flight.play([{ socketId: 'se', focal: false, district: true, points: [point(slot)] }], 0), stage);
-  flight.update(t.flyIn); assert.ok(cam.position.distanceTo(new Vector3(...HERO_POSITION)) < 1e-8);
+  flight.update(t.flyIn); assert.ok(cam.position.distanceTo(new Vector3(...HERO_SETTLED_POSITION)) < 1e-8);
   flight.update((t.flyIn + t.hold) / 2);
-  const midpoint = new Vector3(...HERO_POSITION).lerp(new Vector3(...SHOTS[stage].position), .5); midpoint.y += lift;
+  const midpoint = new Vector3(...HERO_SETTLED_POSITION).lerp(new Vector3(...SHOTS[stage].position), .5); midpoint.y += lift;
   assert.ok(cam.position.distanceTo(midpoint) < 1e-8, `${stage} midpoint lift`);
   flight.update(t.hold); assert.ok(cam.position.distanceTo(new Vector3(...SHOTS[stage].position)) < 1e-8);
   flight.update((t.flyOut + t.done) / 2);
   const endPose = new Vector3(...SHOTS[stage].position).lerp(new Vector3(...SHOTS[stage].target), .07);
-  const returnMid = new Vector3(...HERO_POSITION).lerp(endPose, .5); returnMid.y += lift;
+  const returnMid = new Vector3(...HERO_SETTLED_POSITION).lerp(endPose, .5); returnMid.y += lift;
   assert.ok(cam.position.distanceTo(returnMid) < 1e-8, `${stage} return midpoint lift`);
-  flight.update(t.done); assert.ok(cam.position.distanceTo(new Vector3(...HERO_POSITION)) < 1e-8);
+  flight.update(t.done); assert.ok(cam.position.distanceTo(new Vector3(...HERO_SETTLED_POSITION)) < 1e-8);
 }

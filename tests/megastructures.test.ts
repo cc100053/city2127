@@ -1,11 +1,14 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { Box3, Group, Matrix4, Mesh, MeshStandardMaterial, InstancedMesh, Raycaster, Triangle, Vector3 } from 'three';
+import { Box3, BufferGeometry, Float32BufferAttribute, Group, Matrix4, Mesh, MeshStandardMaterial, InstancedMesh, LinearMipmapLinearFilter, Raycaster, Triangle, Vector3 } from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { MeshBVH } from 'three-mesh-bvh';
 import { ConcentrationDistrict } from '../src/districtMeters.ts';
 import { changeSites, guideway, PLAZA, plazaAt, plazaWalks } from '../src/layout.ts';
-import { ARCH, FOOTPRINTS, groundContacts, HULL, inMega, inRect, megastructures, RING, RING_GATE } from '../src/megastructures.ts';
-import { routes } from '../src/mobility.ts';
+import { hullFront, hullTiers } from '../src/hullFacade.ts';
+import { HULL_BOW_PORTAL } from '../src/hullPortal.ts';
+import { ARCH, FOOTPRINTS, groundContacts, HULL, inMega, inRect, megastructures, RING, RING_GATE, updateMegastructures } from '../src/megastructures.ts';
+import { routes, TRAIN_SPEED, trainPose } from '../src/mobility.ts';
 import { occupants, strollPose } from '../src/occupants.ts';
 import { plazaDeck } from '../src/plazaDeck.ts';
 import odaibaLayout from '../src/odaiba-layout.json' with {type: 'json'};
@@ -16,23 +19,47 @@ const group = megastructures(), box = new Box3(), parts = new Map<string, Box3>(
 group.updateMatrixWorld(true);
 group.traverse(o => { if (o instanceof Mesh && !(o instanceof InstancedMesh)) { o.geometry.computeBoundingBox(); parts.set(`${o.material.color.getHexString()}${parts.size}`, box.copy(o.geometry.boundingBox!).clone()); } });
 const shell =[...parts.entries()].find(([k]) => k.startsWith('f3f2ec'))![1];
-const structureBatches = group.children.filter(part => part instanceof Mesh).length;
-assert.ok(structureBatches >= 4 && structureBatches <= 12, `structure draws ${structureBatches}`);
+const structureBatches = group.children.filter(part => part instanceof Mesh && !(part instanceof InstancedMesh));
+const facadeNames = ['hull-frame-metal', 'hull-glass', 'hull-panel-metal', 'hull-room-cove'];
+const facadeBatches = structureBatches.filter(part => part.material instanceof MeshStandardMaterial
+  && facadeNames.includes(part.material.name));
+assert.deepEqual(facadeBatches.map(part => part.material.name).sort(), facadeNames);
+const silver = facadeBatches.find(part => part.material.name === 'hull-frame-metal');
+const panel = facadeBatches.find(part => part.material.name === 'hull-panel-metal');
+assert.ok(silver && panel);
+for (const { geometry, material } of [silver, panel]) {
+  const uv = geometry.getAttribute('uv'), positions = geometry.getAttribute('position');
+  assert.equal(uv.count, positions.count, 'merged metal batch retains UVs for every vertex');
+  for (let i = 0; i < uv.count; i += 3) {
+    const a = new Vector3().fromBufferAttribute(positions, i);
+    const b = new Vector3().fromBufferAttribute(positions, i + 1);
+    const c = new Vector3().fromBufferAttribute(positions, i + 2);
+    if (b.sub(a).cross(c.sub(a)).lengthSq() < 1e-8) continue;
+    const area = (uv.getX(i + 1) - uv.getX(i)) * (uv.getY(i + 2) - uv.getY(i))
+      - (uv.getY(i + 1) - uv.getY(i)) * (uv.getX(i + 2) - uv.getX(i));
+    assert.ok(Math.abs(area) > 1e-6, 'visible metal triangles have a usable bump-map basis');
+  }
+  assert.ok(material.roughnessMap && material.roughnessMap === material.bumpMap);
+  assert.ok(material.roughnessMap.generateMipmaps, 'grain is mipmapped for the city camera');
+  assert.equal(material.roughnessMap.minFilter, LinearMipmapLinearFilter);
+}
+const sharedBatchCount = structureBatches.length - facadeBatches.length;
+assert.ok(sharedBatchCount >= 4 && sharedBatchCount <= 12, `shared structure draws ${sharedBatchCount}`);
 // Heights: the hoop's top, the arch apex and the hull top all lie inside the shell batch's bounds.
 const within = (v: number, want: number, what: string) => assert.ok(v >= want * .75 && v <= want * 1.25, `${what} ${v.toFixed(0)} m vs ${want} m`);
-within(RING.centreY + RING.outer, 195, 'ring top'); within(ARCH.apex, 170, 'arch apex'); within(HULL.steps * HULL.step, 120, 'hull top');
-assert.ok(shell.max.y >= HULL.steps * HULL.step * .9 && shell.max.y <= 200, `shell top ${shell.max.y}`);
+within(RING.centreY + RING.outer, 195, 'ring top'); within(ARCH.apex, 170, 'arch apex'); within(hullTiers.at(-1)!.deck, 120, 'hull top');
+assert.ok(shell.max.y >= hullTiers.at(-1)!.deck * .9 && shell.max.y <= 200, `shell top ${shell.max.y}`);
 within(RING.outer * 2, 210, 'ring diameter'); within(Math.hypot(ARCH.b[0] - ARCH.a[0], ARCH.b[1] - ARCH.a[1]), 240, 'arch span'); within(HULL.length, 190, 'hull length');
 // The three openings have continuous paved floors and retain planted terraces beside them.
 {
   const axis = new Vector3(0, 1, 0), origin = new Vector3(HULL.x, 0, HULL.z);
   const floorHit = (tier: number, u: number, inset: number) => {
-    const depth = tier * HULL.recede - 8 * (1 - (u / (HULL.length / 2)) ** 2) + inset;
-    const start = new Vector3(u, (tier + 1) * HULL.step + 3, depth).applyAxisAngle(axis, HULL.yaw).add(origin);
+    const depth = hullFront(tier, u) + inset;
+    const start = new Vector3(u, hullTiers[tier].deck + 3, depth).applyAxisAngle(axis, HULL.yaw).add(origin);
     return new Raycaster(start, new Vector3(0, -1, 0), 0, 3.1).intersectObject(group)[0];
   };
-  for (const [tier, start, end] of [[0, 35, 71], [3, -39, 9], [6, 31, 67]]) {
-    const deck = (tier + 1) * HULL.step;
+  for (const [tier, deck, start, end] of [[0, 15, 35, 71], [3, 60, -39, 9], [6, 105, 31, 67]]) {
+    assert.equal(hullTiers[tier].deck, deck);
     for (let u = start + 2; u <= end - 2; u += 2) for (const inset of [3.6, 4.9, tier === 6 ? 2.4 : 6.6]) {
       const hit = floorHit(tier, u, inset);
       assert.ok(hit && Math.abs(hit.point.y - deck - .18) < .01, `terrace ${tier}: paving clear at ${u}, ${inset}`);
@@ -42,6 +69,115 @@ within(RING.outer * 2, 210, 'ring diameter'); within(Math.hypot(ARCH.b[0] - ARCH
       assert.ok(hit && hit.point.y >= deck + .59, `terrace ${tier}: planting beside the opening at ${u}`);
     }
   }
+}
+// Every tier has real, inset glass and interior room faces behind it.
+{
+  const axis = new Vector3(0, 1, 0);
+  const origin = new Vector3(HULL.x, 0, HULL.z);
+  const inward = new Vector3(0, 0, 1).applyAxisAngle(axis, HULL.yaw);
+  const halfLength = HULL.length / 2;
+  const glass = facadeBatches.find(part => part.material.name === 'hull-glass');
+  assert.ok(glass && glass.material.transparent && !glass.castShadow);
+  for (const [tier, { from, to, base, deck }] of hullTiers.entries()) {
+    let insetPanes = 0;
+    for (const width of [.12, .24, .36, .48, .6, .72, .84]) {
+      const u = from + (to - from) * width;
+      const d = hullFront(tier, u);
+      for (const fraction of [.23, .43, .63, .83]) {
+        const p = new Vector3(u, base + (deck - base) * fraction, d - 4).applyAxisAngle(axis, HULL.yaw).add(origin);
+        const hits = new Raycaster(p, inward, 0, tier === 0 ? 23 : 14).intersectObjects(structureBatches, false);
+        if (hits[0]?.object !== glass) continue;
+        const paneDepth = tier === 0 && width > .65 ? 3.45 : 1.42;
+        assert.ok(Math.abs(hits[0].distance - 4 - paneDepth) < .04, `tier ${tier}: glass is inset`);
+        assert.ok(hits.some(hit => hit.object !== glass && hit.distance > hits[0].distance + .1),
+          `tier ${tier}: window has an interior surface behind the pane`);
+        insetPanes++;
+      }
+    }
+    assert.ok(insetPanes >= 4, `tier ${tier}: only ${insetPanes} pane samples visible`);
+  }
+  for (const u of [51.4, 53, 54.6]) {
+    const d = -8 * (1 - (u / halfLength) ** 2);
+    for (const y of [1.35, 2.6, 4]) {
+      const p = new Vector3(u, y, d - 4).applyAxisAngle(axis, HULL.yaw).add(origin);
+      assert.equal(new Raycaster(p, inward, 0, 12).intersectObjects(structureBatches, false).length, 0,
+        `plaza door clear at ${u}, ${y}`);
+    }
+  }
+
+  const cove = facadeBatches.find(part => part.material.name === 'hull-room-cove');
+  assert.ok(cove);
+  const localPoint = (u: number, y: number, depth: number) =>
+    new Vector3(u, y, depth).applyAxisAngle(axis, HULL.yaw).add(origin);
+  const front = hullFront;
+  // At the entrance centre the full-height pane and warm back wall are separated by over thirteen metres.
+  const [pane, rear] = new Raycaster(localPoint(53, 8, front(0, 53) - 4), inward, 0, 24).intersectObjects(structureBatches, false);
+  assert.ok(pane?.object === glass && rear?.object === cove && rear.distance - pane.distance > 13.6, 'lobby opens behind its glazing');
+  for (const u of [43, 64]) {
+    const [mezzanine] = new Raycaster(localPoint(u, 2, front(0, u) + 12), axis, 0, 8).intersectObjects(structureBatches, false);
+    assert.ok(mezzanine && Math.abs(mezzanine.point.y - 5.115) < .02, `mezzanine wing at ${u}`);
+  }
+  const [ceiling] = new Raycaster(localPoint(53, 2, front(0, 53) + 12), axis, 0, 13).intersectObjects(structureBatches, false);
+  assert.ok(ceiling?.object === cove && ceiling.point.y > 11, 'warm ceiling above full-height entry');
+  for (const depth of [5.5, 15]) {
+    const [reveal] = new Raycaster(localPoint(53, 2, front(0, 53) + depth), axis, 0, 13)
+      .intersectObjects(structureBatches, false);
+    assert.ok(reveal && reveal.object !== cove && reveal.point.y > ceiling.point.y + .25,
+      `ceiling reveal stands above the warm panel at ${depth} m`);
+  }
+  const [header] = new Raycaster(localPoint(53, 4.42, front(0, 53) - 4), inward, 0, 8)
+    .intersectObjects(structureBatches, false);
+  assert.ok(header && header.object !== glass && Math.abs(header.distance - 7.18) < .04, 'entrance transom sits in front of the pane');
+  for (const u of [44.5, 61.5]) {
+    const [column] = new Raycaster(localPoint(u, 2.25, front(0, u) + 5), inward, 0, 5).intersectObjects(structureBatches, false);
+    assert.ok(column && Math.abs(column.distance - 2.23) < .25, `column behind the pane at ${u}`);
+  }
+  const [outerPanel] = new Raycaster(localPoint(-1, 37, front(2, -1) - 4), inward, 0, 6)
+    .intersectObjects(structureBatches, false);
+  assert.equal(outerPanel?.object, panel, 'the dark fascia uses its own metal batch');
+  // The middle deck remains open from the walking surface to the water above the existing guardrail.
+  for (let u = -37; u <= 7; u++) {
+    if (u === -35 || u === -15) continue; // Existing canopy posts.
+    for (const y of [61.55, 62.5, 63.3]) {
+      const sights = new Raycaster(localPoint(u, y, front(3, u) + 6.2), inward.clone().negate(), 0, 8);
+      assert.equal(sights.intersectObjects(structureBatches, false).length, 0, `middle terrace sightline at ${u}, ${y}`);
+    }
+  }
+  // Each cross-tier fold covers the slab nose and meets the upper frame without raising the public deck.
+  for (const [tier, head, foot] of [[2, -59.4, -59.12], [2, -2.7, -2.64], [3, 14.32, 14.376], [5, -.074, .368], [6, 24.368, 24.65]]) {
+    const { deck } = hullTiers[tier];
+    const setback = front(tier + 1, foot) - front(tier, foot);
+    for (const [u, rise, depth] of [[head, -.25, -1.8], [foot + .4, 1.35, setback - 1.12]]) {
+      const [fold] = new Raycaster(localPoint(u, deck + rise, front(tier, u) + depth - 1.1), inward, 0, 2)
+        .intersectObjects(structureBatches, false);
+      assert.ok(fold?.object === silver && Math.abs(fold.distance - 1.1) < .22,
+        `silver fold at tier ${tier}, ${u}, ${rise}: distance ${fold?.distance}`);
+    }
+    const [deckFold] = new Raycaster(localPoint(head + .49, deck + 1.4, front(tier, head + .49) + .9),
+      axis.clone().negate(), 0, 1).intersectObjects(structureBatches, false);
+    assert.ok(deckFold?.object === silver && deckFold.point.y > deck + .8 && deckFold.point.y < deck + 1.1,
+      `silver turns above the existing kerb at tier ${tier}, ${head}`);
+  }
+  // Measure the built roof slab at both shoulders and across the broad middle.
+  for (const [u, height] of [[11, 130.75], [32, 134], [55, 134], [80, 130.15]]) {
+    const [roof] = new Raycaster(localPoint(u, 135.25, front(7, u) + 2), axis.clone().negate(), 0, 6)
+      .intersectObjects(structureBatches, false);
+    assert.ok(roof && Math.abs(roof.point.y - height) < .2, `rounded crest slab at ${u}: ${roof?.point.y}`);
+  }
+  // Both ends of the 105 m deck remain clear above head height beside the crown's extended frame.
+  for (const u of [32, 40, 48, 56, 64, 66]) for (const inset of [2.4, 4.9]) {
+    const head = new Raycaster(localPoint(u, 105.19, front(6, u) + inset), axis, 0, 2.2);
+    assert.equal(head.intersectObjects(structureBatches, false).length, 0, `lookout headroom at ${u}, ${inset}`);
+  }
+  const positions = cove.geometry.getAttribute('position'), uv = cove.geometry.getAttribute('uv');
+  const lightRoles = new Set<number>();
+  let canopyVertices = 0;
+  for (let i = 0; i < uv.count; i++) {
+    lightRoles.add(uv.getX(i));
+    if (uv.getX(i) === 2 && Math.abs(positions.getY(i) - 63.96) < .01) canopyVertices++;
+  }
+  assert.deepEqual([...lightRoles].sort(), [0, 1, 2, 3, 4], 'ordinary rooms, focused rooms, warm soffits, lobby bounce and lobby back wall share one batch');
+  assert.equal(canopyVertices, 18, 'all three shade panels have warm soffits');
 }
 // Ground contacts (plinth, arch feet, hull footprint) keep 14 m clear of every Meter site and of the civic core base.
 const contacts = groundContacts(), all = [contacts.ring, ...contacts.archFeet, contacts.hull];
@@ -79,8 +215,126 @@ for (const walk of plazaWalks) for (const [i, [x, y, z]] of walk.entries()) {
   }
 }
 
-// Test the actual exported triangles in ring-local metres against the tunnel and garden walk keep-outs.
 const loader = new GLTFLoader();
+// The new lining leaves R6's full rectangular mouth open through the recess, including the planted hull edge.
+{
+  const { face, recess, centre, width, bottom, top } = HULL_BOW_PORTAL;
+  assert.deepEqual([face, centre, width, bottom, top], [92.6, 12.75, 18, 9, 23]);
+  const up = new Vector3(0, 1, 0), origin = new Vector3(HULL.x, 0, HULL.z);
+  const toLocal = new Matrix4().makeRotationY(-HULL.yaw).multiply(new Matrix4().makeTranslation(-HULL.x, 0, -HULL.z));
+  const southEdge = centre - width / 2, northEdge = centre + width / 2;
+  const envelope = new Box3(new Vector3(recess + .025, bottom + .025, southEdge + .025),
+    new Vector3(face + 1.05, top - .025, northEdge - .025));
+  const triangle = new Triangle(), instance = new Matrix4();
+  group.traverse(part => {
+    if (!(part instanceof Mesh)) return;
+    const { geometry } = part, position = geometry.getAttribute('position'), index = geometry.getIndex();
+    geometry.computeBoundingBox();
+    const bounds = geometry.boundingBox;
+    assert.ok(bounds);
+    for (let i = 0; i < (part instanceof InstancedMesh ? part.count : 1); i++) {
+      if (part instanceof InstancedMesh) part.getMatrixAt(i, instance);
+      else instance.identity();
+      instance.premultiply(part.matrixWorld).premultiply(toLocal);
+      if (!bounds.clone().applyMatrix4(instance).intersectsBox(envelope)) continue;
+      for (let j = 0; j < (index?.count ?? position.count); j += 3) {
+        [triangle.a, triangle.b, triangle.c].forEach((p, k) =>
+          p.fromBufferAttribute(position, index?.getX(j + k) ?? j + k).applyMatrix4(instance));
+        assert.ok(!envelope.intersectsTriangle(triangle), `${part.name} obstructs the bow portal`);
+      }
+    }
+  });
+  const ray = new Raycaster(new Vector3(face + 4, 19, centre).applyAxisAngle(up, HULL.yaw).add(origin),
+    new Vector3(-1, 0, 0).applyAxisAngle(up, HULL.yaw));
+  const [rear] = ray.intersectObjects(structureBatches, false);
+  assert.ok(rear && Math.abs(rear.distance - (face + 4 - recess)) < .02, 'the visible back sits behind the bulkhead');
+  const guides = structureBatches.filter(part => part.material instanceof MeshStandardMaterial &&
+    part.material.name === 'hull-portal-guide');
+  assert.equal(guides.length, 1, 'the recessed guide runs in one batch');
+  for (const [y, d] of [[bottom - .25, centre], [top + .25, centre], [16, southEdge - .25], [16, northEdge + .25]]) {
+    ray.ray.origin.set(face + 4, y, d).applyAxisAngle(up, HULL.yaw).add(origin);
+    const [light] = ray.intersectObjects(structureBatches, false);
+    assert.equal(light?.object, guides[0], `guide visible in front of the old bulkhead at ${y}, ${d}`);
+  }
+  updateMegastructures(0);
+  const dayGuide = guides[0].material.emissiveIntensity;
+  updateMegastructures(1);
+  assert.ok(guides[0].material.emissiveIntensity > dayGuide && guides[0].material.emissiveIntensity < 1);
+  updateMegastructures(0);
+
+  // Sample the live train placement against the aperture with all three production car variants.
+  const bytes = Uint8Array.from(readFileSync(new URL('../asset/models/train-2127/train-2127.glb', import.meta.url)));
+  const { scene: fleet } = await loader.parseAsync(bytes.buffer, '');
+  fleet.updateMatrixWorld(true);
+  const vertices: Vector3[] = [];
+  for (const name of ['train_lead', 'train_mid', 'train_tail']) {
+    const car = fleet.getObjectByName(name);
+    assert.ok(car);
+    const inverse = car.matrixWorld.clone().invert();
+    car.traverse(part => {
+      if (!(part instanceof Mesh)) return;
+      const local = inverse.clone().multiply(part.matrixWorld);
+      const position = part.geometry.getAttribute('position');
+      for (let i = 0; i < position.count; i++) {
+        vertices.push(new Vector3().fromBufferAttribute(position, i).applyMatrix4(local));
+      }
+    });
+  }
+
+  const rolled = new Vector3();
+  const minGaps: number[] = [];
+  for (const track of routes().tracks) {
+    const length = track.getLength();
+    let gap = Infinity;
+    for (let time = 0; time < length / TRAIN_SPEED; time += .02) {
+      const { u, visible } = trainPose(time, 0, 2, 0, length);
+      const p = track.getPointAt(u).applyMatrix4(toLocal);
+      if (visible < 1 || p.x < envelope.min.x - 10 || p.x > envelope.max.x + 10) continue;
+      const heading = track.getTangentAt(u).applyAxisAngle(up, -HULL.yaw);
+      for (const v of vertices) {
+        rolled.set(p.x + v.x * heading.z + v.z * heading.x, p.y + v.y, p.z - v.x * heading.x + v.z * heading.z);
+        if (rolled.x < envelope.min.x || rolled.x > envelope.max.x) continue;
+        gap = Math.min(gap, rolled.y - bottom, top - rolled.y, rolled.z - southEdge, northEdge - rolled.z);
+      }
+    }
+    assert.ok(Number.isFinite(gap) && gap > 1.5, `each train clears the real bow recess on its track, got ${gap.toFixed(2)} m`);
+    minGaps.push(gap);
+  }
+  console.log(`hull bow portal ok (track clearance: ${minGaps.map(gap => gap.toFixed(2)).join(' / ')} m)`);
+}
+// The enlarged upper tiers stay at least 1.5 m off the actual Grand Nikko GLB, including its outlying roof edges.
+{
+  const id = 'grand-nikko-tokyo-daiba';
+  const placement = odaibaLayout.buildings.find(entry => entry.id === id);
+  assert.ok(placement);
+  const bytes = Uint8Array.from(readFileSync(new URL(`../asset/models/${id}/${id}.glb`, import.meta.url)));
+  const { scene: hotel } = await loader.parseAsync(bytes.buffer, '');
+  placeOdaibaModel(hotel, placement);
+  hotel.updateMatrixWorld(true);
+  const worldToHull = new Matrix4().makeRotationY(-HULL.yaw).multiply(new Matrix4().makeTranslation(-HULL.x, 0, -HULL.z));
+  const vertices: number[] = [];
+  const triangle = [new Vector3(), new Vector3(), new Vector3()];
+  for (const batch of structureBatches) {
+    const positions = batch.geometry.getAttribute('position');
+    for (let i = 0; i < positions.count; i += 3) {
+      triangle.forEach((point, j) => point.fromBufferAttribute(positions, i + j).applyMatrix4(worldToHull));
+      if (triangle.every(point => point.y <= 30.0001)
+        || triangle.some(point => Math.abs(point.x) > 96 || point.z < -15 || point.z > 94)) continue;
+      for (const point of triangle) vertices.push(point.x, point.y, point.z);
+    }
+  }
+  assert.ok(vertices.length > 0, 'upper hull surfaces were sampled');
+  const upperHull = new BufferGeometry().setAttribute('position', new Float32BufferAttribute(vertices, 3));
+  const tree = new MeshBVH(upperHull);
+  hotel.traverse(part => {
+    if (!(part instanceof Mesh)) return;
+    const clearance = tree.closestPointToGeometry(part.geometry, worldToHull.clone().multiply(part.matrixWorld), {}, {}, 0, 1.5);
+    assert.ok(!clearance || clearance.distance >= 1.5, `upper hull clears Grand Nikko at ${part.name}`);
+  });
+  upperHull.dispose();
+}
+
+// Test the actual exported triangles in ring-local metres against the tunnel and garden walk keep-outs.
 async function parseRingAsset(name: string) {
   const bytes = Uint8Array.from(readFileSync(new URL(`../asset/models/ring-gate-2127/${name}-2127.glb`, import.meta.url)));
   const { scene } = await loader.parseAsync(bytes.buffer, '');

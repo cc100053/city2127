@@ -1,10 +1,10 @@
-# 2127 — Frozen Intersection
+# Mind craft― 選択の積み重ねでつくる都市 ―
 
 > **2026-11-21: the nine-question rotation (9 questions × 3 models) is the only exhibition version.** The version4 four-question / four-Meter version is retired; Meter tools and notes below are legacy code. Start a run with `SURVEY_QUESTIONS=src/survey/questions.rotation.v1.json` (the server default is still the old file).
 
 ## About the work
 
-"Who will decide what a city looks like in 100 years?" Cities have usually been shaped by governments and large corporations rather than by the people who live in them. What if the residents decided the future 100 years from now? This exhibition explores that possibility. Each visitor answers questions about daily life as one resident of Odaiba in 2127; their voice accumulates with other residents' voices into the city the next visitor inherits. No single answer decides the city alone. The opening city card `intro.origin` introduces the world with the same question (see [RESIDENT_COPY](docs/RESIDENT_COPY.md)).
+In *Mind craft*, each visitor becomes a resident of Odaiba in 2127 and answers four of nine questions about everyday life. All four answers count toward the response totals for their questions. The shared screen focuses on one choice and shows a single site change when one is available. Once enough residents have answered the same question, the result also shows the share who made the same choice. The next visitor inherits the city as it stands. The opening city card asks who gets to shape a city (see [RESIDENT_COPY](docs/RESIDENT_COPY.md)).
 
 ## Two concurrent Guest devices — 2026-10-02
 

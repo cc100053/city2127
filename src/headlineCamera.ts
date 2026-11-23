@@ -1,7 +1,7 @@
 import { MathUtils, PerspectiveCamera, Vector3 } from 'three';
 import { DISPLAY_MS } from '../survey/src/shared/displayTiming.ts';
 import type { CarrierChange } from './cityChangeManager.ts';
-import { HERO_POSITION, HERO_TARGET } from './heroCamera.ts';
+import { HERO_SETTLED_POSITION, HERO_TARGET } from './heroCamera.ts';
 import { energyChangedPart } from './surveyAtmosphere.ts';
 import { FLY_OUT, shotTimeline } from './resultTimeline.ts';
 import { STAGE_SLOTS } from './stages.ts';
@@ -80,7 +80,7 @@ export function shotStage(elapsed: number, displayMs = DISPLAY_MS) {
   return elapsed < t.flyIn ? 'journey' : elapsed < t.hold ? 'fly-in' : elapsed < t.flyOut ? 'hold' : elapsed < t.done ? 'fly-out' : 'done';
 }
 type Controls = { target: Vector3; enabled: boolean; update(): unknown };
-const heroPosition = new Vector3(...HERO_POSITION), heroTarget = new Vector3(...HERO_TARGET);
+const heroPosition = new Vector3(...HERO_SETTLED_POSITION), heroTarget = new Vector3(...HERO_TARGET);
 
 export class HeadlineCamera {
   private shot: ShotId | null = null;
@@ -119,13 +119,21 @@ export class HeadlineCamera {
   /** Flies to `shot` on the normal result timeline (null returns to, or stays at, the hero pose); a change without a Meter carrier
    *  (question rotation Q02) names its shot directly. */
   playShot(shot: ShotId | null, now: number, displayMs = DISPLAY_MS): ShotId | null {
-    if (displayMs < DISPLAY_MS - 100 || (!shot && !this.active)) { this.cancel(); return null; }
+    if (displayMs < DISPLAY_MS - 100 || (!shot && !this.active)) { this.returnHome(now); return null; }
     if (shot && Object.hasOwn(VIEWPOINT_COVERAGE, shot)) this.lastUsed.set(shot, this.sequence++);
     this.fromPosition.copy(this.camera.position); this.fromTarget.copy(this.controls.target);
     if (shot) { this.position.set(...SHOTS[shot].position); this.target.set(...SHOTS[shot].target); }
     this.returning = shot === null;
     this.shot = shot; this.started = now; this.displayMs = displayMs; this.controls.enabled = false;
     return shot;
+  }
+  /** Ease back to the hero pose from wherever the camera is (attract drift, a close-up, a staff orbit) over FLY_OUT; already at hero it just
+   *  settles. Snapshots, resets, Undo and catch-up use this too (owner 2026-11-23): the city state stays immediate, only the camera eases.
+   *  Reduced motion still cuts (main.ts cancels an active flight). */
+  returnHome(now: number) {
+    if (this.camera.position.distanceTo(heroPosition) < 1e-3 && this.controls.target.distanceTo(heroTarget) < 1e-3) { this.cancel(); return; }
+    this.fromPosition.copy(this.camera.position); this.fromTarget.copy(this.controls.target);
+    this.shot = null; this.returning = true; this.started = now; this.displayMs = DISPLAY_MS; this.controls.enabled = false;
   }
   cancel() {
     this.shot = null; this.returning = false;

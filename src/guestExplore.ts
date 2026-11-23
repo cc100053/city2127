@@ -1,6 +1,6 @@
 import { addHudChrome } from './hudFrame.ts';
 import * as T from 'three';
-import { HERO_POSITION, HERO_TARGET } from './heroCamera.ts';
+import { HERO_SETTLED_POSITION, HERO_TARGET } from './heroCamera.ts';
 import { SKY_RING } from './layout.ts';
 import { berthAngle, berthPark, EXPLORE_BERTH, ringPoint } from './skyRing.ts';
 import type { ExploreLook } from './surveyView.ts';
@@ -61,7 +61,7 @@ export function ringWeight(local: number, cycle: number) {
 
 type Controls = { target: T.Vector3; enabled: boolean };
 type Ring = { pod: T.Group; highlight(k: number | null, glow?: number): void };
-const heroPosition = new T.Vector3(...HERO_POSITION), heroTarget = new T.Vector3(...HERO_TARGET);
+const heroPosition = new T.Vector3(...HERO_SETTLED_POSITION), heroTarget = new T.Vector3(...HERO_TARGET);
 
 export class GuestExplore {
   /** Accumulated proposals, shown under the caption. */

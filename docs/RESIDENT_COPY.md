@@ -4,6 +4,10 @@
 
 日期：2026-10-02。Owner：Codex。**P1 文案已完成；2026-10-02由 [P2](handoffs/archive/resident-experience-p2.md) 接入runtime。** 下文保留P1原交付與P2/P3條件；當前接入／驗證以P2交接為準。 產品方向見 [SPEC](EXHIBITION_SPEC.md)，交接見 [resident-copy-p1](handoffs/archive/resident-copy-p1.md)。以下日文是接入用產品文案，中文是編輯／實作說明。
 
+## 現行作品介紹
+
+正式表記：**Mind craft― 選択の積み重ねでつくる都市 ―**。日文讀法及對外介紹文案見[展覽規格](EXHIBITION_SPEC.md#正式作品名與介紹2026-11-23)。
+
 ## E4正式Q3與能源文案（2026-10-24）
 
 使用者確認以能源Q3取代下方P1舊夏日涼感Q3；Q1／Q2／Q4原文不變。P1舊Q3段落保留供原文／歷史對照，不能當目前問題。正式日文問題／背景／四個選項見[能源Q3評審方案](ENERGY_CITY_PLAN.md#e4評審草案四題與能源權威配置2026-10-24待產品決定)及[JSON](../survey/src/survey/questions.exhibition.json)。版本4；舊答案不重新解釋，舊草稿Q3重選。

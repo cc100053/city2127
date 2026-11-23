@@ -123,6 +123,18 @@ ANGLE Metal), Vite DEV, 1920×1080 viewport, deviceScaleFactor 1 (renderer pixel
 
 ## Current evidence and open acceptance
 
+階梯巨構立面 R2（2026-11-22）：[megastructures.test.ts](../tests/megastructures.test.ts) 射線檢查八級凹入窗面、背牆、廣場入口和三處公共退台。Chrome 2400×1350／DPR 1 同鏡位日夜對照與正式 build 日夜載入檢查見 [立面交接](handoffs/hull-facade.md)。展覽機未測。
+
+階梯巨構立面 R3（2026-11-22）：[megastructures.test.ts](../tests/megastructures.test.ts) 以射線核對三處退台鋪面、60 m 退台望海淨空、廣場入口、大堂玻璃深度、兩翼夾層及柱列。兩端列車洞口網格與 R2 基準逐三角核對。Mac Chrome 檢查正式 build，並以 R2 主鏡及近鏡比較 12:00、18:00、21:25。[數據及圖集](handoffs/hull-facade.md#r3--中段退台與廣場大堂)
+
+階梯巨構立面 R4（2026-11-22）：[megastructures.test.ts](../tests/megastructures.test.ts) 加驗跨層折面的樓板邊、頂面及上層框腳，以及玻璃前的門楣和暖天花兩側的高差。三處退台鋪面、望海淨空及入口射線沿用 R3。列車口按 R3 基準比較局部三角網格。[Chrome 日昏夜對照和正式 build 結果](handoffs/hull-facade.md#r4--樓板折返與大堂層次)
+
+階梯巨構 R5（2026-11-23）：[巨構幾何測試](../tests/megastructures.test.ts) 核對頂層屋面剖面、五處跨層銀框、三處公共退台樓面和入口淨空，以及上層船身距實際 Grand Nikko GLB 至少 1.5 m。兩側列車口繼續對 R4 逐面比對。[Mac Chrome 主鏡和近鏡日昏夜對照、入口回歸及量測](handoffs/hull-facade.md#r5--船身輪廓與量體)
+
+階梯巨構 R6（2026-11-23）：[巨構測試](../tests/megastructures.test.ts) 核對兩個金屬批次、合批後 UV、mipmap 及外立面命中。Mac Chrome 主鏡、近鏡、近鏡原尺寸局部和入口回歸見 [R6 交接](handoffs/hull-facade.md#r6--曲框與深灰金屬)。展覽機待驗證。
+
+階梯巨構 R7（2026-11-23）：[巨構測試](../tests/megastructures.test.ts) 檢查原洞口包絡、凹入深度與內緣導光。沿兩條實際軌道抽樣 GLB 的頭／中／尾車，最小側面或上下淨距為 1.84／3.75 m。[實時列車、日昏夜回歸與交接](handoffs/hull-facade.md#r7--船首列車口)。業主目視驗收及展覽機驗證待完成。
+
 直立環形巨構 R6（2026-11-21，main 整合 `ca3b8663`）：根目錄測試、build、差異及圖檔檢查通過。合併後重新擷取原 Hero 日夜，覆核居民接駁門牌視線與正式 GLB 載入／R2 回退。展覽機未測。[整合記錄](handoffs/ring-glb-pilot.md)
 
 直立環形巨構 R6 候選 `dadffcc2`（2026-11-21）：根目錄 `npm test`、`npm run build`、`git diff --check` 通過。實際種植面測試覆蓋四個載入版本、四道下環種植帶及道路 ①／Yurikamome 淨空。Chrome 日夜共 1,116 條居民視線均先命中門牌，正式 build 的日夜載入及夜間 R2 回退通過。開發 Mac 1080p／DPR 1 的三個 120 幀窗口為 60.0 FPS。展覽機未測。[Gemini 目標、日夜對照及完整驗證](handoffs/ring-glb-pilot.md#round-6)
