@@ -6,7 +6,7 @@
 
 ## 作品概念
 
-《Mind craft》以 2127 年嘅台場為舞台。觀眾化身當地居民，每人從九題入面答四題，揀自己想點生活。四個答案都會按題計入「住民の声」。大屏幕聚焦其中一個選擇，有可見變化時就會切換一處設施。回答累積到一定數量後，結果亦會顯示同題揀同一選項嘅居民比例。下一位觀眾會接手當刻嘅城市。大屏幕開場由「街は、誰が決めるのか。」引入住民身份（見 [RESIDENT_COPY](docs/RESIDENT_COPY.md)）。
+《Mind craft》以 2127 年嘅台場為舞台。觀眾化身當地居民，每人從九題入面答四題，揀自己想點生活。四個答案都會按題計入「住民の声」。大屏幕聚焦其中一個選擇，有可見變化時就會切換一處設施。同一題累積足夠回答後，觀眾可以喺 iPad 交接頁揭開聲音卡，睇同題揀同一選項嘅居民比例。下一位觀眾會接手當刻嘅城市。大屏幕開場由「街は、誰が決めるのか。」引入住民身份（見 [RESIDENT_COPY](docs/RESIDENT_COPY.md)）。
 
 ## 展覽啟動（Mac / Windows）
 
@@ -20,7 +20,7 @@
 cd survey
 npm ci
 npm run build
-npm run server
+SURVEY_QUESTIONS=src/survey/questions.rotation.v1.json npm run server
 ```
 
 **Tab 2 — 3D 城市**（根目錄 Three.js 場景；另開一個 terminal tab，從 repo 根目錄執行）：
@@ -38,6 +38,7 @@ npm run dev -- --port 5173
 Set-Location survey
 npm ci
 npm run build
+$env:SURVEY_QUESTIONS='src/survey/questions.rotation.v1.json'
 npm run server
 ```
 
@@ -64,15 +65,21 @@ npm run dev -- --port 5173
 
 要畀同一個可信 LAN 嘅另一部裝置開 Guest／City：server 用 `SURVEY_HOST=0.0.0.0 npm run server`（PowerShell：`$env:SURVEY_HOST='0.0.0.0'; npm run server`），root 用 `npm run dev -- --host 0.0.0.0 --port 5173`；以 host 電腦嘅 LAN IP 取代網址中嘅 `127.0.0.1`。兩個 port 都要可達；Admin 仍然只限 host 電腦嘅 localhost。預設 loopback 設定只供本機使用，LAN 並無 guest 身分驗證。若 server 改用其他 port，例如 `8790`，City 用 `http://127.0.0.1:5173/?survey=ws://127.0.0.1:8790/ws`。
 
-Admin 新增 **直前の提案を取り消す**：只可撤銷最後一份已完成提案，而且必須喺下一位開始前使用。會還原提交前城市同人數，原提案保留並標記撤銷；Guest 可重新開始四題。A/B 新草稿一旦開始，即使稍後中止亦唔會重新開放舊提案 Undo。更新後重新 build／啟動 survey server，再刷新 City／Guest／Admin；Undo 在 schema 6 引入；目前既有 SQLite 自動升至 schema 8，毋須刪除資料。
+Admin 新增 **直前の提案を取り消す**：只可撤銷最後一份已完成提案，而且必須喺下一位開始前使用。會還原提交前城市同人數，原提案保留並標記撤銷；Guest 可重新開始四題。A/B 新草稿一旦開始，即使稍後中止亦唔會重新開放舊提案 Undo。更新後重新 build／啟動 survey server，再刷新 City／Guest／Admin；Undo 在 schema 6 引入；目前既有 SQLite 自動升至 schema 9，毋須刪除資料。
+
+### iPad「住民の窓」與手勢操作
+
+展覽 iPad 用 Safari 開 `https://<展覽電腦 LAN IP>:8443/guest?hand`。雙站分別用 `/guest?station=A&hand` 同 `/guest?station=B&hand`。前鏡頭需要 iPad 信任嘅 HTTPS 憑證同相機權限。首次設定先喺 `survey/` 執行 `npm run fetch:hand-model`，再 build。完整憑證、輪換題組及啟動設定見 [survey 啟動指引](survey/README.md#ipad住民の窓與手勢操作)。
+
+張開手掌移動游標、預覽卡片，用拇指同食指捏合揀選。送出、開啟地標導覽或返回開始畫面時捏住約 0.8 秒。放低手或握拳可以休止，成個流程亦可用觸控。送出後 iPad 提示抬頭睇大屏幕，交接頁停留喺聲音卡上或用手指按住卡片，即可揭示該題比例。普通 `/guest` 繼續提供原有觸控介面。
 
 ### 兩部裝置同時作答（2026-10-02）
 
 兩部答題裝置用同一個 LAN／同一個 survey server，各開 `http://<展覽電腦 LAN IP>:8787/guest?station=A` 同 `/guest?station=B`。展覽電腦按上方 LAN 指示啟動 server；如果 City 留喺展覽電腦，root Vite 可維持 loopback。每站有獨立草稿、四題、結果同交接，一站完成唔會清掉另一站；server 按收到提交嘅順序累積，重試只計一次。每站同時只接受一個體驗；同一站唔好重複開多個頁面。Server 用 `SURVEY_HOST=0.0.0.0` 啟動時會喺 terminal 印出 `LAN Guest:` A／B 完整網址，照抄去 iPad 即可；iPad／router 現場設定見 [LAN 雙站交接](docs/handoffs/lan-guest-stations.md)。原本 `/guest` 單站流程保留，但未完成體驗期間唔可混用單站／A/B。
 
-城市live結果依記錄順序保留至少13秒觀看時段（2026-10-29 由10秒延長），動畫仍3秒，標示提案編號同 A/B；排隊嘅 Guest 顯示已保存、等待展示，再顯示自己嘅結果13秒／交接5秒。City 重新連接會直接復原最新完整狀態。A/B reset 會暫停新開始，等兩站問卷及結果／交接完成先執行；Admin 可單獨中止 **A／B の未完了の体験を終了**。離線站會喺問卷5分鐘期限，或已提交結果租期（展示開始後15秒）結束後釋放；Admin 無須確認離場。City reset 保留總人數，full reset 清零但保留歷史。
+城市live結果依記錄順序保留至少13秒觀看時段（2026-10-29 由10秒延長），動畫仍3秒，標示提案編號同 A/B；排隊嘅 Guest 顯示已保存、等待展示，再顯示自己嘅結果 13 秒。交接頁可選地標導覽。普通 Guest 提供 20 秒，住民の窓按手勢或觸控採用相應倒數。City 重新連接會直接復原最新完整狀態。A/B reset 會暫停新開始，等兩站問卷及結果／交接完成先執行；Admin 可單獨中止 **A／B の未完了の体験を終了**。離線站會喺問卷5分鐘期限，或已提交結果租期（展示開始後 18 秒）結束後釋放；Admin 無須確認離場。City reset 保留總人數，full reset 清零但保留歷史。
 
-更新後重新 build／啟動 survey server，同時刷新 Guest／City／Admin；SQLite 自動升至 schema 8，保留既有城市及歷史。實作及驗證見 [雙裝置交接](docs/handoffs/archive/two-guest-devices.md)。
+更新後重新 build／啟動 survey server，同時刷新 Guest／City／Admin；SQLite 自動升至 schema 9，保留既有城市及歷史。實作及驗證見 [雙裝置交接](docs/handoffs/archive/two-guest-devices.md)。
 
 想單獨睇城市原型，開 `http://127.0.0.1:5173/` 即可，無須 Tab 1；呢個模式唔會接收觀眾提案。`module-swap/` 係保留嘅 v1 因果示範，唔係展覽城市，亦唔接受 v2 CityView。
 

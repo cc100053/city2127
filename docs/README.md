@@ -11,7 +11,8 @@
 | [README 繁中](../README.md)／[English](../README.en.md)／[日本語](../README.ja.md) | 本機／LAN 啟動及展覽操作 |
 | [EXHIBITION_SPEC](EXHIBITION_SPEC.md) | 場地、產品契約、累積／變化、當前決策及尚待驗收事項 |
 | [PROJECT](PROJECT.md) | 現行模組、source/data/render flow、資源 lifecycle |
-| [RESIDENT_COPY](RESIDENT_COPY.md) | P1 日文居民文案與接入條件；P2文案／P3結果接入；設施增加仍須符合實際證據 |
+| [iPad「住民の窓」](EXHIBITION_SPEC.md#ipad住民の窓) | 五頁問卷、手勢／觸控、共享屏幕分工；[HTTPS 啟動](../survey/README.md#ipad住民の窓與手勢操作) · [驗收](VALIDATION.md#ipad住民の窓實測與回歸) |
+| [RESIDENT_COPY](RESIDENT_COPY.md) | 現行 iPad 文案入口、P1 日文居民文案與 P2／P3 接入歷史 |
 | [建築故事集](BUILDING_STORIES.md) | 逐座記錄可見造型、2127 年的用途與居民如何使用 |
 | [RESIDENT_EXPERIENCE_PLAN](RESIDENT_EXPERIENCE_PLAN.md) | 居民雙屏體驗 P1–P5 計劃、交付及驗收；P1–P3已實作，P4軟件驗證通過，P5驗收表已準備、實機未測 |
 | [RESIDENT_SCENE_PLAN](RESIDENT_SCENE_PLAN.md) | 方向 A（owner 2026-11-12 採納）：每個變化單位先打磨建築／變化，再做人物情景；單位總表、四位居民、台詞同 owner 決定。Runtime 只有 DEV 演示 |
@@ -22,7 +23,7 @@
 | [VALIDATION](VALIDATION.md) | 今日可執行 checks、dated evidence 入口；不複製全部 handoff |
 | [BLENDER](BLENDER.md) | 素材 source/export/placement 及每台工作站的 MCP 設定契約 |
 | [AGENTS](../AGENTS.md)／[CONTRIBUTING](CONTRIBUTING.md) | Agent 工作規則／Git 與整合流程 |
-| [survey guide](../survey/README.md) | v2 server/API/schema7/DEV工具及 legacy 邊界 |
+| [survey guide](../survey/README.md) | v2 server／API、iPad HTTPS 啟動同 DEV 工具 |
 | [module-swap guide](../module-swap/README.md) | standalone／legacy v1 viewer；不是展覽城市 |
 
 新產品決策寫入 SPEC，模組事實寫入 PROJECT，驗證方法寫入 VALIDATION；各任務的日期／commit／證據留在自己的 handoff。不要向歷史計劃追加新方向。

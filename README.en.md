@@ -4,13 +4,19 @@
 
 ## About the work
 
-In *Mind craft*, each visitor becomes a resident of Odaiba in 2127 and answers four of nine questions about everyday life. All four answers count toward the response totals for their questions. The shared screen focuses on one choice and shows a single site change when one is available. Once enough residents have answered the same question, the result also shows the share who made the same choice. The next visitor inherits the city as it stands. The opening city card asks who gets to shape a city (see [RESIDENT_COPY](docs/RESIDENT_COPY.md)).
+In *Mind craft*, each visitor becomes a resident of Odaiba in 2127 and answers four of nine questions about everyday life. All four answers count toward the response totals for their questions. The shared screen focuses on one choice and shows a single site change when one is available. Once enough residents have answered a question, visitors can reveal the share who made the same choice on an iPad handoff card. The next visitor inherits the city as it stands. The opening city card asks who gets to shape a city (see [RESIDENT_COPY](docs/RESIDENT_COPY.md)).
+
+## iPad resident window and hand controls
+
+Open `https://<exhibition-PC LAN IP>:8443/guest?hand` in iPad Safari. For two stations, use `/guest?station=A&hand` and `/guest?station=B&hand`. Camera tracking requires trusted HTTPS and camera permission. Run `npm run fetch:hand-model` in `survey/` before building. See the [survey setup guide](survey/README.md#ipad住民の窓與手勢操作).
+
+Move the cursor with an open palm and pinch your thumb and index finger to select. Hold the pinch for 0.8 seconds to submit, open a landmark tour, or return to the start screen. Touch works throughout. After the shared-screen result, hover over a voice card or press and hold it on the iPad to reveal the share for that question.
 
 ## Two concurrent Guest devices — 2026-10-02
 
-Use one survey server on the trusted LAN. Open `http://<exhibition-PC LAN IP>:8787/guest?station=A` on one device and `http://<exhibition-PC LAN IP>:8787/guest?station=B` on the other. Use only one page per station; each station admits one active experience. With `SURVEY_HOST=0.0.0.0` the server prints the full A/B `LAN Guest:` URLs to type on the iPads; router/iPad setup is in the [LAN station handoff](docs/handoffs/lan-guest-stations.md). Bind the survey server with `SURVEY_HOST=0.0.0.0` (PowerShell: `$env:SURVEY_HOST='0.0.0.0'`). Each station has its own four-question draft/result/handoff; submissions accumulate in server arrival order and retries count once. Live City results reserve ten-second reading slots with three-second transitions and proposal/station labels. City reconnect restores the latest snapshot immediately. The existing `/guest` single-station flow remains; do not mix it with active A/B experiences.
+Use one survey server on the trusted LAN. Open `http://<exhibition-PC LAN IP>:8787/guest?station=A` on one device and `http://<exhibition-PC LAN IP>:8787/guest?station=B` on the other. Use only one page per station; each station admits one active experience. With `SURVEY_HOST=0.0.0.0` the server prints the full A/B `LAN Guest:` URLs to type on the iPads; router/iPad setup is in the [LAN station handoff](docs/handoffs/lan-guest-stations.md). Bind the survey server with `SURVEY_HOST=0.0.0.0` (PowerShell: `$env:SURVEY_HOST='0.0.0.0'`). Each station has its own four-question draft/result/handoff; submissions accumulate in server arrival order and retries count once. Live City results reserve 13-second reading slots with three-second transitions and proposal/station labels. City reconnect restores the latest snapshot immediately. The existing `/guest` single-station flow remains; do not mix it with active A/B experiences.
 
-A/B reset stops new starts and waits for both experiences, including results/handoffs. Admin can end only the named unfinished station. Disconnected questionnaires expire after five minutes; submitted result leases finish 15 seconds after their scheduled display (retry resumes the remaining slot without renewing the lease). Rebuild/restart survey and refresh Guest/City/Admin; schema 7 preserves existing data. See [handoff](docs/handoffs/archive/two-guest-devices.md).
+A/B reset stops new starts and waits for both experiences, including results/handoffs. Admin can end only the named unfinished station. Disconnected questionnaires expire after five minutes; submitted result leases finish 18 seconds after their scheduled display starts (retry resumes the remaining slot without renewing the lease). Rebuild/restart survey and refresh Guest/City/Admin; schema 9 preserves existing data. See [handoff](docs/handoffs/archive/two-guest-devices.md).
 
 **Language:** [繁體中文](README.md) · [English](README.en.md) · [日本語](README.ja.md)
 
@@ -22,7 +28,7 @@ Development auto-answer (DEV-ONLY): run `cd survey && npm run dev:auto`, open `h
 
 Install Git and **Node.js 24+** (including npm). Use a desktop browser with WebGL 2. Keep both terminal tabs running. Run each command from the repository root unless a step changes directory. The project has no public deployment setup.
 
-Admin **直前の提案を取り消す** undoes only the latest completed proposal before the next guest starts. It restores the previous city and counts, keeps the proposal marked as undone, and lets the guest start a fresh four-question session. Rebuild/restart the survey server and refresh City/Guest/Admin. Undo was introduced in schema 6; the current SQLite migrates to schema 7 without deleting data. A newer A/B draft closes Undo for an older proposal even if that draft is later cancelled.
+Admin **直前の提案を取り消す** undoes only the latest completed proposal before the next guest starts. It restores the previous city and counts, keeps the proposal marked as undone, and lets the guest start a fresh four-question session. Rebuild/restart the survey server and refresh City/Guest/Admin. Undo was introduced in schema 6; the current SQLite migrates to schema 9 without deleting data. A newer A/B draft closes Undo for an older proposal even if that draft is later cancelled.
 
 ### macOS — two Terminal tabs
 
@@ -32,7 +38,7 @@ Admin **直前の提案を取り消す** undoes only the latest completed propos
 cd survey
 npm ci
 npm run build
-npm run server
+SURVEY_QUESTIONS=src/survey/questions.rotation.v1.json npm run server
 ```
 
 **Tab 2: 3D city** — open a fresh tab at the repository root. Vite hosts the root Three.js scene.
@@ -50,6 +56,7 @@ npm run dev -- --port 5173
 Set-Location survey
 npm ci
 npm run build
+$env:SURVEY_QUESTIONS='src/survey/questions.rotation.v1.json'
 npm run server
 ```
 

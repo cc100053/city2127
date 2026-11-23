@@ -20,6 +20,10 @@
 
 使用者 2026-10-04 決定：兩部 iPad 用 Safari 經專用 LAN 開 `/guest?station=A`／`B`，City 留喺 Mac mini 經 HDMI 出 65 吋屏，取代 [P5](resident-experience-p5.md) 早前「主機直接輸出畫面到 iPad」方案。LAN A/B 模式早已實作及測試（[雙站](archive/two-guest-devices.md)）；本任務只做現場需要嘅細修同設定步驟。完成條件：P5 D0 喺真 router／iPad 通過並留證。
 
+## 「住民の窓」手勢版（2026-11-24）
+
+以下 HTTP 設定適用於普通觸控 Guest。要用 iPad 前鏡頭，照 [HTTPS 啟動指引](../../survey/README.md#ipad住民の窓與手勢操作) 配置同一部 survey server。每部 iPad 信任憑證並允許相機後，分別開 `https://<主機 IP>:8443/guest?station=A&hand` 同 `https://<主機 IP>:8443/guest?station=B&hand`。單站 iPad Air 已實測，兩部 iPad 同時操作仍待驗收。現有 HTTP A/B 證據記錄喺下方。
+
 ## Architecture
 
 ```

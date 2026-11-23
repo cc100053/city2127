@@ -8,13 +8,19 @@
 
 この町お台場の未来をあなたの選択で変えていこう！100年後の街は個人が決める！
 
-舞台は、2127年のお台場です。来場者は住民の一人として、暮らしにまつわる九つの問いのうち四つに答えます。四つの回答はすべて、問いごとに「住民の声」として集計されます。大画面では一つの選択に焦点を当て、目に見える変化がある場合は一か所の施設が切り替わります。同じ問いへの回答が十分に集まると、同じ選択をした住民の割合も表示されます。次の来場者は、その時点の街を引き継ぎます（[RESIDENT_COPY](docs/RESIDENT_COPY.md)）。
+舞台は、2127年のお台場です。来場者は住民の一人として、暮らしにまつわる九つの問いのうち四つに答えます。四つの回答はすべて、問いごとに「住民の声」として集計されます。大画面では一つの選択に焦点を当て、目に見える変化がある場合は一か所の施設が切り替わります。同じ問いへの回答が十分に集まると、iPad の交代画面のカードで、同じ選択をした住民の割合を確認できます。次の来場者は、その時点の街を引き継ぎます（[RESIDENT_COPY](docs/RESIDENT_COPY.md)）。
+
+## iPad「住民の窓」とジェスチャー操作
+
+iPad の Safari で `https://<展示PCのLAN IP>:8443/guest?hand` を開きます。2台の場合は `/guest?station=A&hand` と `/guest?station=B&hand` を使います。カメラの利用には、iPad が信頼する HTTPS 証明書とカメラの使用許可が必要です。ビルド前に `survey/` で `npm run fetch:hand-model` を実行します。[セットアップ手順](survey/README.md#ipad住民の窓與手勢操作)を参照してください。
+
+手のひらを開いてカーソルを動かし、親指と人差し指でつまんで選びます。送信・ランドマークの案内・開始画面への移動は 0.8 秒つまみ続けます。全画面をタッチでも操作できます。大画面での表示が終わったら、iPad の声のカードにカーソルを合わせるか、指で長押しすると、その問いの割合を見られます。
 
 ## 2台で同時に回答 — 2026-10-02
 
-同じ信頼できる LAN の survey server に接続し、1台で `http://<展示PCのLAN IP>:8787/guest?station=A`、もう1台で `http://<展示PCのLAN IP>:8787/guest?station=B` を開きます。各ステーション同時1体験なので、同じステーションのページを複数開かないでください。`SURVEY_HOST=0.0.0.0` で起動すると server が A/B の `LAN Guest:` URL を表示します。ルーター／iPad の設定は [LAN 2台 handoff](docs/handoffs/lan-guest-stations.md) を参照。server は `SURVEY_HOST=0.0.0.0`（PowerShell：`$env:SURVEY_HOST='0.0.0.0'`）で起動します。各ステーションの四問・草稿・結果・交代は独立し、提案は server の受信順に累積、再送は一度だけ加算します。Cityの結果は10秒以上の閲覧枠を予約し（都市転換は3秒）、提案番号と A/B を表示します。再接続は最新 snapshot に復元します。既存 `/guest` の単独モードは維持し、体験中の A/B と混在させないでください。
+同じ信頼できる LAN の survey server に接続し、1台で `http://<展示PCのLAN IP>:8787/guest?station=A`、もう1台で `http://<展示PCのLAN IP>:8787/guest?station=B` を開きます。各ステーション同時1体験なので、同じステーションのページを複数開かないでください。`SURVEY_HOST=0.0.0.0` で起動すると server が A/B の `LAN Guest:` URL を表示します。ルーター／iPad の設定は [LAN 2台 handoff](docs/handoffs/lan-guest-stations.md) を参照。server は `SURVEY_HOST=0.0.0.0`（PowerShell：`$env:SURVEY_HOST='0.0.0.0'`）で起動します。各ステーションの四問・草稿・結果・交代は独立し、提案は server の受信順に累積、再送は一度だけ加算します。Cityの結果は13秒以上の閲覧枠を予約し（都市転換は3秒）、提案番号と A/B を表示します。再接続は最新 snapshot に復元します。既存 `/guest` の単独モードは維持し、体験中の A/B と混在させないでください。
 
-A/B のリセットは新しい開始を停止し、両方の回答・結果・交代が終わるまで保留します。Admin は指定した未完了ステーションだけを終了できます。通信断の草稿は開始から5分、記録済みの結果は予定展示から15秒で解放されます（結果復元は元の枠の残り時間を接続し、租期は延長しません）。survey を build／再起動し Guest／City／Admin を更新してください。schema 7 は既存データを保持します。[handoff](docs/handoffs/archive/two-guest-devices.md)を参照。
+A/B のリセットは新しい開始を停止し、両方の回答・結果・交代が終わるまで保留します。Admin は指定した未完了ステーションだけを終了できます。通信断の草稿は開始から5分、記録済みの結果は予定の展示開始から18秒で解放されます（結果復元は元の枠の残り時間を接続し、租期は延長しません）。survey を build／再起動し Guest／City／Admin を更新してください。schema 9 は既存データを保持します。[handoff](docs/handoffs/archive/two-guest-devices.md)を参照。
 
 **言語：** [繁體中文](README.md) · [English](README.en.md) · [日本語](README.ja.md)
 
@@ -26,7 +32,7 @@ A/B のリセットは新しい開始を停止し、両方の回答・結果・�
 
 Git と **Node.js 24 以上**（npm を含む）、WebGL 2 対応のデスクトップブラウザーが必要です。二つのターミナルタブを起動したままにします。特記がなければ、リポジトリのルートから実行してください。公開デプロイの設定はありません。
 
-Admin の **直前の提案を取り消す** は、次の来場者が開始する前に、直前の完了した提案だけを取り消します。変更前の街と参加人数を復元し、元の提案は取消済みとして保存します。再回答は新しい四問の体験として開始します。survey を再ビルド・再起動し、City／Guest／Admin を更新してください。Undo は schema 6 で導入され、現在の SQLite はデータを削除せず schema 7 に移行します。A/B の新しい草稿を開始した後は、その草稿を中止しても古い提案の Undo は再び使えません。
+Admin の **直前の提案を取り消す** は、次の来場者が開始する前に、直前の完了した提案だけを取り消します。変更前の街と参加人数を復元し、元の提案は取消済みとして保存します。再回答は新しい四問の体験として開始します。survey を再ビルド・再起動し、City／Guest／Admin を更新してください。Undo は schema 6 で導入され、現在の SQLite はデータを削除せず schema 9 に移行します。A/B の新しい草稿を開始した後は、その草稿を中止しても古い提案の Undo は再び使えません。
 
 ### Mac — ターミナルを二つ開く
 
@@ -36,7 +42,7 @@ Admin の **直前の提案を取り消す** は、次の来場者が開始す�
 cd survey
 npm ci
 npm run build
-npm run server
+SURVEY_QUESTIONS=src/survey/questions.rotation.v1.json npm run server
 ```
 
 **タブ 2：3D の街** — リポジトリのルートで新しいタブを開きます。Vite が Three.js シーンを提供します。
@@ -54,6 +60,7 @@ npm run dev -- --port 5173
 Set-Location survey
 npm ci
 npm run build
+$env:SURVEY_QUESTIONS='src/survey/questions.rotation.v1.json'
 npm run server
 ```
 
