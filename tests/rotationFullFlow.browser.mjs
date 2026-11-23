@@ -41,7 +41,7 @@ const cityState = () => city.evaluate(() => {
   const d = document.querySelector('canvas').dataset;
   return { nw: JSON.parse(d.siteAssets).magnetEast.automationHub?.band, lots: JSON.parse(d.lots), farm: JSON.parse(d.energy).farm.visible,
     swVacant: JSON.parse(d.siteAssets).dogenzakaSouth.commonsPlaza?.vacant, card: document.querySelector('.resident-card-copy')?.textContent,
-    place: document.querySelector('.resident-place')?.textContent, share: document.querySelector('.resident-share')?.textContent };
+    place: document.querySelector('.resident-place')?.textContent };
 });
 const shot = async (page, name) => { await page.screenshot({ path: `${out}/${name}.png` }); };
 /** City back to its ambient panel (the live result's reading slot is over). */

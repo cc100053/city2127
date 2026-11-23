@@ -1,0 +1,223 @@
+// Optional browser acceptance for hand mode (M2): drives a full guest run with the DEV-only synthetic hand
+// (住民の窓: 住民登録 palm scan + pinch -> four hologram question cards by pinch -> review, edit, hold-to-send -> look-up -> handoff share -> idle exit) against a scratch-DB server on the rotation set.
+// Uses an existing Playwright installation, not a repo dependency (same convention as tests/surveyAuto.browser.mjs):
+//   npm run build && CITY2127_PLAYWRIGHT_PATH=/path/to/playwright/index.mjs npm run test:hand-browser
+// Optional: CITY2127_CHROME_PATH (browser binary), HAND_SHOTS_DIR (saves a screenshot of each hand-mode screen).
+import assert from 'node:assert/strict';
+import { spawn } from 'node:child_process';
+import { mkdtempSync, mkdirSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { pathToFileURL, fileURLToPath } from 'node:url';
+
+if (!process.env.CITY2127_PLAYWRIGHT_PATH) throw new Error('Set CITY2127_PLAYWRIGHT_PATH to the installed Playwright index.mjs');
+const { chromium } = await import(pathToFileURL(process.env.CITY2127_PLAYWRIGHT_PATH).href);
+const surveyDir = fileURLToPath(new URL('..', import.meta.url));
+const port = Number(process.env.HAND_TEST_PORT ?? 8796), base = `http://127.0.0.1:${port}`;
+const shots = process.env.HAND_SHOTS_DIR;
+if (shots) mkdirSync(shots, { recursive: true });
+
+const server = spawn(process.execPath, ['--experimental-strip-types', 'src/server/server.ts'], {
+  cwd: surveyDir, stdio: ['ignore', 'pipe', 'inherit'],
+  env: { ...process.env, SURVEY_PORT: String(port), SURVEY_HOST: '127.0.0.1', SURVEY_DB_PATH: join(mkdtempSync(join(tmpdir(), 'hand-guest-')), 'survey.sqlite'),
+    SURVEY_QUESTIONS: 'src/survey/questions.rotation.v1.json', SURVEY_DEV_HAND: '', SURVEY_TLS_CERT: '', SURVEY_TLS_KEY: '' },
+});
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+for (let i = 0; ; i++) {
+  try { if ((await fetch(`${base}/api/health`)).ok) break; } catch { /* starting */ }
+  if (i > 100) throw new Error('survey server did not start');
+  await sleep(100);
+}
+
+const launch = process.env.CITY2127_CHROME_PATH ? { executablePath: process.env.CITY2127_CHROME_PATH } : {};
+const browser = await chromium.launch({ ...launch, headless: true });
+const errors = [];
+try {
+  const context = await browser.newContext({ viewport: { width: 1180, height: 746 }, deviceScaleFactor: 1 });
+  const page = await context.newPage();
+  page.on('pageerror', error => errors.push(String(error.stack ?? error.message).split('\n').slice(0, 3).join(' | ')));
+
+  // Without ?hand neither the hand layer, the 住民の窓 stage nor its card images load.
+  const images = [];
+  page.on('request', request => { if (/\.webp(\?|$)/.test(request.url())) images.push(request.url()); });
+  await page.goto(`${base}/guest?station=A`);
+  await page.waitForFunction(() => document.querySelector('#app')?.dataset.screen === 'welcome');
+  await sleep(500);
+  assert.equal(await page.locator('.hand-layer, .holo').count(), 0, 'no hand layer or stage without ?hand');
+  assert.deepEqual(images, [], 'no card images without ?hand');
+
+  // A stale draft from an earlier run (its session unknown to this server) must not trap the hand kiosk: back to 住民登録.
+  await page.evaluate(() => {
+    const q = id => ({ id, text: id, options: [{ id: 'A', label: 'a' }, { id: 'B', label: 'b' }, { id: 'C', label: 'c' }] });
+    localStorage.setItem('city2127.guest-draft.v2.A', JSON.stringify({
+      session: { session: { id: 'gone-session' }, questions: ['Q01', 'Q02', 'Q03', 'Q04'].map(q),
+        state: { revision: 0, scores: { automation: 0, publicSharing: 0, environmentalPriority: 0, urbanConcentration: 0 } } },
+      choices: [['Q01', 'A']], questionIndex: 1, screen: 'question' }));
+  });
+  await page.goto(`${base}/guest?station=A&hand&dev-hand`);
+  await page.waitForFunction(() => document.querySelector('#app')?.dataset.screen === 'welcome' && '__handDev' in window);
+  const screen = () => page.evaluate(() => document.querySelector('#app').dataset.screen);
+  const title = () => page.evaluate(() => document.querySelector('#app h1')?.textContent ?? '');
+  const center = selector => page.evaluate(sel => { const r = document.querySelector(sel).getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }, selector);
+  const fromStage = (x, y) => page.evaluate(([x, y]) => window.__handDev.fromStage(x, y), [x, y]);
+  const hold = (p, pose = 'palm', pinch = false) => page.evaluate(([x, y, pose, pinch]) => window.__handDev.hold(x, y, { pose, pinch }), [p.x, p.y, pose, pinch]);
+  const release = () => page.evaluate(() => window.__handDev.release());
+  const state = () => page.evaluate(() => window.__handDev.state());
+  const holo = async () => (await state()).holo ?? {};
+  /** Effective opacity of an element (product up to the stage) above 0.5, and inside the viewport. */
+  const shown = selector => page.evaluate(sel => {
+    const el = document.querySelector(sel);
+    if (!el) return false;
+    let op = 1;
+    for (let n = el; n && n !== document.body; n = n.parentElement) op *= Number(getComputedStyle(n).opacity);
+    const r = el.getBoundingClientRect();
+    return op > 0.5 && r.width > 0 && r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth;
+  }, selector);
+  const shot = async name => { if (shots) await page.screenshot({ path: join(shots, `${name}.png`) }); };
+  const waitFor = async (check, what, timeout = 6000) => {
+    for (const end = Date.now() + timeout; Date.now() < end; await sleep(50)) if (await check()) return;
+    throw new Error(`timed out waiting for ${what}`);
+  };
+  /** Open palm on p, then close the pinch (a fresh closing edge) and open again. */
+  const pinchAt = async p => { await hold(p, 'palm'); await sleep(300); await hold(p, 'palm', true); await sleep(150); await hold(p, 'palm'); };
+  const ring = await fromStage(320, 410);
+
+  // Page 1 住民登録: a fist or a pinch before the scan does nothing; a 4 s open palm scans, locks and releases, then a pinch registers.
+  await waitFor(async () => (await holo()).page === 'register' && (await holo()).phase === 'idle', 'registration stage');
+  assert.equal(await page.locator('#app').evaluate(el => getComputedStyle(el).visibility), 'hidden', 'page DOM hidden under the stage');
+  await shot('01-register-idle');
+  await hold(ring, 'rest'); await sleep(400); await hold(ring, 'rest', true); await sleep(300);
+  assert.equal((await holo()).phase, 'idle', 'a fist and a pinch do not register');
+  await hold(ring, 'palm'); await sleep(1500);
+  assert.equal((await holo()).phase, 'charge');
+  await hold(ring, 'palm', true); await sleep(150); await hold(ring, 'palm');
+  assert.equal((await holo()).phase, 'charge', 'a pinch during the scan does not register');
+  await waitFor(async () => (await holo()).phase === 'ready', 'scan, lock and release', 8000);
+  await shot('04-register-ready');
+  await hold(ring, 'palm', true); await sleep(150);
+  await waitFor(async () => (await holo()).phase === 'registered', 'registered', 2000);
+  await hold(ring, 'palm');
+  await sleep(600); await shot('05-registered');
+  await release();
+  await waitFor(async () => (await screen()) === 'question' && (await holo()).page === 'question', 'first question after registration', 6000);
+
+  // Page 2: four questions picked by pinch through the hologram cards.
+  for (let q = 0; q < 4; q++) {
+    const before = await title();
+    const index = q % 3;
+    const card = `.p2-card[data-i="${index}"]`;
+    const input = page.locator('.guest-choice input').nth(index);
+    const p = await center(card);
+    assert.equal((await holo()).locked, true, `question ${q + 1} read lock`);
+    if (q === 0) { await sleep(450); await shot('06-cards-build-in'); }
+    await pinchAt(p);
+    assert.equal(await input.isChecked(), false, 'pinch during the read lock ignored');
+    await waitFor(async () => (await holo()).locked === false, 'read lock end', 3000);
+    if (q === 0) {
+      // A palm already on a card previews it as soon as the read lock ends (no move-off rule, rex 2026-11-23).
+      await sleep(300);
+      assert.equal((await holo()).hover, `pick:${index}`, 'preview right after the read lock');
+      await hold(p, 'rest'); await sleep(600);
+      assert.equal(await page.locator('.hs-cursor.is-gone').count(), 1, 'fist = rest, no cursor');
+      await hold(p, 'palm'); await sleep(1500);
+      assert.equal((await holo()).hover, `pick:${index}`, 'an open palm previews the card');
+      assert.equal(await input.isChecked(), false, 'hovering never selects');
+      await shot('07-card-hover');
+    }
+    await pinchAt(p);
+    await waitFor(() => input.isChecked(), `question ${q + 1} pick`, 2000);
+    if (q === 0) { await sleep(450); await shot('08-picked-chip'); }
+    await waitFor(async () => (await screen()) === 'review' || (await title()) !== before, `advance after question ${q + 1}`, 4000);
+  }
+  // Page 3 review: four answer cards drop from the HUD; pinching one edits it and the re-pick comes back to review.
+  await waitFor(async () => (await screen()) === 'review' && (await holo()).page === 'review', 'review stage');
+  await waitFor(async () => (await holo()).locked === false, 'review cards built', 6000);
+  await shot('10-review');
+  const editAt = await center('.hx-rcard[data-i="1"]');
+  await pinchAt(editAt);
+  await waitFor(async () => (await screen()) === 'question' && (await holo()).page === 'question', 'edit opens the question', 6000);
+  assert.ok((await page.locator('.p2-eyebrow').textContent()).includes('変更中'), 'editing marker');
+  await waitFor(async () => (await holo()).locked === false, 'edit read lock end', 3000);
+  const before = await page.locator('.guest-choice input:checked').getAttribute('value');
+  const other = await page.locator('.guest-choice input').evaluateAll((inputs, was) => inputs.findIndex(i => i.value !== was), before);
+  await pinchAt(await center(`.p2-card[data-i="${other}"]`));
+  await waitFor(async () => (await screen()) === 'review' && (await holo()).page === 'review', 're-pick returns to review', 6000);
+  await waitFor(async () => (await holo()).locked === false, 'edited card rebuilt', 6000);
+
+  // Send = pinch-hold: a short pinch does not send; holding ~0.8 s locks and sends, the packet flies into the look-up.
+  const sendAt = await center('.hx-submit');
+  await pinchAt(sendAt); await sleep(300);
+  assert.equal(await screen(), 'review', 'a short pinch does not send');
+  await hold(sendAt, 'palm'); await sleep(300); await hold(sendAt, 'palm', true);
+  await sleep(500); await shot('11-send-hold');
+  await waitFor(async () => (await holo()).sending === true, 'send lock', 3000);
+  await hold(sendAt, 'palm'); await release();
+  await waitFor(async () => (await holo()).page === 'lookup', 'look-up stage', 10_000);
+  await waitFor(async () => (await holo()).phase === 'show', 'uplink show', 6000);
+  assert.ok(await shown('.hx-lkh'), 'look-up text visible');
+  await sleep(800); await shot('12-look-up');
+  await waitFor(async () => (await holo()).dimmed === true, 'dimmed', 6000);
+  await sleep(1000); await shot('13-dimmed');
+
+  // Page 5 handoff: the share shows only on the card under the hand; an idle hand returns to 住民登録 after 8 s.
+  await waitFor(async () => (await screen()) === 'handoff' && (await holo()).page === 'handoff', 'handoff', 25_000);
+  await waitFor(async () => (await holo()).locked === false, 'handoff cards built', 6000);
+  assert.ok(await shown('.hx-hh'), 'handoff text visible');
+  await hold(await center('.hx-vc[data-i="0"]'), 'palm'); await sleep(1200);
+  assert.deepEqual((await holo()).shown, [0], 'share on the hovered card only');
+  await shot('14-handoff-share');
+  await hold(await center('.hx-vc[data-i="2"]'), 'palm'); await sleep(400 + 260 + 400);
+  assert.deepEqual((await holo()).shown, [2], 'the left card folds back into its stamp');
+  // Landmark: pinch-hold turns the city screen; 戻る (one pinch) brings the handoff back.
+  const lmAt = await center('.hx-lm[data-i="0"]');
+  await hold(lmAt, 'palm'); await sleep(900); await shot('15-landmark');
+  await hold(lmAt, 'palm', true);
+  await waitFor(async () => (await holo()).exploring === true && (await holo()).hover === 'back' || (await holo()).mode === 'explore', 'explore', 6000);
+  await hold(lmAt, 'palm');
+  await waitFor(async () => (await holo()).hover !== undefined || (await page.locator('.hx-exback').count()) === 1, 'tour layout', 6000);
+  const backAt = await center('.hx-exback');
+  await hold(backAt, 'palm'); await sleep(2500); await shot('16-explore');
+  assert.ok((await page.evaluate(() => document.querySelector('#app').textContent)).includes('戻る'), 'the page is exploring');
+  await pinchAt(backAt);
+  await waitFor(async () => (await holo()).mode === 'cards' && (await holo()).exploring === false, 'back to the handoff', 6000);
+  await hold(await fromStage(590, 170), 'palm');
+  await waitFor(async () => (await holo()).mode === 'leaving', 'idle exit', 12_000);
+  await sleep(700); await shot('17-de-res');
+  await release();
+  await waitFor(async () => (await screen()) === 'welcome' && (await holo()).page === 'register', 'back to 住民登録', 8000);
+  // A second guest (touch start, four pinches, hold send): the reused look-up and handoff pages must show again.
+  await page.click('.p1-touch');
+  for (let q = 0; q < 4; q++) {
+    await waitFor(async () => (await holo()).page === 'question' && (await holo()).locked === false, `guest 2 question ${q + 1}`, 8000);
+    const before2 = await title();
+    await pinchAt(await center(`.p2-card[data-i="${q % 3}"]`));
+    await waitFor(async () => (await screen()) === 'review' || (await title()) !== before2, `guest 2 advance ${q + 1}`, 4000);
+  }
+  await waitFor(async () => (await holo()).page === 'review' && (await holo()).locked === false, 'guest 2 review', 8000);
+  const send2 = await center('.hx-submit');
+  await hold(send2, 'palm'); await sleep(300); await hold(send2, 'palm', true);
+  await waitFor(async () => (await holo()).sending === true, 'guest 2 send', 3000);
+  await hold(send2, 'palm'); await release();
+  await waitFor(async () => (await holo()).page === 'lookup' && (await holo()).phase === 'show', 'guest 2 look-up', 10_000);
+  await sleep(500);
+  assert.ok(await shown('.hx-lkh'), 'guest 2 look-up text visible (the previous fade must not linger)');
+  await shot('18-guest2-look-up');
+  await waitFor(async () => (await holo()).page === 'handoff' && (await holo()).locked === false, 'guest 2 handoff', 25_000);
+  assert.ok(await shown('.hx-hh'), 'guest 2 handoff text visible');
+  // A stage error never strands a guest: the page's own handoff takes over, and the next welcome returns to the stage.
+  await page.evaluate(() => window.__handDev.failStage());
+  assert.equal(await page.locator('.holo').isHidden(), true, 'stage hidden after an error');
+  assert.equal(await page.locator('#app').evaluate(el => getComputedStyle(el).visibility), 'visible', 'page handoff shown');
+  await page.locator('#app button', { hasText: 'はじめる画面へ' }).click();
+  await waitFor(async () => (await screen()) === 'welcome' && (await holo()).page === 'register', 'stage back for the next guest', 8000);
+  const stats = await state();
+  assert.equal(stats.registered, 1, 'one hand registration (the second guest started by touch)');
+  assert.ok(stats.pinch >= 12, `pinch actions ${stats.pinch}`);
+  const city = await (await fetch(`${base}/api/city-state`)).json();
+  assert.equal(city.data.guestCount, 2, 'two proposals recorded');
+  assert.deepEqual(errors, []);
+  console.log(`PASS hand guest run: 住民登録 scan -> pinch register -> 4 hologram questions (pinch) -> review -> edit -> hold send -> look-up -> dim -> handoff share -> idle exit -> guest 2 look-up/handoff visible (pinch ${stats.pinch})`);
+} finally {
+  await browser.close();
+  server.kill();
+}

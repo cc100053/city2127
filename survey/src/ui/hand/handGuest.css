@@ -1,0 +1,98 @@
+/* Hand mode (M3, /guest?hand): graphite theme from guestTheme.css, full-screen layout for an iPad in landscape
+   (~1180x746 CSS px) that never scrolls. Top: text-only zone (no targets). Bottom: big pinch targets.
+   Scoped to .guest--hand / .hand-layer so the touch-only page is unchanged. */
+body.guest-page--hand { display: block; padding: 0; overflow: hidden; }
+#app.guest.guest--hand { width: 100vw; max-width: none; height: 100vh; }
+.guest--hand .guest-frame { display: flex; flex-direction: column; height: 100vh; border: 0; border-radius: 0; box-shadow: none; }
+.guest--hand .guest-masthead { flex: none; min-height: 52px; padding: 0 28px; }
+.guest--hand .guest-screen { position: relative; flex: 1; min-height: 0; padding: 22px 70px 24px; }
+.guest--hand h1 { font-size: 34px; line-height: 1.4; margin: 6px 0 10px; }
+/* Titles still take programmatic focus for screen readers; a hand/touch kiosk shows no focus ring. */
+.guest--hand h1:focus { outline: none; }
+
+/* ---- question: text zone + option band ---------------------------------------------------------------------- */
+.guest--hand[data-screen='question'] .guest-progress-block { order: -1; display: flex; flex-direction: row; align-items: center; gap: 18px; margin: 0 0 6px; }
+.guest--hand .guest-progress-copy { order: 0; margin: 0; color: var(--guest-amber); font-size: 14px; letter-spacing: 3px; }
+.guest--hand .guest-steps { order: 1; flex: none; gap: 10px; }
+.guest--hand .guest-steps li { flex: none; width: 12px; height: 12px; border: 2px solid #4f5d55; border-radius: 50%; background: transparent; box-sizing: border-box; }
+.guest--hand .guest-steps li.is-complete { background: #637b70; border-color: #637b70; }
+.guest--hand .guest-steps li.is-current { background: var(--guest-cyan); border-color: var(--guest-cyan); box-shadow: 0 0 10px #94c9c288; }
+.guest--hand[data-screen='question'] .guest-eyebrow { display: none; }
+.guest--hand[data-screen='question'] .guest-copy { margin: 0; }
+
+.guest--hand .guest-form { position: absolute; left: 0; right: 0; bottom: 24px; height: calc(100vh - 52px - 262px); padding: 0 28px 0 100px; }
+.guest--hand .guest-choices,
+.guest--hand .guest-choices[data-option-count='4'] { box-sizing: border-box; height: 100%; padding: 0; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 34px; counter-reset: hand-option; }
+.guest--hand .guest-choices[data-option-count='2'] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.guest--hand .guest-choices[data-option-count='4'] { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px; }
+.guest--hand .guest-choice,
+.guest--hand .guest-choices[data-option-count='4'] .guest-choice {
+  counter-increment: hand-option; position: relative; display: grid; grid-template-columns: 1fr; grid-template-rows: auto 1fr auto; align-items: start;
+  min-height: 0; padding: 26px 26px 20px; border-radius: 10px; transition: transform .2s, border-color .2s, background .2s, opacity .2s;
+}
+.guest--hand .guest-choice::before {
+  content: counter(hand-option, upper-alpha); position: static; display: grid; place-items: center; width: 56px; height: 56px;
+  color: var(--guest-cyan); font-size: 26px; font-weight: 500; border: 1px solid #6d7d74; border-radius: 50%; background: none;
+}
+.guest--hand .guest-choice input { position: absolute; opacity: 0; pointer-events: none; }
+.guest--hand .guest-choice-content { grid-column: 1; grid-row: 2; align-self: center; }
+.guest--hand .guest-choice-copy { color: var(--guest-ink); font-size: 24px; line-height: 1.6; }
+.guest--hand .guest-choice-title { font-size: 20px; }
+.guest--hand .guest-choice-state { grid-column: 1; grid-row: 3; min-height: 22px; }
+.guest--hand .guest-choice::after { content: ''; grid-column: 1; grid-row: 3; justify-self: end; color: var(--guest-cyan); font-size: 15px; }
+/* Checked (e.g. back via 前の質問へ): keep the letter disc, which guestTheme's checked accent bar would shrink. */
+.guest--hand .guest-choice:has(input:checked)::before { width: 56px; height: 56px; color: #1b211e; background: var(--guest-cyan); border-color: var(--guest-cyan); }
+.guest--hand .guest-choice.is-hand-hover { transform: translateY(-10px) scale(1.03); border-color: var(--guest-cyan); background: #354b41; box-shadow: 0 0 0 3px #94c9c233, 0 18px 40px #0008; }
+.guest--hand .guest-choice.is-hand-hover::before { color: #1b211e; background: var(--guest-cyan); border-color: var(--guest-cyan); }
+.guest--hand .guest-choice.is-hand-hover::after { content: 'つまんで選ぶ'; }
+.guest--hand .guest-choice.is-hand-picked, .guest--hand .guest-choice.is-hand-picked:has(input:checked) { border-color: var(--guest-amber); background: #3e3a2c; box-shadow: 0 0 0 4px #dfbd8555; animation: hand-pick .5s ease-out; }
+.guest--hand .guest-choice.is-hand-picked::before, .guest--hand .guest-choice.is-hand-picked:has(input:checked)::before { color: #1b211e; background: var(--guest-amber); border-color: var(--guest-amber); }
+.guest--hand .guest-choice.is-hand-picked::after { content: '選択しました'; color: var(--guest-amber); }
+.guest--hand .guest-choice.is-hand-picked .guest-choice-state { visibility: hidden; }
+@keyframes hand-pick { from { box-shadow: 0 0 0 18px #dfbd8500; } 30% { box-shadow: 0 0 0 6px #dfbd85aa; } }
+
+/* 前の質問へ = narrow left-edge strip; 次へ is replaced by the pick's auto-advance (touch keeps radios clickable). */
+.guest--hand .guest-form .guest-actions { position: static; padding: 0; border: 0; margin: 0; }
+.guest--hand .guest-form [data-auto-action='next'] { display: none; }
+.guest--hand .guest-form .guest-actions button:not([data-auto-action]) {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 72px; min-height: 0; padding: 0 8px; font-size: 15px; line-height: 1.5;
+  border-left: 0; border-radius: 0 10px 10px 0; white-space: normal;
+}
+
+
+/* ---- review: 2x2 answer cards + big submit --------------------------------------------------------------------- */
+.guest--hand[data-screen='review'] .guest-screen, .guest--hand[data-screen='submitting'] .guest-screen { display: flex; flex-direction: column; }
+.guest--hand .guest-review-list { display: grid; flex: 1; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 1fr; gap: 16px; margin: 4px 0 16px; }
+.guest--hand .guest-review-row { position: relative; display: grid; align-content: center; padding: 14px 20px; border: 1px solid var(--guest-line); border-radius: 10px; background: #2c3430; }
+.guest--hand .guest-review-row .guest-review-answer { font-size: 19px; line-height: 1.5; }
+.guest--hand .guest-review-row button { position: absolute; right: 14px; top: 12px; min-height: 0; min-width: 0; padding: 4px 10px; font-size: 13px; }
+.guest--hand .guest-review-row.is-hand-hover { border-color: var(--guest-cyan); background: #354b41; box-shadow: 0 0 0 3px #94c9c233; }
+.guest--hand .guest-review-row.is-hand-hover button { color: var(--guest-cyan); border-color: var(--guest-cyan); }
+.guest--hand .guest-review-row.is-hand-hover button::after { content: '・つまんで変更'; }
+.guest--hand[data-screen='review'] .guest-actions, .guest--hand[data-screen='submitting'] .guest-actions { margin-top: 0; padding-top: 0; border: 0; align-items: stretch; }
+.guest--hand button { min-height: 64px; padding: 0 28px; font-size: 18px; }
+.guest--hand [data-auto-action='submit'] { min-width: 58%; min-height: 104px; font-size: 26px; border-radius: 12px; }
+.guest--hand [data-auto-action='submit']::after { content: 'つまんで送信'; display: block; margin-top: 4px; color: #5a5232; font-size: 14px; }
+.guest--hand [data-auto-action='submit'].is-hand-hover { box-shadow: 0 0 0 5px #dfbd8566; }
+.guest--hand .guest-actions button.is-hand-hover:not([data-auto-action='submit']) { color: var(--guest-ink); border-color: var(--guest-cyan); background: #354238; outline: none; }
+
+/* ---- waiting / handoff --------------------------------------------------------------------------------------------- */
+.guest--hand[data-screen='handoff'] .guest-screen, .guest--hand[data-screen='waiting'] .guest-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.guest--hand[data-screen='handoff'] .guest-actions { gap: 22px; }
+.guest--hand[data-screen='handoff'] .guest-actions button { min-width: 220px; min-height: 110px; font-size: 20px; border-radius: 10px; }
+.guest--hand[data-screen='handoff'] .guest-actions button.is-hand-hover { box-shadow: 0 0 0 4px #94c9c255; }
+
+/* ---- overlay: cursor, hand state, status ---------------------------------------------------------------------------- */
+.hand-layer { position: fixed; inset: 0; z-index: 50; pointer-events: none; color: var(--guest-ink, #f0eee6); }
+.hand-cursor { position: absolute; left: 0; top: 0; width: 30px; height: 30px; margin: -15px 0 0 -15px; border-radius: 50%; opacity: 0; will-change: transform;
+  background: radial-gradient(circle, #fff 0 30%, #94c9c2 45%, #94c9c200 72%); box-shadow: 0 0 20px 8px #94c9c288; transition: opacity .12s; }
+.hand-layer.has-cursor .hand-cursor { opacity: 1; }
+.hand-cursor.is-pinched { background: radial-gradient(circle, #fff 0 30%, #dfbd85 45%, #dfbd8500 72%); box-shadow: 0 0 24px 10px #dfbd8599; }
+.hand-state { position: absolute; top: 11px; right: 150px; display: flex; align-items: center; gap: 8px; margin: 0; padding: 6px 12px;
+  color: #bac1bb; font-size: 13px; border: 1px solid #59675f; border-radius: 20px; background: #1b211ecc; }
+.hand-state[hidden], .hand-status[hidden] { display: none; }
+.hand-state-dot { width: 10px; height: 10px; box-sizing: border-box; border: 2px solid #bac1bb; border-radius: 50%; }
+.hand-state.is-point { color: #f0eee6; border-color: #94c9c2; }
+.hand-state.is-point .hand-state-dot { border: 0; background: #94c9c2; box-shadow: 0 0 10px #94c9c2; }
+.hand-status { position: absolute; left: 16px; bottom: 10px; margin: 0; color: #bac1bb; font-size: 13px; }
+.hand-video { position: absolute; width: 2px; height: 2px; opacity: 0; }
