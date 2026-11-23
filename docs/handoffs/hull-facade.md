@@ -211,3 +211,9 @@ R4 加闊兩道斜框上緣，讓銀色折面從下層框延至樓板邊，沿�
 - 固定 Hero 沿用 18:00、場景時間 20 秒。全幅和同一裁切位置可比較 R9 與 R10，方向圖與斜前方另放在同一對照板。斜前方的 65.70、66.20、67.06 秒依序顯示接近、跨口面、深入洞腔。廣場日夜與夜間簷下的三組對照覆核外門框、簷篷及室內暖光。[固定 Hero 與 Target](../../artifacts/hull-facade/r10-hero.jpg) · [列車入洞](../../artifacts/hull-facade/r10-bow.jpg) · [入口回歸](../../artifacts/hull-facade/r10-entry.jpg)
 - 最終八張 Chrome 原圖及 sidecar 為 2400 × 1350／DPR 1，來自乾淨的 `88486657`，頁面例外皆為零。原檔存於 `~/city2127-evidence/hull-facade/r10/review/`，新拍的 R9 基準存於 `r10/baseline/`。Root `npm test`、`npm run build`、`git diff --check` 通過。
 - 業主目視驗收及展覽機驗證待完成。
+
+### R10 整合
+
+- 工作分支 `683f15c8` 已推送。從最新 `origin/main`（`3f1c0a57`）在獨立工作樹整合為 `50663a18663f26178a191d779c9ea202bc40bab1`。
+- 整合版 root `npm test`、`npm run build`、差異空白、圖檔規格及 12 個本機文件連結全部通過。整份 `dist/` 與 Chrome 驗證的正式 build 逐檔一致。
+- 開發 Mac 的實體 Chrome 視窗用 1920 × 1080／DPR 1 量固定 Hero。每個時段量四段 120 幀並略去首段，12:00 為 53.3–57.6 FPS，21:25 為 55.7–59.9 FPS。實測記錄在 `~/city2127-evidence/hull-facade/r10/fps.json`。
