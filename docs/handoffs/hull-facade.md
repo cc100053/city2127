@@ -125,3 +125,23 @@ R4 加闊兩道斜框上緣，讓銀色折面從下層框延至樓板邊，沿�
 - 工作分支提交 `2caa4e6a` 已推送。由已 fetch 的 `origin/main`（`5b5ef75e`）在獨立工作樹整合為 `014f2008`。
 - 整合版 root `npm test`、`npm run build`、差異空白、圖檔規格及 R6 連結檢查全數通過。整份 `dist/` 與 Chrome 實測的 build 逐檔一致。
 - [GitHub main CI](https://github.com/cc100053/city2127/actions/runs/45091927011) 驗證 `74b69ede`。Root、survey、module-swap 測試和 build、差異空白及圖檔規格全數通過。[工作分支 CI](https://github.com/cc100053/city2127/actions/runs/45091490804) 驗證 `2caa4e6a`，亦已通過。
+
+## R7 · 船首列車口
+
+- 業主 cc100053。工作分支 `codex/hull-facade-r7` 由已 fetch 的 `origin/main`（`d8c1fe5794fdee63488f36179b750b7297d6ee3f`）建立，含 R6 整合 `014f2008` 及 [R6 main CI](https://github.com/cc100053/city2127/actions/runs/45091927011) 所驗證的 `74b69ede`。本機 `main` 在 `2df6d8b6`，領先 0、落後 8。兩個獨立工作樹分別用於實作及整合，保留原工作區未追蹤的 `Dev_QA.md`。
+- [方向圖](../../artifacts/hull-facade/target.jpg) 的銀色曲框沿船側接入有深度的列車口。R6 兩端的矩形光帶在深色封板前。比較兩端的實際列車和斜前鏡位後，選靠廣場一端（船身局部 `+u`）。此角度可把相鄰曲框、入洞列車及兩條軌道放在同一畫面。
+- 以 R6 的 18 × 14 m 口徑切開局部端牆及相交板件。原口面後留 9.1 m 襯板，由拉絲銀向深灰金屬轉入，末段在船身內遮蔽。凹入的冷白導光跟隨原日夜係數，合成一批；銀框及襯板分別併入現有兩個金屬批次。門套和切口按這端船身剖面與軌道定形，屬該地標構件。移一株碰到凹口的低層邊緣灌木到靠海一排，並縮細其樹冠。三處公共退台、大堂、遠端外觀及兩條路徑沿用 R6。
+- 本輪實體淨空查核由原洞口至門套終端，車輛隨原路線在船身內遮蔽。船身內部的完整鐵路廊道未建模。
+
+### R7 驗證
+
+- [巨構測試](../../tests/megastructures.test.ts) 驗證原口面位置與尺寸、門套後緣、四邊導光、入口矩形淨空及日夜燈值。以 0.02 秒間隔沿兩條原軌道套用實際列車姿態及頭／中／尾車 GLB，門套範圍內抽樣到的最小淨距分別為 1.84／3.75 m。
+- 另一端局部掃描盒 `u=−94.2…−91, y=7…25, d=36…62.5` 中的 594 個三角面，頂點、法線及材質與 R6 基準逐面一致。
+- 開發 Mac 的 Chrome 157.0.8103.79（Apple M6／ANGLE Metal），1600×900／DPR 1 的正式 build 在 12:00、18:00、21:25 都有持續畫布輸出。另以相同環境的 DEV 斜前方鏡位，在 21:25 記錄實時車頭由門外穿過口面至遮蔽面之後的 169 幀。頁面例外、shader 錯誤及本機資源錯誤均為零。記錄見 `~/city2127-evidence/hull-facade/r7/browser.json`。
+- [黃昏及夜間列車入洞](../../artifacts/hull-facade/r7-bow.jpg) 採用 `review=street&cam=-126.6,29,-30.1&at=-175,18,40`，場景時間 65.7、66.2、67.06 秒。三格分別見車頭接近、進入口面、前車深入門套。
+- [城市主鏡](../../artifacts/hull-facade/r7-hero.jpg)、[立面近鏡](../../artifacts/hull-facade/r7-close.jpg) 和[廣場及大堂入口](../../artifacts/hull-facade/r7-entry.jpg) 沿用 R6 的鏡位、時間和 2400×1350／DPR 1。原圖和 sidecar 在 `~/city2127-evidence/hull-facade/{r6,r7}/after/`。
+- Root `npm test`、`npm run build`、`git diff --check` 通過。
+
+受測程式提交為 `4dd323bd`，擷取批次在提交前開始，sidecar 記錄起始基準和 dirty 狀態。
+
+業主目視驗收及展覽機驗證待完成。

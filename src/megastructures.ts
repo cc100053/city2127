@@ -2,6 +2,7 @@ import * as T from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { buildHullFacade, hullFrameReturns, hullFront, hullLobby, hullRear, hullTiers } from './hullFacade.ts';
 import { hullFrameMetal, hullFrameUv, hullPanelMetal } from './hullMetals.ts';
+import { buildHullBowPortal, cutHullBowOpening, HULL_BOW_PORTAL } from './hullPortal.ts';
 import { hash, plantCanopy, plantShrubs } from './coastalCanopy.ts';
 import { bodyFootprints, inRect } from './megaFootprints.ts';
 import { addCityModel } from './modelAssets.ts';
@@ -46,6 +47,9 @@ megaFace.customProgramCacheKey = () => 'mega-face';
 const megaJoint = new T.MeshStandardMaterial({ color: '#4b5258', roughness: .6, metalness: .3 });
 /** The dark mouth of the hull's Yurikamome tunnel, faintly lit from inside. */
 const megaPortal = new T.MeshStandardMaterial({ color: '#141b20', emissive: '#30485a', emissiveIntensity: .35, roughness: .8 });
+const hullPortalGuide = new T.MeshStandardMaterial({
+  name: 'hull-portal-guide', color: '#9daeb8', emissive: '#d2e8f1', emissiveIntensity: .12, roughness: .5,
+});
 /** Tunnel lights in the ring's road gate (outside the carve, so its own finish). */
 const gateLight = new T.MeshStandardMaterial({ color: '#fff4dc', emissive: '#fff1d0', emissiveIntensity: .8, roughness: .4 });
 const ringGlazing = new T.MeshStandardMaterial({ color: '#6c8895', emissive: '#c59262', emissiveIntensity: .06, roughness: .22, metalness: .26 });
@@ -104,6 +108,7 @@ export const updateMegastructures = (night: number) => {
   ringGlazing.emissiveIntensity = .06 + night * 1.05;
   transferCove.emissiveIntensity = .62 + night * 1.3;
   hullCove.emissiveIntensity = .02 + night * 1.21;
+  hullPortalGuide.emissiveIntensity = .12 + night * .85;
   lightSlopePlants(night);
 };
 
@@ -392,9 +397,11 @@ function hull(batch: Batch, trees: Plant[], shrubs: Shrub[]) {
   const at = (u: number, d: number, y: number) => new T.Matrix4().compose(world(u, d, y), q, new T.Vector3(1, 1, 1));
   // Road fix A (owner 2026-11-20): both Yurikamome tracks (deck 14.2 m) pass through the hull's end bulkheads, so each end gets a lit tunnel
   // mouth over them: [end sign, centre d, width] from where the tracks cross u = ±L2 (east d 9.7-15.8, west d 43.7-54.8).
-  const portals = [[1, 12.75, 18], [-1, 49.25, 22]] as const, portalY = [9, 23] as const;
+  const portals = [[1, HULL_BOW_PORTAL.centre, HULL_BOW_PORTAL.width], [-1, 49.25, 22]] as const;
+  const portalY = [HULL_BOW_PORTAL.bottom, HULL_BOW_PORTAL.top] as const;
   const inPortal = (sgn: number, d: number, k: number) => k < 2 && portals.some(([s, c, w]) => s === sgn && Math.abs(d - c) < w / 2 + 1);
   for (const [sgn, c, w] of portals) {
+    if (sgn > 0) continue;
     const u = sgn * (L2 + 2.6), h = portalY[1] - portalY[0], y = (portalY[0] + portalY[1]) / 2;
     put(batch, megaPortal, new T.BoxGeometry(.3, h, w), at(u, c, y));
     for (const [dy, dd, bh, bw] of [[h / 2, 0, .7, w + 1.4], [-h / 2, 0, .7, w + 1.4], [0, w / 2 + .35, h, .7], [0, -w / 2 - .35, h, .7]])
@@ -525,8 +532,10 @@ function hull(batch: Batch, trees: Plant[], shrubs: Shrub[]) {
       for (let u = u0 + 2, i = 0; u < u1 - 2; u += gap, i++) {
         const radius = r + hash(k * 99 + i + off) * .7;
         if (!clearForPlanting(u, radius * 1.2)) continue;
-        const p = deckPoint(u, off, .5);
-        shrubs.push([p.x, p.y, p.z, radius, 1.4 + hash(k * 99 + i + 4) * .5]);
+        // The last shrub on the inner row straddled the new reveal. Keep it on the seaward planter.
+        const besideBow = k === 0 && off === 5.2 && u > HULL_BOW_PORTAL.recess;
+        const p = deckPoint(u, besideBow ? 1.8 : off, .5);
+        shrubs.push([p.x, p.y, p.z, besideBow ? 1.65 : radius, 1.4 + hash(k * 99 + i + 4) * .5]);
       }
     }
     for (let u = u0 + 8 + hash(k) * 12, c = 0; u < u1 - 8; u += 24 + hash(k * 7 + c) * 16, c++) {
@@ -616,7 +625,17 @@ export function carveContext(environment: T.Object3D) {
 export function megastructures(ringModels?: { entrance: T.Group; body?: T.Group; hasTransfer?: boolean }): T.Group {
   const root = new T.Group(); root.name = 'megastructures';
   const batch: Batch = new Map(), trees: Plant[] = [], shrubs: Shrub[] = [], plants: SlopePlant[] = [], tops: [number, number][] = [];
-  ring(batch, plants, Boolean(ringModels), Boolean(ringModels?.body), Boolean(ringModels?.hasTransfer)); arch(batch, tops); hull(batch, trees, shrubs);
+  ring(batch, plants, Boolean(ringModels), Boolean(ringModels?.body), Boolean(ringModels?.hasTransfer)); arch(batch, tops);
+  const hullBatch: Batch = new Map();
+  hull(hullBatch, trees, shrubs);
+  for (const [material, parts] of hullBatch) {
+    for (const part of parts) cutHullBowOpening(part);
+    const existing = batch.get(material);
+    if (existing) existing.push(...parts);
+    else batch.set(material, parts);
+  }
+  const portalFinishes = { frame: hullFrameMetal, panel: hullPanelMetal, guide: hullPortalGuide, dark: megaPortal };
+  buildHullBowPortal((finish, geometry) => put(batch, portalFinishes[finish], geometry));
   for (const [material, list] of batch) {
     const mesh = new T.Mesh(mergeGeometries(list), carved.get(material) ?? material);
     mesh.castShadow = material !== hullGlass;
