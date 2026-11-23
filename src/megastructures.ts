@@ -1,8 +1,8 @@
 import * as T from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { buildHullFacade, hullFrameReturns, hullFront, hullLobby, hullRear, hullTiers } from './hullFacade.ts';
-import { hullFrameMetal, hullFrameUv, hullPanelMetal } from './hullMetals.ts';
-import { buildHullBowPortal, cutHullBowOpening, HULL_BOW_PORTAL } from './hullPortal.ts';
+import { hullBowMetal, hullFrameMetal, hullFrameUv, hullPanelMetal } from './hullMetals.ts';
+import { buildHullBowPortal, cutHullBowOpening, HULL_BOW_FLANK_AT_DECK, HULL_BOW_PORTAL } from './hullPortal.ts';
 import { hash, plantCanopy, plantShrubs } from './coastalCanopy.ts';
 import { bodyFootprints, inRect } from './megaFootprints.ts';
 import { addCityModel } from './modelAssets.ts';
@@ -47,6 +47,12 @@ megaFace.customProgramCacheKey = () => 'mega-face';
 const megaJoint = new T.MeshStandardMaterial({ color: '#4b5258', roughness: .6, metalness: .3 });
 /** The dark mouth of the hull's Yurikamome tunnel, faintly lit from inside. */
 const megaPortal = new T.MeshStandardMaterial({ color: '#141b20', emissive: '#30485a', emissiveIntensity: .35, roughness: .8 });
+const hullPortalLiner = new T.MeshStandardMaterial({
+  name: 'hull-portal-liner', color: '#78828a', emissive: '#879da8', emissiveIntensity: .14, roughness: .82,
+});
+const hullPortalBaffle = new T.MeshStandardMaterial({
+  name: 'hull-portal-baffle', color: '#67757c', emissive: '#62727b', emissiveIntensity: .24, roughness: .92, vertexColors: true,
+});
 const hullPortalGuide = new T.MeshStandardMaterial({
   name: 'hull-portal-guide', color: '#9daeb8', emissive: '#d2e8f1', emissiveIntensity: .12, roughness: .5,
 });
@@ -109,6 +115,7 @@ export const updateMegastructures = (night: number) => {
   transferCove.emissiveIntensity = .62 + night * 1.3;
   hullCove.emissiveIntensity = .02 + night * 1.21;
   hullPortalGuide.emissiveIntensity = .12 + night * .85;
+  hullPortalLiner.emissiveIntensity = .14 + night * .14;
   lightSlopePlants(night);
 };
 
@@ -118,7 +125,7 @@ type Batch = Map<T.Material, T.BufferGeometry[]>;
 /** Queue a geometry (placed by `m`) under a material; everything is normalised so per-material merging always succeeds. */
 function put(batch: Batch, material: T.Material, g: T.BufferGeometry, m?: T.Matrix4) {
   const flat = g.index ? g.toNonIndexed() : g.clone();
-  if (material !== hullCove && material !== hullFrameMetal && material !== hullPanelMetal) flat.deleteAttribute('uv');
+  if (material !== hullCove && material !== hullFrameMetal && material !== hullBowMetal && material !== hullPanelMetal) flat.deleteAttribute('uv');
   if (m) flat.applyMatrix4(m);
   (batch.get(material) ?? batch.set(material, []).get(material)!).push(flat);
 }
@@ -461,7 +468,10 @@ function hull(batch: Batch, trees: Plant[], shrubs: Shrub[]) {
         continue;
       }
       for (let d = d0 + 6; d < back - 2; d += 8) if (!inPortal(sgn, d, k)) put(batch, megaRib, new T.BoxGeometry(1.1, edgeHeight - 1, .8), at(u + sgn * 2.6, d, y0 + edgeHeight / 2));
-      if (k < 2 && !inPortal(sgn, d0 + 1, k)) put(batch, megaSeam, new T.BoxGeometry(.6, height, .6), at(u + sgn * 2.6, d0 + 1, y0 + height / 2));
+      if (k < 2 && !inPortal(sgn, d0 + 1, k)) {
+        const finish = sgn > 0 && k === 0 ? megaRib : megaSeam;
+        put(batch, finish, new T.BoxGeometry(.6, height, .6), at(u + sgn * 2.6, d0 + 1, y0 + height / 2));
+      }
     }
     const terrace = publicTerraces.get(k);
     const deckPoint = (u: number, inset: number, rise: number) => world(u, hullFront(k, u) + inset, tierElevation(k, u, deckY) + rise);
@@ -532,10 +542,11 @@ function hull(batch: Batch, trees: Plant[], shrubs: Shrub[]) {
       for (let u = u0 + 2, i = 0; u < u1 - 2; u += gap, i++) {
         const radius = r + hash(k * 99 + i + off) * .7;
         if (!clearForPlanting(u, radius * 1.2)) continue;
-        // The last shrub on the inner row straddled the new reveal. Keep it on the seaward planter.
-        const besideBow = k === 0 && off === 5.2 && u > HULL_BOW_PORTAL.recess;
-        const p = deckPoint(u, besideBow ? 1.8 : off, .5);
-        shrubs.push([p.x, p.y, p.z, besideBow ? 1.65 : radius, 1.4 + hash(k * 99 + i + 4) * .5]);
+        // Keep the planting row beside the cut on the supported part of the lowest deck.
+        const besideBow = k === 0 && u + radius > HULL_BOW_FLANK_AT_DECK;
+        const plantedU = besideBow ? HULL_BOW_FLANK_AT_DECK - 1.75 - Math.max(0, u - HULL_BOW_FLANK_AT_DECK) * .42 : u;
+        const p = deckPoint(plantedU, besideBow ? off + 1.2 : off, .5);
+        shrubs.push([p.x, p.y, p.z, besideBow ? 1.1 : radius, 1.4 + hash(k * 99 + i + 4) * .5]);
       }
     }
     for (let u = u0 + 8 + hash(k) * 12, c = 0; u < u1 - 8; u += 24 + hash(k * 7 + c) * 16, c++) {
@@ -621,8 +632,8 @@ export function carveContext(environment: T.Object3D) {
   });
 }
 
-/** The three megastructures, with the optional Blender ring exterior. */
-export function megastructures(ringModels?: { entrance: T.Group; body?: T.Group; hasTransfer?: boolean }): T.Group {
+/** The three megastructures, with available Blender exterior parts. */
+export function megastructures(ringModels?: { entrance: T.Group; body?: T.Group; hasTransfer?: boolean }, bowModel?: T.Group): T.Group {
   const root = new T.Group(); root.name = 'megastructures';
   const batch: Batch = new Map(), trees: Plant[] = [], shrubs: Shrub[] = [], plants: SlopePlant[] = [], tops: [number, number][] = [];
   ring(batch, plants, Boolean(ringModels), Boolean(ringModels?.body), Boolean(ringModels?.hasTransfer)); arch(batch, tops);
@@ -634,8 +645,8 @@ export function megastructures(ringModels?: { entrance: T.Group; body?: T.Group;
     if (existing) existing.push(...parts);
     else batch.set(material, parts);
   }
-  const portalFinishes = { frame: hullFrameMetal, panel: hullPanelMetal, guide: hullPortalGuide, dark: megaPortal };
-  buildHullBowPortal((finish, geometry) => put(batch, portalFinishes[finish], geometry));
+  const portalFinishes = { frame: hullFrameMetal, bow: hullBowMetal, panel: hullPanelMetal, guide: hullPortalGuide, dark: megaPortal, liner: hullPortalLiner, baffle: hullPortalBaffle };
+  buildHullBowPortal((finish, geometry) => put(batch, portalFinishes[finish], geometry), bowModel);
   for (const [material, list] of batch) {
     const mesh = new T.Mesh(mergeGeometries(list), carved.get(material) ?? material);
     mesh.castShadow = material !== hullGlass;
@@ -679,7 +690,8 @@ export async function loadMegastructures(): Promise<T.Group> {
 
   const body = new T.Group();
   body.name = 'ring-body-2127';
-  const [entrance, sections] = await Promise.allSettled([
+  const bowUrl = new URL('../asset/models/hull-bow-2127/hull-bow-2127.glb', import.meta.url).href;
+  const [entrance, sections, bow] = await Promise.allSettled([
     loadRingPart(entranceUrl, new T.Group()),
     Promise.all([
       loadRingPart(transferUrl, body).catch(error => {
@@ -688,15 +700,18 @@ export async function loadMegastructures(): Promise<T.Group> {
       }),
       ...ringUpperUrls.map(url => loadRingPart(url, body)),
     ]),
+    addCityModel(new T.Group(), bowUrl, [0, 0, 0]),
   ]);
+  const bowModel = bow.status === 'fulfilled' ? bow.value : undefined;
+  if (bow.status === 'rejected') console.warn('Hull bow model could not load. Using the procedural collar.', bow.reason);
   if (entrance.status === 'rejected') {
     console.warn('Ring entrance model could not load. Using the procedural ring and entrance.', entrance.reason);
-    return megastructures();
+    return megastructures(undefined, bowModel);
   }
   entrance.value.name = 'ring-gate-2127';
   if (sections.status === 'rejected') {
     console.warn('Ring shell could not load. Using the procedural shell with the Blender entrance.', sections.reason);
-    return megastructures({ entrance: entrance.value });
+    return megastructures({ entrance: entrance.value }, bowModel);
   }
   const [lower] = sections.value;
   const transfer = lower.getObjectByName('Concourse_floor') ? lower : undefined;
@@ -714,5 +729,5 @@ export async function loadMegastructures(): Promise<T.Group> {
       transfer.add(panel);
     }
   }
-  return megastructures({ entrance: entrance.value, body, hasTransfer: Boolean(transfer) });
+  return megastructures({ entrance: entrance.value, body, hasTransfer: Boolean(transfer) }, bowModel);
 }
