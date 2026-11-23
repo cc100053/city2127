@@ -192,7 +192,7 @@ function loft(rows: T.Vector3[][]) {
   return { geometry: geometry.applyMatrix4(root), indices };
 }
 
-type Finish = 'frame' | 'bow' | 'panel' | 'guide' | 'dark';
+type Finish = 'frame' | 'bow' | 'panel' | 'guide' | 'dark' | 'liner' | 'baffle';
 
 function buildBowFrame(surface: (finish: Finish, geometry: T.BufferGeometry) => void) {
   const stations = flank.flatMap(({ x, y }, i) => {
@@ -274,26 +274,31 @@ function buildBowFrame(surface: (finish: Finish, geometry: T.BufferGeometry) => 
   geometry.dispose();
 }
 
+function liningStrip(edges: [T.Vector3, T.Vector3][]) {
+  const grain = hullFrameUv(edges);
+  const positions: number[] = [], uv: number[] = [];
+  for (let i = 1; i < edges.length; i++) {
+    const [a, b] = edges[i - 1], [c, d] = edges[i];
+    for (const vertex of [a, b, c, c, b, d]) positions.push(...vertex.toArray());
+    const [first, next] = [grain[i - 1], grain[i]];
+    uv.push(first.along, first.low, first.along, first.high, next.along, next.low,
+      next.along, next.low, first.along, first.high, next.along, next.high);
+  }
+  const geometry = new T.BufferGeometry();
+  geometry.setAttribute('position', new T.Float32BufferAttribute(positions, 3));
+  geometry.setAttribute('uv', new T.Float32BufferAttribute(uv, 2));
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
 function buildFlankLining(surface: (finish: Finish, geometry: T.BufferGeometry) => void) {
-  const point = (u: number, y: number, d: number) => new T.Vector3(u, y, d).applyMatrix4(root);
   const strip = (finish: Finish, edges: [T.Vector3, T.Vector3][]) => {
-    const grain = hullFrameUv(edges);
-    const positions: number[] = [], uv: number[] = [];
-    for (let i = 1; i < edges.length; i++) {
-      const [a, b] = edges[i - 1], [c, d] = edges[i];
-      for (const vertex of [a, b, c, c, b, d]) positions.push(...vertex.toArray());
-      const [first, next] = [grain[i - 1], grain[i]];
-      uv.push(first.along, first.low, first.along, first.high, next.along, next.low,
-        next.along, next.low, first.along, first.high, next.along, next.high);
-    }
-    const geometry = new T.BufferGeometry();
-    geometry.setAttribute('position', new T.Float32BufferAttribute(positions, 3));
-    geometry.setAttribute('uv', new T.Float32BufferAttribute(uv, 2));
-    geometry.computeVertexNormals();
+    const geometry = liningStrip(edges);
     subtract(geometry, axialCut);
     surface(finish, geometry);
     geometry.dispose();
   };
+  const point = (u: number, y: number, d: number) => new T.Vector3(u, y, d).applyMatrix4(root);
   // Finish the exposed cut itself. Split at the 15 m step so the edge meets each skin.
   const lower = flank.filter(({ y }) => y <= 15);
   const upper = flank.filter(({ y }) => y >= 15);
@@ -363,27 +368,81 @@ export function buildHullBowPortal(surface: (finish: Finish, geometry: T.BufferG
   const guideTop = { u: face + .08, side: .40, crown: .40, sill: .40, radius: .80, fold: { reach: .38, inset: .08 } };
   const guideBottom = { u: face - .06, side: .14, crown: .14, sill: .14, radius: .39, fold: { reach: 0, inset: .08 } };
   const liner = { u: face - 1.12, side: 0, crown: 0, sill: 0, radius: 0 };
-  const back = { ...liner, u: recess };
-  const finishBand = (finish: Finish, outer: Profile, inner: Profile) => {
-    const a = outline(outer), b = outline(inner);
-    const { geometry } = loft(a.map((point, i) => [point, b[i]]));
+  const finishBand = (finish: Finish, profiles: Profile[]) => {
+    const outlines = profiles.map(outline);
+    const { geometry } = loft(outlines[0].map((_, i) => outlines.map(row => row[i])));
     const flat = geometry.toNonIndexed();
     subtract(flat, flankCut);
     surface(finish, flat);
     flat.dispose();
     geometry.dispose();
   };
-  finishBand('panel', throat, guideTop);
-  finishBand('guide', guideTop, guideBottom);
-  finishBand('frame', guideBottom, liner);
-  finishBand('panel', liner, back);
+  finishBand('panel', [throat, guideTop]);
+  finishBand('guide', [guideTop, guideBottom]);
+
+  // The rounded liner stays outside all four corners of the rectangular rail envelope.
+  // Let the backing sweep down to the baffle so the roof reads through the seaward cut.
+  const cabin: Profile[] = [
+    { ...liner, u: face - .78, side: .32, crown: 2.25, sill: .32, radius: .72 },
+    { ...liner, u: face - 2.85, side: .22, crown: 1.73, sill: .22, radius: .55 },
+    { ...liner, u: face - 5.7, side: .10, crown: .89, sill: .10, radius: .30 },
+    { ...liner, u: recess, crown: .03 },
+  ];
+  finishBand('frame', [guideBottom, cabin[0]]);
+  finishBand('liner', cabin);
+
+  // Follow the soffit with a recessed light on either side of its centre.
+  for (const depth of [centre - 3, centre + 5.3]) {
+    const edges = cabin.map(({ u, crown }): [T.Vector3, T.Vector3] => [
+      new T.Vector3(u, top + Math.max(.027, crown - .075), depth - .12),
+      new T.Vector3(u, top + Math.max(.027, crown - .075), depth + .12),
+    ]);
+    const cove = liningStrip(edges).applyMatrix4(root);
+    surface('guide', cove);
+    cove.dispose();
+  }
 
   buildFlankLining(surface);
   if (!model || !buildBlenderBowFrame(model, surface)) buildBowFrame(surface);
 
-  // The deep end disappears into the unmodelled hull interior beyond this entrance.
-  const shadow = new T.PlaneGeometry(width, height * 2).rotateY(Math.PI / 2)
-    .translate(recess, mid, centre).applyMatrix4(root);
-  surface('dark', shadow);
+  // Roll the exposed seaward edge back into the existing flank cut. The
+  // joint follows both skins and steps across the 15 m deck between them.
+  const backEdge: [number, number, number][] = [
+    [9, 84.5, 0], [10.5, 81.8, 0], [12.45, 80.55, 0], [15, 80, 0],
+    [15, 80, 1], [18.6, 80, 1], [20.8, 80.6, 1], [22.2, 81.35, 1], [23, 82.85, 1],
+  ];
+  const outerEdge = centre - half + .08;
+  const fold = [0, .19, .46, .71, 1];
+  const turned = backEdge.map(([y, cut, tier]) => fold.map(t => {
+    const u = Math.min(cut - .17, recess - .7);
+    const skin = hullFront(tier, u) - .4;
+    const depth = tier === 0
+      ? T.MathUtils.lerp(outerEdge, skin, Math.sin(t * Math.PI / 2))
+      : T.MathUtils.lerp(outerEdge, skin, t * t) - 3.2 * Math.sin(t * Math.PI);
+    return new T.Vector3(T.MathUtils.lerp(recess - .08, u, Math.sqrt(t)), y, depth);
+  }));
+  // The two deck stations share their first vertex. Start the deck return at
+  // the second point to avoid a zero-area face on the baffle seam.
+  for (let i = 1; i < turned.length; i++) {
+    const start = turned[i][0].equals(turned[i - 1][0]) ? 1 : 0;
+    const sides = turned[i].slice(start).map((point, j): [T.Vector3, T.Vector3] => [point, turned[i - 1][j + start]]);
+    const geometry = liningStrip(sides).applyMatrix4(root);
+    surface('liner', geometry);
+    geometry.dispose();
+  }
+
+  // The fixed mask stays at the original depth. Soft pools from the soffit
+  // leave a darker track zone without flattening the whole tunnel to black.
+  const shadow = new T.PlaneGeometry(width, height * 2, 20, 12);
+  const positions = shadow.getAttribute('position'), colors: number[] = [];
+  for (let i = 0; i < positions.count; i++) {
+    const topWash = T.MathUtils.smoothstep(positions.getY(i), 1.8, height) * .42;
+    const flankWash = T.MathUtils.smoothstep(Math.abs(positions.getX(i)), 3, half) * .16;
+    const wash = .49 + topWash + flankWash;
+    colors.push(wash, wash, wash);
+  }
+  shadow.setAttribute('color', new T.Float32BufferAttribute(colors, 3));
+  shadow.rotateY(Math.PI / 2).translate(recess, mid, centre).applyMatrix4(root);
+  surface('baffle', shadow);
   shadow.dispose();
 }

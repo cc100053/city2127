@@ -47,6 +47,12 @@ megaFace.customProgramCacheKey = () => 'mega-face';
 const megaJoint = new T.MeshStandardMaterial({ color: '#4b5258', roughness: .6, metalness: .3 });
 /** The dark mouth of the hull's Yurikamome tunnel, faintly lit from inside. */
 const megaPortal = new T.MeshStandardMaterial({ color: '#141b20', emissive: '#30485a', emissiveIntensity: .35, roughness: .8 });
+const hullPortalLiner = new T.MeshStandardMaterial({
+  name: 'hull-portal-liner', color: '#78828a', emissive: '#879da8', emissiveIntensity: .14, roughness: .82,
+});
+const hullPortalBaffle = new T.MeshStandardMaterial({
+  name: 'hull-portal-baffle', color: '#67757c', emissive: '#62727b', emissiveIntensity: .24, roughness: .92, vertexColors: true,
+});
 const hullPortalGuide = new T.MeshStandardMaterial({
   name: 'hull-portal-guide', color: '#9daeb8', emissive: '#d2e8f1', emissiveIntensity: .12, roughness: .5,
 });
@@ -109,6 +115,7 @@ export const updateMegastructures = (night: number) => {
   transferCove.emissiveIntensity = .62 + night * 1.3;
   hullCove.emissiveIntensity = .02 + night * 1.21;
   hullPortalGuide.emissiveIntensity = .12 + night * .85;
+  hullPortalLiner.emissiveIntensity = .14 + night * .14;
   lightSlopePlants(night);
 };
 
@@ -461,7 +468,10 @@ function hull(batch: Batch, trees: Plant[], shrubs: Shrub[]) {
         continue;
       }
       for (let d = d0 + 6; d < back - 2; d += 8) if (!inPortal(sgn, d, k)) put(batch, megaRib, new T.BoxGeometry(1.1, edgeHeight - 1, .8), at(u + sgn * 2.6, d, y0 + edgeHeight / 2));
-      if (k < 2 && !inPortal(sgn, d0 + 1, k)) put(batch, megaSeam, new T.BoxGeometry(.6, height, .6), at(u + sgn * 2.6, d0 + 1, y0 + height / 2));
+      if (k < 2 && !inPortal(sgn, d0 + 1, k)) {
+        const finish = sgn > 0 && k === 0 ? megaRib : megaSeam;
+        put(batch, finish, new T.BoxGeometry(.6, height, .6), at(u + sgn * 2.6, d0 + 1, y0 + height / 2));
+      }
     }
     const terrace = publicTerraces.get(k);
     const deckPoint = (u: number, inset: number, rise: number) => world(u, hullFront(k, u) + inset, tierElevation(k, u, deckY) + rise);
@@ -635,7 +645,7 @@ export function megastructures(ringModels?: { entrance: T.Group; body?: T.Group;
     if (existing) existing.push(...parts);
     else batch.set(material, parts);
   }
-  const portalFinishes = { frame: hullFrameMetal, bow: hullBowMetal, panel: hullPanelMetal, guide: hullPortalGuide, dark: megaPortal };
+  const portalFinishes = { frame: hullFrameMetal, bow: hullBowMetal, panel: hullPanelMetal, guide: hullPortalGuide, dark: megaPortal, liner: hullPortalLiner, baffle: hullPortalBaffle };
   buildHullBowPortal((finish, geometry) => put(batch, portalFinishes[finish], geometry), bowModel);
   for (const [material, list] of batch) {
     const mesh = new T.Mesh(mergeGeometries(list), carved.get(material) ?? material);

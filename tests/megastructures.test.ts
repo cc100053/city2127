@@ -22,7 +22,11 @@ const bowRoles: string[] = [];
 bow.traverse(part => {
   if (part instanceof Mesh && !Array.isArray(part.material)) bowRoles.push(part.material.name);
 });
-assert.deepEqual(bowRoles.sort(), ['bow_recess', 'bow_silver']);
+assert.deepEqual(bowRoles.sort(), ['bow_recess', 'bow_silver', 'bow_silver', 'bow_silver']);
+for (const name of ['Bow_Bearing_Seaward', 'Bow_Bearing_Inland']) {
+  const bearing = bow.getObjectByName(name);
+  assert.ok(bearing instanceof Mesh, `the editable GLB includes ${name}`);
+}
 
 // P1: the three megastructures exist, reach their table heights (±25%) and stand clear of the Meter sites (+14 m) and the civic core.
 const group = megastructures(undefined, bow), box = new Box3(), parts = new Map<string, Box3>();
@@ -258,8 +262,11 @@ for (const walk of plazaWalks) for (const [i, [x, y, z]] of walk.entries()) {
   });
   const ray = new Raycaster(new Vector3(face + 4, 19, centre).applyAxisAngle(up, HULL.yaw).add(origin),
     new Vector3(-1, 0, 0).applyAxisAngle(up, HULL.yaw));
+  const portalLiner = structureBatches.find(part => part.material.name === 'hull-portal-liner');
+  const baffle = structureBatches.find(part => part.material.name === 'hull-portal-baffle');
+  assert.ok(portalLiner && baffle);
   const [rear] = ray.intersectObjects(structureBatches, false);
-  assert.ok(rear && Math.abs(rear.distance - (face + 4 - recess)) < .02, 'the visible back sits behind the bulkhead');
+  assert.ok(rear?.object === baffle && Math.abs(rear.distance - (face + 4 - recess)) < .02, 'the visible back sits behind the bulkhead');
   const guides = structureBatches.filter(part => part.material instanceof MeshStandardMaterial &&
     part.material.name === 'hull-portal-guide');
   assert.equal(guides.length, 1, 'the recessed guide runs in one batch');
@@ -271,13 +278,15 @@ for (const walk of plazaWalks) for (const [i, [x, y, z]] of walk.entries()) {
     const point = new Vector3(u, y, d).applyAxisAngle(up, HULL.yaw).add(origin);
     return new Raycaster(hero, point.sub(hero).normalize()).intersectObjects(structureBatches, false)[0];
   };
+  const darkReturn = fromHero(82.4, 14, northEdge)?.object;
+  assert.ok(darkReturn instanceof Mesh && darkReturn !== baffle && darkReturn.material.color.getHexString() === '141b20');
   for (const y of [10.7, 14, 17.5, 19.6]) {
     for (const u of [84.5, 87]) {
       const hit = fromHero(u, y, northEdge);
-      assert.equal(hit?.object, panel, 'Hero looks through the cut across the rail cavity to the inland liner');
-      assert.ok(Math.abs(hit.point.clone().applyMatrix4(toLocal).z - northEdge) < .03);
+      assert.equal(hit?.object, portalLiner, 'Hero looks through the cut across the rail cavity to the inland liner');
+      assert.ok(Math.abs(hit.point.clone().applyMatrix4(toLocal).z - northEdge) < .22);
     }
-    assert.equal(fromHero(82.4, y, northEdge)?.object, rear.object,
+    assert.equal(fromHero(82.4, y, northEdge)?.object, darkReturn,
       'Hero sees the dark return where the flank meets the original recess');
   }
   assert.equal(fromHero(80.04, 17, hullFront(1, 80) - .88)?.object, guides[0],
@@ -285,7 +294,7 @@ for (const walk of plazaWalks) for (const [i, [x, y, z]] of walk.entries()) {
   for (const [y, outer, groove, inner] of [[13, 77.8, 79.2, 79.8], [19, 77.4, 78.9, 79.55], [22, 77.8, 79.6, 80.4]]) {
     const depth = hullFront(y < 15 ? 0 : 1, 80) - 2;
     const a = fromHero(outer, y, depth), seam = fromHero(groove, y, depth), b = fromHero(inner, y, depth);
-    assert.ok(a?.object === bowSilver && seam?.object === rear.object && b?.object === bowSilver,
+    assert.ok(a?.object === bowSilver && seam?.object === darkReturn && b?.object === bowSilver,
       `Hero sees both silver rims and the shadow seam at ${y} m`);
     const seamDepth = seam.point.clone().applyMatrix4(toLocal).z;
     assert.ok(seamDepth - a.point.clone().applyMatrix4(toLocal).z > .65, 'the softened outer bevel still shadows the gasket');
@@ -323,10 +332,36 @@ for (const walk of plazaWalks) for (const [i, [x, y, z]] of walk.entries()) {
     assert.ok(hit?.object === bowSilver && hit.point.clone().applyMatrix4(toLocal).x > face + .5,
       `the rolled sill covers the bow's corner stiffener at ${depth} m`);
   }
+  // The supports start inside the lower bulkhead and meet both surveyed track beds.
+  const environmentBytes = Uint8Array.from(readFileSync(new URL(
+    '../asset/models/odaiba-masterplan/odaiba_district_v01_environment.glb', import.meta.url)));
+  const { scene: environment } = await loader.parseAsync(environmentBytes.buffer, '');
+  environment.updateMatrixWorld(true);
+  const guidewayMesh = environment.getObjectByName('YURIKAMOME_GUIDEWAY');
+  assert.ok(guidewayMesh instanceof Mesh);
+  const hullPoint = (u: number, y: number, d: number) => new Vector3(u, y, d).applyAxisAngle(up, HULL.yaw).add(origin);
+  for (const depth of [9.75, 18.05]) for (const [u, y] of [[89.75, 24.655], [86.9, 23.815]]) {
+    const [light] = new Raycaster(oblique, hullPoint(u, y, depth).sub(oblique).normalize())
+      .intersectObjects(structureBatches, false);
+    assert.equal(light?.object, guides[0], 'the original oblique camera sees both recessed soffit guides');
+  }
+  for (const [rootDepth, bearingDepth] of [[9.4, 7.8], [16, 13.9]]) {
+    const [heel] = new Raycaster(hullPoint(92.2, 10, rootDepth), up.clone().negate(), 0, 4)
+      .intersectObject(bowSilver);
+    assert.ok(heel && heel.point.y < bottom, 'the shoe extends into the bulkhead below the aperture');
+    const down = new Raycaster(hullPoint(101.9, 14.3, bearingDepth), up.clone().negate(), 0, .3);
+    const [trackBed] = down.intersectObject(guidewayMesh);
+    const [seat] = down.intersectObject(bowSilver);
+    assert.ok(trackBed && seat && trackBed.point.y - seat.point.y > 0 && trackBed.point.y - seat.point.y < .03,
+      'the bearing seats immediately beneath the original guideway bed');
+  }
+
   updateMegastructures(0);
   const dayGuide = guides[0].material.emissiveIntensity;
+  const dayLiner = portalLiner.material.emissiveIntensity;
   updateMegastructures(1);
   assert.ok(guides[0].material.emissiveIntensity > dayGuide && guides[0].material.emissiveIntensity < 1);
+  assert.ok(portalLiner.material.emissiveIntensity > dayLiner && portalLiner.material.emissiveIntensity < .4);
   updateMegastructures(0);
 
   // Sample the live train placement against the aperture with all three production car variants.
@@ -348,6 +383,11 @@ for (const walk of plazaWalks) for (const [i, [x, y, z]] of walk.entries()) {
     });
   }
 
+  const bearingTop = Math.max(...['Bow_Bearing_Seaward', 'Bow_Bearing_Inland'].map(name =>
+    new Box3().setFromObject(bow.getObjectByName(name)!).max.y));
+  const lowestCarVertex = vertices.reduce((low, point) => Math.min(low, point.y), Infinity);
+  assert.ok(guideway[0][1] + lowestCarVertex > bearingTop,
+    'even the lowest vertex of the three production train cars clears both bearing seats');
   const rolled = new Vector3();
   const minGaps: number[] = [], mouthGaps: number[] = [];
   for (const track of routes().tracks) {
@@ -371,6 +411,8 @@ for (const walk of plazaWalks) for (const [i, [x, y, z]] of walk.entries()) {
     minGaps.push(gap);
     mouthGaps.push(mouthGap);
   }
+  assert.deepEqual(minGaps.map(gap => gap.toFixed(2)), ['1.84', '3.12']);
+  assert.deepEqual(mouthGaps.map(gap => gap.toFixed(2)), ['1.84', '3.75']);
   console.log(`hull bow portal ok (approach clearance: ${minGaps.map(gap => gap.toFixed(2)).join(' / ')} m; `
     + `R7 mouth clearance: ${mouthGaps.map(gap => gap.toFixed(2)).join(' / ')} m)`);
 }
