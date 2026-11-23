@@ -13,9 +13,8 @@ export type Spot={at:T.Vector3;yaw:number;mode:'talk'|'desk'|'audience';crowd:Cr
 /** One person, or an abreast pair `pair` m either side of the line, strolling end to end along `curve` and back, resting `rest` s at
  * each end facing `view` (yaw; a pair faces each other) before turning back. */
 export type Walk={curve:T.Curve<T.Vector3>;crowd:Crowd;pair?:number;view?:number;rest?:readonly [number,number]};
-/** Riders standing on an escalator from `from` to `to`, `gap` m apart in two staggered files, at `speed` m/s; hidden while their feet are
- * within a `through` height band (where the escalator runs through solid structure). */
-export type Ride={from:T.Vector3;to:T.Vector3;gap:number;speed:number;through?:readonly (readonly [number,number])[]};
+/** An escalator route includes the flat connections where riders walk between flights and out onto the promenade. */
+export type Ride={path:T.CurvePath<T.Vector3>;gap:number;speed:number};
 export const TALK=1.9;
 
 const spots:Spot[]=[],walks:(Walk&{length:number})[]=[],rides:Ride[]=[];
@@ -33,16 +32,14 @@ export function strollPose(time:number,index:number,length:number,rest:readonly 
   const s=((time+hash(index,42)*cycle)%cycle+cycle)%cycle,back=s>=walk+pause,t=back?s-walk-pause:s,d=t<walk?t*speed:length;
   return {d:back?length-d:d,forward:!back,resting:t<walk?-1:t-walk,pause,speed};
 }
-/** How much of a rider `d` metres up an escalator `length` m long is shown: fading over the .6 m at each landing and each `through` band. */
-export function rideShown(ride:Ride,length:number,d:number) {
-  const rise=(ride.to.y-ride.from.y)/length,y=ride.from.y+d*rise;
-  return (ride.through??[]).reduce((v,[lo,hi])=>v*T.MathUtils.clamp(Math.max(lo-y,y-hi)/(.6*rise),0,1),
-    d<length?T.MathUtils.clamp(d/.6,0,1)*T.MathUtils.clamp((length-d)/.6,0,1):0);
+/** Fade over the first and last .6 m of the complete route. */
+export function rideShown(length:number,d:number) {
+  return d<length?T.MathUtils.clamp(d/.6,0,1)*T.MathUtils.clamp((length-d)/.6,0,1):0;
 }
 /** Riders on an escalator `length` m long: `d` metres up for rider `k` of `riders`, and how much of them is shown. */
 export function ridePose(time:number,ride:Ride,length:number,k:number) {
   const n=Math.ceil(length/ride.gap),loop=n*ride.gap,d=((time*ride.speed+k*ride.gap)%loop+loop)%loop;
-  return {d,visible:rideShown(ride,length,d),riders:n};
+  return {d,visible:rideShown(length,d),riders:n};
 }
 /** Conversations: greedy groups of up to three `talk` spots within TALK m at one level, seated with seated. */
 export function talkGroups(list:readonly Spot[]) {
@@ -113,12 +110,12 @@ export function publishRoofWalks(model:T.Object3D,clusters:readonly (readonly [n
 
 /** The occupant fleet; `update` once a frame, after `mobility` (which sets the shared collar light). */
 export function occupantFleet(scene:T.Object3D) {
-  const pose=new T.Object3D(),p=new T.Vector3(),t=new T.Vector3(),side=new T.Vector3();
+  const pose=new T.Object3D(),p=new T.Vector3(),t=new T.Vector3(),side=new T.Vector3(),ahead=new T.Vector3();
   let built=-1,people:ReturnType<typeof pedestrians>|null=null,facing=new Float32Array(0),groupOf=new Int32Array(0),groups:number[][]=[];
   let level=new Float32Array(0),walkBase=0,rideBase=0,lastTime=NaN,rideLengths:number[]=[];
   const build=()=>{
     if(people){scene.remove(...people.meshes);people.meshes.forEach(m=>{m.geometry.dispose();(m.material as T.Material).dispose();m.dispose();});}
-    rideLengths=rides.map(r=>r.from.distanceTo(r.to));
+    rideLengths=rides.map(r=>r.path.getLength());
     walkBase=spots.length;rideBase=walkBase+walks.reduce((n,w)=>n+(w.pair?2:1),0);
     const total=rideBase+rides.reduce((n,r,i)=>n+ridePose(0,r,rideLengths[i],0).riders,0);
     people=total?pedestrians(scene,total,'building-occupants'):null;
@@ -176,11 +173,17 @@ export function occupantFleet(scene:T.Object3D) {
       });
     });
     rides.forEach((r,i)=>{
-      t.subVectors(r.to,r.from).normalize();side.set(-t.z,0,t.x).normalize();
-      for(let k=0;k<ridePose(0,r,rideLengths[i],0).riders;k++,slot++){
-        const q=ridePose(time,r,rideLengths[i],k);
-        pose.position.copy(r.from).addScaledVector(t,q.d).addScaledVector(side,(k%2-.5)*.5);pose.rotation.set(0,Math.atan2(t.x,t.z),0);
-        pose.scale.setScalar(size(slot,'public',q.visible));people!.set(slot,pose);people!.gait(slot,0,0);people!.social(slot,.4*Math.sin(time*.2+k*2.7),0);
+      const length=rideLengths[i];
+      for(let k=0;k<ridePose(0,r,length,0).riders;k++,slot++){
+        const q=ridePose(time,r,length,k), u=Math.min(1,q.d/length);
+        r.path.getPoint(u,p);
+        r.path.getPoint(Math.min(1,u+.45/length),ahead);
+        r.path.getPoint(Math.max(0,u-.45/length),t);
+        t.subVectors(ahead,t).normalize();
+        side.set(-t.z,0,t.x).normalize();
+        pose.position.copy(p).addScaledVector(side,(k%2-.5)*.5);pose.rotation.set(0,Math.atan2(t.x,t.z),0);
+        pose.scale.setScalar(size(slot,'public',q.visible));people!.set(slot,pose);
+        people!.gait(slot,q.d*5.5+slot,Math.abs(t.y)<.03?.34:0);people!.social(slot,.4*Math.sin(time*.2+k*2.7),0);
       }
     });
     people.flush();

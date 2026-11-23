@@ -333,7 +333,7 @@ function arch(batch: Batch, tops: [number, number][]) {
   for (let j = 1; j < 16; j++) { const t = j / 16; put(batch, megaJoint, sweep(t - .0013, t + .0013, 1, () => ({ hw: width(t) / 2 + .15, hh: width(t) * .3125 + .15, k: 4 }))); }
   // Foot collars with an emitter seam.
   for (const f of [f1, f2]) {
-    put(batch, megaShell, new T.CylinderGeometry(11.5, 12.5, 4, 32), mat({ x: f.x, y: 2, z: f.z }));
+    put(batch, megaShell, new T.CylinderGeometry(11.5, ARCH.footRadius, 4, 32), mat({ x: f.x, y: 2, z: f.z }));
     put(batch, megaSeam, new T.CylinderGeometry(11.7, 11.7, .7, 32), mat({ x: f.x, y: 4.2, z: f.z }));
   }
   tops.push([point(.5).x, point(.5).z]);

@@ -8,7 +8,7 @@ import { leaf, trim } from './cityRig.ts';
 import { glowTexture } from './glowTexture.ts';
 import { hash, plantCanopy } from './coastalCanopy.ts';
 import { routes, waterways } from './mobility.ts';
-import { BOULEVARD, changeSites, civicAt, DRAWER_HOUSING, EVENT_SHELF_FRONTAGE, POD_TOWER, STREET_KIT, WATER } from './layout.ts';
+import { BOULEVARD, changeSites, CIVIC, civicAt, DRAWER_HOUSING, EVENT_SHELF_FRONTAGE, POD_TOWER, STREET_KIT, WATER } from './layout.ts';
 import { HULL, RING } from './megaFootprints.ts';
 
 /** Large pale ceramic panels: a 256 px tile with fine seams on two edges, repeated per panel in metres through the strip's uv. */
@@ -398,7 +398,7 @@ function podTowerAccess(avenue: Curve, environment: T.Object3D) {
  * Ring: an apron on the plinth's west and plaza sides (the avenue passes its east corner, a Meter pavilion bay its plaza corner). Hull: a forecourt over the old self-assembling
  * building's ground in front of the shopfront storey, joined to ①'s footway. Planters break up the hull's floor. */
 export const FORECOURTS = {
-  civic: { r: 80, door: 1.95, half: 5, reach: 107.3 },
+  civic: { r: 80, door: CIVIC.door, half: 5, reach: 107.3 },
   // Ring-local [x0, x1, z0, z1] strips outside the plinth (x ±30, z ±25): west, and the plaza side short of the staffed-pavilion bay that stands
   // across the plinth's +x/+z corner (automationBays index 4, its west edge at x ≈ 3 here). The −z side stays lawn: DECKS' forecourt walks use it.
   // No planters here: the membrane housing site (45, −215) stands on the paving's west corner.
@@ -408,7 +408,7 @@ export const FORECOURTS = {
   hull: { u: 50, d: [-46, -3], kerb: 12.5 },
 } as const;
 function landmarkForecourts(avenue: Curve, environment: T.Object3D) {
-  const y = .2, tile: [number, number] = [2.4, 2.4], paving: T.BufferGeometry[] = [], beds: ReturnType<typeof planter>[] = [];
+  const y = CIVIC.foyerPavingY, tile: [number, number] = [2.4, 2.4], paving: T.BufferGeometry[] = [], beds: ReturnType<typeof planter>[] = [];
   const line = (a: T.Vector3, b: T.Vector3) => new T.LineCurve3(a, b);
   // The surveyed lawn rises up to ~1 m round the ring and hull, so their pads follow it: a 3 m grid, each vertex `y` over the landscape below.
   const lawn: T.Object3D[] = [], ray = new T.Raycaster(), down = new T.Vector3(0, -1, 0);
@@ -435,6 +435,19 @@ function landmarkForecourts(avenue: Curve, environment: T.Object3D) {
   const disc = new T.ShapeGeometry(shape, 1).rotateX(-Math.PI / 2).translate(C[0], y, C[2]), uv = disc.attributes.uv, pos = disc.attributes.position;
   for (let i = 0; i < uv.count; i++) uv.setXY(i, pos.getX(i) / tile[0], pos.getZ(i) / tile[1]);
   paving.push(disc);
+  // Flush inlays leave the promenade clear and carry the avenue's light to the foot of the foyer steps.
+  const guideAt = (radius: number, across: number) => {
+    const [x, z] = at(radius, across);
+    return new T.Vector3(C[0] + x, y + .009, C[2] - z);
+  };
+  const guide = (r0: number, t0: number, r1: number, t1: number, width: number) => {
+    const c = line(guideAt(r0, t0), guideAt(r1, t1));
+    return band(c, 0, c.getLength(), -width / 2, width / 2, 0);
+  };
+  const foot = CIVIC.stepEdge * CIVIC.k + .16;
+  const guides = [-2.4, 2.4].map(t => guide(reach - .65, t, foot, t, .24));
+  for (const radius of [97, 88, 77]) for (const side of [-1, 1])
+    guides.push(guide(radius + 1.65, side * 1.3, radius, 0, .29));
   // Ring: its local x runs (cos yaw, −sin yaw), z (sin yaw, cos yaw).
   const ring = (lx: number, lz: number) => new T.Vector3(RING.x + lx * Math.cos(RING.yaw) + lz * Math.sin(RING.yaw), 0, RING.z - lx * Math.sin(RING.yaw) + lz * Math.cos(RING.yaw));
   for (const [x0, x1, z0, z1] of FORECOURTS.ring) paving.push(pad((a, b) => ring(x0 + (x1 - x0) * a, z0 + (z1 - z0) * b), x1 - x0, z1 - z0));
@@ -451,6 +464,7 @@ function landmarkForecourts(avenue: Curve, environment: T.Object3D) {
   const root = new T.Group(); root.name = 'landmark-forecourts';
   root.add(mesh(beds.map(b => b.wall), trim, 'landmark-forecourt-planters'), mesh(beds.map(b => b.soil), leaf, 'landmark-forecourt-beds'));
   plantBeds(root, beds.map(b => b.bed));
+  root.add(mesh(guides, seamLight, 'fuji-forecourt-guides', false));
   return root;
 }
 

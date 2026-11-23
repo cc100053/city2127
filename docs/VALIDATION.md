@@ -95,6 +95,22 @@ use explicit `nw:-12/0/12` for 0/3/6 automated ports (band shorthand `low/high` 
 
 ## Performance evidence
 
+富士大樓幕牆 R1（owner 已選定，`19432b63`）：Blender QA 無錯誤，GLB 重匯入 39,924 面，Three.js 整棟 2,184,776 → 931,724 面、10 材質批次。根 `npm test`、`npm run build`、`git diff --check` 通過。開發 Mac／Chrome 157 headless／1920×1080 DPR 1，固定 `reviewTime=20`，日夜主鏡及近鏡各一，GLB 200、零頁面錯誤；模擬 GLB 404 回退可見。主鏡 6 秒短測日 53.8 → 58.8 FPS、夜 56.2 → 58.9 FPS，展覽機與長跑未量。[實測交接](handoffs/fuji-civic-facade.md)。
+
+富士大樓 R3 導光候選（2026-11-22）：[Odaiba 射線測試](../tests/odaiba.test.ts) 驗證前庭導線貼住鋪面、梯級與公共平台燈條有原表面承托及頭部淨空；同時沿用住民及泊位航線淨空測試。Chrome headless 3200×1800 固定 12:00／21:00、DPR 1、`reviewTime=20`，同鏡比較 R1／R3 的前庭及主鏡，另看入口近鏡。根目錄測試、build 與差異檢查通過。Apple M6／Chrome 157 headless 1920×1080 主鏡短測，日 59.3 → 59.0 FPS、夜 59.5 → 59.2 FPS，一般幀日夜各增加 2 次 draw call；展覽機待測。[夜景對照](../artifacts/fuji-civic-facade/r3/night-comparison.jpg) · [實測交接](handoffs/fuji-civic-facade.md#r3-夜間導光候選)。
+
+富士大樓 R4 公共接駁候選（2026-11-22，`83dffbfa`）。[Odaiba 射線測試](../tests/odaiba.test.ts) 檢查細級梯、開口、大堂步廊、低位轉乘與扶梯踏面的連續承托及頭部淨空，亦檢查拱腳、高架支柱和鄰近建築。根目錄測試、build 與差異檢查通過。Chrome headless 3200×1800／DPR 1 同鏡日夜、R3 對照及夜間主鏡四張均零頁面錯誤。大樓增 7,672 個三角面，維持 10 個材質批次。展覽機未測。[日景](../artifacts/fuji-civic-facade/r4/south-day.jpg) · [夜景](../artifacts/fuji-civic-facade/r4/south-night.jpg) · [交接](handoffs/fuji-civic-facade.md#r4-公共接駁體塊候選)
+
+富士大樓 R5 上層扶梯候選（2026-11-22，`e63c3433`）。[Odaiba 射線測試](../tests/odaiba.test.ts) 從末段進場到上層步道，以三條探線核對連續踏面與 2.3 m 頭頂空間，另用雙向射線檢查薄欄板及開口。沿保留基座周邊抽樣至基座最外半徑外 1.05 m，核對富士地台退讓，並重跑 R4 入口梯、步廊、低位接駁與泊位測試。根目錄測試、build 與差異檢查通過。Mac Chrome headless 3200×1800／DPR 1 擷取五張圖，零頁面錯誤。展覽機未測。[扶梯頂日景](../artifacts/fuji-civic-facade/r5/upper-day.jpg) · [拱腳近鏡](../artifacts/fuji-civic-facade/r5/arch-foot-day.jpg) · [驗證交接](handoffs/fuji-civic-facade.md#r5-上層扶梯出口與拱腳收邊)
+
+富士大樓 R6 導向候選（2026-11-22，`2e7da194`）。[Odaiba 射線測試](../tests/odaiba.test.ts) 驗證兩種幕牆嘅導線沿原踏面、開口和步道入口貼地，沿用 R5 扶梯、拱腳及泊位淨空檢查。根目錄測試、build 和差異檢查通過。開發 Mac Chrome headless 同鏡日夜 3200×1800，另錄 1440×810 日夜行人視角。[日景對照](../artifacts/fuji-civic-facade/r6/comparison-day.jpg) · [夜景對照](../artifacts/fuji-civic-facade/r6/comparison-night.jpg) · [R6 交接](handoffs/fuji-civic-facade.md#r6-轉乘台與上層出口導向)
+
+富士大樓 R7 外牆樣板（2026-11-22，`c9792c7b`）。Blender Game QA 無幾何錯誤，GLB 重匯入 39,428 面、五個材質角色。[Odaiba 幾何回歸](../tests/odaiba.test.ts) 驗證兩組窗嘅外框、退入玻璃、轉角接縫同整棟包圍盒。根測試、build 同差異檢查通過。開發 Mac Chrome headless 3200×1800／DPR 1 同鏡日夜及城市主鏡共四張零頁面錯誤，真 GLB 200 同模擬 404 回退通過。展覽機及 owner 樣板驗收待做。[日景](../artifacts/fuji-civic-facade/r7/comparison-day.jpg) · [夜景](../artifacts/fuji-civic-facade/r7/comparison-night.jpg) · [R7 交接](handoffs/fuji-civic-facade.md#r7-兩翼外牆樣板)。
+
+富士大樓 R8 外牆樣板（2026-11-22，`352f07fe`）。Blender Game QA 通過，五種材質及 39,428 個三角面。[Odaiba 幾何回歸](../tests/odaiba.test.ts) 射線核對斜肋折面、轉角窗台斜接、側邊收分、兩面玻璃及原路徑淨空。根目錄測試、build 和差異檢查通過。開發 Mac Chrome headless 3200×1800／DPR 1 同鏡日夜及城市主鏡四張零頁面錯誤。Owner 已接受外牆樣板，展覽機待測。[近鏡日景](../artifacts/fuji-civic-facade/r8/comparison-day.jpg) · [近鏡夜景](../artifacts/fuji-civic-facade/r8/comparison-night.jpg) · [R8 交接](handoffs/fuji-civic-facade.md#r8-轉角陶板折面)。
+
+富士大樓 R9 窗套導光（2026-11-23，`3bf3a92e`）。Blender Game QA 核對夾層承托，重匯入 39,512 個三角面、六種材質。[Odaiba 幾何回歸](../tests/odaiba.test.ts) 覆核光線 UV 斜接、燈粒間隙、材質合批、原玻璃及通行淨空。根目錄測試、build、差異檢查通過。開發 Mac Chrome headless 3200×1800／DPR 1 同鏡日夜近鏡及主鏡四張零頁面錯誤。展覽機待測。[近鏡夜景對照](../artifacts/fuji-civic-facade/r9/comparison-night.jpg) · [主鏡夜景對照](../artifacts/fuji-civic-facade/r9/hero-comparison-night.jpg) · [R9 交接](handoffs/fuji-civic-facade.md#r9-窗套導光)。
+
 Measure current Odaiba on the stated real GPU, ideally the exhibition machine at 1920×1080. State pixel ratio, actual viewport, camera/hour/mode, frame sampling interval, draw calls/triangles and console/network results. Mesh counts, source file size, headless/software FPS and old Shibuya 60 FPS are not equivalent to a current measurement. Do not claim Windows or another workstation was tested from Mac evidence.
 
 Opening origin card (2026-10-19, `feat/intro-origin-card` from `5e2fc3a`): ambient resident cards now open with `intro.origin` 「街は、誰が決めるのか。」 before `intro.identity`; READMEs gain an about-the-work section. Root `npm test`/`npm run build`, `git diff --check` PASS; scratch-DB headless Google Chrome 1280×720 `?survey=…&hour=16`: rotation origin → identity → lineage → participation → four facility cards → origin at 12 s each, both sentences fit the card ([screenshot](../artifacts/intro-origin/intro-origin.png), second cycle). The first card is in the DOM at ~8 s but is not painted while the scene is still loading (pre-existing, also true of identity before). Physical display NOT RUN; [handoff](handoffs/archive/intro-origin-card.md).

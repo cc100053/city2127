@@ -28,6 +28,7 @@
 | [近鏡後續／能源講解](closeup-next.md) | F1/F2、C1 INTEGRATED（C1 owner批准，24組兩秒辨認未做）；N1 能源講解 INTEGRATED（13s／日文），F3等硬件（2026-10-29） | cc100053 |
 | [清除斷頭路與舊地台](road-fix.md) | IN_PROGRESS（2026-11-20）；A1/B1-a/C1 及地台清單已實作，本機測試通過，待 owner 目視及 PR | cc100053 |
 | [主樓正門、環形底座、船身前庭](entrance-polish.md) | DONE（2026-11-21，PR #9）；前庭、天橋落點、底座大堂、船身商店層、環形隧道門，玻璃盒移除 | cc100053 |
+| [富士大樓打磨](fuji-civic-facade.md) | R1 外觀已獲選，R8 闊翼陶板轉角樣板已接受，R9 窗套導光候選待驗收 | Codex |
 | [直立環形巨構 GLB 試作](ring-glb-pilot.md) | R6 下環接駁及斜坡植栽整合 main，展覽機待測 | Codex |
 | [階梯巨構立面](hull-facade.md#r12--blender-船首洞口) | R12 Blender 船首洞口，待業主目視驗收及展覽機驗證 | cc100053 |
 | [Road audit](road-audit.md) | IN_PROGRESS（2026-11-04）；修路已 merge main，owner 目視驗收同餘下決定未做 | cc100053 |
