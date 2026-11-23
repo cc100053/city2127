@@ -15,8 +15,17 @@ import { plazaDeck } from '../src/plazaDeck.ts';
 import odaibaLayout from '../src/odaiba-layout.json' with {type: 'json'};
 import { placeOdaibaModel } from '../src/odaibaPlacement.ts';
 
+const loader = new GLTFLoader();
+const bowBytes = Uint8Array.from(readFileSync(new URL('../asset/models/hull-bow-2127/hull-bow-2127.glb', import.meta.url)));
+const { scene: bow } = await loader.parseAsync(bowBytes.buffer, '');
+const bowRoles: string[] = [];
+bow.traverse(part => {
+  if (part instanceof Mesh && !Array.isArray(part.material)) bowRoles.push(part.material.name);
+});
+assert.deepEqual(bowRoles.sort(), ['bow_recess', 'bow_silver']);
+
 // P1: the three megastructures exist, reach their table heights (±25%) and stand clear of the Meter sites (+14 m) and the civic core.
-const group = megastructures(), box = new Box3(), parts = new Map<string, Box3>();
+const group = megastructures(undefined, bow), box = new Box3(), parts = new Map<string, Box3>();
 group.updateMatrixWorld(true);
 group.traverse(o => { if (o instanceof Mesh && !(o instanceof InstancedMesh)) { o.geometry.computeBoundingBox(); parts.set(`${o.material.color.getHexString()}${parts.size}`, box.copy(o.geometry.boundingBox!).clone()); } });
 const shell =[...parts.entries()].find(([k]) => k.startsWith('f3f2ec'))![1];
@@ -216,7 +225,6 @@ for (const walk of plazaWalks) for (const [i, [x, y, z]] of walk.entries()) {
   }
 }
 
-const loader = new GLTFLoader();
 // The seaward cut opens the side view while keeping the axial clearance and recess.
 {
   const { face, recess, centre, width, bottom, top } = HULL_BOW_PORTAL;
@@ -271,14 +279,14 @@ const loader = new GLTFLoader();
   }
   assert.equal(fromHero(80.04, 17, hullFront(1, 80) - .88)?.object, guides[0],
     'the light on the new seaward rim is visible from Hero');
-  for (const [y, outer, groove, inner] of [[13, 77.8, 79.1, 79.65], [19, 77.4, 78.7, 79.35], [22, 77.8, 79.6, 80.2]]) {
+  for (const [y, outer, groove, inner] of [[13, 77.8, 79.2, 79.8], [19, 77.4, 78.9, 79.55], [22, 77.8, 79.6, 80.4]]) {
     const depth = hullFront(y < 15 ? 0 : 1, 80) - 2;
     const a = fromHero(outer, y, depth), seam = fromHero(groove, y, depth), b = fromHero(inner, y, depth);
     assert.ok(a?.object === silver && seam?.object === rear.object && b?.object === silver,
       `Hero sees both silver rims and the shadow seam at ${y} m`);
     const seamDepth = seam.point.clone().applyMatrix4(toLocal).z;
-    assert.ok(seamDepth - a.point.clone().applyMatrix4(toLocal).z > .75);
-    assert.ok(seamDepth - b.point.clone().applyMatrix4(toLocal).z > .18);
+    assert.ok(seamDepth - a.point.clone().applyMatrix4(toLocal).z > .65, 'the softened outer bevel still shadows the gasket');
+    assert.ok(seamDepth - b.point.clone().applyMatrix4(toLocal).z > .16, 'the inner lip stays in front of the gasket');
   }
   for (const [depth, y] of [[8, 26.7], [11, 26.7], [14, 26.7], [17, 26], [20, 25.5], [23, 24.5], [25, 23.8]]) {
     ray.ray.origin.set(face + 4, y, depth).applyAxisAngle(up, HULL.yaw).add(origin);
@@ -302,6 +310,10 @@ const loader = new GLTFLoader();
     const [hit] = new Raycaster(from, inwards, 0, 8).intersectObjects(structureBatches, false);
     assert.ok(hit?.object === silver, `tier ${tier}: silver ribbon reaches the portal at ${u}, ${y}`);
   }
+  const ribbonOrigin = new Vector3(77, 3.4, hullFront(0, 77) - 8).applyAxisAngle(up, HULL.yaw).add(origin);
+  const [ribbon] = new Raycaster(ribbonOrigin, inwards, 0, 8).intersectObjects(structureBatches, false);
+  assert.ok(ribbon?.object === silver && ribbon.point.clone().applyMatrix4(toLocal).z < -3.30,
+    'the Blender return exposes a rolled surface in front of the original lobby sill');
   for (const depth of [-.7, 0, 1, 3, 5]) {
     ray.ray.origin.set(face + 4, 7, depth).applyAxisAngle(up, HULL.yaw).add(origin);
     const hit = ray.intersectObjects(structureBatches, false)[0];
