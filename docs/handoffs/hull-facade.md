@@ -189,3 +189,8 @@ R4 加闊兩道斜框上緣，讓銀色折面從下層框延至樓板邊，沿�
 - [黃昏及夜間入洞](../../artifacts/hull-facade/r9-bow.jpg) 沿用 R8 斜前方鏡位，在場景時間 66.20 秒核對頭車越過口面。[廣場及簷下入口](../../artifacts/hull-facade/r9-entry.jpg) 比對 R8 和 R9 在廣場日夜及夜間簷下的三個鏡位，入口門框、簷篷及暖光大堂皆通過回歸。最終八張 2400 × 1350／DPR 1 原圖及 sidecar 在 `~/city2127-evidence/hull-facade/r9/final/`，頁面例外為零。
 
 業主目視驗收及展覽機驗證待完成。
+
+### R9 整合
+
+- 工作分支 `b237ca14` 已推送。從最新 `origin/main`（`a142d27f`）在獨立工作樹整合為 `4ef277d40eae420bec04f5852ed867db5a084808`。
+- 整合版 root `npm test`、`npm run build`、差異空白、圖檔規格及九個新文件連結全部通過。整份 `dist/` 與 Chrome 驗證過的正式 build 逐檔一致。
