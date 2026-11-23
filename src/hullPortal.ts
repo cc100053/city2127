@@ -54,6 +54,16 @@ function cutVolume(bounds: T.Box3, extraSides: HalfSpace[] = []) {
 }
 
 const axialCut = cutVolume(opening);
+const innerEnd = recess - 9;
+export const HULL_BOW_GALLERY_END = 59;
+const innerCut = cutVolume(new T.Box3(
+  new T.Vector3(innerEnd, bottom - .65, centre - half + 1.65),
+  new T.Vector3(recess, top + 2.25, centre + half + 3),
+));
+const galleryCut = cutVolume(new T.Box3(
+  new T.Vector3(HULL_BOW_GALLERY_END, 13.35, 8.45),
+  new T.Vector3(innerEnd, 20.75, 26.4),
+));
 const flankCut = cutVolume(flankBounds, flank.slice(1).map((end, i) => {
   const start = flank[i], slope = (end.x - start.x) / (end.y - start.y);
   return p => p.x - start.x - (p.y - start.y) * slope;
@@ -63,6 +73,8 @@ const flankCut = cutVolume(flankBounds, flank.slice(1).map((end, i) => {
 export function cutHullBowOpening(geometry: T.BufferGeometry) {
   subtract(geometry, axialCut);
   subtract(geometry, flankCut);
+  subtract(geometry, innerCut);
+  subtract(geometry, galleryCut);
 }
 
 function subtract(geometry: T.BufferGeometry, { bounds, worldBounds, sides }: ReturnType<typeof cutVolume>) {
@@ -128,12 +140,13 @@ function subtract(geometry: T.BufferGeometry, { bounds, worldBounds, sides }: Re
 type Profile = {
   u: number; side: number; crown: number; sill: number; radius: number;
   fold?: { reach: number; inset: number };
+  offset?: number; dome?: number; seawardInset?: number;
 };
 
 const seawardShoulderDepth = -.55;
 const foldSlope = Math.tan(T.MathUtils.degToRad(35));
 
-function outline({ u, side, crown, sill, radius, fold }: Profile) {
+function outline({ u, side, crown, sill, radius, fold, offset = 0, dome = 0, seawardInset = 0 }: Profile) {
   const corners = [[1, 1], [-1, 1], [-1, -1], [1, -1]].map(([d, y], corner) =>
     Array.from({ length: 9 }, (_, step) => {
       const angle = (corner + step / 8) * Math.PI / 2;
@@ -155,9 +168,16 @@ function outline({ u, side, crown, sill, radius, fold }: Profile) {
         const plane = face - .06 + (point.z - seawardShoulderDepth) * foldSlope - fold.inset;
         point.x = T.MathUtils.lerp(u, plane, turn);
       }
+      point.y += vaultRise(point.z - centre, dome)
+        * T.MathUtils.smoothstep(point.y, top + crown - radius, top + crown);
+      point.z += offset + seawardInset * (1 - T.MathUtils.smoothstep(point.z, centre - half, centre + half));
       return point;
     });
   });
+}
+
+function vaultRise(across: number, dome: number) {
+  return dome * Math.max(0, 1 - (across / half) ** 2);
 }
 
 function loft(rows: T.Vector3[][]) {
@@ -192,7 +212,7 @@ function loft(rows: T.Vector3[][]) {
   return { geometry: geometry.applyMatrix4(root), indices };
 }
 
-type Finish = 'frame' | 'bow' | 'panel' | 'guide' | 'dark' | 'liner' | 'baffle';
+type Finish = 'frame' | 'bow' | 'panel' | 'guide' | 'dark' | 'liner' | 'cove';
 
 function buildBowFrame(surface: (finish: Finish, geometry: T.BufferGeometry) => void) {
   const stations = flank.flatMap(({ x, y }, i) => {
@@ -292,9 +312,17 @@ function liningStrip(edges: [T.Vector3, T.Vector3][]) {
 }
 
 function buildFlankLining(surface: (finish: Finish, geometry: T.BufferGeometry) => void) {
+  const soffitCut = cutVolume(new T.Box3(
+    new T.Vector3(recess, top, centre - 4),
+    new T.Vector3(face - .6, top + 1.7, centre + half),
+  ));
   const strip = (finish: Finish, edges: [T.Vector3, T.Vector3][]) => {
     const geometry = liningStrip(edges);
     subtract(geometry, axialCut);
+    if (finish === 'panel') {
+      subtract(geometry, innerCut);
+      subtract(geometry, soffitCut);
+    }
     surface(finish, geometry);
     geometry.dispose();
   };
@@ -335,6 +363,7 @@ function buildFlankLining(surface: (finish: Finish, geometry: T.BufferGeometry) 
   const shape = new T.ShapeGeometry(returnWall);
   const lining = shape.toNonIndexed().rotateY(Math.PI).translate(0, 0, flankDepth).applyMatrix4(root);
   subtract(lining, axialCut);
+  subtract(lining, innerCut);
   surface('dark', lining);
   lining.dispose();
   shape.dispose();
@@ -367,12 +396,15 @@ export function buildHullBowPortal(surface: (finish: Finish, geometry: T.BufferG
   const throat = { u: face + .13, side: .32, crown: .32, sill: .32, radius: .7, fold: { reach: .49, inset: .06 } };
   const guideTop = { u: face + .08, side: .40, crown: .40, sill: .40, radius: .80, fold: { reach: .38, inset: .08 } };
   const guideBottom = { u: face - .06, side: .14, crown: .14, sill: .14, radius: .39, fold: { reach: 0, inset: .08 } };
-  const liner = { u: face - 1.12, side: 0, crown: 0, sill: 0, radius: 0 };
-  const finishBand = (finish: Finish, profiles: Profile[]) => {
+  const finishBand = (finish: Finish, profiles: Profile[], clipFlank = true) => {
     const outlines = profiles.map(outline);
     const { geometry } = loft(outlines[0].map((_, i) => outlines.map(row => row[i])));
     const flat = geometry.toNonIndexed();
-    subtract(flat, flankCut);
+    if (clipFlank) subtract(flat, flankCut);
+    if (finish === 'liner') shadeInterior(flat, (u, y, d) =>
+      (.05 + .95 * T.MathUtils.smoothstep(u, innerEnd + 1, face - .78))
+      * (.66 + .34 * T.MathUtils.smoothstep(y, bottom, top))
+      * (.30 + .70 * T.MathUtils.smoothstep(d, centre - half, centre - 2)));
     surface(finish, flat);
     flat.dispose();
     geometry.dispose();
@@ -380,54 +412,140 @@ export function buildHullBowPortal(surface: (finish: Finish, geometry: T.BufferG
   finishBand('panel', [throat, guideTop]);
   finishBand('guide', [guideTop, guideBottom]);
 
-  // The rounded liner stays outside all four corners of the rectangular rail envelope.
-  // Let the backing sweep down to the baffle so the roof reads through the seaward cut.
+  // The 9.1 m section ends at an open throat. The inner gallery follows
+  // the tracks inland, so the seaward cheek folds behind the R9 flank cut.
   const cabin: Profile[] = [
-    { ...liner, u: face - .78, side: .32, crown: 2.25, sill: .32, radius: .72 },
-    { ...liner, u: face - 2.85, side: .22, crown: 1.73, sill: .22, radius: .55 },
-    { ...liner, u: face - 5.7, side: .10, crown: .89, sill: .10, radius: .30 },
-    { ...liner, u: recess, crown: .03 },
+    { u: face - .78, side: .42, crown: 1.67, sill: .40, radius: .85, dome: .60 },
+    { u: face - 2.85, side: .36, crown: 1.44, sill: .38, radius: .75, dome: .85 },
+    { u: face - 5.18, side: .35, crown: 1.12, sill: .36, radius: .68, dome: .86 },
+    { u: face - 5.45, side: .23, crown: .80, sill: .24, radius: .58, dome: .72 },
+    { u: face - 5.7, side: .30, crown: .96, sill: .32, radius: .62, dome: .86 },
+    { u: recess + .62, side: .25, crown: .72, sill: .27, radius: .60, dome: .70 },
+    { u: recess, side: .16, crown: .32, sill: .19, radius: .46, dome: .52 },
+    { u: recess - .56, side: .28, crown: .64, sill: .04, radius: .59, offset: .10, dome: .61, seawardInset: 1.45 },
+    { u: recess - 2.75, side: .28, crown: .26, sill: -.8, radius: .60, offset: .65, dome: .62, seawardInset: 2.65 },
+    { u: recess - 5.5, side: .22, crown: -1.25, sill: -1.85, radius: .56, offset: 1.75, dome: .59, seawardInset: 2.7 },
+    { u: innerEnd, side: .18, crown: -2.55, sill: -3, radius: .52, offset: 2.78, dome: .52, seawardInset: 2.45 },
   ];
   finishBand('frame', [guideBottom, cabin[0]]);
-  finishBand('liner', cabin);
+  const throatIndex = cabin.findIndex(profile => profile.u === recess);
+  finishBand('liner', cabin.slice(0, throatIndex + 1));
+  finishBand('liner', cabin.slice(throatIndex), false);
+  // A bevelled brow above the swept cars catches the last spill from the
+  // soffit coves and gives the open throat a visible roof edge.
+  const brow = Array.from({ length: 25 }, (_, i): [T.Vector3, T.Vector3, T.Vector3] => {
+    const across = 1 - i / 12;
+    const d = 14.65 + 8.14 * across;
+    const y = 19.55 + 2.55 * Math.cos(across * Math.PI / 2);
+    return [new T.Vector3(recess - 2.1, y + .47, d),
+      new T.Vector3(recess - 2.55, y, d),
+      new T.Vector3(recess - 3.45, y + .60, d)];
+  });
+  for (const edges of [brow.map(([a, b]): [T.Vector3, T.Vector3] => [a, b]),
+    brow.map(([, b, c]): [T.Vector3, T.Vector3] => [b, c])]) {
+    const lip = liningStrip(edges).applyMatrix4(root);
+    shadeInterior(lip, (u, _y, d) => (.13 + .48 * T.MathUtils.smoothstep(u, recess - 3.45, recess - 2.1))
+      * (.47 + .53 * T.MathUtils.smoothstep(d, 7, 14)));
+    surface('liner', lip);
+    lip.dispose();
+  }
+  buildRailGalleries(surface);
 
-  // Follow the soffit with a recessed light on either side of its centre.
-  for (const depth of [centre - 3, centre + 5.3]) {
-    const edges = cabin.map(({ u, crown }): [T.Vector3, T.Vector3] => [
-      new T.Vector3(u, top + Math.max(.027, crown - .075), depth - .12),
-      new T.Vector3(u, top + Math.max(.027, crown - .075), depth + .12),
-    ]);
+  // Each strip follows the curved soffit and tapers out past the throat.
+  for (const across of [-3, 5.3]) {
+    const edges = cabin.slice(0, -2).map(({ u, crown, offset = 0, dome = 0, seawardInset = 0 }): [T.Vector3, T.Vector3] => {
+      const span = .10 * T.MathUtils.smoothstep(u, recess - 3.2, face - 3);
+      const edge = (a: number) => new T.Vector3(
+        u, top + crown + vaultRise(a, dome) - .31,
+        centre + offset + a + seawardInset * (1 - T.MathUtils.smoothstep(a, -half, half)),
+      );
+      return [edge(across - span), edge(across + span)];
+    });
+    mountCove(edges, .96);
+  }
+
+  const wallCove = cabin.slice(0, throatIndex + 1).map(({ u, side }): [T.Vector3, T.Vector3] => {
+    const y = 19.7 - .10 * (face - u), d = centre + half + side - .055;
+    return [new T.Vector3(u, y + .08, d), new T.Vector3(u, y - .08, d)];
+  });
+  mountCove(wallCove, .49);
+
+  function mountCove(edges: [T.Vector3, T.Vector3][], brightness: number) {
     const cove = liningStrip(edges).applyMatrix4(root);
-    surface('guide', cove);
+    shadeInterior(cove, u => brightness * T.MathUtils.smoothstep(u, recess - 2.75, face - 2.1));
+    surface('cove', cove);
     cove.dispose();
   }
 
   buildFlankLining(surface);
   if (!model || !buildBlenderBowFrame(model, surface)) buildBowFrame(surface);
+}
 
-  // Hem the seaward edge behind the mask, clear of the swept flank and glazing.
-  const hem = Array.from({ length: 6 }, (_, i): [T.Vector3, T.Vector3] => {
-    const angle = i * Math.PI / 10;
-    const u = recess - .08 - 1.04 * (1 - Math.cos(angle));
-    const d = centre - half + .08 - .64 * Math.sin(angle);
-    return [new T.Vector3(u, top, d), new T.Vector3(u, bottom, d)];
-  });
-  const cheek = liningStrip(hem).applyMatrix4(root);
-  surface('liner', cheek);
-  cheek.dispose();
-
-  // The fixed mask stays at the original depth. Soft pools from the soffit
-  // leave a darker track zone without flattening the whole tunnel to black.
-  const shadow = new T.PlaneGeometry(width, height * 2, 20, 12);
-  const positions = shadow.getAttribute('position'), colors: number[] = [];
+function shadeInterior(geometry: T.BufferGeometry, brightness: (u: number, y: number, d: number) => number) {
+  const positions = geometry.getAttribute('position'), point = new T.Vector3(), colors: number[] = [];
   for (let i = 0; i < positions.count; i++) {
-    const topWash = T.MathUtils.smoothstep(positions.getY(i), 1.8, height) * .42;
-    const flankWash = T.MathUtils.smoothstep(Math.abs(positions.getX(i)), 3, half) * .16;
-    const wash = .49 + topWash + flankWash;
-    colors.push(wash, wash, wash);
+    point.fromBufferAttribute(positions, i).applyMatrix4(inverse);
+    const shade = brightness(point.x, point.y, point.z);
+    colors.push(shade, shade, shade);
   }
-  shadow.setAttribute('color', new T.Float32BufferAttribute(colors, 3));
-  shadow.rotateY(Math.PI / 2).translate(recess, mid, centre).applyMatrix4(root);
-  surface('baffle', shadow);
-  shadow.dispose();
+  geometry.setAttribute('color', new T.Float32BufferAttribute(colors, 3));
+}
+
+// The two surveyed paths turn inland at different rates. The deeper sleeves
+// are long enough for their sidewalls to screen the interior from the plaza.
+function buildRailGalleries(surface: (finish: Finish, geometry: T.BufferGeometry) => void) {
+  const low = 13.55, high = 19.85;
+  const galleries = [
+    { entrance: 11.86, exit: 13.94, halfWidth: 2.8 },
+    { entrance: 19.88, exit: 22.99, halfWidth: 2.9 },
+  ];
+  for (const { entrance, exit, halfWidth } of galleries) {
+    const sections = [[innerEnd, entrance], [HULL_BOW_GALLERY_END, exit]].map(([u, d]) => [
+      new T.Vector3(u, low, d - halfWidth), new T.Vector3(u, low, d + halfWidth),
+      new T.Vector3(u, high, d + halfWidth), new T.Vector3(u, high, d - halfWidth),
+    ]);
+    const { geometry } = loft(sections[0].map((_, i) => sections.map(section => section[i])));
+    // The loft's first side faces into the bore, as does each successive side.
+    shadeInterior(geometry, () => .026);
+    surface('liner', geometry);
+    geometry.dispose();
+  }
+
+  // A recessed web joins the vault to both sleeves and hides the adjacent rooms.
+  // Its two openings leave the full swept train volumes inside each bore.
+  const web = new T.Shape().moveTo(-8.4, 11.25).lineTo(-8.4, 21.5)
+    .lineTo(-26, 21.5).lineTo(-26, 11.25).closePath();
+  for (const { entrance, halfWidth } of galleries) {
+    const left = -entrance - halfWidth, right = -entrance + halfWidth;
+    web.holes.push(new T.Path().moveTo(left, low).lineTo(right, low)
+      .lineTo(right, high).lineTo(left, high).closePath());
+  }
+  const geometry = new T.ShapeGeometry(web).rotateY(Math.PI / 2)
+    .translate(innerEnd, 0, 0).applyMatrix4(root);
+  shadeInterior(geometry, () => .023);
+  surface('liner', geometry);
+  geometry.dispose();
+}
+
+/** Fade the surveyed rail surfaces and the 2127 light lines inside the bow. */
+export function shadeBowGuideway(material: T.Material) {
+  const compile = material.onBeforeCompile.bind(material), cache = material.customProgramCacheKey();
+  const cos = Math.cos(HULL.yaw), sin = Math.sin(HULL.yaw);
+  material.onBeforeCompile = (shader, renderer) => {
+    compile(shader, renderer);
+    shader.vertexShader = shader.vertexShader
+      .replace('#include <common>', '#include <common>\nvarying vec2 bowRail;')
+      .replace('#include <project_vertex>', `#include <project_vertex>
+        vec3 bowWorld = (modelMatrix * vec4(transformed, 1.)).xyz;
+        bowRail = vec2(dot(bowWorld.xz - vec2(${HULL.x}., ${HULL.z}.), vec2(${cos}, ${-sin})), bowWorld.y);`);
+    shader.fragmentShader = shader.fragmentShader
+      .replace('#include <common>', '#include <common>\nvarying vec2 bowRail;')
+      .replace('#include <opaque_fragment>', `
+        float bowShade = smoothstep(${HULL_BOW_GALLERY_END - 8}., ${innerEnd}, bowRail.x)
+          * (1. - smoothstep(${recess - 2}, ${face + 1.2}, bowRail.x))
+          * smoothstep(10.5, 13.25, bowRail.y);
+        outgoingLight *= mix(1., .016, bowShade);
+        #include <opaque_fragment>`);
+  };
+  material.customProgramCacheKey = () => cache + '|bow-rail-shade';
 }

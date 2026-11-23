@@ -7,7 +7,7 @@ import { ConcentrationDistrict } from '../src/districtMeters.ts';
 import { changeSites, guideway, PLAZA, plazaAt, plazaWalks } from '../src/layout.ts';
 import { HERO_SETTLED_POSITION } from '../src/heroCamera.ts';
 import { hullFront, hullTiers } from '../src/hullFacade.ts';
-import { HULL_BOW_PORTAL } from '../src/hullPortal.ts';
+import { HULL_BOW_GALLERY_END, HULL_BOW_PORTAL } from '../src/hullPortal.ts';
 import { ARCH, FOOTPRINTS, groundContacts, HULL, inMega, inRect, megastructures, RING, RING_GATE, updateMegastructures } from '../src/megastructures.ts';
 import { routes, TRAIN_SPEED, trainPose } from '../src/mobility.ts';
 import { occupants, strollPose } from '../src/occupants.ts';
@@ -241,55 +241,64 @@ for (const walk of plazaWalks) for (const [i, [x, y, z]] of walk.entries()) {
   const southEdge = centre - width / 2, northEdge = centre + width / 2;
   const envelope = new Box3(new Vector3(recess + .025, bottom + .025, southEdge + .025),
     new Vector3(face + 5, top - .025, northEdge - .025));
+  assert.ok(Math.abs(face - recess - 9.1) < 1e-9);
   const triangle = new Triangle(), instance = new Matrix4();
-  group.traverse(part => {
-    if (!(part instanceof Mesh)) return;
-    const { geometry } = part, position = geometry.getAttribute('position'), index = geometry.getIndex();
-    geometry.computeBoundingBox();
-    const bounds = geometry.boundingBox;
-    assert.ok(bounds);
-    for (let i = 0; i < (part instanceof InstancedMesh ? part.count : 1); i++) {
-      if (part instanceof InstancedMesh) part.getMatrixAt(i, instance);
-      else instance.identity();
-      instance.premultiply(part.matrixWorld).premultiply(toLocal);
-      if (!bounds.clone().applyMatrix4(instance).intersectsBox(envelope)) continue;
-      for (let j = 0; j < (index?.count ?? position.count); j += 3) {
-        [triangle.a, triangle.b, triangle.c].forEach((p, k) =>
-          p.fromBufferAttribute(position, index?.getX(j + k) ?? j + k).applyMatrix4(instance));
-        assert.ok(!envelope.intersectsTriangle(triangle), `${part.name} obstructs the bow portal`);
+  function assertClear(boxes: Box3[], label: string) {
+    const bounds = boxes.reduce((region, box) => region.union(box), new Box3());
+    group.traverse(part => {
+      if (!(part instanceof Mesh)) return;
+      const { geometry } = part, position = geometry.getAttribute('position'), index = geometry.getIndex();
+      geometry.computeBoundingBox();
+      assert.ok(geometry.boundingBox);
+      for (let i = 0; i < (part instanceof InstancedMesh ? part.count : 1); i++) {
+        if (part instanceof InstancedMesh) part.getMatrixAt(i, instance);
+        else instance.identity();
+        instance.premultiply(part.matrixWorld).premultiply(toLocal);
+        if (!geometry.boundingBox.clone().applyMatrix4(instance).intersectsBox(bounds)) continue;
+        for (let j = 0; j < (index?.count ?? position.count); j += 3) {
+          [triangle.a, triangle.b, triangle.c].forEach((p, k) =>
+            p.fromBufferAttribute(position, index?.getX(j + k) ?? j + k).applyMatrix4(instance));
+          for (const box of boxes) {
+            if (!box.intersectsTriangle(triangle)) continue;
+            assert.fail(`${label} at ${box.min.x.toFixed(2)} m intersects ${part.name}`);
+          }
+        }
       }
-    }
-  });
+    });
+  }
+  assertClear([envelope], 'The 18 × 14 m bow envelope');
   const ray = new Raycaster(new Vector3(face + 4, 19, centre).applyAxisAngle(up, HULL.yaw).add(origin),
     new Vector3(-1, 0, 0).applyAxisAngle(up, HULL.yaw));
   const portalLiner = structureBatches.find(part => part.material.name === 'hull-portal-liner');
-  const baffle = structureBatches.find(part => part.material.name === 'hull-portal-baffle');
-  assert.ok(portalLiner && baffle);
-  const [rear] = ray.intersectObjects(structureBatches, false);
-  assert.ok(rear?.object === baffle && Math.abs(rear.distance - (face + 4 - recess)) < .02, 'the visible back sits behind the bulkhead');
+  const portalCove = structureBatches.find(part => part.material.name === 'hull-portal-cove');
+  assert.ok(portalLiner && portalCove);
+  assert.ok(!structureBatches.some(part => part.material.name === 'hull-portal-baffle'));
+  assert.ok(ray.intersectObjects(structureBatches, false).every(hit => hit.distance > face + 4 - recess + 5),
+    'the 9.1 m throat is open to the continuation');
   const guides = structureBatches.filter(part => part.material instanceof MeshStandardMaterial &&
     part.material.name === 'hull-portal-guide');
   assert.equal(guides.length, 1, 'the recessed guide runs in one batch');
   ray.ray.origin.set(face + 4, 16, northEdge + .25).applyAxisAngle(up, HULL.yaw).add(origin);
-  assert.equal(ray.intersectObjects(structureBatches, false)[0]?.object, guides[0], 'the inland jamb keeps its guide');
+  assert.ok(ray.intersectObjects(structureBatches, false)[0]?.object === guides[0], 'the inland jamb keeps its guide');
 
   const hero = new Vector3(...HERO_SETTLED_POSITION);
   const fromHero = (u: number, y: number, d: number) => {
     const point = new Vector3(u, y, d).applyAxisAngle(up, HULL.yaw).add(origin);
     return new Raycaster(hero, point.sub(hero).normalize()).intersectObjects(structureBatches, false)[0];
   };
-  const darkReturn = fromHero(82.4, 14, northEdge)?.object;
-  assert.ok(darkReturn instanceof Mesh && darkReturn !== baffle && darkReturn.material.color.getHexString() === '141b20');
+  const darkReturn = structureBatches.find(part => part.material.color.getHexString() === '141b20');
+  assert.ok(darkReturn);
   for (const y of [10.7, 14, 17.5, 19.6]) {
     for (const u of [84.5, 87]) {
       const hit = fromHero(u, y, northEdge);
-      assert.equal(hit?.object, portalLiner, 'Hero looks through the cut across the rail cavity to the inland liner');
-      assert.ok(Math.abs(hit.point.clone().applyMatrix4(toLocal).z - northEdge) < .22);
+      assert.ok(hit?.object === portalLiner, 'Hero looks through the cut across the rail cavity to the inland liner');
+      assert.ok(Math.abs(hit.point.clone().applyMatrix4(toLocal).z - northEdge) < .35);
     }
-    assert.equal(fromHero(82.4, y, northEdge)?.object, darkReturn,
-      'Hero sees the dark return where the flank meets the original recess');
+    const deep = fromHero(82.4, y, northEdge);
+    assert.ok(deep?.object === portalLiner, 'Hero sees the deeper liner through the seaward cut');
+    assert.ok(deep.point.clone().applyMatrix4(toLocal).x < recess);
   }
-  assert.equal(fromHero(80.04, 17, hullFront(1, 80) - .88)?.object, guides[0],
+  assert.ok(fromHero(80.04, 17, hullFront(1, 80) - .88)?.object === guides[0],
     'the light on the new seaward rim is visible from Hero');
   for (const [y, outer, groove, inner] of [[13, 77.8, 79.2, 79.8], [19, 77.4, 78.9, 79.55], [22, 77.8, 79.6, 80.4]]) {
     const depth = hullFront(y < 15 ? 0 : 1, 80) - 2;
@@ -340,10 +349,22 @@ for (const walk of plazaWalks) for (const [i, [x, y, z]] of walk.entries()) {
   const guidewayMesh = environment.getObjectByName('YURIKAMOME_GUIDEWAY');
   assert.ok(guidewayMesh instanceof Mesh);
   const hullPoint = (u: number, y: number, d: number) => new Vector3(u, y, d).applyAxisAngle(up, HULL.yaw).add(origin);
-  for (const depth of [9.75, 18.05]) for (const [u, y] of [[89.75, 24.655], [86.9, 23.815]]) {
-    const [light] = new Raycaster(oblique, hullPoint(u, y, depth).sub(oblique).normalize())
-      .intersectObjects(structureBatches, false);
-    assert.equal(light?.object, guides[0], 'the original oblique camera sees both recessed soffit guides');
+  // The oblique view reaches three surfaces at increasing axial depths.
+  const insideFromOblique = (u: number, y: number, d: number) =>
+    new Raycaster(oblique, hullPoint(u, y, d).sub(oblique).normalize()).intersectObjects(structureBatches, false)[0];
+  for (const [u, y, d, near, far] of [
+    [83.50, 20.31, 4.05, recess - .8, recess],
+    [83.50, 17.39, 11.23, 73.9, 75.0],
+    [83.50, 20.34, 13.00, HULL_BOW_GALLERY_END, 64],
+  ]) {
+    const hit = insideFromOblique(u, y, d);
+    assert.ok(hit?.object === portalLiner, 'the angled side, deep web and gallery return block light from behind');
+    const depth = hit.point.clone().applyMatrix4(toLocal).x;
+    assert.ok(depth > near && depth < far, `unexpected liner depth ${depth.toFixed(2)} m`);
+  }
+  for (const across of [9.75, 18.05]) {
+    const [cove] = new Raycaster(hullPoint(89.75, 22.7, across), up).intersectObject(portalCove);
+    assert.ok(cove && cove.point.y > top, 'both recessed guides run above the rail envelope');
   }
   for (const [rootDepth, bearingDepth] of [[9.4, 7.8], [16, 13.9]]) {
     const [heel] = new Raycaster(hullPoint(92.2, 10, rootDepth), up.clone().negate(), 0, 4)
@@ -359,9 +380,11 @@ for (const walk of plazaWalks) for (const [i, [x, y, z]] of walk.entries()) {
   updateMegastructures(0);
   const dayGuide = guides[0].material.emissiveIntensity;
   const dayLiner = portalLiner.material.emissiveIntensity;
+  const dayCove = portalCove.material.emissiveIntensity;
   updateMegastructures(1);
   assert.ok(guides[0].material.emissiveIntensity > dayGuide && guides[0].material.emissiveIntensity < 1);
   assert.ok(portalLiner.material.emissiveIntensity > dayLiner && portalLiner.material.emissiveIntensity < .4);
+  assert.ok(portalCove.material.emissiveIntensity > dayCove);
   updateMegastructures(0);
 
   // Sample the live train placement against the aperture with all three production car variants.
@@ -390,16 +413,20 @@ for (const walk of plazaWalks) for (const [i, [x, y, z]] of walk.entries()) {
     'even the lowest vertex of the three production train cars clears both bearing seats');
   const rolled = new Vector3();
   const minGaps: number[] = [], mouthGaps: number[] = [];
+  const innerStep = .25, innerClearance = .32;
   for (const track of routes().tracks) {
     const length = track.getLength();
     let gap = Infinity, mouthGap = Infinity;
+    const swept = Array.from({ length: Math.ceil((recess - HULL_BOW_GALLERY_END) / innerStep) }, () => new Box3());
     for (let time = 0; time < length / TRAIN_SPEED; time += .02) {
       const { u, visible } = trainPose(time, 0, 2, 0, length);
       const p = track.getPointAt(u).applyMatrix4(toLocal);
-      if (visible < 1 || p.x < envelope.min.x - 10 || p.x > envelope.max.x + 10) continue;
+      if (visible < 1 || p.x < HULL_BOW_GALLERY_END - 10 || p.x > envelope.max.x + 10) continue;
       const heading = track.getTangentAt(u).applyAxisAngle(up, -HULL.yaw);
       for (const v of vertices) {
         rolled.set(p.x + v.x * heading.z + v.z * heading.x, p.y + v.y, p.z - v.x * heading.x + v.z * heading.z);
+        const slice = swept[Math.floor((rolled.x - HULL_BOW_GALLERY_END) / innerStep)];
+        slice?.expandByPoint(rolled);
         if (rolled.x < envelope.min.x || rolled.x > envelope.max.x) continue;
         const clearance = Math.min(rolled.y - bottom, top - rolled.y, rolled.z - southEdge, northEdge - rolled.z);
         gap = Math.min(gap, clearance);
@@ -408,13 +435,22 @@ for (const walk of plazaWalks) for (const [i, [x, y, z]] of walk.entries()) {
     }
     assert.ok(Number.isFinite(gap) && gap > 1.5, `each train clears the real bow recess on its track, got ${gap.toFixed(2)} m`);
     assert.ok(Number.isFinite(mouthGap) && mouthGap > 1.5, 'each train crosses the original R7 mouth');
+    assert.ok(swept.every(box => !box.isEmpty()));
+    // Quarter-metre bins enclose the swept GLB of all three cars. Expand in
+    // rise and across-track only, so the test stays within the tunnel ends.
+    for (const box of swept) {
+      box.min.y -= innerClearance; box.max.y += innerClearance;
+      box.min.z -= innerClearance; box.max.z += innerClearance;
+    }
+    assertClear(swept, 'The swept production train envelope with added clearance');
     minGaps.push(gap);
     mouthGaps.push(mouthGap);
   }
   assert.deepEqual(minGaps.map(gap => gap.toFixed(2)), ['1.84', '3.12']);
   assert.deepEqual(mouthGaps.map(gap => gap.toFixed(2)), ['1.84', '3.75']);
   console.log(`hull bow portal ok (approach clearance: ${minGaps.map(gap => gap.toFixed(2)).join(' / ')} m; `
-    + `R7 mouth clearance: ${mouthGaps.map(gap => gap.toFixed(2)).join(' / ')} m)`);
+    + `R7 mouth clearance: ${mouthGaps.map(gap => gap.toFixed(2)).join(' / ')} m; `
+    + `new galleries: ≥ ${innerClearance.toFixed(2)} m on both tracks)`);
 }
 // The enlarged upper tiers stay at least 1.5 m off the actual Grand Nikko GLB, including its outlying roof edges.
 {

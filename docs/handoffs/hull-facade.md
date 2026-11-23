@@ -299,3 +299,19 @@ R12 在 Blender 用一張四邊面網格連起雙銀緣、凹槽及兩段曲帶�
 - 整合版 root npm test、npm run build、差異空白、圖檔規格及 12 個本機 Markdown 連結與錨點通過。整份 dist 與 Chrome 驗證過的正式 build 逐檔一致。
 - 開發 Mac 的實體 Chrome 視窗在 1920 × 1080／DPR 1 量固定 Hero。12:00／21:25 各量四段 120 幀，兩次首段都是 58.5 FPS，其後三段在兩個時段均為 59.9–60.0 FPS。記錄在 ~/city2127-evidence/hull-facade/r13/fps-final.json。
 - 工作分支 CI 驗證 560393f4ea6efbc6d1e45744cde8ae3d3b44c322，主線 CI 驗證 44974c3d6cc177cdeb18da3bd21b56474179766d。兩次 root、survey、module-swap 的測試與 build、差異空白及圖檔規格均通過。[工作分支 CI](https://github.com/cc100053/city2127/actions/runs/45177344674) · [主線 CI](https://github.com/cc100053/city2127/actions/runs/45178124918)
+
+## R14 · 船首深洞
+
+- 業主 cc100053 在 R13 夜景圈出原圖約 x 1080–1445、y 560–880，看見兩道軌道同時在一塊灰牆前中斷。斜前方射線命中船身局部 X = 83.5 m 的平面遮蔽，右側直邊來自其窄弧收邊。移走遮蔽後，射線繼續命中 X 約 80 m 的 R9 裁切收口面，該面也擋住軌道，進一步開通後才露出背後樓板及室內光線。
+- 2026-11-23 從已 fetch 的 `origin/main`（`d028f89926f86a9442a43c7bb9b52938965671cb`）開乾淨工作樹 `codex/hull-facade-r14`，基準含 R13 程式 `df5ede6f`。當時原工作區 `main` 在 `2df6d8b6`，領先 0、落後 51，保留 `Dev_QA.md` 與 `Presentation.md`。幾何提交 `8953efbe`，分支其後在 `693bd838` 合入含 `assertGuard` 的 `origin/main`（`3a1503ef`）。巨構測試使用 `./assert.ts`。[R13 主線 CI](https://github.com/cc100053/city2127/actions/runs/45178124918)
+- R14 由外向內依次為銀緣、弧頂及後掠側壁、9.1 m 敞開咽口、低一級的斜邊弧眉，再到內彎的雙軌通道。接入雙通道的後段隔牆距原口面 18.1 m，開口各自讓車通過，最深截光側壁延至距口面 33.6 m。頂燈及側壁燈隨日夜調光，軌道與軌邊光只在靠廣場船首內外的過渡段減光。程序洞腔貼合場地剖面及測繪軌道，沿用原有合批及 GLB 回退方式。[洞腔程式](../../src/hullPortal.ts)
+- R12 霧面拉絲雙緣、上下曲帶、下框繞角及 R13 支座繼續使用同一個 Blender GLB。固定 Hero 仍可經 R9 靠海削口望見內側襯板及入洞軌道。兩條軌道路徑、導軌的網格及列車模型均沿用 R13。
+
+### R14 驗證
+
+- [巨構測試](../../tests/megastructures.test.ts) 重驗 18 × 14 m 包絡、9.1 m 敞開咽口及斜前方的三個遮光深度。兩路每 0.02 秒抽樣實際頭／中／尾車 GLB，延伸段為 1.84／3.12 m，原口面段為 1.84／3.75 m，與 R13 一致。新內層通道以沿軸每 0.25 m 的掃掠盒驗證，兩路車身上下及橫向保有至少 0.32 m。
+- 另一端和 60／105 m 退台的頂點屬性與材質逐面一致。大堂和 15 m 退台的部分長樓板三角面因洞腔裁切重新分割，指定區域內的表面經三軸共 14,398 條射線核對，所有命中的位置及材質一致。三處鋪面及望海通視測試通過。
+- 最終程式 `d68c96e638a5d836778e7391ff9077aa82f0600e` 的 root `npm test`（含 `assertGuard`）、`npm run build` 及差異空白檢查通過。使用船首 GLB 時，巨構維持 17 組合批，非 instanced 三角面由 76,309 增至 76,311。
+- 八張 2400 × 1350／DPR 1 原圖及 sidecar 取自乾淨的 `d68c96e6`，頁面例外為零，存於 `~/city2127-evidence/hull-facade/r14/review/`。固定 Hero 用 18:00、場景時間 20 秒。同一斜前方以 65.70／66.20／67.06 秒核對接近、跨口面及深入，另以 21:25 的 66.20 秒核對原圈選區。廣場及簷下同鏡保有入口門框、簷篷及暖光大堂，少量陰影有差異。[固定 Hero 全幅與等位局部](../../artifacts/hull-facade/r14-hero.jpg) · [黃昏、夜間與原圈選區](../../artifacts/hull-facade/r14-bow.jpg) · [列車入洞三時點](../../artifacts/hull-facade/r14-train.jpg) · [廣場及大堂入口](../../artifacts/hull-facade/r14-entry.jpg)
+
+原斜前方仍可辨認靠海側的深色回折邊及底部的細小暖色亮點。業主目視驗收及展覽機驗證待完成。
