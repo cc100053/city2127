@@ -431,6 +431,24 @@ export function buildHullBowPortal(surface: (finish: Finish, geometry: T.BufferG
   const throatIndex = cabin.findIndex(profile => profile.u === recess);
   finishBand('liner', cabin.slice(0, throatIndex + 1));
   finishBand('liner', cabin.slice(throatIndex), false);
+  // A bevelled brow above the swept cars catches the last spill from the
+  // soffit coves and gives the open throat a visible roof edge.
+  const brow = Array.from({ length: 25 }, (_, i): [T.Vector3, T.Vector3, T.Vector3] => {
+    const across = 1 - i / 12;
+    const d = 14.65 + 8.14 * across;
+    const y = 19.55 + 2.55 * Math.cos(across * Math.PI / 2);
+    return [new T.Vector3(recess - 2.1, y + .47, d),
+      new T.Vector3(recess - 2.55, y, d),
+      new T.Vector3(recess - 3.45, y + .60, d)];
+  });
+  for (const edges of [brow.map(([a, b]): [T.Vector3, T.Vector3] => [a, b]),
+    brow.map(([, b, c]): [T.Vector3, T.Vector3] => [b, c])]) {
+    const lip = liningStrip(edges).applyMatrix4(root);
+    shadeInterior(lip, (u, _y, d) => (.13 + .48 * T.MathUtils.smoothstep(u, recess - 3.45, recess - 2.1))
+      * (.47 + .53 * T.MathUtils.smoothstep(d, 7, 14)));
+    surface('liner', lip);
+    lip.dispose();
+  }
   buildRailGalleries(surface);
 
   // Each strip follows the curved soffit and tapers out past the throat.
