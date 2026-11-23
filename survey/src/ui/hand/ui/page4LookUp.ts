@@ -253,4 +253,3 @@ export class LookUpPage {
     this.root.animate([{ opacity: 1 }, { opacity: 0 }], { duration: T.endFadeMs, fill: 'forwards' });
   }
 }
-
