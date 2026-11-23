@@ -6,8 +6,9 @@ import { MeshBVH } from 'three-mesh-bvh';
 import { ConcentrationDistrict } from '../src/districtMeters.ts';
 import { changeSites, guideway, PLAZA, plazaAt, plazaWalks } from '../src/layout.ts';
 import { hullFront, hullTiers } from '../src/hullFacade.ts';
-import { ARCH, FOOTPRINTS, groundContacts, HULL, inMega, inRect, megastructures, RING, RING_GATE } from '../src/megastructures.ts';
-import { routes } from '../src/mobility.ts';
+import { HULL_BOW_PORTAL } from '../src/hullPortal.ts';
+import { ARCH, FOOTPRINTS, groundContacts, HULL, inMega, inRect, megastructures, RING, RING_GATE, updateMegastructures } from '../src/megastructures.ts';
+import { routes, TRAIN_SPEED, trainPose } from '../src/mobility.ts';
 import { occupants, strollPose } from '../src/occupants.ts';
 import { plazaDeck } from '../src/plazaDeck.ts';
 import odaibaLayout from '../src/odaiba-layout.json' with {type: 'json'};
@@ -215,6 +216,92 @@ for (const walk of plazaWalks) for (const [i, [x, y, z]] of walk.entries()) {
 }
 
 const loader = new GLTFLoader();
+// The new lining leaves R6's full rectangular mouth open through the recess, including the planted hull edge.
+{
+  const { face, recess, centre, width, bottom, top } = HULL_BOW_PORTAL;
+  assert.deepEqual([face, centre, width, bottom, top], [92.6, 12.75, 18, 9, 23]);
+  const up = new Vector3(0, 1, 0), origin = new Vector3(HULL.x, 0, HULL.z);
+  const toLocal = new Matrix4().makeRotationY(-HULL.yaw).multiply(new Matrix4().makeTranslation(-HULL.x, 0, -HULL.z));
+  const southEdge = centre - width / 2, northEdge = centre + width / 2;
+  const envelope = new Box3(new Vector3(recess + .025, bottom + .025, southEdge + .025),
+    new Vector3(face + 1.05, top - .025, northEdge - .025));
+  const triangle = new Triangle(), instance = new Matrix4();
+  group.traverse(part => {
+    if (!(part instanceof Mesh)) return;
+    const { geometry } = part, position = geometry.getAttribute('position'), index = geometry.getIndex();
+    geometry.computeBoundingBox();
+    const bounds = geometry.boundingBox;
+    assert.ok(bounds);
+    for (let i = 0; i < (part instanceof InstancedMesh ? part.count : 1); i++) {
+      if (part instanceof InstancedMesh) part.getMatrixAt(i, instance);
+      else instance.identity();
+      instance.premultiply(part.matrixWorld).premultiply(toLocal);
+      if (!bounds.clone().applyMatrix4(instance).intersectsBox(envelope)) continue;
+      for (let j = 0; j < (index?.count ?? position.count); j += 3) {
+        [triangle.a, triangle.b, triangle.c].forEach((p, k) =>
+          p.fromBufferAttribute(position, index?.getX(j + k) ?? j + k).applyMatrix4(instance));
+        assert.ok(!envelope.intersectsTriangle(triangle), `${part.name} obstructs the bow portal`);
+      }
+    }
+  });
+  const ray = new Raycaster(new Vector3(face + 4, 19, centre).applyAxisAngle(up, HULL.yaw).add(origin),
+    new Vector3(-1, 0, 0).applyAxisAngle(up, HULL.yaw));
+  const [rear] = ray.intersectObjects(structureBatches, false);
+  assert.ok(rear && Math.abs(rear.distance - (face + 4 - recess)) < .02, 'the visible back sits behind the bulkhead');
+  const guides = structureBatches.filter(part => part.material instanceof MeshStandardMaterial &&
+    part.material.name === 'hull-portal-guide');
+  assert.equal(guides.length, 1, 'the recessed guide runs in one batch');
+  for (const [y, d] of [[bottom - .25, centre], [top + .25, centre], [16, southEdge - .25], [16, northEdge + .25]]) {
+    ray.ray.origin.set(face + 4, y, d).applyAxisAngle(up, HULL.yaw).add(origin);
+    const [light] = ray.intersectObjects(structureBatches, false);
+    assert.equal(light?.object, guides[0], `guide visible in front of the old bulkhead at ${y}, ${d}`);
+  }
+  updateMegastructures(0);
+  const dayGuide = guides[0].material.emissiveIntensity;
+  updateMegastructures(1);
+  assert.ok(guides[0].material.emissiveIntensity > dayGuide && guides[0].material.emissiveIntensity < 1);
+  updateMegastructures(0);
+
+  // Sample the live train placement against the aperture with all three production car variants.
+  const bytes = Uint8Array.from(readFileSync(new URL('../asset/models/train-2127/train-2127.glb', import.meta.url)));
+  const { scene: fleet } = await loader.parseAsync(bytes.buffer, '');
+  fleet.updateMatrixWorld(true);
+  const vertices: Vector3[] = [];
+  for (const name of ['train_lead', 'train_mid', 'train_tail']) {
+    const car = fleet.getObjectByName(name);
+    assert.ok(car);
+    const inverse = car.matrixWorld.clone().invert();
+    car.traverse(part => {
+      if (!(part instanceof Mesh)) return;
+      const local = inverse.clone().multiply(part.matrixWorld);
+      const position = part.geometry.getAttribute('position');
+      for (let i = 0; i < position.count; i++) {
+        vertices.push(new Vector3().fromBufferAttribute(position, i).applyMatrix4(local));
+      }
+    });
+  }
+
+  const rolled = new Vector3();
+  const minGaps: number[] = [];
+  for (const track of routes().tracks) {
+    const length = track.getLength();
+    let gap = Infinity;
+    for (let time = 0; time < length / TRAIN_SPEED; time += .02) {
+      const { u, visible } = trainPose(time, 0, 2, 0, length);
+      const p = track.getPointAt(u).applyMatrix4(toLocal);
+      if (visible < 1 || p.x < envelope.min.x - 10 || p.x > envelope.max.x + 10) continue;
+      const heading = track.getTangentAt(u).applyAxisAngle(up, -HULL.yaw);
+      for (const v of vertices) {
+        rolled.set(p.x + v.x * heading.z + v.z * heading.x, p.y + v.y, p.z - v.x * heading.x + v.z * heading.z);
+        if (rolled.x < envelope.min.x || rolled.x > envelope.max.x) continue;
+        gap = Math.min(gap, rolled.y - bottom, top - rolled.y, rolled.z - southEdge, northEdge - rolled.z);
+      }
+    }
+    assert.ok(Number.isFinite(gap) && gap > 1.5, `each train clears the real bow recess on its track, got ${gap.toFixed(2)} m`);
+    minGaps.push(gap);
+  }
+  console.log(`hull bow portal ok (track clearance: ${minGaps.map(gap => gap.toFixed(2)).join(' / ')} m)`);
+}
 // The enlarged upper tiers stay at least 1.5 m off the actual Grand Nikko GLB, including its outlying roof edges.
 {
   const id = 'grand-nikko-tokyo-daiba';
