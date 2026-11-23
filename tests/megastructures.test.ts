@@ -220,7 +220,7 @@ const loader = new GLTFLoader();
 // The seaward cut opens the side view while keeping the axial clearance and recess.
 {
   const { face, recess, centre, width, bottom, top } = HULL_BOW_PORTAL;
-  assert.deepEqual([face, centre, width, bottom, top], [92.6, 12.75, 18, 9, 23]);
+  assert.deepEqual([face, recess, centre, width, bottom, top], [92.6, 83.5, 12.75, 18, 9, 23]);
   const up = new Vector3(0, 1, 0), origin = new Vector3(HULL.x, 0, HULL.z);
   const toLocal = new Matrix4().makeRotationY(-HULL.yaw).multiply(new Matrix4().makeTranslation(-HULL.x, 0, -HULL.z));
   const southEdge = centre - width / 2, northEdge = centre + width / 2;
@@ -271,6 +271,27 @@ const loader = new GLTFLoader();
   }
   assert.equal(fromHero(80.04, 17, hullFront(1, 80) - .88)?.object, guides[0],
     'the light on the new seaward rim is visible from Hero');
+  for (const [y, outer, groove, inner] of [[13, 77.8, 79, 79.4], [19, 77.4, 78.6, 79.4], [23.5, 78.6, 80.2, 81]]) {
+    const depth = hullFront(y < 15 ? 0 : 1, 80) - 2;
+    const a = fromHero(outer, y, depth), seam = fromHero(groove, y, depth), b = fromHero(inner, y, depth);
+    assert.ok(a?.object === silver && seam?.object === rear.object && b?.object === silver,
+      `Hero sees both silver rims and the shadow seam at ${y} m`);
+    const seamDepth = seam.point.clone().applyMatrix4(toLocal).z;
+    assert.ok(seamDepth - a.point.clone().applyMatrix4(toLocal).z > .75);
+    assert.ok(seamDepth - b.point.clone().applyMatrix4(toLocal).z > .2);
+  }
+  for (const depth of [8, 11, 14, 17, 20]) {
+    ray.ray.origin.set(face + 4, 26, depth).applyAxisAngle(up, HULL.yaw).add(origin);
+    const hit = ray.intersectObjects(structureBatches, false)[0];
+    assert.ok(hit?.object === silver && hit.point.clone().applyMatrix4(toLocal).x > face - .7,
+      `the rolled crown continues around the bow to the end wall at ${depth} m`);
+  }
+  for (const depth of [-.7, 0, 1, 3, 5]) {
+    ray.ray.origin.set(face + 4, 7, depth).applyAxisAngle(up, HULL.yaw).add(origin);
+    const hit = ray.intersectObjects(structureBatches, false)[0];
+    assert.ok(hit?.object === silver && hit.point.clone().applyMatrix4(toLocal).x > face + .5,
+      `the rolled sill covers the bow's corner stiffener at ${depth} m`);
+  }
   updateMegastructures(0);
   const dayGuide = guides[0].material.emissiveIntensity;
   updateMegastructures(1);
