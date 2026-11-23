@@ -361,8 +361,7 @@ export function startSurveyAtmosphere(
           el('p', 'resident-place', `街の画面：${result.place}`));
         const showReason = () => {
           latest.querySelector('.resident-card-copy')!.textContent = `${result.preference}${result.effect}`;
-          // The share joins the reason, so the number never precedes the city's answer.
-          if (result.share) latest.querySelector('.resident-card-copy')!.after(el('p', 'resident-share', `住民の声：${result.share}`));
+          // The crowd share stays off the big screen (owner 2026-11-23): only the hovered card on the guest's iPad shows it.
         };
         const transitionMs = reasonDelayMs(displayMs, globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false, q08Swap(proposal)?.shelf ? SHELF_TRANSITION_SECONDS : headlineTransitionSeconds(evidence?.[0], SITE_TRANSITION_SECONDS));
         if (transitionMs === 0) showReason();
