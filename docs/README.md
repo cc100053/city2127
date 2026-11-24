@@ -10,6 +10,8 @@
 | [iPad「住民の窓」啟動](../survey/README.md#ipad住民の窓與手勢操作) | LAN、可信 HTTPS、手勢模型及觸控後備 |
 | [VALIDATION](VALIDATION.md) · [P5 現場驗收](handoffs/resident-experience-p5.md) | 自動化、實機同展場驗收，已量測結果同限制 |
 | [現行交接](handoffs/README.md) | 待接續、驗收或決定嘅任務 |
+| [發表原稿](PRESENTATION.md) | 展示前約 1 分鐘的日文介紹、示範流程及預計問答 |
+| [展位電源計劃](EXHIBITION_POWER_PLAN.md) | 500W、兩個插座的器材分配及當日檢查表 |
 
 ## 產品同製作
 

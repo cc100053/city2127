@@ -24,6 +24,7 @@
 - 交接歸檔索引為六份狀態未標完成的交接註明取代來源。
 - 三語 README 改寫為精簡的展覽啟動指南（伺服器、各裝置網址、現場操作），並修正指向舊 README 錨點的連結。
 - owner 的 Dev Q&A 移入 [history/DEV_QA.md](../history/DEV_QA.md)，內容不變，只更新連結。
+- owner 的發表原稿（原 `Presentation.md`）移入 [docs/PRESENTATION.md](../PRESENTATION.md)，展位電源計劃 [EXHIBITION_POWER_PLAN](../EXHIBITION_POWER_PLAN.md) 一併提交，內容不變，並加入文件索引。
 - 驗證：root `npm test`、`npm run build`、`git diff --check`，以及全 repo Markdown 連結與錨點檢查。
 
 ## 接續
