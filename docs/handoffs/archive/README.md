@@ -89,7 +89,7 @@
 
 - [Asset library — reusable 3D parts index](asset-library.md)
 - [bay-flower-placement — Q02-B 蓮花受電：選址與放置](bay-flower-placement.md)
-- [bay-flower-receiver — Q02-B bay flower space-solar receiver (draft model)](bay-flower-receiver.md)
+- [bay-flower-receiver — Q02-B bay flower space-solar receiver (draft model)](bay-flower-receiver.md)：狀態仍標 IN_PROGRESS，選址及放置已由 [bay-flower-placement](bay-flower-placement.md) 完成並取代
 - [building-stories — 建築故事集](building-stories.md)
 - [capture-command — Fixed evidence capture command](capture-command.md)
 - [car-closeup-polish — 街道車輛家族（Blender）](car-closeup-polish.md)
@@ -106,14 +106,14 @@
 - [q02a-hydro-placement — Q02-A 水の棚田：選址與周邊環境](q02a-hydro-placement.md)
 - [q02a-hydro-terrace — Q02-A 空中の水の棚田（Blender 素材）](q02a-hydro-terrace.md)
 - [question-pool — SURVEY_V2 question pool beside the exhibition survey](question-pool.md)
-- [rectenna-building — Rectenna canopy farm as a building-only asset](rectenna-building.md)
+- [rectenna-building — Rectenna canopy farm as a building-only asset](rectenna-building.md)：狀態標示未接入，接入已由 [rectenna-farm-placement](rectenna-farm-placement.md) 完成並取代
 - [rectenna-change-review — 陸上農園變化總覽](rectenna-change-review.md)
 - [rectenna-farm-placement — Q3 large receiver and terrace farm](rectenna-farm-placement.md)
 - [se-high-blender — SE +1 tower 用 Blender 重建](se-high-blender.md)
 - [SE 塔＋pod — district close-up polish](se-stage-closeup-polish.md)
 - [train-closeup-polish — 導軌列車（Blender）](train-closeup-polish.md)
-- [change-explanation](change-explanation.md)
+- [change-explanation](change-explanation.md)：狀態仍標 PLANNED，所依據的 version4 Meter 變化說明已隨四題版本退役（2026-11-21）；現行結果卡見 [RESIDENT_COPY](../../RESIDENT_COPY.md)
 - [guest-voice-experience](guest-voice-experience.md)
-- [guest-agency](guest-agency.md)
-- [energy-city](energy-city.md)
-- [housing-city](housing-city.md)
+- [guest-agency](guest-agency.md)：部分完成，未完成項目屬已退役的每票可見變化方案，由九題抽題輪換取代
+- [energy-city](energy-city.md)：狀態仍標 PARTIAL，能源題已不在九題題組內；展覽機驗收改依 [P5](../resident-experience-p5.md) 及 [VALIDATION](../../VALIDATION.md)
+- [housing-city](housing-city.md)：M／P／U 固定背景已完成；2026-11-19 撤走 U、M（地塊給 Q06 蛋艙塔），P 維持背景，見 [輪換模型及地塊](../../QUESTION_ROTATION_PLAN.md)

@@ -17,6 +17,13 @@
 
 驗證日期 2026-11-24，共用 root 依賴及 survey lockfile 安裝依賴，Node 26。本 PR 提交前嘅工作樹通過 root／survey `npm test` 同 `npm run build`，以及 `git diff --check`。由生成器重建變化總覽，核對 27 個選項、41 個超連結及 48 個圖像路徑，沿用既有截圖。核對修改過嘅 Markdown 嘅本機連結及錨點。正式 build 嘅 HTML 顯示新分頁標題。本輪未重新驗證 iPad、展場實機或瀏覽器互動。
 
+## PR 審閱跟進（2026-11-24）
+
+- 變化總覽導言及「其他資產」說明改回書面語（owner 2026-11-13 規則），由生成器重建。
+- QUESTION_ROTATION_PLAN 加註：程式註解所引的舊章節編號以 2026-11-24 快照為準。
+- 交接歸檔索引為六份狀態未標完成的交接註明取代來源。
+- 驗證：root `npm test`、`npm run build`、`git diff --check`，以及全 repo Markdown 連結與錨點檢查。
+
 ## 接續
 
 由 PR 審閱本次整理。展場技術驗收仍見 [VALIDATION](../VALIDATION.md#ipad住民の窓實測與回歸)。

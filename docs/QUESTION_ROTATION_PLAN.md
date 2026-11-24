@@ -4,6 +4,8 @@
 
 [實作及驗證交接](handoffs/question-rotation.md) · [原始 rollout、決策及模擬](history/QUESTION_ROTATION_PLAN_2026-11-24.md)
 
+本文件只保留第 2 節（生成器讀取其總表）。程式註解所引的 1.x、2.1、2.2、2.6、3.1–3.7、4.x–6.x 等編號，以及 RESIDENT_COPY 的舊註記，均以 [2026-11-24 快照](history/QUESTION_ROTATION_PLAN_2026-11-24.md)及 [RESIDENT_COPY 快照](history/RESIDENT_COPY_2026-11-24.md)為準；現行產品規則見[展覽規格](EXHIBITION_SPEC.md#抽題輪換唯一現行版本)。
+
 ## 2. 總表：題目 × 模型 × 地塊
 
 狀態：**驗收**＝owner 已接受；**已建**＝模型存在但未驗收或未放置；**無**＝未有模型。地塊方式：**同地輪換**＝三個模型共用一塊地；**各有地塊**＝每個模型有自己的地塊，未輪到時顯示空置態。

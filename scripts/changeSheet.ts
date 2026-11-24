@@ -177,13 +177,13 @@ dt{color:#667;font-size:13px;margin-top:8px}dd{margin:0}.frames{display:grid;gri
 p.intro{background:#f4f3ee;border-radius:6px;padding:8px 12px;margin:10px 0}figure{margin:0}figure img{width:100%;display:block;border-radius:4px;background:#ddd}figcaption{font-size:12px;color:#667}</style>
 <h1>變化總覽：${set.questions.length} 題 × 3 選項＝${versions.length} 個建築版本</h1>
 <p>生成：${exhibitionDate}，<code>scripts/changeSheet.ts</code>。題目、選項、模型及地塊來自輪換題組 <code>questions.rotation.v1.json</code>（version ${set.version}${set.draft ? '，草稿：題目文字仍為 SURVEY_V2 暫定稿' : ''}）；狀態來自 QUESTION_ROTATION_PLAN 第 2 節總表；居民來自 RESIDENT_SCENE_PLAN；日文結果卡及設施卡文案由程式生成。Q01 截圖取自 <code>scripts/closeupSheet.mjs</code>，其餘為輪換實時測試的畫面（含 guest 所見的結果卡）。</p>
-<p class="intro"><b>抽題輪換。</b>每位觀眾從 ${set.questions.length} 題入面答 ${DRAW_COUNT} 題，優先抽最久未變嘅題。四個答案都按題集計，大屏幕聚焦其中一個選擇，最多切換一個模型。冇可見變化時，鏡頭探訪已顯示觀眾所選模型嘅地塊，或到構想地展示「構想中」。iPad 交接頁可逐張揭示同題同選項嘅比例（含本人）；每題未滿 ${CROWD_SHARE_MIN_VOTES} 票時顯示收集進度。</p>
+<p class="intro"><b>抽題輪換。</b>每位觀眾從 ${set.questions.length} 題中回答 ${DRAW_COUNT} 題，優先抽取最久未變的題目。四個答案均按題目分別計入，大屏幕聚焦其中一個選擇，最多切換一個模型。沒有可見變化時，鏡頭探訪已顯示觀眾所選模型的地塊，或前往構想地展示「構想中」。iPad 交接頁可逐張揭示同題同選項的比例（含本人）；每題未滿 ${CROWD_SHARE_MIN_VOTES} 票時顯示收集進度。</p>
 <p>現況：${versions.length} 個版本中，${count('有模型')} 個有模型，${count('空置（地塊已定）')} 個為空置地塊，${count('未有模型及地塊')} 個未有模型及地塊。</p>
 <table><tr><th>題</th><th>選項</th><th>建築版本（計劃總表）</th><th>類別</th></tr>
 ${versions.map(({ q, o }, i) => `<tr>${i % 3 ? '' : `<td rowspan="3"><a href="#${q.id}">${q.id}</a><br><small>${esc(q.text)}</small></td>`}<td><a href="#${q.id}-${o.id}">${o.id}</a>「${esc(o.label)}」</td><td>${md(planRows.find(c => c[0] === q.id)![2 + OPTIONS.indexOf(o.id)])}</td><td>${esc(kind(o))}</td></tr>`).join('\n')}</table>
 ${articles.join('\n')}
 <article id="others"><h2>不在新題組內的現有資產 <small>QUESTION_ROTATION_PLAN 第 2 節</small></h2>
-<p>下表記錄已轉做背景或待確認去留嘅資產。城市輪換規則見<a href="../../docs/EXHIBITION_SPEC.md#抽題輪換唯一現行版本">展覽規格</a>。</p>
+<p>下表記錄已轉為背景或待確認去留的資產。城市輪換規則見<a href="../../docs/EXHIBITION_SPEC.md#抽題輪換唯一現行版本">展覽規格</a>。</p>
 <table><tr><th>資產</th><th>處理建議</th></tr>${otherAssets.map(c => `<tr>${c.map(x => `<td>${md(x)}</td>`).join('')}</tr>`).join('')}</table></article>
 </html>`);
 console.log(`${set.questions.length} questions, ${versions.length} versions, ${copied} frames refreshed → ${out}`);
