@@ -14,6 +14,8 @@
 
 兩個 terminal 視窗在展覽期間均須保持開啟。
 
+**Windows 一鍵啟動：** 在 repo 根目錄雙擊 `start-windows.cmd`。它會自動使用 Node 24（即使 PATH 上有較舊的 Node 亦會改用 nvm 的版本）、在依賴缺少或過時時執行 `npm ci`、在兩個獨立視窗啟動下列兩個伺服器，然後以獨立 Chrome profile 加 `--force_high_performance_gpu` 開啟大屏幕，令 Intel + NVIDIA 雙顯卡手提電腦使用獨立顯卡。`survey/data/tls/` 有憑證時以 LAN／HTTPS 模式啟動並列出 iPad 網址，否則只限本機。可加 `-Low`（`&quality=low`）、`-Kiosk`（全螢幕）、`-NoBrowser` 或 `-Local`（有憑證亦只限本機），例如 `.\start-windows.cmd -Kiosk -Low`。Windows 上準備 iPad：`winget install FiloSottile.mkcert`、`mkcert -install`，再喺 `survey/` 執行 `mkcert -cert-file data/tls/ipad.pem -key-file data/tls/ipad-key.pem <LAN IP> localhost 127.0.0.1`（LAN IP 改變就要重新簽發；用 iPhone 熱點時電腦會拎到 `172.20.10.2`–`172.20.10.14`，可以將 13 個 IP 一次過寫入同一張憑證）；將 `%LOCALAPPDATA%\mkcert\rootCA.pem`（切勿傳 `rootCA-key.pem`）裝到每部 iPad 並啟用信任；Windows 防火牆允許 TCP 8443、8787 入站（以管理員執行 `New-NetFirewallRule -Direction Inbound -Action Allow -Protocol TCP -LocalPort 8443,8787 -RemoteAddress LocalSubnet`）。腳本使用九題抽題輪換，若資料庫目前的 run 仍是舊四題版，要先喺 Admin 重設城市，訪客才可以開始。
+
 **Terminal 1 — 問卷伺服器**（API、WebSocket、Guest／Admin 頁面及 SQLite 資料）
 
 Mac：
