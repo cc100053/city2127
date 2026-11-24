@@ -89,6 +89,12 @@ LAN 冇 guest 身分驗證，所以只用自己控制嘅 router；場館 Wi-Fi �
 
 - 2026-10-04 單機現場試（main `2fdb1f9`）：L0 用現有 TP-Link Archer AX3000（fw 1.1.3）；Mac Wi-Fi 私人地址設「固定」，使用者自行喺 router 設 DHCP 預約 `192.168.0.215`（我未能睇到 router 設定核實）。一部輸入裝置經 LAN 完成 station A 一份提案，scratch DB 1 份提交、無重複。B／雙機／瞓機 NOT RUN：暫時只有一部裝置，使用者決定延後。
 
+### 2026-11-24 固定 IP 設定紀錄
+
+- 喺現有測試網絡嘅 TP-Link Archer AX3000（管理地址 `192.168.0.1`）新增 DHCP 位址保留，將 Mac 當時連線用嘅 Wi-Fi MAC 綁定到 `192.168.0.215`。已核對 Mac 當時嘅 DHCP 租約同已啟用嘅路由器條目。重連後重新取址同場館網絡仍待測試。
+- 路由器設定截圖存喺 `~/city2127-evidence/lan-guest-stations/2026-11-24/dhcp-reservation.jpg`。
+- 呢個網絡嘅 A 站網址係 `https://192.168.0.215:8443/guest?station=A&hand`，B 站係 `https://192.168.0.215:8443/guest?station=B&hand`。仍需配置涵蓋 `192.168.0.215` 嘅 HTTPS 憑證、啟動問卷伺服器，再用兩部 iPad 驗證。場館若用另一部路由器或改用網線，按實際連線介面重做 L0，再按實際 IP 設定 HTTPS。
+
 ## Known issues and blockers
 
 - 需要 router 及兩部 iPad 先可以做 L0–L4。
