@@ -1,7 +1,7 @@
 # H1 — 建築・居住五配置靜態比較
 
 2026-10-26；owner：Codex。**H1 已實作／軟件驗證，並由 cc100053 於 2026-10-26 簽收；H1b／H2／H3 尚未完成。**
-[計劃](../../docs/HOUSING_CITY_PLAN.md)／[已接受 H0](../housing-city-h0/README.md)／[當前交接](../../docs/handoffs/housing-city.md)。
+[計劃](../../docs/history/HOUSING_CITY_PLAN.md)／[已接受 H0](../housing-city-h0/README.md)／[當前交接](../../docs/handoffs/archive/housing-city.md)。
 
 ## 開啟與比較
 

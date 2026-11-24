@@ -17,7 +17,7 @@
 
 ## Goal and acceptance criteria
 
-Owner 提供概念車圖。判斷：方向啱，但橙／高飽和青撞色規則、細碎 vent 喺城市距離變噪點、暗色展台與日常無關，所以先改圖再建模。Owner 揀兩種都換、同一家族。目標圖 [target/](../../artifacts/car-closeup-polish/target/)，prompt [prompts.md](../../artifacts/car-closeup-polish/prompts.md)，owner 2026-11-07 通過 pod、car 日景；pod 夜景係其後生成，owner 未單獨揀。
+Owner 提供概念車圖。判斷：方向啱，但橙／高飽和青撞色規則、細碎 vent 喺城市距離變噪點、暗色展台與日常無關，所以先改圖再建模。Owner 揀兩種都換、同一家族。目標圖 [target/](../../../artifacts/car-closeup-polish/target)，prompt [prompts.md](../../../artifacts/car-closeup-polish/prompts.md)，owner 2026-11-07 通過 pod、car 日景；pod 夜景係其後生成，owner 未單獨揀。
 
 ## 交付
 
@@ -29,7 +29,7 @@ Owner 提供概念車圖。判斷：方向啱，但橙／高飽和青撞色規�
 
 ## R1
 
-對比圖 [r1/vs-target.jpg](../../artifacts/car-closeup-polish/r1/vs-target.jpg)。未跑 skill 嘅三個 absolute judges＋pairwise judge，亦未寫 rubric；由 owner 直接判斷。
+對比圖 [r1/vs-target.jpg](../../../artifacts/car-closeup-polish/r1/vs-target.jpg)。未跑 skill 嘅三個 absolute judges＋pairwise judge，亦未寫 rubric；由 owner 直接判斷。
 
 已知低於目標：
 
@@ -43,7 +43,7 @@ FPS（`fps.sh`，headed Chrome，hero `se:high`，1920×1080，同一機況）�
 
 ## R2
 
-對比圖 [vs-target.jpg](../../artifacts/car-closeup-polish/vs-target.jpg)，[rubric](../../artifacts/car-closeup-polish/rubric.md)。
+對比圖 [vs-target.jpg](../../../artifacts/car-closeup-polish/vs-target.jpg)，[rubric](../../../artifacts/car-closeup-polish/rubric.md)。
 
 改動：圓鼓車尾、車頂最高點移到中後段（全高 1.91 m）、窗框凸邊、軟身座椅、nose slot、車身 metalness .5（解決白色過曝）、較實玻璃、柔和接地陰影 `car_shadow`、pod 3 cm 浮動、細啲嘅懸浮環同車輪、車尾環日間淺色夜間發紅。
 

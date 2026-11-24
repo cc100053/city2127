@@ -1,14 +1,14 @@
 # 台場2127 — 能源城市計劃
 
-> **2026-11-21：version4 四題／四個 Meter 版本已永久退役，現行唯一版本係九題抽題輪換（[SPEC](EXHIBITION_SPEC.md#抽題輪換唯一現行版本)）。** 本文件講 Meter、分數或 ladder 嘅部分只係歷史記錄。
+> **2026-11-21：version4 四題／四個 Meter 版本已永久退役，現行唯一版本係九題抽題輪換（[SPEC](../EXHIBITION_SPEC.md#抽題輪換唯一現行版本)）。** 本文件講 Meter、分數或 ladder 嘅部分只係歷史記錄。
 
 2026-10-24。Owner：Codex；產品決策：cc100053。狀態：**E1–E4完成，E4已發布main並通過CI，證據見交接；E5本機Mac限定30分鐘性能／操作量測已完成，實際展覽硬件與訪客理解仍未驗**。
 
-本文件記錄使用者要求的能源篇規劃、E1概念、E2靜態空間比較、E3城市組合／動態及E4居民提案接入。候選方案不等於已核准的模型、問卷或計分變更；現行行為以 [EXHIBITION_SPEC](EXHIBITION_SPEC.md) 為準，實際驗證見 [任務交接](handoffs/energy-city.md)。
+本文件記錄使用者要求的能源篇規劃、E1概念、E2靜態空間比較、E3城市組合／動態及E4居民提案接入。候選方案不等於已核准的模型、問卷或計分變更；現行行為以 [EXHIBITION_SPEC](../EXHIBITION_SPEC.md) 為準，實際驗證見 [任務交接](../handoffs/archive/energy-city.md)。
 
 ## 目標與範圍
 
-透過能源的收集、儲存、分配與使用，讓整座台場有更多可辨識的未來形態；離開富士電視台，街區仍能讀到相同系統。延續 [CITY MASTER TASTE](ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md) 的百年演化、可理解工程、海陸共同運作、克制外觀及居民尺度。
+透過能源的收集、儲存、分配與使用，讓整座台場有更多可辨識的未來形態；離開富士電視台，街區仍能讀到相同系統。延續 [CITY MASTER TASTE](../ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md) 的百年演化、可理解工程、海陸共同運作、克制外觀及居民尺度。
 
 四個研究領域先作企劃分類，逐篇提出可混合的城市變化：
 
@@ -104,7 +104,7 @@ A／B／C是形態比較標籤，並非現有Meter bands，也不是三選一已
 | 街の拠点にまとめて、身近な空間を広く使いたい。 | 集中共用，附近少放設備 | 實際集中設施與釋放／重配的街區位置；不可只憑答案聲稱空間變大 |
 | 海の先に設備を集め、街の電力を支えたい。 | 接受外海能源用地以支撐城市 | 實際能源島邊界／連橋／街區配電配置；不可推論核能必然是唯一答案 |
 
-這題探索「與設施的生活距離」，未同時衡量能源種類、風險承擔或土地政策。E4需與其餘領域一起決定問題能否表達所需取捨；不將上述三個回答直接配成−1／0／+1。居民只貢獻累積偏好，結果卡仍須以實際前後配置說明，與 [變化說明卡任務](handoffs/change-explanation.md) 對齊。
+這題探索「與設施的生活距離」，未同時衡量能源種類、風險承擔或土地政策。E4需與其餘領域一起決定問題能否表達所需取捨；不將上述三個回答直接配成−1／0／+1。居民只貢獻累積偏好，結果卡仍須以實際前後配置說明，與 [變化說明卡任務](../handoffs/archive/change-explanation.md) 對齊。
 
 候選背景文案：
 
@@ -116,15 +116,15 @@ A／B／C是形態比較標籤，並非現有Meter bands，也不是三選一已
 
 | 現有模組／路徑 | 可重用的責任與後續影響 |
 | --- | --- |
-| [civicCore.ts](../src/civicCore.ts)、[odaibaScene.ts](../src/odaibaScene.ts) | 程序富士核心／載入及occupants發布；外環需另留可動部分，不能隨靜態幾何烘焙，也不能帶動既有人物／劇場 |
-| [waterRooms.ts](../src/waterRooms.ts)、[skyways.ts](../src/skyways.ts) | `shoreRoomBays()`共用六座海上空間位置，且查船路；skyways與district共用這些位置，不能單邊另算新位置 |
-| [amphibiousShore.ts](../src/amphibiousShore.ts)、[layout.ts](../src/layout.ts)、[mobility.ts](../src/mobility.ts) | 潮汐邊緣、城市邊界、步道與海空航路；新設施須以實際幾何檢查通道與泊位淨空 |
-| [cityRig.ts](../src/cityRig.ts)、[coastalCanopy.ts](../src/coastalCanopy.ts) | 共享工廠／材質、現有屋頂平台；優先重用，重複構件用instancing，不新增資產套件或逐幀建立幾何 |
-| [districtMeters.ts](../src/districtMeters.ts)、[cityChangeManager.ts](../src/cityChangeManager.ts)、[createCityChangeManager.ts](../src/createCityChangeManager.ts) | 既有carrier、配對、seed及前後變化證據；E2先隔離比較，E4才決定能源targets，保留3秒retarget及立即恢復契約 |
-| [cityView.ts](../survey/src/shared/cityView.ts)、[scoreEngine.ts](../survey/src/survey/scoreEngine.ts)、[正式四題](../survey/src/survey/questions.exhibition.json) | server權威配置／累積演算法／問題；目前沒有能源種類分配契約，不能在renderer私下由環境分數重解讀 |
-| [surveyAtmosphere.ts](../src/surveyAtmosphere.ts) | 大屏幕設施及結果卡；只能描述畫面實際配置；文案接入時同步[RESIDENT_COPY](RESIDENT_COPY.md) |
+| [civicCore.ts](../../src/civicCore.ts)、[odaibaScene.ts](../../src/odaibaScene.ts) | 程序富士核心／載入及occupants發布；外環需另留可動部分，不能隨靜態幾何烘焙，也不能帶動既有人物／劇場 |
+| [waterRooms.ts](../../src/waterRooms.ts)、[skyways.ts](../../src/skyways.ts) | `shoreRoomBays()`共用六座海上空間位置，且查船路；skyways與district共用這些位置，不能單邊另算新位置 |
+| [amphibiousShore.ts](../../src/amphibiousShore.ts)、[layout.ts](../../src/layout.ts)、[mobility.ts](../../src/mobility.ts) | 潮汐邊緣、城市邊界、步道與海空航路；新設施須以實際幾何檢查通道與泊位淨空 |
+| [cityRig.ts](../../src/cityRig.ts)、[coastalCanopy.ts](../../src/coastalCanopy.ts) | 共享工廠／材質、現有屋頂平台；優先重用，重複構件用instancing，不新增資產套件或逐幀建立幾何 |
+| [districtMeters.ts](../../src/districtMeters.ts)、[cityChangeManager.ts](../../src/cityChangeManager.ts)、[createCityChangeManager.ts](../../src/createCityChangeManager.ts) | 既有carrier、配對、seed及前後變化證據；E2先隔離比較，E4才決定能源targets，保留3秒retarget及立即恢復契約 |
+| [cityView.ts](../../survey/src/shared/cityView.ts)、[scoreEngine.ts](../../survey/src/survey/scoreEngine.ts)、[正式四題](../../survey/src/survey/questions.exhibition.json) | server權威配置／累積演算法／問題；目前沒有能源種類分配契約，不能在renderer私下由環境分數重解讀 |
+| [surveyAtmosphere.ts](../../src/surveyAtmosphere.ts) | 大屏幕設施及結果卡；只能描述畫面實際配置；文案接入時同步[RESIDENT_COPY](../RESIDENT_COPY.md) |
 
-後續檢查範圍：root的[odaiba幾何檢查](../tests/odaiba.test.ts)、[district carriers](../tests/districtMeters.test.ts)、[結果卡](../tests/surveyAtmosphere.test.ts)，以及root／survey真實HTTP/WebSocket pipeline。E4若改shared state／問題，需補survey狀態、replay、舊答案與相容性檢查；`module-swap/`仍是legacy v1，不加入能源功能。
+後續檢查範圍：root的[odaiba幾何檢查](../../tests/odaiba.test.ts)、[district carriers](../../tests/districtMeters.test.ts)、[結果卡](../../tests/surveyAtmosphere.test.ts)，以及root／survey真實HTTP/WebSocket pipeline。E4若改shared state／問題，需補survey狀態、replay、舊答案與相容性檢查；`module-swap/`仍是legacy v1，不加入能源功能。
 
 ## E1驗收與下一步
 
@@ -153,9 +153,9 @@ Root Vite DEV 開 `?energy=baseline&hour=12&reviewTime=20`，右上選單切換�
 
 A＝水庭＋小翼；B＝完整翼＋富士環；C＝能源島＋檢修橋；M1＝四組共存。A/B/C沒有改成環境Meter的low/mixed/high；M1在E2先做靜態共存檢查，E3的城市擴展與動態仍未開始。
 
-實作：[energyPrototype](../src/energyPrototype.ts)只建立一次量體／共享材質batch，切換只改visibility與翼scale；[devEnergy](../src/devEnergy.ts)提供DEV選單及可重開URL；[幾何檢查](../tests/energyPrototype.test.ts)加入root npm test。四組共19個材質batch；rotor保留獨立群組。
+實作：[energyPrototype](../../src/energyPrototype.ts)只建立一次量體／共享材質batch，切換只改visibility與翼scale；[devEnergy](../../src/devEnergy.ts)提供DEV選單及可重開URL；[幾何檢查](../../tests/energyPrototype.test.ts)加入root npm test。四組共19個材質batch；rotor保留獨立群組。
 
-驗證：[五張原hero日景與補充近景](../artifacts/energy-city-e2/README.md)。320秒船隊週期每0.5秒檢查全部可見船體的保守包圍盒（21,595個），另檢查22 m航空走廊、兩種泊位、公共路、六座rooms／連岸路、beacons、真實tidal-edge上的新水庭步道、四站hero視線及原hero畫框；前置rotor與實際civicCore網格不相交。這是離散幾何檢查，並非連續碰撞／海岸／結構／電力工程認證。Root test/build與整合結果記錄於[交接](handoffs/energy-city.md)。
+驗證：[五張原hero日景與補充近景](../../artifacts/energy-city-e2/README.md)。320秒船隊週期每0.5秒檢查全部可見船體的保守包圍盒（21,595個），另檢查22 m航空走廊、兩種泊位、公共路、六座rooms／連岸路、beacons、真實tidal-edge上的新水庭步道、四站hero視線及原hero畫框；前置rotor與實際civicCore網格不相交。這是離散幾何檢查，並非連續碰撞／海岸／結構／電力工程認證。Root test/build與整合結果記錄於[交接](../handoffs/archive/energy-city.md)。
 
 已知視覺限度：hero能讀到輪廓與新增岸界，但管線／渦輪細節需近景；環在劇場前方，並非貼殼同心機械；能源島及橋仍是概念量體。E3需在這些實際淨空內進一步設計，不能把E2當成最終美術或工程尺寸。
 
@@ -177,7 +177,7 @@ A＝水庭＋小翼；B＝完整翼＋富士環；C＝能源島＋檢修橋；M1
 
 最初第二庭碰水上轉乘泊位，移位後通過；完整掃掠亦促使固定軸承退到旋轉面後方、外露渦輪提高0.5 m。幾何檢查現在包含富士環全周保守環形掃掠、兩庭渦輪全周圓盤掃掠、兩條步道對真實tidal-edge、既有21,595個船體樣本、公共／航空／泊位與四站hero視線。這不是全城連續碰撞或工程認證。
 
-[實際五配置／日暮夜／動態與靜態比較](../artifacts/energy-city-e3/README.md)與[交接](handoffs/energy-city.md)記錄檢查。Hero可讀兩處水庭、集中環／翼與外擴岸界；小流向／水位及配電細節仍需近景。保留前置環而非貼球殼的限制，能源島仍為候選量體；實測FPS、展覽硬件、Safari／iPad及工程可行性未驗證。E3交付不包含E4權威配置／問卷。
+[實際五配置／日暮夜／動態與靜態比較](../../artifacts/energy-city-e3/README.md)與[交接](../handoffs/archive/energy-city.md)記錄檢查。Hero可讀兩處水庭、集中環／翼與外擴岸界；小流向／水位及配電細節仍需近景。保留前置環而非貼球殼的限制，能源島仍為候選量體；實測FPS、展覽硬件、Safari／iPad及工程可行性未驗證。E3交付不包含E4權威配置／問卷。
 
 ## 參考與推演界線
 
@@ -234,16 +234,16 @@ Q1服務（交通／物流的日常服務接口）、Q2共享（社会・生活�
 - `votes.energy`表示一個獨立類別；同一紀錄的`environmentalPriority:0`只為保留舊四軸欄位，是**缺席標記**，reducer明確跳過氣候，並非中性票。`state.energy`保存四類counts及`climateGuestCount`；總能源票必須等於guestCount−climateGuestCount。舊事件沒有energy欄位，照原四軸replay；初次新提案才附加energy狀態，舊JSON／原文不重寫。氣候分數與Scale A分別用氣候回答數，不受能源人數拉伸。
 - 正式門檻採上述2票＋20%／40%，以整數比較避免浮點邊界。`layout.energy`明列水庭0／1／2、翼none／small／large、環與島開關；配電門架由任一可見能源設備啟用。A／B／C／M1保持DEV比較預設，不作正式bands。
 - SQLite8只新增nullable `exhibition_snapshots.energy_json`；schema7資料原地升級，不刪DB，不改immutable事件。舊已保存ID重試仍回原紀錄；未提交舊草稿須重新預約，Q1／Q2／Q4有效選項保留，舊cooling不自動選能源。
-- Native checks覆蓋舊81組與新108組答案、完整歷史超過64筆、精確門檻、氣候凍結、真實7→8升級／重啟／Undo／reset／idempotency、實際模型與結果證據。實際命令／browser結果與整合commit只以[handoff](handoffs/energy-city.md)及[VALIDATION](VALIDATION.md)完成紀錄為準，不以本段推論全部通過。
+- Native checks覆蓋舊81組與新108組答案、完整歷史超過64筆、精確門檻、氣候凍結、真實7→8升級／重啟／Undo／reset／idempotency、實際模型與結果證據。實際命令／browser結果與整合commit只以[handoff](../handoffs/archive/energy-city.md)及[VALIDATION](../VALIDATION.md)完成紀錄為準，不以本段推論全部通過。
 - E5實際硬件／性能／訪客理解仍另留後續；沒有新增部署、依賴或外部資產。能源仍為2127形態／流程示意，不提供容量／可靠度／海岸工程認證。
 
 
 ## G2 能源保底配置（2026-10-30 owner 決定；2026-11-01 merge）
 
-為使每份提案都有近鏡與變化：`EnergyConfiguration` 可帶 `activity`（每類 1／2 兩種可辨認整備配置，嚴格 wire 驗證）。當提案沒有其他與該 Guest 相關的變化時，所選能源類別在兩種配置間輪替；該類未建成時顯示整備框架／整備船（不宣稱設施已成），已成熟則換配置。按有效提案次序 fold 並由伺服器重建，replay／Undo／snapshot 一致；能源門檻（≥2票＋20%）與規模規則不變。渲染重用既有材質，每類兩個烘焙 frame（共 8 組）；非陰影 draw calls +0.7–1.0%，陰影重繪未配對量度。視覺與真人辨認 gate 未驗收，見 [guest-agency](handoffs/guest-agency.md)。
+為使每份提案都有近鏡與變化：`EnergyConfiguration` 可帶 `activity`（每類 1／2 兩種可辨認整備配置，嚴格 wire 驗證）。當提案沒有其他與該 Guest 相關的變化時，所選能源類別在兩種配置間輪替；該類未建成時顯示整備框架／整備船（不宣稱設施已成），已成熟則換配置。按有效提案次序 fold 並由伺服器重建，replay／Undo／snapshot 一致；能源門檻（≥2票＋20%）與規模規則不變。渲染重用既有材質，每類兩個烘焙 frame（共 8 組）；非陰影 draw calls +0.7–1.0%，陰影重繪未配對量度。視覺與真人辨認 gate 未驗收，見 [guest-agency](../handoffs/archive/guest-agency.md)。
 
 ## E5本機部分完成（2026-10-24）
 
 使用者本輪限定先測目前Mac mini。M6／24GB／macOS27.0.1、headed Chrome156／ANGLE Metal、City1920×1080／DPR1、Vite DEV：low自動日夜真實1801.94秒平均59.94FPS，p95／p99 17.9／18.6ms、max66.7ms；90份原生Guest A/B＋16份HTTP種子，最終count106，沒有page crash／exception／context loss。60秒default兩種場景31.10／32.36FPS，low均59.94；鏡頭曾偏離初始hero，不能當完全固定鏡頭或能源GPU增量benchmark。
 
-獨立真實TCP斷線／新連線與count／能源target復原通過；renderer geometry／texture counts全段425／24。最終runner另驗canvas輸入保護及拒絕覆寫舊證據，統計self-check接root npm test。[完整方法／結果／限制](../artifacts/energy-city-e5/README.md)及[Git／CI交接](handoffs/energy-city.md)。本輪Mac限定工作完成與E5整體完成分開；4K、所有配置、整日穩定性、65吋HDMI、iPad Safari／專用LAN及真人閱讀理解仍未驗，依P5表另行安排。
+獨立真實TCP斷線／新連線與count／能源target復原通過；renderer geometry／texture counts全段425／24。最終runner另驗canvas輸入保護及拒絕覆寫舊證據，統計self-check接root npm test。[完整方法／結果／限制](../../artifacts/energy-city-e5/README.md)及[Git／CI交接](../handoffs/archive/energy-city.md)。本輪Mac限定工作完成與E5整體完成分開；4K、所有配置、整日穩定性、65吋HDMI、iPad Safari／專用LAN及真人閱讀理解仍未驗，依P5表另行安排。

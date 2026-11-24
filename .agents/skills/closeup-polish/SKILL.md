@@ -30,8 +30,8 @@ An accepted close-up is rung 1 of the [polish ladder](../polish-ladder/SKILL.md)
 
 Proven on SE +1 (2026-11-05/06): 6 → 10 → 9/12 against the target in three rounds, after seven procedural rounds had stalled at 7/12.
 
-- **On `main` since 2026-11-06.** The tower GLB, `city-kit-2127`, `propKit.ts` and `geo_helpers.py` were merged at R3 by owner request; the handoff is [se-high-blender](../../../docs/handoffs/se-high-blender.md).
-- **Blender skills:** `blender-core` (headless runner), `blender-hardsurface-modeling`, `blender-export-pipelines` (`gltf` preset, no Meshopt) and `blender-asset-qa` (`qa_check`, `review_shots`), under `.agents/skills/blender-*`. They are vendored in the owner's checkout but not committed yet.
+- **On `main` since 2026-11-06.** The tower GLB, `city-kit-2127`, `propKit.ts` and `geo_helpers.py` were merged at R3 by owner request; the handoff is [se-high-blender](../../../docs/handoffs/archive/se-high-blender.md).
+- **Blender skills:** `blender-core` (headless runner), `blender-hardsurface-modeling`, `blender-export-pipelines` (`gltf` preset, no Meshopt) and `blender-asset-qa` (`qa_check`, `review_shots`), under `.agents/skills/blender-*`. The repository includes these skills under that path.
 - **Blender:** 5.2 at `/Applications/Blender.app/Contents/MacOS/Blender`. The MCP add-on is not needed.
 
 - **Build script, not hand edits.** `asset/models/<id>/build_*.py` regenerates the `.blend` and `.glb` (`blender -b --factory-startup --python-exit-code 1 -P build_*.py`), so every round is a reviewable diff. Shared helpers live in `asset/models/geo_helpers.py`.

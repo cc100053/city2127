@@ -5,7 +5,7 @@ description: Bring an owner-supplied building image into city2127 — choose its
 
 # Place a building
 
-Proven on the SW event shelf (2026-11-13; handoff `docs/handoffs/sw-event-shelf.md` on `feat/sw-event-shelf`, owner decisions in `Dev_QA.md` Q12–Q13). The owner brings a finished image; you turn it into a placed, Meter-driven building. The **owner judges every round**: no judge subagents, no rubric scores.
+Proven on the SW event shelf (2026-11-13; handoff `docs/handoffs/sw-event-shelf.md` on `feat/sw-event-shelf`, owner decisions in `Dev_QA.md` Q12–Q13). The owner brings a finished image; you turn it into a building placed on a rotation lot or in the fixed background. The **owner judges every round**: no judge subagents, no rubric scores.
 
 Two kinds of session:
 
@@ -17,18 +17,18 @@ Two kinds of session:
 1. **Lock the massing first.** Before any scan or image generation, ask these questions together in one message:
    - Is the image the target, and which state does it show?
    - Should the building follow the vote, or stay as fixed background?
-   - Does it need −1 and +1 forms, or does another building replace it at ±1?
+   - Which question and A/B/C option should it represent, and what occupies the lot in the other options?
    - What is the massing: footprint in metres, floors × floor height, overhangs?
 
-   Done when the owner has answered all four. On the shelf, four ±1 images went to waste when the owner later asked for ten floors and dropped ±1.
-2. **Fit table.** (Updated 2026-11-21: the four-Meter version is retired; the nine-question rotation is the only product. List the nine questions' A/B/C options that lack a model plus "fixed background" instead of Meters; ignore focal/district-slot and ±1/±2 wording below, which is history from the shelf round.) List the four Meters plus "fixed background", one line each, and name any existing landmark the building would duplicate (the shelf echoed housing U). Separate a **focal** role (headline on every ±1) from a **district slot** (changes only at ±2 or ±3 and shares its trigger rate with its siblings).
+   Done when the owner has answered all four.
+2. **Fit table.** Compare missing A/B/C models in the [rotation matrix](../../../docs/QUESTION_ROTATION_PLAN.md) and fixed-background placement. Note duplicates and whether the options use one lot or several. Record the selected option and its vacant state when applicable.
    - Quote every site in metres. `changeSites` `w`/`d` are local units × `scale`: COMMONS PLAZA is 12 × 10 × 4 = 48 × 40 m. Misreading it as 12 × 10 m skewed the case for a new flagship over a court upgrade.
 
    Done when the owner has picked the role.
-3. **Lot.** The **footprint** is the largest of: the building with all its overhangs (crane rails, canopies), the ±1 replacement models, and the forecourt.
+3. **Lot.** The **footprint** is the largest of: the building with all its overhangs (crane rails, canopies), the other replacement models on the same lot, and the forecourt.
    - Scan: `SCAN_LOT=<w>,<d> node --experimental-strip-types tests/odaiba.test.ts` (about 50 s). It lists clear areas, each with its best hero pixel count.
    - Probe: `SCAN_LOT=<w>,<d>,<x>,<z>` lists every reason that centre fails (change sites, courts, housing, towers, pods, bays, routes, the district edge, ground, blockers in the whole rectangle). Show a lot as a candidate only after its probe prints `CLEAR`.
-   - Not covered by the scan: energy devices, the Sky Ring, the aerial layers in `src/layout.ts` (check the building height against them) and other sites' ±1 models that outgrow their `w × d`. List these as unverified.
+   - Not covered by the scan: energy devices, the Sky Ring, the aerial layers in `src/layout.ts` (check the building height against them) and other sites' models that outgrow their `w × d`. List these as unverified.
    - Hero visibility ranks the candidates but never gates them.
    - Lessons from the old court scan, which raycast only `city` with a circle:
      - It offered the NW AUTO HUB lot as "best" twice, because survey sites are not in `city`.
@@ -44,7 +44,7 @@ Two kinds of session:
    Done when the owner has picked a target for every needed state.
 5. **Set up rounds.**
    - Work on `feat/<task>` in the main checkout; if it holds another session's work, create a worktree `../city2127-<task>` from `origin/main` (AGENTS.md) and remove it when the task is done.
-   - Write the handoff from `docs/handoffs/TEMPLATE.md` with every decision: role, lot, facing, massing, mechanism, states, target paths and the owner's own words. Add a `Dev_QA.md` entry.
+   - Write the handoff from `docs/handoffs/TEMPLATE.md` with every decision: role, lot, facing, massing, mechanism, states, target paths and the owner's own words.
    - Write `artifacts/<task>/spec.md` as a target inventory (closeup-polish step 5 format), including the `## Library` table.
    - Write `## R1 brief` in the handoff.
 

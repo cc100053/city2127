@@ -14,7 +14,7 @@
 
 ## Goal and scope
 
-Complete [resident plan P4](../../RESIDENT_EXPERIENCE_PLAN.md): comprehensive software acceptance using scratch SQLite and simultaneous Guest/City/Admin. Reuse existing native/browser checks, add the missing desktop input/recovery/expiry cases, and trace resident reasons through real carrier evidence. No runtime behavior, geometry/camera, dependencies, exhibition database, survey schema/algorithm, module-swap, deployment or P5 hardware changes.
+Complete [resident plan P4](../../history/RESIDENT_EXPERIENCE_PLAN.md): comprehensive software acceptance using scratch SQLite and simultaneous Guest/City/Admin. Reuse existing native/browser checks, add the missing desktop input/recovery/expiry cases, and trace resident reasons through real carrier evidence. No runtime behavior, geometry/camera, dependencies, exhibition database, survey schema/algorithm, module-swap, deployment or P5 hardware changes.
 
 ## Completed work
 

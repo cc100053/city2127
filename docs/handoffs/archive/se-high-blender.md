@@ -17,7 +17,7 @@
 
 ## Goal and acceptance criteria
 
-Owner 2026-11-05：SE 夜間分最低（closeup-night R6 20/38，SW 23/30），用 Blender 重建一個 SE focal 版本。Owner 揀 **+1 high**（`se:focal`，H 鏡位），headless Blender（vendored `blender-*` skills）。Rubric 沿用 [closeup-night SE rubric](../../artifacts/closeup-night/se/rubric.md) `fh-*` 六項；收貨只由 owner 決定。Spec 同診斷：[spec](../../artifacts/se-high-blender/spec.md)。
+Owner 2026-11-05：SE 夜間分最低（closeup-night R6 20/38，SW 23/30），用 Blender 重建一個 SE focal 版本。Owner 揀 **+1 high**（`se:focal`，H 鏡位），headless Blender（vendored `blender-*` skills）。Rubric 沿用 [closeup-night SE rubric](../../../artifacts/closeup-night/se/rubric.md) `fh-*` 六項；收貨只由 owner 決定。Spec 同診斷：[spec](../../../artifacts/se-high-blender/spec.md)。
 
 ## In-scope files and dependencies
 
@@ -63,4 +63,4 @@ Owner 2026-11-05：SE 夜間分最低（closeup-night R6 20/38，SW 23/30），�
 
 ## Next expected step
 
-Owner 2026-11-06 叫停喺 R3 並 merge 入 main。如果再開：R4 建議（逐項揀）：floors／gardens 用 R3；crown 用 R3 單環＋R2 嗰種高樹（新 kit 樹）；lift 白環減到每 4 層、玻璃更實、cabin 更大更實；角柱加粗圓角（frame 係 locked，要 owner 批）；查夜間 FPS。（舊：R3 建議：上層暖色、每層傢俬唔同、升降井玻璃管要讀到＋cabin 大而實、kit 樹改矮叢、頂環修鋸齒加密屋頂花園。（R2 背景：owner 2026-11-05 叫寫 R2（[spec](../../artifacts/se-high-blender/spec.md) `# R2`）：由 target 逐項寫（T1–T10），材質唔再鎖（只鎖人仔），新做 reusable prop kit `city-kit-2127`（樹、室內植物、傢俬、長凳、lift cabin，真實米＋每 site `unitsPerMetre`）。下一步：owner 批 spec → Sonnet 實作 R2 → 三個 absolute judge 對 target。）
+Owner 2026-11-06 叫停喺 R3 並 merge 入 main。如果再開：R4 建議（逐項揀）：floors／gardens 用 R3；crown 用 R3 單環＋R2 嗰種高樹（新 kit 樹）；lift 白環減到每 4 層、玻璃更實、cabin 更大更實；角柱加粗圓角（frame 係 locked，要 owner 批）；查夜間 FPS。（舊：R3 建議：上層暖色、每層傢俬唔同、升降井玻璃管要讀到＋cabin 大而實、kit 樹改矮叢、頂環修鋸齒加密屋頂花園。（R2 背景：owner 2026-11-05 叫寫 R2（[spec](../../../artifacts/se-high-blender/spec.md) `# R2`）：由 target 逐項寫（T1–T10），材質唔再鎖（只鎖人仔），新做 reusable prop kit `city-kit-2127`（樹、室內植物、傢俬、長凳、lift cabin，真實米＋每 site `unitsPerMetre`）。下一步：owner 批 spec → Sonnet 實作 R2 → 三個 absolute judge 對 target。）

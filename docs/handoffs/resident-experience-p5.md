@@ -16,7 +16,7 @@
 
 ## 2026-10-24能源E5本機續作
 
-使用者限定「test this mac mini only」。目前Mac mini M6／24GB已做1080p、DPR1、low真實30分鐘A/B長跑，數據與相機限制見[能源E5紀錄](../../artifacts/energy-city-e5/README.md)及[交接](energy-city.md)。這是目前主機的本機證據，不填成D0–D10的65吋HDMI／iPad／專用router或真人結果；展覽日完整時長／門檻及P5／S5仍待owner安排。
+使用者限定「test this mac mini only」。目前Mac mini M6／24GB已做1080p、DPR1、low真實30分鐘A/B長跑，數據與相機限制見[能源E5紀錄](../../artifacts/energy-city-e5/README.md)及[交接](archive/energy-city.md)。這是目前主機的本機證據，不填成D0–D10的65吋HDMI／iPad／專用router或真人結果；展覽日完整時長／門檻及P5／S5仍待owner安排。
 
 ## Session Git state
 
@@ -24,11 +24,11 @@
 
 ## Goal and acceptance criteria
 
-執行 [居民計劃 P5](../RESIDENT_EXPERIENCE_PLAN.md#p5--展場與實際裝置驗收in_progress)：在指定展覽裝置／實際連線／觀看位置完成操作、閱讀、理解與復原驗收。結果須附實際commit、裝置、日期及證據；未執行項目不可標PASS。P5完成不自動代表 [S5](../EXHIBITION_SPEC.md#開發工具與待完成驗收) 全部完成。
+執行 [居民計劃 P5](../history/RESIDENT_EXPERIENCE_PLAN.md#p5--展場與實際裝置驗收in_progress)：在指定展覽裝置／實際連線／觀看位置完成操作、閱讀、理解與復原驗收。結果須附實際commit、裝置、日期及證據；未執行項目不可標PASS。P5完成不自動代表 [S5](../EXHIBITION_SPEC.md#展覽待驗收) 全部完成。
 
 ## In-scope files and dependencies
 
-本交接兼作驗收表，沿用 [P4](archive/resident-experience-p4.md)、[VALIDATION](../VALIDATION.md) 及 [README啟動流程](../../README.md#展覽啟動mac--windows)。只同步本交接、計劃、驗證入口與索引。實測問題出現後才trace callers並修正；不新增泛用手機responsive／adaptive camera、依賴或服務，不改展覽DB。
+本交接兼作驗收表，沿用 [P4](archive/resident-experience-p4.md)、[VALIDATION](../VALIDATION.md) 及 [README啟動流程](../../README.md#1-啟動兩個伺服器)。只同步本交接、計劃、驗證入口與索引。實測問題出現後才trace callers並修正；不新增泛用手機responsive／adaptive camera、依賴或服務，不改展覽DB。
 
 ## 裝置與場地記錄
 
@@ -38,7 +38,7 @@
 | --- | --- |
 | 主屏幕／輸出 | 預計65吋、主機HDMI輸出；型號、解析度、refresh rate、CSS viewport／pixel ratio、City browser待提供 |
 | 觀看距離 | 預計約4米；實際站位、輸入裝置高度／角度、燈光／反光待測 |
-| 輸入裝置／模式 | 預計兩部iPad接收主機畫面、A/B；型號、尺寸、iPadOS、主機Guest browser版本、各站橫向CSS viewport／縮放待提供 |
+| 輸入裝置／模式 | 兩部 iPad 用 Safari 經 LAN 開各自 A/B；記錄型號、尺寸、iPadOS 同橫向 viewport／縮放 |
 | 運行電腦 | 使用者提供「Mac mini M6」作預計主機；實際型號／OS／CPU／GPU／Node版本尚未核驗 |
 | 裝置連接／LAN | 2026-10-04 使用者改選：兩部iPad用Safari經專用router LAN開 `/guest?station=A`／`B`，City留主機HDMI；取代早前「主機直接輸出畫面到iPad」方案。設定步驟見 [LAN雙站](lan-guest-stations.md) |
 | 現場操作人／日期／場所 | 待指定 |
@@ -48,9 +48,9 @@
 
 ## 實機操作與驗收表
 
-1. 先完成D0：按 [LAN雙站](lan-guest-stations.md) 設定router及iPad，記錄軟件版本及接線。不新增顯示驅動／第三方服務。依README build；survey server用 `SURVEY_HOST=0.0.0.0` 並抄下terminal印出嘅 `LAN Guest:` A／B網址，Vite維持loopback，City視窗放HDMI主屏。（2026-10-04前此步驟寫「主機直接輸出畫面到iPad」，已由使用者改選LAN取代。）測試server用 `SURVEY_DB_PATH` 指定獨立scratch SQLite；Admin始終使用host localhost。不使用展覽DB做reset／Undo演練，也不依賴DEV-ONLY自動答題。
+1. 先完成D0：按 [LAN雙站](lan-guest-stations.md) 設定router及iPad，記錄軟件版本及接線。不新增顯示驅動／第三方服務。依README build；survey server用 `SURVEY_HOST=0.0.0.0` 並抄下terminal印出嘅 `LAN Guest:` A／B網址，Vite維持loopback，City視窗放HDMI主屏。手勢版使用可信 HTTPS 同各站嘅 `&hand`。測試server用 `SURVEY_DB_PATH` 指定獨立scratch SQLite；Admin始終使用host localhost。不使用展覽DB做reset／Undo演練，也不依賴DEV-ONLY自動答題。
 2. 在指定橫向iPad、65吋HDMI主屏與約4米站位逐項執行。睡眠、斷網、租期及長跑使用真實時間，不以P4 clock jumps或Chromium觸控模擬當實機證據。
-3. 訪談先記錄原話，再解釋設計。實測需要縮短文案時同步 [P1 copy](../RESIDENT_COPY.md) 與正式callers；先縮句。如仍需改10秒時段，同步server排程、Guest、lease／guard／drain並重新驗證。
+3. 訪談先記錄原話，再解釋設計。實測需要縮短文案時同步 [居民文案](../RESIDENT_COPY.md) 與正式callers；先縮句。如需改13秒時段，同步server排程、Guest、lease／guard／drain並重新驗證。
 4. 由展覽owner確認復原政策，現場操作人演練並留下結果；完成相關修正／checks／新證據後才關閉P5。
 
 | ID／檢查 | 通過條件 | 結果／證據 |
@@ -59,17 +59,15 @@
 | D1 iPad觸控／焦點／核對修改 | 選項、返回、下一題、修改、提交可用；選取／焦點清楚；題目與操作可達 | NOT RUN |
 | D2 約4米可讀性／抬頭／反光 | 正常站位可讀Guest及City；找到自己的站號／編號及變化位置，城市仍可觀看 | NOT RUN |
 | D3 單站／下一位 | 四題只累積一次；Guest／City識別一致；下一Start自動交接並繼承城市 | NOT RUN |
-| D4 A/B同時提交 | 草稿／保存獨立；依實際提交順序呈現；10秒slot不重疊，不混淆身份 | NOT RUN |
-| D5 閱讀／城市結果 | 0–3秒找到位置，3–10秒讀懂偏好及共同結果；變化／維持與實際城市一致 | NOT RUN |
-| D6 Guest睡眠／reload／實際連線中斷 | 按輸出方案實測USB斷接或Wi-Fi中斷；草稿及未知保存結果可復原／同ID重試，無重複票；已到期依期限交接 | NOT RUN |
+| D4 A/B同時提交 | 草稿／保存獨立；依實際提交順序呈現；13 秒展示時段不重疊，不混淆身份 | NOT RUN |
+| D5 閱讀／城市結果 | 沿投票旅程找到位置，喺 13 秒內讀懂偏好及可見結果；變化／維持與實際城市一致 | NOT RUN |
+| D6 Guest睡眠／reload／實際連線中斷 | 實測 Wi-Fi／LAN 中斷；草稿及未知保存結果可復原／同ID重試，無重複票；已到期依期限交接 | NOT RUN |
 | D7 City睡眠／斷網／重連 | 立即恢復最新權威狀態，無舊字幕／動畫重播；記錄漏看展示情況 | NOT RUN |
-| D8 reset／取消／Undo／離線站 | Scratch DB：reset遵守drain、中止只影響指定未完成站、Undo符合條件；問卷5分鐘及展示起點後15秒租期實際釋放 | NOT RUN |
+| D8 reset／取消／Undo／離線站 | Scratch DB：reset遵守drain、中止只影響指定未完成站、Undo符合條件；問卷5分鐘及展示起點後18秒租期實際釋放 | NOT RUN |
 | D9 重啟／照明／reduced motion | 正常關閉後重啟同一scratch DB，城市／歷史／照明保留；照明不吞queue，reduced motion立即恢復 | NOT RUN |
 | D10 長跑／GPU | 按owner確認時長及負載運行，記錄停頓、記憶體、FPS採樣、draw calls／triangles、console／network及復原 | NOT RUN；時長／門檻待定 |
 
 每筆填：ID、日期／時間、被測commit、裝置、站號／submission識別、操作步驟、預期／實際、PASS／FAIL／NOT RUN／有理由的N/A、證據路徑。不同run保留不同證據，不覆寫P2–P4截圖。性能按 [VALIDATION](../VALIDATION.md#performance-evidence) 記錄；現有City canvas `data-fps` 每120 frames更新平均，`data-draw-calls`可輔助採樣，不能當frame-time分布或長跑證據。
-
-輸出方案核對（2026-10-02）：[Apple現行Sidecar說明](https://support.apple.com/en-ie/102597) 支援延伸／鏡像及USB連接，並記錄macOS／iPadOS27起擴充觸控；[Apple 2019技術說明](https://www.apple.com/macos/big-sur/docs/Sidecar_Tech_Brief_Oct_2019.pdf) 曾明列一次一部iPad。這份舊限制不能當新OS實測；現行說明沒有證明本案雙iPad獨立觸控配置可行，故不把Sidecar當已選定方案。實際版本與D0結果必須留證，不能只證明畫面能亮。
 
 ## 理解程度訪談
 
@@ -90,7 +88,7 @@
 | 情境 | 現行能力／限制 | Owner決策／演練 |
 | --- | --- | --- |
 | 下一位／reset | 單站Start自動交接；A/B reset停止admission並drain；city reset保留總人數，full reset清展示計數但保留歷史 | 何時reset、由誰操作：待確認 |
-| 放棄問卷／離線站 | Admin指定未完成session中止；問卷5分鐘／result展示起點後15秒租期釋放 | 等候／中止與觀眾提示：待確認 |
+| 放棄問卷／離線站 | Admin指定未完成session中止；問卷5分鐘／result展示起點後18秒租期釋放 | 等候／中止與觀眾提示：待確認 |
 | 保存結果未知 | 原submission ID重試，不建新票猜成功 | 工作人員協助方式：待演練 |
 | City漏看／主屏斷線 | 重連恢復最新snapshot；排程不確認viewer已播放，沒有viewer-ack或漏看動畫重播 | 暫停／恢復接待與重新說明方式：待確認 |
 | 主機／server重啟 | 沿用原SQLite，不刪DB；重開Guest／City／Admin核對 | 正常關閉、資料保存及值班人：待確認／演練 |

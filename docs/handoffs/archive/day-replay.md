@@ -1,7 +1,7 @@
 # day-replay — 「今日の台場」回顧章節
 
 - Owner: cc100053（規劃討論：Claude Code）
-- Status: SUPERSEDED（owner 2026-11-20）— 建築快轉會重複見到同一批模型，改由 [attract-loop](attract-loop.md) 嘅「声の灯」（今日提案光點＋Meter 曲線）取代；以下保留作參考
+- Status: SUPERSEDED（owner 2026-11-20）— 建築快轉會重複見到同一批模型，改由 [attract-loop](../attract-loop.md) 嘅「声の灯」（今日提案光點＋Meter 曲線）取代；以下保留作參考
 - Branch: 未建立（建議 `feat/day-replay`，由最新 main 開）
 - Base commit: 未開始；規劃時 main 係 `2695823`
 - Last verified commit: NONE
@@ -60,13 +60,13 @@
 
 - **Server**：新增 `GET /api/city-history`，回傳當前 run 每份有效提案嘅 `{ordinal, stationId, afterScores, slotSeeds}`。layout 由 `exhibitionStateLayout(afterScores, ordinal)` 計，跟刻度 A。slot seed 用 `foldSlotSeeds` 逐份推算。現有 `runProposalRecords` 上限係 64 份，要另外寫 query。
 - **Root**：新增回顧控制器，逐步呼叫 `CityChangeManager.applyExhibitionLayout`。加速方法係回顧期間畀 change manager 一個大約 5 倍速嘅時鐘，唔改 3 秒常數。
-- **重用**：DEV `?scaleLab`（[scaleLab.ts](../../src/scaleLab.ts)）已經做到 seeded replay 同四條 Meter 曲線，時間軸可以參考；章節可以用 [一票旅程](archive/vote-journey.md) 嘅光點：回顧時光點逐位亮起。
+- **重用**：DEV `?scaleLab`（[scaleLab.ts](../../../src/scaleLab.ts)）已經做到 seeded replay 同四條 Meter 曲線，時間軸可以參考；章節可以用 [一票旅程](vote-journey.md) 嘅光點：回顧時光點逐位亮起。
 - **測試**：keyframe 最後一步等於 `CityView`；打斷後回到權威狀態；章節揀選規則（band flip、上限 4 個）。
 
 ## 相關決定（已確定）
 
 - 2026-10-13 owner：**不做自動 reset**（所以一個 run 可能成日都唔 reset；「今日」嘅定義要再確認，見下）。
-- 2026-10-13 owner：採用 [刻度 A](archive/meter-scale-a.md)（×0.85→2.4）；[一票旅程](archive/vote-journey.md) 已接入 live。
+- 2026-10-13 owner：採用 [刻度 A](meter-scale-a.md)（×0.85→2.4）；[一票旅程](vote-journey.md) 已接入 live。
 - 現行規則：主鏡頭唔郁；v2 分數唔影響全城氣氛（回顧壓暗屬演出，要確認唔算違反）。
 
 ## 待決定（開工前）

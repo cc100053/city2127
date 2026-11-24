@@ -35,11 +35,11 @@
 | 車坐喺導軌面，冇 maglev 特徵 | 冇裙板、冇 under-emitter、冇浮動間隙 |
 | 夜晚得薄荷線發光 | 冇室內光、車頭燈、車尾燈 |
 
-Baseline 截圖：`~/city2127-evidence/train-closeup-polish/baseline/`（`train-day.png`、`train-night.png`、`hero-day.png`）。Prompt：[prompts.md](../../artifacts/train-closeup-polish/prompts.md)。
+Baseline 截圖：`~/city2127-evidence/train-closeup-polish/baseline/`（`train-day.png`、`train-night.png`、`hero-day.png`）。Prompt：[prompts.md](../../../artifacts/train-closeup-polish/prompts.md)。
 
 ## 目標圖
 
-Gemini 第 1 輪（保守 maglev：尖頭、玻璃帶、裙板）owner 退回：「not 2127 taste, more exaggerate」。第 2 輪兩個方向：A 浮空力場、B 巨型軌道環（要沿導軌加固定環，改 hero）。Owner 2026-11-08 揀 **A 夜景版**（發光環套住每個車廂接駁位、隨車移動；刀鋒車頭；玻璃頂見乘客）；日景按同一設計補生成。[target/](../../artifacts/train-closeup-polish/target/)，prompt [prompts.md](../../artifacts/train-closeup-polish/prompts.md)。
+Gemini 第 1 輪（保守 maglev：尖頭、玻璃帶、裙板）owner 退回：「not 2127 taste, more exaggerate」。第 2 輪兩個方向：A 浮空力場、B 巨型軌道環（要沿導軌加固定環，改 hero）。Owner 2026-11-08 揀 **A 夜景版**（發光環套住每個車廂接駁位、隨車移動；刀鋒車頭；玻璃頂見乘客）；日景按同一設計補生成。[target/](../../../artifacts/train-closeup-polish/target)，prompt [prompts.md](../../../artifacts/train-closeup-polish/prompts.md)。
 
 ## R1
 
@@ -48,7 +48,7 @@ Gemini 第 1 輪（保守 maglev：尖頭、玻璃帶、裙板）owner 退回：
 - Runtime：`mobility.ts` `trainFleet()` 將每列車拆成 lead／mid／tail 三個 fleet（mid fleet 喺車頭車尾 slot 畫 scale 0），GLB 載入後 `rebuild`；方盒 fallback 保留（已驗：footprint 超出時保持方盒）。`guideway-pods` 同 `sweep-pods` 都換。`districtMeters` 測試改為三個 fleet 加埋計可見車廂數。
 - Bug：第一版 shell winding 反咗（面朝內），runtime 睇落成架車透明；已修。
 
-對比圖 [r1/vs-target.jpg](../../artifacts/train-closeup-polish/r1/vs-target.jpg)（左 baseline、中 R1、右目標；上日下夜）。Opus 目測，未跑 judge／rubric。已知低於目標：
+對比圖 [r1/vs-target.jpg](../../../artifacts/train-closeup-polish/r1/vs-target.jpg)（左 baseline、中 R1、右目標；上日下夜）。Opus 目測，未跑 judge／rubric。已知低於目標：
 
 - 車頭刀鋒太長太幼，擋風玻璃同暖白頭燈帶喺鏡頭入面讀唔到。
 - 腰線冷光（seam）日夜都幾乎睇唔到；目標係明顯一條。
@@ -60,7 +60,7 @@ FPS：NOT RUN（24+4 車廂，每卡約 3k tris，draw calls 由 8 增至約 39�
 
 ## R2
 
-針對 R1 五項。對比圖 [r2/vs-target.jpg](../../artifacts/train-closeup-polish/r2/vs-target.jpg)（左 R1、中 R2、右目標；上日下夜）。Opus 目測，未跑 judge。
+針對 R1 五項。對比圖 [r2/vs-target.jpg](../../../artifacts/train-closeup-polish/r2/vs-target.jpg)（左 R1、中 R2、右目標；上日下夜）。Opus 目測，未跑 judge。
 
 - 環：車身升到離導軌頂 1.02 m（`FLOAT`），環半徑 1.66 → 2.0、管 .12 → .15，腳仍然離導軌頂 .06。
 - 力場：車底光片之外加兩幅由車腹邊斜落導軌兩側嘅光簾（頂亮底暗，additive）；日間強度 .55 → .9。
@@ -79,7 +79,7 @@ FPS（`fps.sh` headed Chrome，hero `se:high`，1920×1080，同一部機同一�
 
 ## R3
 
-對比圖 [r3/vs-target.jpg](../../artifacts/train-closeup-polish/r3/vs-target.jpg)（左 R2、中 R3、右目標；上日下夜）。Opus 目測，未跑 judge。開工前關咗一個閒置 11 小時嘅 playwright `r4` headless Chrome（本 project，非本任務開）。
+對比圖 [r3/vs-target.jpg](../../../artifacts/train-closeup-polish/r3/vs-target.jpg)（左 R2、中 R3、右目標；上日下夜）。Opus 目測，未跑 judge。開工前關咗一個閒置 11 小時嘅 playwright `r4` headless Chrome（本 project，非本任務開）。
 
 - 車頭：車頂全高保持到 `NOSE_START`（車身前端前 1.2 m）先開始落，所以車頭由長刺變成子彈頭；成個車頭頂係一塊深色反光擋風玻璃（新角色 `train_screen`，runtime `trainScreen`），刀鋒前段保持白色。頭車座艙收短到擋風玻璃後面（之前座位穿出車頭）。
 - 夜景室內：唔再用橙色 emissive 塗晒成個座艙；每卡車頂加一條暖白燈帶（新角色 `train_lamp`，日 .4／夜 3.4），室內 emissive 改淡暖白（日 .12／夜 .42），乘客保留自己衫色。

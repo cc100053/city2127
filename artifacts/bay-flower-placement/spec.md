@@ -19,4 +19,4 @@
 | 放置方法（`addCityModel`、海面對齊、常駐背景） | Reuse | [hydroTerrace](../../src/hydroTerrace.ts) |
 | 城市水面 | Reuse | [bayWater](../../src/bayWater.ts) |
 
-狀態、選址驗證及 R1 驗收見 [handoff](../../docs/handoffs/bay-flower-placement.md)。
+狀態、選址驗證及 R1 驗收見 [handoff](../../docs/handoffs/archive/bay-flower-placement.md)。

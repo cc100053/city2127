@@ -1,53 +1,35 @@
 # 現行 handoffs
 
-> **2026-11-21：version4／Meter 版本已退役，現行唯一版本係九題抽題輪換。** 舊交接入面嘅 Meter 下一步唔再係 backlog。
+2026-11-24 整理。開新交接用 [TEMPLATE](TEMPLATE.md)。已結案、已取代同舊版設計記錄見 [Archive](archive/README.md)。
 
-2026-11-05 整理（原 2026-10-03／10-13）。只列仍待接續的任務。產品決策 owner：cc100053；每項保留自己的 owner，修改共用模組或素材前先協調。
+目前文件整理見 [docs-archive](docs-archive.md)。
 
-| 交接 | 狀態／下一步 | Owner |
-| --- | --- | --- |
-| [台場素材](odaiba-assets.md) | IN_PROGRESS；素材研究／跨機接續仍開放。Runtime 已使用匯入素材；不要重做舊「未整合」步驟 | cc100053 |
-| [台場換場 P6/S5](odaiba-venue.md) | P0–P5已整合；P6/S5展覽驗收未完成，與P5實機表協調 | cc100053 |
-| [台場 Dream Loop r2](odaiba-dream-loop-2.md) | 已整合，target未達；視覺polish延後，待owner指定再開新任務分支 | cc100053 |
-| [LAN 雙站 iPad](lan-guest-stations.md) | IN_PROGRESS；軟件已整合，單機 station A 經 LAN PASS；雙機／瞓機待第二部裝置 | cc100053 |
-| [iPad「住民の窓」](hand-guest.md) | 已整合 main；五頁單站 iPad Air 試用通過，兩站同時用手勢及展覽現場待驗 | cc100053 |
-| [居民體驗 P5](resident-experience-p5.md) | IN_PROGRESS；文件準備已發布，D0–D10／理解程度／長跑實機NOT RUN。先提供輸出方案及可測硬件 | Codex；展覽決策cc100053，現場操作人待指定 |
-| [描畫品質](render-quality.md) | `?quality=low` 已實作；TODO：自動品質調整（按實測 FPS 逐級降低） | cc100053 |
-| [閒置吸引循環](attract-loop.md) | IN_PROGRESS；Step A（漂移鏡頭＋呼籲）已實作待驗收，Step B「声の灯」未開始 | cc100053 |
-| [回顧章節](day-replay.md) | SUPERSEDED（owner 2026-11-20）：建築快轉改為 attract-loop 嘅「声の灯」；保留作參考 | cc100053 |
-| [變化說明卡](change-explanation.md) | PLANNED（TODO）；右上卡片直接說明「乜嘢變成乜嘢」，未定案前先用參數前後變動 | cc100053 |
-| [能源城市](energy-city.md) | E1–E4完成並發布main，CI通過；Q3獨立能源權威配置、舊氣候／歷史與正式browser通過；E5本機Mac mini 30分鐘量測與TCP復原已驗；展覽硬件／訪客待驗 | Codex；產品決策cc100053 |
-| [建築・居住](housing-city.md) | SOFTWARE COMPLETE A：owner 2026-10-27選A固定背景，M搬位，已整合main且CI通過；只餘展覽硬件／訪客／工程驗收；[證據](../../artifacts/housing-background/README.md) | Codex；產品決策cc100053 |
-| [NW focal デックス西接駁](nw-focal-connections.md) | 候選待 owner 視覺驗收，見 Gemini、變化總覽與接駁斜俯視 | cc100053 |
-| [近鏡打磨](closeup-polish.md) | S0 INTEGRATED，98/98；coordinator接受量度基準，失敗保留；worker 01a17d74；分 S0 基準 → A NE → B SW → C SE → D NW → Z 回歸；驗收同 capture 標準已定，每個 sector 要 owner 睇圖批准先 merge | cc100053 |
-| [近鏡推近／先推近後變化](closeup-zoom.md) | INTEGRATED CANDIDATE（2026-10-30 owner 指示 merge）；F／A 視覺硬門檻仍未達 | cc100053；實作Codex |
-| [每位Guest近鏡＋明顯變化](guest-agency.md) | G1–G3、G7、G2 候選已 merge main `95c70be`（CI 通過）；G5 文案、G4／G7 視覺與性能 gate、真人兩秒辨認未驗收 | cc100053 |
-| [導軌列車](train-closeup-polish.md) | DONE（2026-11-09）；owner 接受 R3 並 merge（目測，未跑 judge；已知差距見 handoff） | cc100053 |
-| [街道車輛家族](car-closeup-polish.md) | DONE；owner 接受 R2 並 merge（獨立 judge 8/18，已知差距見 handoff） | cc100053 |
-| [空の環 Sky Ring](hero-sky-ring.md) | DONE（2026-11-02）；方案 B 巨構：250 m 桁架環＋六支 V 斜柱＋泊位＋居民聲音燈點；close-up polish owner 接受 R5 | cc100053 |
-| [Hero 霧與光層次](hero-atmosphere.md) | IN_PROGRESS（2026-11-02）；R1 高度霧／夜間窗燈層次／夜空地平線，R2 水面燈光倒影，等 owner 目視 | cc100053 |
-| [近鏡後續／能源講解](closeup-next.md) | F1/F2、C1 INTEGRATED（C1 owner批准，24組兩秒辨認未做）；N1 能源講解 INTEGRATED（13s／日文），F3等硬件（2026-10-29） | cc100053 |
-| [清除斷頭路與舊地台](road-fix.md) | IN_PROGRESS（2026-11-20）；A1/B1-a/C1 及地台清單已實作，本機測試通過，待 owner 目視及 PR | cc100053 |
-| [主樓正門、環形底座、船身前庭](entrance-polish.md) | DONE（2026-11-21，PR #9）；前庭、天橋落點、底座大堂、船身商店層、環形隧道門，玻璃盒移除 | cc100053 |
-| [富士大樓打磨](fuji-civic-facade.md) | R1 外觀已獲選，R8 闊翼陶板轉角樣板已接受，R9 窗套導光候選待驗收 | Codex |
-| [直立環形巨構 GLB 試作](ring-glb-pilot.md) | R6 下環接駁及斜坡植栽整合 main，展覽機待測 | Codex |
-| [階梯巨構立面](hull-facade.md#r12--blender-船首洞口) | R12 Blender 船首洞口，待業主目視驗收及展覽機驗證 | cc100053 |
-| [Road audit](road-audit.md) | IN_PROGRESS（2026-11-04）；修路已 merge main，owner 目視驗收同餘下決定未做 | cc100053 |
-| [SE +1 Blender 塔](se-high-blender.md) | MERGED R3（2026-11-06，owner 叫停）；9/12 對目標，`fh-frame`／`fh-crown`／`fh-lift` 未到 2，夜間 hero FPS 53–57 待查 | cc100053 |
-| [SW 活動モジュール棚](sw-event-shelf.md) | IMPLEMENTED，待 owner 視覺驗收（2026-11-13）；棚 GLB 與接入已完成，分支 `feat/sw-event-shelf` 未 merge | cc100053 |
-| [SE 塔＋pod district 近鏡](se-stage-closeup-polish.md) | IN_PROGRESS。R3 日 20/30、夜 19/30，等 owner 視覺驗收。 | cc100053 |
-| [一票旅程落點](journey-landing.md) | DONE（實作）；光點落喺變化格，owner 目視驗收未做 | cc100053 |
-| [Q02-A 水の棚田素材](q02a-hydro-terrace.md) | DONE（2026-11-17）；`asset/models/q02a-hydro-terrace/` source＋GLB 已發布 main，未放入 runtime | noifex |
-| [Q02-A Three.js 水流](q02a-water-threejs.md) | PLANNED（條件式）；Q02-A 被採用先開工：GLB 靜態，水面／瀑布流動同水車轉動要喺 Three.js 做 | noifex |
-| [Q02-A 水の棚田選址](q02a-hydro-placement.md) | DONE（owner 2026-11-17 接受 R1，已合併 main）；西岸海面 (−375, −170) 常駐背景、北岸步道、水上的士環線西端南移；角色待定 | cc100053 |
-| [Q02-B 蓮花受電選址](bay-flower-placement.md) | DONE（owner 2026-11-19 接受 R2，已合併 main `b27c3802`）；南部公園西岸外海，花中心 (−712, 300)，version4 只顯示空置態（岸上機房），DEV `?bayFlower=1` 顯示花 | cc100053 |
-| [居民情景：湊](resident-minato.md) | IN_PROGRESS（2026-11-12）；NW focal 三個狀態、四種轉變嘅 DEV 演示已 merge（`?residentDemo`）；演技／口形、FPS、三種中斷同正式接入未做 | cc100053 |
-| [素材庫](asset-library.md) | DONE（2026-11-13）；`asset/models/LIBRARY.md` 索引＋`modules.py`＋索引測試已上 main；模組 polish 1 owner 收貨（accepted）；SE 分支已改用模組，SE 嗰輪仍待收貨同 merge | cc100053 |
-| [Rectenna 建物 GLB](rectenna-building.md) | DONE（2026-11-13）；dream-loop rectenna 只留建物，金屬 Space Grey、受電膜少し虹色，`asset/models/rectenna-farm-canopy/`；未擺入城市，R2 菜低多邊形＋密度減半，2.9 M → 0.56 M tris | cc100053 |
-| [CI 時間餘量](ci-headroom.md) | DONE（2026-11-10）；`odaiba.test.ts` 街車淨空檢查改用分格 raycast，245 s → 45 s，檢查內容不變 | cc100053 |
+## 展覽流程同現場驗收
 
-已完成或不再適用的74份交接及Meter截圖見 [歸檔索引](archive/README.md)。歷史下一步不會自動變成backlog；Shibuya不再開發。人類美術review／實機未測等限制保留，不因歸檔而結案。
+| 交接 | 下一步 |
+| --- | --- |
+| [輪換題目](question-rotation.md) | 按現行矩陣補齊模型、文案同驗收 |
+| [iPad「住民の窓」](hand-guest.md) · [LAN 雙站](lan-guest-stations.md) | 單站 iPad Air 已有實測，雙站手勢、休眠及斷線復原待驗 |
+| [居民體驗 P5](resident-experience-p5.md) · [台場換場 P6/S5](odaiba-venue.md) | 核對展場設備、距離、長跑同當日復原 |
+| [顯示品質](render-quality.md) | 以展場機驗證日夜、主鏡、近鏡及可用畫質 |
+| [閒置吸引循環](attract-loop.md) | 核對候選狀態同展覽體驗 |
+| [投票落點](journey-landing.md) | 以現行輪換及結果畫面審閱候選 |
 
-新交接沿用 [TEMPLATE](TEMPLATE.md)。完成後歸檔並修正連結；任務日期／commit／實際驗證仍留在各自文件。現行入口：[文件索引](../README.md)、[SPEC](../EXHIBITION_SPEC.md)、[PROJECT](../PROJECT.md)、[VALIDATION](../VALIDATION.md)。
+## 建築、場景同候選
 
-- [Sky Ring Blender close-up polish](skyring-closeup-polish.md) — R1 candidate, owner calibration and clearance checks pending.
+| 交接 | 下一步 |
+| --- | --- |
+| [階梯巨構立面](hull-facade.md) · [公共退台](hull-terraces.md) | R14 已有目視驗收，展覽機及其餘候選見交接 |
+| [Fuji TV](fuji-civic-facade.md) · [直立環形巨構](ring-glb-pilot.md) | 核對已接候選同各自實機驗收 |
+| [空の環](hero-sky-ring.md) · [Sky Ring Blender 近鏡](skyring-closeup-polish.md) · [Hero 霧光](hero-atmosphere.md) | 跟各交接保留嘅視覺驗收 |
+| [NW 接駁](nw-focal-connections.md) · [SW 接駁](sw-focal-connections.md) | 審閱接駁候選同日夜圖 |
+| [SW 活動棚](sw-event-shelf.md) · [水の棚田流動](q02a-water-threejs.md) | 以現行 Q08／Q02 編配同 owner 決定為準 |
+| [原 Q08-C 住宅塔候選](q08c-housing-tower.md) | 另案審閱。現行 Q08-C 已使用活動模組棚 |
+| [湊](resident-minato.md) · [凪](resident-sw-nagi.md) · [葵](resident-aoi.md) | 人物情景只作 DEV 審閱，按[情景計劃](../RESIDENT_SCENE_PLAN.md)排下一級 |
+| [道路盤點](road-audit.md) · [道路修整](road-fix.md) · [街景填充](urban-fill.md) · [台場素材](odaiba-assets.md) | 待視覺確認或實際採用決定 |
+| [近鏡基準](closeup-polish.md) · [近鏡後續](closeup-next.md) · [近鏡推進](closeup-zoom.md) · [過場](build-transition.md) · [台場 Dream Loop](odaiba-dream-loop-2.md) | 參考既有測量、候選同驗收缺口，按現行輪換選項安排工作 |
+| [Chrome 截圖啟動](chrome-capture-startup.md) | 擷取工作遇到啟動問題時查閱 |
+
+## 早期工作嘅驗收限制
+
+[能源研究](archive/energy-city.md)、[住宅背景](archive/housing-city.md)同[原每票可見變化方案](archive/guest-agency.md)曾經留下實機或人類目視驗收缺口。現行展覽機驗收跟 [P5](resident-experience-p5.md) 同 [VALIDATION](../VALIDATION.md)。已退役內容留作證據。

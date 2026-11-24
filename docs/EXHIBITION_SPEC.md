@@ -1,6 +1,6 @@
 # Mind craft― 選択の積み重ねでつくる都市 ―
 
-展覽規格，核對日期：2026-10-02；Owner：cc100053，文件整理：Codex。操作入口見 [README](../README.md)，程式責任見 [PROJECT](PROJECT.md)，驗證方法與證據見 [VALIDATION](VALIDATION.md)。
+展覽規格，核對日期：2026-11-24；Owner：cc100053，文件整理：Codex。操作入口見 [README](../README.md)，程式責任見 [PROJECT](PROJECT.md)，驗證方法與證據見 [VALIDATION](VALIDATION.md)。
 
 ## 正式作品名與介紹（2026-11-23）
 
@@ -16,177 +16,29 @@
 
 ## 場地與決策
 
-- 直立環形巨構 R6（2026-11-21）：廣場天橋經花園簷篷、公共轉乘大堂通往露天花園。日文門牌與冷白導光沿樓面引路，等候區及庭園有固定植栽。下環四道斜坡種植帶採用羽狀蕨、折葉叢、垂藤及帶點光的高莖。道路 ① 及 Yurikamome 沿原隧道通過。[日夜對照及交接](handoffs/ring-glb-pilot.md#round-6)
-
-- 階梯巨構公共退台 R1（2026-11-22，待視覺驗收）：廣場入口上方、中段及上段各打開一處植栽帶，露出低層平台、有遮蔭的中層庭院及高層觀景台。[交接](handoffs/hull-terraces.md)
-- 階梯巨構立面 R2（2026-11-22）：業主選定 Gemini 的曲線立面方向。八級船身改用相接的銀色曲框、深窗洞、玻璃後的暖光和局部菱格遮光板，沿用三處公共退台及廣場接駁。[方向圖與實景對照](handoffs/hull-facade.md)
-- 階梯巨構立面 R3（2026-11-22，待視覺驗收）：中段兩道銀框跨層相接，留出公共退台的步行和望海範圍。廣場簷篷後可隔着深窗看見大堂柱列、夾層邊及暖色天花；黃昏至夜間由大堂與中層退台形成兩處暖光焦點。[實景對照](handoffs/hull-facade.md#r3--中段退台與廣場大堂)
-- 階梯巨構立面 R4（2026-11-22，待視覺驗收）：銀框沿樓板折返上層。廣場簷篷下可分辨玻璃前的門框、夾層燈線與後方暖色天花；大堂與中層退台繼續提供兩處暖光焦點。[實景對照](handoffs/hull-facade.md#r4--樓板折返與大堂層次)
-- 階梯巨構 R5（2026-11-23，待視覺驗收）：城市主鏡可見更闊更高的圓肩頂層、長短退縮和向內轉彎的船首。銀框沿中段及上層逐級接續，低層平台、中層庭院、高層觀景台，以及夜間的大堂與庭院兩處暖光仍保留。[實景對照](handoffs/hull-facade.md#r5--船身輪廓與量體)
-- 階梯巨構 R6（2026-11-23，待視覺驗收）：近看銀色曲框沿弧面及跨層折面帶細拉絲，深灰金屬板在斜光下有輕微明暗。城市主鏡以外框反光和原有室內暖光為主。[實景對照](handoffs/hull-facade.md#r6--曲框與深灰金屬)
-- 階梯巨構 R7（2026-11-23，待視覺驗收）：靠廣場的船首由曲面銀框收進深灰門套。由水岸斜前方可見 Yurikamome 沿原軌道入洞，冷白內緣在黃昏及夜間交代口面與洞深。[入洞圖集](handoffs/hull-facade.md#r7--船首列車口)
-- 階梯巨構 R8（2026-11-23，待視覺驗收）：靠廣場一端的船首門套向海折返，固定城市主鏡可分辨拉絲銀折面及靠海側的冷白內緣。由水岸斜前方可繼續看見列車沿原軌道深入門套。[主鏡及入洞圖集](handoffs/hull-facade.md#r8--船首門套向主鏡折返)
-- 階梯巨構 R9（2026-11-23，待視覺驗收）：船首靠鏡頭的角落削成向外張開的凹口。固定城市主鏡可沿兩條 Yurikamome 軌道看到深灰洞腔，薄銀邊和冷白導光勾出入口。[固定主鏡對照](handoffs/hull-facade.md#r9--削開船首近側牆)
-- 階梯巨構 R10（2026-11-23，待視覺驗收）：靠廣場的列車口加上弧面厚銀框，暗槽分隔內外兩道銀邊。外框順兩層船身和既有銀色曲帶折返，固定城市主鏡仍可沿兩條 Yurikamome 軌道望入洞腔。[主鏡與方向圖](handoffs/hull-facade.md#r10--船首洞口雙層銀框)
-- 階梯巨構 R11（2026-11-23，待視覺驗收）的靠廣場的列車口以較連續的橢圓弧繞過端牆。上下銀帶沿低層船身展闊，接入雙銀緣外側。固定城市主鏡仍可沿兩條 Yurikamome 軌道看入深灰洞腔。[同鏡實景與方向圖](handoffs/hull-facade.md#r11--連續橢圓弧與船身曲帶)
-- 階梯巨構 R12（2026-11-23，待目視驗收）的靠廣場列車口用 Blender 細分曲面連起雙銀緣與上下銀帶。固定 Hero 仍可經靠海削口看到兩條入洞的 Yurikamome 軌道。[模型與實景](handoffs/hull-facade.md#r12--blender-船首洞口)
-- 階梯巨構 R13（2026-11-23，待目視驗收）的靠廣場列車口在黃昏、夜間都可沿冷白導光辨認頂襯、側壁和較深的灰色遮蔽面。兩個銀色支座由下框附近的船身托至原軌底，固定 Hero 可沿靠海削口望入洞腔。[同鏡對照](handoffs/hull-facade.md#r13--洞腔層次與軌道支座)
-
-- 階梯巨構 R14（2026-11-24，業主目視驗收通過）的靠廣場列車口由雙銀緣、凹入弧頂和側壁、再到陰影中的內層通道構成。列車繼續沿兩條既有 Yurikamome 路線行駛，固定 Hero 可經靠海削口望見入洞段。[列車入洞與固定主鏡](handoffs/hull-facade.md#r14--船首深洞)
-
-- 展覽唯一城市是 **2127 年 Odaiba／台場海濱**，根目錄 `src/` 是目標城市。
-- **Shibuya 已結束，未來不再做**（使用者確認，2026-10-02）。不保留場地切換，不將舊 Plan 01／02 的未完成項目列為後續工作。舊模型、內部識別碼與 Git／文件證據可保留；它們不代表場地或任務仍有效。
-- **唯一現行版本係九題抽題輪換（owner 2026-11-21）**，見下面〈抽題輪換〉。version4 四題／四個 Meter 版本永久退役，未來唔會再做；下面〈累積與權威 layout〉、〈城市可見變化〉等講 Meter 嘅章節只係歷史同 code 對照，唔好按佢規劃或者為 Meter 位留地。
-- 2127 是固定時代。每題 A／B／C 三個模型都是成熟未來；任何一個選項都不能代表舊時代、空城、缺乏技術或未開發。
-- Desktop presentation only；不加入 mobile／responsive 驗收。普通 renderer resize 保留。
-- 未來身份、可讀的選擇效果及城市延續性優先。行人、車、drones、空中航線已獲允許。交通分層（2026-10-06 user決定）：空中分區域160–170m／城市80–100m／服務30–45m三層，航道有地標及建築泊位；空の環（Sky Ring，700 m 桁架環，甲板頂 250 m）係航道上空嘅共用港，高度 owner 2026-11-02 決定，close-up polish R5 owner 2026-11-02 接受；guest 睇完自己結果後可以喺 iPad 揀「空の環を見る」，大畫面飛去泊位近景循環展示到港→轉乘→全環聲音燈點（含自己嗰粒），由「戻る」、下一位 Start 或新結果結束（2026-11-02 owner 決定：泊位鏡頭用 side，handoff 畫面留 20 s 俾 guest 撳掣；`feat/guest-explore`，owner 2026-11-02 接受）；遠景有一座固定嘅軌道升降機剪影（約 7.5 km 外，唔跟 Meter，2026-11-02 owner 接受）；行人有停留、架空層、海邊轉乘及夜間光環，細節見 [PROJECT](PROJECT.md)。Hologram 媒體（owner 2026-11-02 接受 R5，`feat/hero-holograms`）：8 塊居民尺度光造 panel 貼喺 Fuji TV、Aqua City 同天橋（地標屏「2127」「フジ 文化放送」、ゆりかもめ站前、空氣數據、live「住民の声」＝提案數＋四條 Meter 柱、3 個導向 tag），全日文、冇柱、面向居民而唔面向 hero；taste amendment 見 [舊 CITY_MASTER_TASTE](history/CITY_MASTER_TASTE_2026-11-02.md)。
-- NW focal デックス西接駁（2026-11-17，待視覺驗收）：海濱大道接短支路，步道分流往海濱及 AUTO HUB 地台。三態沿用原來的建築、功能與近鏡。[候選交接](handoffs/nw-focal-connections.md)
-- 現行視覺方向是 [CITY MASTER TASTE](ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md)（owner 2026-11-02 重寫：由「克制、合理」改為「睇得見嘅超高科技」——巨構骨架＋少量懸浮焦點，每件不可能物件要有科技簽名；科技光用低飽和冷白藍；所有現有物件可重新設計；hero 唔再要求睇到四個 Meter 設施，任何視線／可見度規則都唔可以阻設計，設施變化交由 headline close-up 同一票旅程呈現；全城日景總目標圖 owner 已鎖定 `artifacts/city-taste-v2/target/master-day.png`；舊版見 [history](history/CITY_MASTER_TASTE_2026-11-02.md)）；材質及動畫實作規則見 [ART](ART.md)。Shibuya／Pic 2 只作歷史來源。
-- Fuji TV 打磨（2026-10-07，已按使用者要求合併）：程序 civic core 加入通透球室／公共樓層、柱內轉乘細節、植栽斜街、環台及屋頂遮蔭；[三輪交接](handoffs/archive/fuji-tv-polish.md) 分開記錄已整合實作與未達目標圖的細節。
-- Fuji TV 新目標（2026-10-07，六項訪談選擇已確認，待實作）：保留媒體製作總部用途，以約七成工作／三成公共作設計比重；兩側工作翼包含實心隔音攝影棚／剪接空間及玻璃辦公協作層，中間保留大空隙，球體改為直播／媒體劇場。公共入口、指定平台及劇場有獨立路線，工作翼另設員工入口及受控製作區。[目標v2](../artifacts/fuji-tv-polish/target-v2.png) 是生成參考，比例並非量度樓面數據，現有程序模型尚未實作此方向。
-- Fuji TV 目標選定（2026-10-07）：使用者上傳並指定 [目標v3](../artifacts/fuji-tv-polish/target-v3.png) 為正式視覺目標，取代v2的外觀參考；兩側可見工作／製作樓層、中間球體劇場、大空隙及斜向連接以此圖為準。媒體總部用途及公共／員工路線要求延續；隔音製作空間的內部配置仍需實作，外觀圖不驗證隔音或出入控制。圖片內的生成UI文字不取代現有產品文案。
-- Fuji TV v3三輪實作（2026-10-07，feature branch待視覺review）：已加入兩側工作翼／剪接夾層／後方密閉製作空間、球體直播劇場／階梯觀眾席／主播台與攝影機，以及玻璃公共大堂、職員入口、在座職員／觀眾與平台小組。建築室內暖光及螢幕冷光跟隨日夜，原有城市與Meter行為延續。人物及設備為靜態幾何；隔音性能、室內通行及出入控制未模擬。[最終日景](../artifacts/fuji-tv-polish/v3-pass3.jpg)／[交接](handoffs/archive/fuji-tv-polish.md) 記錄已測軟件結果及目標細節仍部分達成，未合併此輪到main。
-- Fuji TV v3第六組三輪打磨（2026-10-07，待視覺review，接續上列實作）：加高及分格劇場螢幕、暖色舞台框／佈景、減少球殼肋線、加強演播室藍色佈景，並加入海側平台小組及26位中層長廊訪客。長廊訪客按實際結構梁面修正至Y=65；人物保持靜態，隔音／室內通行／出入控制及展覽機性能仍未驗證。目標細節仍部分達成；[本輪日景](../artifacts/fuji-tv-polish/v3r6-pass3.jpg)／[交接](handoffs/archive/fuji-tv-polish.md) 為最新feature證據。
-- Fuji TV v3第七組三輪打磨（2026-10-07，待視覺review，接續上列實作）：斜向扶手電梯改為開放式（深色梯級、玻璃欄河、藍光扶手），球體上半改為通透玻璃，移除側面斜撐及柱上暖光方格；兩翼側面加入玻璃演播室長廊，工作層後牆改為連續暖光牆並掛上藍色螢幕。人物／設備仍為靜態幾何；[交接](handoffs/archive/fuji-tv-polish.md) 記錄驗證與限制。
-- Fuji TV v3第八組三輪打磨（2026-10-07，待視覺review，接續上列實作）：玻璃更通透、工作層改為深色後牆加暖光天花，藍色螢幕只集中喺三層演播室；球體內壁改為紫藍舞台光漸變至深藍，斜向扶手電梯加上藍色玻璃欄河及外牆。人物／設備仍為靜態幾何；[交接](handoffs/archive/fuji-tv-polish.md) 記錄驗證與限制。
-- Fuji TV v3第九組三輪打磨（2026-10-07，待視覺review，接續上列實作）：扶手電梯改返銀色配深藍飾邊；球體加深藍肋線、深藍穹頂、額外射燈、紫色觀眾席及全幅藍色螢幕；房間燈光降低及減飽和，配深色地板、深藍螢幕及深色窗框。人物／設備仍為靜態幾何；[交接](handoffs/archive/fuji-tv-polish.md) 記錄驗證與限制。
-- Fuji TV v3合併（2026-10-07）：使用者睇完第九組後要求合併，上列v3第一至九組打磨已整合至main；上列「待視覺review」狀態由此取代。同目標圖仍有差距（樓層數、舞台光束、大堂人流），屬日後另一輪工作。
-- Fuji TV（2026-11-22）：owner 選定 R1 幕牆版本作為基準；R3 候選以冷白藍導線、入口梯級燈及公共平台箭嘴標出海側入口和斜扶梯，沿用既有通行動線，待 owner 驗收。[富士交接](handoffs/fuji-civic-facade.md#r3-夜間導光候選)。
-- Fuji TV R4（2026-11-22，方案 A 待驗收）：由前庭經入口樓梯、通高大堂、海側步廊及低位轉乘平台接上既有斜扶梯，公共平台打開扶梯通過位。[R4 交接](handoffs/fuji-civic-facade.md#r4-公共接駁體塊候選)。
-- Fuji TV R5（2026-11-22，待 owner 驗收）：扶梯經主樑下轉乘台與海側短段，接上公共步道的平出口。富士大堂地台局部退讓，露出獨立拱腳基座，入口梯與海側步廊保持連通。[R5 交接](handoffs/fuji-civic-facade.md#r5-上層扶梯出口與拱腳收邊)。白拱背景見[〈白拱下嘅路〉](BUILDING_STORIES.md#white-arch)。
-- Fuji TV R6（2026-11-22，待 owner 驗收）用啞面鋪地同冷白藍短箭嘴標出兩段扶梯之間嘅轉向，以及 Y=87.75 m 公共步道嘅入口。[R6 交接](handoffs/fuji-civic-facade.md#r6-轉乘台與上層出口導向)。
-- Fuji TV R7（2026-11-22，樣板待 owner 驗收）沿主鏡中銀球左側闊翼嘅海側同內轉角做兩組雙層窗。淺陶板斜肋、深窗套同轉角玻璃疊出前後層次。主柱樑、銀球、兩段扶梯、白拱同公共動線沿用 R6。[R7 交接](handoffs/fuji-civic-facade.md#r7-兩翼外牆樣板)。
-- Fuji TV R8（2026-11-22，owner 接受外牆樣板）打磨同一幅雙層窗帶。兩組窗以折面陶板框和較斜嘅共用肋分隔，轉角窗台同窗頂接過海側及內側。範圍維持 R7 樣板嘅海側六格及內側三格。[R8 交接](handoffs/fuji-civic-facade.md#r8-轉角陶板折面)。
-- Fuji TV R9（2026-11-23，燈光候選待驗收）喺已接受嘅 R8 窗套樣板加冷白導光，沿窗台跨過玻璃轉角，大窗夾層有七粒狀態燈。日景燈光熄滅，城市夜景可辨兩組開口。[R9 交接](handoffs/fuji-civic-facade.md#r9-窗套導光)。
-- 行人日常（2026-10-06）：長椅／前庭小組有輪流交流、轉頭與小手勢；少量居民從門口走到前庭探訪、停留後返回同一門口。沿用既有空間與人員槽位，low／mixed／high 日夜都保留可見探訪；坐姿及路線空間驗證見 [street-life 交接](handoffs/archive/street-life.md)。
-- 建築互動（2026-10-06）：兩條預留前庭路線有入口門框／簷篷／燈、門旁等人、朋友出門與結伴離開。AUTO HUB 兩個櫃位有居民使用服務：按實際櫃位配置交流、操作端口或接受人員協助；全自律配置仍有使用者。人物維持正常大小，設施切換時暫隱、即時復原時配合最新配置；沒有室內或交易模擬。
-
-## 提案與共同城市
-
-### 能源篇研究（2026-10-24，E1–E3 DEV城市組合完成）
-
-使用者提出按「建築・居住／交通・物流／環境・エネルギー／社会・生活」研究更多城市形態，先做能源子題。[能源城市計劃](ENERGY_CITY_PLAN.md) 已完成E1：水庭儲能、富士旋轉環、填海核能島、軌道能源四構想的角色與整合，以及三種城市方向、混合範例與現況對照。E2已加入隔離的DEV `?energy`基準／A／B／C／M1靜態比較、四類量體與桌面幾何／瀏覽器檢查；[截圖](../artifacts/energy-city-e2/README.md)。E3已擴展兩處沿岸水庭／翼形遮棚及環／翼配電門架，加入可重播60秒充能／暫存／釋能流程與完整靜態閱讀；[E3實際比較](../artifacts/energy-city-e3/README.md)。E4已由使用者確認只替換Q3並接入獨立權威能源配置（見下節）；E5已完成目前Mac mini限定30分鐘性能／操作量測，展覽硬件／訪客理解仍待後續。上述E1–E3研究當時未取代四題／Meter；正式Q3取捨由下節E4記錄。富士媒體總部／劇場用途及六座water rooms保持；E2／E3只驗證目前DEV組合、動態及所列桌面畫面，最終美術、工程及硬件效果未驗證。[交接](handoffs/energy-city.md) 記錄本輪實際檢查及下一步。
-
-2026-10-26：「建築・居住」[計劃](HOUSING_CITY_PLAN.md)已開始H0位置／基準／預算研究，[具體提案與原圖](../artifacts/housing-city-h0/README.md)已由cc100053確認；H1隔離DEV五配置靜態住宅已實作、軟件驗證並獲人類簽收，見[H1原圖](../artifacts/housing-city-h1/README.md)。H1b已實作橫向共享骨架／藻類循環面板／完整小屋及更新軌的靜態次設計，見[H1b證據](../artifacts/housing-city-h1b/README.md)，已通過軟件及coordinator review（未冒稱人類簽收）；H2已加入90秒DEV多年更新壓縮循環，生活艙／完整小屋實際搬運及接駁，靜態／reduced motion回停泊A；[H2實測與限制](../artifacts/housing-city-h2/README.md)另列，2026-10-27已通過coordinator review。仮説1–3（新材料、植物膜、可移動建築）先做隔離DEV視覺／動態比較，與現有建築共存；仮説4（身體自立）只保留概念。使用者已選定90秒多年更新壓縮循環；H0原圖只有預留線框，未新增正式城市住宅。本輪不改四題、Meter或累積規則；[交接](handoffs/housing-city.md)。
-
-2026-10-27：[H3原圖評估與正式選項](../artifacts/housing-city-h3/README.md)已通過coordinator review（2026-10-27），建議保留現有三區／數量／輪廓。Hero可定位新增體量，系統機理仍需近景／說明，未作訪客理解測試。正式歸屬：cc100053於2026-10-27選A固定背景（原三區／數量／輪廓，M移至`(-165,-165)`避讓服務館，U停泊A，90秒循環留DEV，不宣稱投票因果），production已含固定住宅；四題／Meter／DB／live時序不改，見[housing交接](handoffs/housing-city.md)。現有固定中值／全能源測試不證明所有正式配置與轉場共存。
-
-### 居民敘事與畫面分工（2026-10-02）
-
-> 本節嘅固定四題及 Meter 結果規則屬已退役版本。現行規則見[抽題輪換](#抽題輪換唯一現行版本)。
-
-觀眾是 **2127 年台場的一位居民**；四題表達生活偏好，城市呈現居民累積想法與近期聲音形成的生活配置。輸入裝置暫定 iPad，負責問題、選擇、核對及操作提示；共享大屏幕負責城市背景、設施與結果解說。年份固定，畫面濃縮呈現城市回應生活需求的過程。
-
-[居民文案 P1](RESIDENT_COPY.md) 已由 [P2](handoffs/archive/resident-experience-p2.md) 接入：question-set version3、四題／背景、提交前核對，以及 Guest 保存／等待／「街の画面をご覧ください。」和站號／暮らしの声編號。結果頁收起答案、Meter 與設施表格；單站 revision conflict 的復原核對仍保留數值資訊。舊草稿可重新預約並保留有效選項，A/B 先結束自己的舊預約；舊已保存回答原文／version2不重寫，未知提交結果維持同 ID 重試。
-
-Root 用固定360px右上卡片（2026-10-04由左移右，避免遮住focal site），2026-11-02起用HUD外觀（深色煙燻玻璃、青色發光邊、角標、側刻度；日夜同一深色以保對比；能源旁白及空の環說明框共用同一外觀）顯示背景、當前實際 focal 設施及位置；一個標題、最多兩句。開場先顯示 `intro.origin`（2026-10-19：過去街由行政／大企業決定，住民決定會點樣），再顯示 identity（取 P1 內文首兩句）。日常卡本機每12秒輪換；[P3](handoffs/archive/resident-experience-p3.md) 的每份live結果保留10秒，0–3秒身份／位置／原有過渡，3–10秒一項個人偏好＋一項共同城市實際結果，再恢復日常卡。Root比較實際effective carrier targets／可見配對及slot分布；同分不同配置、只有方向改變、完全維持分開處理，seed本身或隱藏配對不算可見變化。Focal count只描述該地點，district-only用實際區域及配置調整文案；沒有前後證據只確認保存，不將個人答案當共同城市變化方向。Snapshot/reset/Undo即時替換，reload不重播舊結果；照明-only snapshot不打斷有效queue。
-
-完整 [P1–P5計劃](RESIDENT_EXPERIENCE_PLAN.md) 保留；P1–P3已實作，P3軟件排程檢查不代表10秒足夠閱讀。[P4全面軟件流程](handoffs/archive/resident-experience-p4.md) 已通過 native／scratch Chrome browser 驗證；「住民の窓」已完成單站 iPad Air 試用。P5／S5 嘅雙站、觀眾理解同閱讀時間仍待驗收。
-
-每位觀眾回答同一組四題，核對後提交**一份完整提案**。四題沒有逐題改城；下一位繼承累積結果。問題／option ids 與 effects 由 [正式 JSON](../survey/src/survey/questions.exhibition.json) 定義；保留日文產品文案。
-
-| 問題 id | Meter | 主 site（內部 socket） | low → mixed → high |
-| --- | --- | --- | --- |
-| `service-2127` | automation | デックス西（nw） | 人員主導 → 人機協作 → 自律服務 |
-| `commons-2127` | publicSharing | お台場南岸（sw，2026-11-13 自アクアシティ南搬遷） | 私密空間 → 活動モジュール棚（40 m、60 格、約 33 入格）→ 開放共享 |
-| `energy-2127` | 獨立能源累計（不作Meter） | 沿岸能源接點；設備分佈於水庭／富士／外海 | 水庭儲能／儲能環／軌道受電設備／核能島可共存 |
-| `functions-2127` | urbanConcentration | フジテレビ東（se） | 分散機能艙 → 混合館 → 垂直集中（2026-11-01 owner 接受 SE 樣板：低亭群＋有蓋步道 → 米白退台中高樓 → 暖光垂直街道塔，Meter 琥珀色日夜可讀；[handoff](handoffs/archive/se-closeup-polish.md)。2026-11-06 +1 塔改用 Blender GLB＋可重用 prop kit，R3 對目標 9/12，owner 叫停並 merge；[handoff](handoffs/se-high-blender.md)） |
-
-お台場南岸的棚前地台經支路接入 ④ 主路，石板步道接到北面及西面兩個共享庭園。接駁適用於 SW 三個狀態。
-
-### E4 Q3能源生活取捨（2026-10-24使用者確認）
-
-Q3採[能源計劃正式四選項](ENERGY_CITY_PLAN.md#e4正式接入2026-10-24)，另外三題原文／effects不變。每位居民仍一份四題提案；能源不按low/mixed/high排列。四類票獨立累計；每類至少2票且`票數×5≥能源回答總數+4`才出現；水庭／翼在`票數×5≥2×(能源回答總數+4)`時兩庭／大翼，否則一庭／小翼。環／島各最多一組；設備可共存，翼尺寸及同一庭有無互斥。這是展示門檻，並非容量或供電佔比；前四個基準席位不代表未記錄居民。設備門檻不因第一票改變；G2 另外顯示能源整備狀態（已 merge main，視覺及真人辨認仍待驗收）。
-
-舊cooling問題、原文及效應保留原意；新能源答案對氣候是缺席，氣候EMA／分數／刻度以有效舊氣候回答人數維持，不按能源回答數稀釋。新run維持D=0成熟混合氣候；其餘三軸如常變化與配對。外部電網為設定前提，水庭／環只儲能，軌道／核能為供電路線推演；沒有容量／可靠度／工程認證，不設災難獎勵特效。
-
-Server產出`layout.energy`，root套用模型並比較實際前後target。新第四票的旅程及lantern在沿岸能源接點，舊氣候票仍在公園；既有時間及立即恢復契約延續。結果卡描述真實設備或整備狀態變化，不由本人選項推論共同結果（G5 歸因文案未獲 owner 批准前維持此規則）；G2 在沒有訪客相關變化時，切換所選能源的整備配置。SQLite8新增nullable能源snapshot欄，保留schema7全部原始歷史；新舊server／City須一起更新，舊草稿重新預約、Q3重選，已保存舊ID仍可回原紀錄。
-
-受電設備 R3 沿用 Q3 票數門檻。至少兩票且比例達 20% 時使用小型離岸翼，達 40% 時使用台場南緣的受電テラス農園。農園的膜接收軌道供電，居民可從西面公共步道進入菜園，再經入口前地沿斜路到膜下梯田。Owner 於 2026-11-15 批准合併 R3。見 [農園交接](handoffs/rectenna-farm-placement.md)。
-
-Q02-A「水の棚田」（舊變電所跨上四層抽水蓄能水池）於 2026-11-17 由 owner 接受為固定背景：西岸海面 (−375, −170)，與水庭一號並存，經北岸步道到達；不屬任何選項或 Meter，角色日後另定。水上的士環線西端因此改經島南。見 [handoff](handoffs/q02a-hydro-placement.md)。
+- 展覽地點係 **2127 年 Odaiba／台場海濱**，用桌面大屏幕同 iPad。展示城市由根目錄 Three.js 場景提供。
+- 每個 A／B／C 選項都代表成熟嘅 2127 年生活。行人、車、水上交通、無人機同分層空中航線屬同一個城市背景。
+- [CITY MASTER TASTE](ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md) 記錄世界觀同畫面方向，[ART](ART.md) 記錄美術實作。[直立環形巨構](handoffs/ring-glb-pilot.md)、[階梯巨構](handoffs/hull-facade.md) 同 [Fuji TV](handoffs/fuji-civic-facade.md) 嘅設計輪次同驗收以各自交接為準。
+- 九題抽題輪換係唯一現行展覽版本。[舊四題／Meter 規格及設計輪次](history/EXHIBITION_SPEC_2026-11-24.md)同 [Shibuya Plan 01](history/SHIBUYA.md)保留作歷史。
 
 ## 抽題輪換（唯一現行版本）
 
-Owner 2026-11-18 批准，2026-11-20 城市端接入（main），2026-11-21 定為唯一版本：version4 四題／Meter 展覽永久退役，本節取代下面所有 Meter 章節。計劃、總表與步驟見 [QUESTION_ROTATION_PLAN](QUESTION_ROTATION_PLAN.md)，審查決定見 [SURVEY_V2_REVIEW](planning-team/SURVEY_V2_REVIEW.md#決定記録)。
+2026-11-18 批准，2026-11-20 接入城市，2026-11-21 定為唯一展覽版本。模型進度見 [輪換模型及地塊](QUESTION_ROTATION_PLAN.md)，審查決定見 [SURVEY_V2_REVIEW](planning-team/SURVEY_V2_REVIEW.md#決定記録)。
 
-- **題目：** 以 [SURVEY_V2](planning-team/SURVEY_V2.md) 9 題取代現行 4 題。展覽題目以居民日常角度書寫，並在題目中直接指出該設施；SURVEY_V2 原文不改，展覽文面另存。九題（包括 Q04）全部參與輪換。
+- **題目：** 以 [SURVEY_V2](planning-team/SURVEY_V2.md) 衍生現行 [九題題組](../survey/src/survey/questions.rotation.v1.json)。九題包括 Q04 全部參與輪換，題組文案仍標示為暫定。
 - **抽題：** 每位訪客答 4 題，從九題中選最久未變的 4 題，平手按題目固定次序。抽中的題目於預約時決定並保存。A/B 雙站各自抽題，可以抽中相同問題。
 - **變化：** 每份提案最多切換一個模型。在答案與目前選項不同的題目中，選最久未變的一題，直接換成所選選項的模型；優先略過本訪客預約之後已被另一站換過的題。選項不作 −1/0/+1 排序。城市狀態由有效提案依次重算，Undo、snapshot、重新連線同樣重算。
 - **群眾比例：** 本 run 每題各自統計同一選項嘅百分比，包含觀眾本人。手勢版 iPad 交接頁有四張聲音卡，游標停留或觸控按住邊張，就揭示邊題嘅比例。大屏幕結果卡已移除比例（owner 2026-11-23）。程式暫定每題至少 10 份回答，低於門檻顯示「まだ集まり始めたところです」。
-- **保底：** 沒有可換的題目時，鏡頭推近其中一題的地塊並播放該模型的活動動畫，結果卡寫「あなたの選んだ暮らしは、すでにここにあります」。出現頻率隨答案一致程度變化（玩具模擬約 1.5%–24%），owner 2026-11-20 改為不另做活動動畫，只用模型本身已有的動態。實作見[計劃 3.4](QUESTION_ROTATION_PLAN.md#34-保底owner-2026-11-18-批准)：同一處理亦用於換了未有模型的題或空置換空置；沒有可探訪地塊時，鏡頭轉到構想地展示「構想中」。
+- **保底：** 冇可見變化時，鏡頭探訪抽中題目中已顯示觀眾所選模型嘅地塊，沿用模型已有嘅動態。冇可探訪地塊時，鏡頭轉到構想地展示「構想中」。未有模型同空置換空置同樣用呢個流程。
 - **地塊與道路：** 三個模型地形相近者同地輪換；地形不同者（Q02）各有地塊，未輪到時顯示空置態。道路網固定，每塊地塊有固定支路及入口平台，模型主入口必須落在平台上，前庭細節隨模型更換。Q06 地塊由道路 ③ 接駁，北、東兩側的入口鋪面與支路在 A／C 空置時保留。Q08 地塊由道路 ④ 的過街位接駁，兩條地軌的共用平台及大堂步道在 A／B 空置時保留。
 - **資產歸屬：** Q01＝AUTO HUB 三態；Q02＝水の棚田（A，由固定背景改為隨投票）／蓮花受電（B）／受電テラス農園（C）；Q03-A＝車抽屜住宅；Q06-B＝蛋艙塔；Q08-C＝SW 活動模組棚。SE 塔與 pod、SW COMMONS、district 舞台不再隨投票，轉為固定背景。水庭、儲能環、核能島及離岸受電翼亦不再隨投票，逐件保留為背景或刪除**未定**，未得 owner 對該件同意前不刪除。
-- **敘事原則改變：** 直接換模型代表一位訪客的答案決定他看到的那一個變化，「眾人之一」改由群眾比例表達。Owner 已接受；AGENTS.md 已同步（2026-11-21），G1 ladder 原則退役。
-- **新舊並存（已結束，2026-11-21）：** 曾經按 run 的題組版本切換地塊執行器，令 version4 run 外觀不變。version4 已退役，唔再需要保證佢嘅外觀；code 入面嘅切換屬待清理嘅 legacy。
 - **上線配置（owner 2026-11-18）：** 未有模型的選項地塊暫時留空，模型完成後補上。survey 端已可用（`SURVEY_QUESTIONS` 選用，見 [PROJECT](PROJECT.md)），城市端已顯示輪換模型（2026-11-20）。注意：survey server 嘅預設題組檔（`SURVEY_QUESTIONS`）仍然係 version4 嘅 `questions.exhibition.json`，要用 `questions.rotation.v1.json` 開 run；改預設屬另一個 code 任務。
-- **未定：** 新 run 各題的起始模型；Q06 地塊；Q05、Q07、Q09 的模型方向；舊能源部件逐件去留；群眾比例少人數門檻；Q02 離場模型的變化是否播出。
 
-## 累積與權威 layout
+## 大屏幕同展示時序
 
-> **已退役（version4／Meter，2026-11-21）。** 九題版本唔用分數、tier 或 ladder；本節只係舊 code（`survey/src/survey/scoreEngine.ts`、`cityView.ts` ladder、`districtMeters.ts`）嘅對照。其中嘅結果時間線（vote journey、近鏡 2.62／5.12／13–15 秒）仍然適用於九題版本。
+City 先播約 2.62 秒投票旅程，再推近約 2 秒、停定約 0.5 秒。一般模型過場由 5.12 秒起播 3 秒，活動模組棚沿用 5 秒序列。近鏡喺 13–15 秒返回主鏡。大屏幕解說所選生活偏好同實際變化，iPad 交接頁提供每題比例。
 
-E4後automation／publicSharing／urbanConcentration每軸每份提案只有一票 `v ∈ {-1,0,+1}`。對第 n 份提案：`Sₙ=Sₙ₋₁+v`、`Rₙ=.75Rₙ₋₁+.25v`、`Mₙ=clamp(6(Sₙ/n+Rₙ),-12,12)`。新 run 的 S／R／M 全部零；中性票亦會更新近期記憶，不能略過。只在 server 計算；replay 與 live 使用同一 reducer：[scoreEngine](../survey/src/survey/scoreEngine.ts)。
-
-**刻度 A（2026-10-13 user決定，取代舊刻度）**：實際 run 嘅 M 多數只喺 ±5 之內，所以 layout 讀「展示分數」`D=clamp(M×g(n),-12,12)`，n 係目前累積觀眾數。`g(n)=0.85+1.55×min(1,(n−1)/11)`：第一位觀眾 ×0.85（溫和開場，第一票 ±1 只到 D=±6.375；2026-10-27 起再受每份一格限制，第一位只令一個 focal site 轉），之後逐位加強，第 12 位起固定 ×2.4（第一格門檻 |D|≥1.5 相當於 M≈±0.63）。計分 reducer 不變；提案紀錄嘅 before/after layout 讀取時由分數同觀眾數重新計算，所以舊歷史一齊轉用新刻度，冇資料遷移。新舊比較見 DEV `?scaleLab` 及 [handoff](handoffs/archive/meter-scale-a.md)。
-
-**分級階梯＋headline（2026-10-30 G1）**：每個 site 有 −3…+3 格（`layout.tiers`），累積目標由 D 的 ±1.5／4／7 門檻決定。每份提案最多令一個 site 移一格：優先沿今位訪客投票方向（中間票向 0），候選移動後須在目標 ±1 格內；選目前離目標最遠者，打和偏向非中間票，再按觀眾數輪替。沒有候選時回退原有遲滯規則（退向 mixed 要再過門檻 2）。±1 是候選條件，並非全部 site 每一刻都在目標 ±1 格內；目標變動及 fallback 都可造成更大差距。[ladderStep](../survey/src/shared/cityView.ts) 由 active proposals fold（O(guests)），Undo、舊歷史及 snapshot 均重算，無資料遷移；既有 run 重開後城市可能改變，展前應開新 run 或由 owner 接受。Root 與 survey 須一起更新。
-
-| 格 | 自動化 nw | 共有 sw | 集約 se |
-| --- | --- | --- | --- |
-| 0 | 全部 mixed（60% hybrid） | 同左 | 同左 |
-| ±1 | 只換 focal：デックス西轉 high／low（端口 6／0） | 只換 focal：お台場南岸（座位 8／0；0 為活動モジュール棚） | 只換 focal：フジテレビ東（模組 6／2） |
-| ±2 | 11 個服務灣按 rank 次序轉一半（mixed 同完整之間），hybrid 30% | 6 water rooms＋10 庭院轉一半，hybrid 30% | 10 塔／26 pods 轉一半，mid-rise 30% |
-| ±3 | 其餘服務灣＋fleets／飛行器／街道 pods（即舊完整 low／high） | 完整形態 | 完整形態 |
-
-P10 配對要兩個 site 同一邊都到 ±3。環境軸 E4 後凍結喺 mixed，所以 sails／冷卻塔／屋頂／外牆唔做格（舊氣候 run 照用同一 ladder）。每個 district 第一次到 ±2 時固定該軸 `slotSeeds`（之前為 0），之後各格 slot 互相包含，唔會每票重排。
-
-Headline 近鏡 G7（2026-10-31，已 merge main，視覺及性能未驗收）：近鏡現有 23 個固定 shot（2026-11-01 加 `se:focal-low`、2026-11-03 加 `nw:focal-low`：SE／NW focal 變化涉及 low 時用較近、較低嘅鏡頭）（含 8 個 district「舞台」闊鏡：2026-11-11 `feat/stage-closeups` 將 37 個逐 slot viewpoint 收成每組 slot 一個闊鏡，同一舞台嘅 slot 喺同一格一齊變；owner 2026-11-11 按靜態對照表批准合併，live 過場未驗收；`nw:bay3`、`nw:bay5`、`nw:street`、4 個水庭、3 個 pod 唔屬任何舞台，只會變化、唔做近鏡主角）。district 變化（±2／±3）時，district 把本次變動 slot 的座標與 ID 交給鏡頭（`CarrierChange.points`），揀覆蓋最多變動 slot 的 viewpoint，打和揀最久未用；±1 保持 focal，能源保持能源 shot，無 points 回退 `*:district`。細節見 [PROJECT](PROJECT.md)。
-
-Live headline（[pickHeadline](../survey/src/shared/cityView.ts)）：先揀向今位訪客投票方向移動的 site（中間票向 0），其次揀該訪客選的能源部件有變的情況；否則沿用新到達最高格、載體變化最多、能源的次序。能源部件同時變動時，鏡頭與結果卡跟所選部件；只有 headline site 有亮 pulse／marker 同結果卡，其他變化（例如同時嘅能源門檻）靜靜過渡。
-
-Headline 近鏡（2026-10-27；時間線於 2026-10-29 修訂）：live 結果先在 hero 播完 2.62 秒 vote journey，再用 2 秒推近 headline，停定 0.5 秒後於 5.12 秒開始 3 秒場景過渡。4.62–13 秒停留，13 秒與 ambient 卡同步開始用 2 秒返回 hero；原因文字於 8.12 秒出現。**例外（owner 2026-11-13）**：SW 焦點変化（活動モジュール棚進／出 mixed）的場景過渡延長為 5 秒（`SHELF_TRANSITION_SECONDS`，只用於 SW）：5.12–10.12 秒，原因文字於 10.12 秒出現（SW 的說明卡按 band 與實際變化選句，見 [RESIDENT_COPY](RESIDENT_COPY.md)），之後約 2.9 秒閱讀，13 秒返回 hero 不變。順序見 [棚 spec](../artifacts/sw-event-shelf/spec.md#r3c)。八個 site shot（四站各 focal／district）及五個能源 shot 用常數表，保留 hero 方向及海／地標定位；focal 與 district 同時改以 district 為準。能源鏡頭與結果卡共用部件優先次序，移除設備亦看原位置。新結果從現有位置先平滑回 hero；snapshot／reset／Undo／reconnect／reduced motion／legacy／追趕中的結果立即 hero。無 headline 不推近；如接續仍在播放的近鏡，先從當前位置用 2 秒平滑返回，再保持 hero 並恢復操作。普通 standalone 及其他 DEV review 不自動播放；DEV 可用 `?shot=` 逐鏡檢查。**閒置吸引循環（owner 2026-11-20）**：展覽畫面連續 10 秒冇 survey 事件、冇近鏡／空の環鏡頭、冇 staff 輸入時，主鏡頭以 hero 為中心慢慢漂（yaw ±12°、只向上微升、約 0.5°/s，不做 site tour），每 60 秒循環一次並於 50–60 秒顯示「次は、あなたの声。」呼籲卡；中段 25–50 秒播「声の灯」：所有投票燈先熄，再逐位觀眾由投票地點升起（約 17.5 秒播完當前 run 最近 64 位），底部卡同步畫出各軸 Meter 曲線、顯示「暮らしの声 #n」，最後一句「いちばん多かった声：「X」寄り N%」；少於 3 位觀眾就跳過、繼續漂。任何 survey 事件或輸入即時停止並由原有鏡頭規則接手；reduced motion 鏡頭不動。詳見 [attract-loop](handoffs/attract-loop.md)。近鏡的模型／材質打磨及真人閱讀／展示硬件驗收另作任務。
-
-Closeup-zoom F 候選（2026-10-30）：district 改為較闊焦點構圖、停留期間慢推 7%；SW focal 避開主要遮擋。SE／NW 焦點及 district carrier 可讀性未達驗收，詳見 [F 自評](../artifacts/closeup-zoom/final/F-review.md)，最終仍待 owner 審閱。
-
-NW 近鏡（2026-11-04，`feat/nw-closeup-polish`，owner 接受盲評分數）：AUTO HUB 同六個服務 bay 跟 owner 揀嘅 Gemini 目標圖重建成白色機械語言——−1 有人嘅玻璃暖房服務廳＋懸浮遮篷碟，0 小廳＋泊位柱＋機械臂，+1 密環自律塔＋無人機流＋藍光大堂；旗艦 R9 25/28、bay R2 19/20（rubric＋新評審盲評＋pairwise）。Bay 大細受淨空限制，owner 決定 bay crop 對準實際位置、唔再放大。未過：旗艦 `fl-glazing`／`fl-material`／`fm-hall`，bay `bl-canopy`／`bl-glazing`。[handoff](handoffs/archive/nw-closeup-polish.md)。
-
-SE 近鏡候選（2026-10-30）：設施加框架平台、冠部、低 tier 構架及橙色 Meter 環，保留 footprint 與 tier 規則；夜景顏色偏白、主體大小及真人辨認仍未過關，待 owner review（[證據](../artifacts/closeup-zoom/final/A-se-review/README.md)）。
-
-能源講解 N1（2026-10-29，已 merge main；見 [closeup-next](handoffs/closeup-next.md)）：owner 同日決定將所有結果嘅閱讀 slot 由 10 秒延長到 13 秒（`DISPLAY_MS`；lease 18 秒），所以上面嘅 headline 近鏡為 4.62–13 秒停留、13–15 秒返回 hero。Headline 係結果後仍存在嘅能源部件時，鏡頭到位（4.62 s）至停留結束（13 s）喺左下顯示日文字幕框，將 60 秒儲能週期壓縮成 8.38 秒播一次（充能 → 蓄電 → 放電，每步約 2.79 秒逐步高亮，每步 ≤16 字）。只有被講解嘅部件行自己嘅時鐘，其他能源部件唔跳相。結果卡講「邊個嘅聲音、改咗乜」，字幕只講設施點運作，標題沿用結果卡地名。Snapshot／reset／Undo／reconnect／下一個 live 結果即時取消並還原時鐘；reduced motion 唔講解（client 本身已將 reduced-motion 結果即時變 snapshot，冇結果卡）。所有 UI 文字用日文（owner 嚴格指示）。
-
-近鏡打磨S0（2026-10-28，coordinator接受量度基準並整合main `c802bba`）：[完整基準](../artifacts/closeup-polish/S0/README.md)記錄98個日夜狀態、96組像素比較及28組兩輪效能；沒有美術、pose、時間線或梯級改動。A1/A2/A3與夜間／綠化仍有明確失敗，20個district狀態跨near plane不可量測；這是後續A–D的起點，並非視覺完成或owner接受。所有正式第二take原圖已逐張檢視，展示硬件及真人辨認未驗；[整合驗證](../artifacts/closeup-polish/S0/integration.json)root test/build/diff PASS，實際published SHA及main CI由本批integration result記錄。
-
-2026-10-29 owner 只選近鏡四個 pose（能源環、SE／SW district、NW focal）連 NW 服務面，另授權 SW focal 一輪 pose-only；C1 其後經 owner 批准已 merge main（見下）。A3 保留 ≥7/9、數值 A4 保留相鄰 ≥6%／極值 ≥12%，兩項改作診斷；新增 hard gate 係 owner 並排原圖、兩秒辨認相鄰狀態變化。A1／A2／A5／A6 同 V hard gates 不變，全部失敗保留，global V3 植栽另作設計任務。同日 owner 批准 merge：SW focal 拉遠至 A1 過關，A5 改睇 FPS 同 hero calls，shot calls 作診斷；24 組兩秒辨認未做、記作缺口。[決定與新驗證](handoffs/closeup-next.md)。
-
-`ladderLayout(tiers, energy)` 是唯一權威映射；focal 數值由 tier 符號決定（`t`= 1／.5／0 對應 >0／0／<0）：
-
-| 參數 | 公式 | tier 0 |
-| --- | --- | --- |
-| automatedPorts | round(6t) | 3 |
-| sharedSeats | round(8t) | 4 |
-| treeCount | 3+round(9t) | 8 |
-| plantedFraction | .2+.6t | .5 |
-| coolingFins | round(6(1−t)) | 3 |
-| functionModules | 2+round(4t) | 4 |
-
-District 直接讀 tier；DEV `?meters`／carrier 測試用 `deriveExhibitionLayout(D)`（同一門檻、唔限速）。全部 round 用 JavaScript `Math.round`。機能單元不是人口或等容量承諾；不能在實作中暗改算法。Root v2 不將 Meter 混入全城天空／氣氛。
-
-## 城市可見變化
-
-> **已退役（version4／Meter，2026-11-21）。** 九題版本每份提案只換一個地塊嘅模型（見〈抽題輪換〉）；下面 district carriers、Meter 光點同 slot 描述只係歷史。九題版本嘅投票對 Meter 軸係中性，所以 district 元素（塔、court、pod 等）永遠凍結喺 tier 0（mixed）做固定背景；佢哋本身嘅 footprint 要避開，但唔再為其他 tier 留地，空嘅位當普通城市地面規劃。
-
-四個 site 是視覺焦點，**三個現行Meter與繼承氣候配置可影響整個 district**（2026-10-01 決策，P0–P12 已整合）；不再受原 MVP「只改四地塊」限制。
-
-- Automation：服務亭／自律端口、步道人數、guideway pods、空中 fleet、服務 quadrotors。
-- Sharing：六座 water rooms、十個內陸庭院的私密／混合／共享形態，以及符合條件的廣場人群。
-- Environment：promenade sails／pergolas、冷卻塔、屋頂 cover、立面氣候層。
-- Concentration：低層 pods／中間高度／十座塔、sky lobbies 與連橋。
-- Mixed 有自己的 hybrid 組合；跨 Meter 條件（兩 site 同邊 ±3）產生配對設施；完整 active run 的投票次序推導四軸 `slotSeeds`，各 district 第一次到 ±2 時固定（2026-10-27），相同分數可保留不同槽位分布。最新 64 份顯示 history 不截斷 seed 來源。
-
-**一票旅程（2026-10-13 user要求）**：live 結果先播約 2.6 秒旅程——觀眾四票化成 Meter 色光點（中性票暖白），由畫面右下（站台方向）飛去四個 focal site（E4後新Q3改到沿岸能源接點，舊氣候票仍到公園），著陸時掃描環升起（2026-11-03 起：headline 係 district 變化時，該軸光點改為飛去今次真正變動嘅 slot，每個變動 slot 升起掃描環；其他軸、能源及 focal 變化照舊落 focal site）；每票留低一粒浮喺 site 上空嘅光點（日間淡、夜間亮），保留最近 64 位觀眾，snapshot／reload 由 `recentProposals` 重建。著陸後先推近並停定，於 5.12 秒開始 3 秒過渡及 pulse；結果卡證據喺收到事件時已經計好，理由句於 8.12 秒出現。Snapshot、reset、Undo、reconnect、reduced motion 唔播旅程，即時恢復。
-
-Live 使用可重新定向的 **3 秒**過渡（SW 進／出 mixed 為 5 秒，見上）；pulse 只標示真的 live 變化；每個改變嘅 Meter 只喺其 site 出光柱，district slots 只有淡色光圈（2026-10-04）。Snapshot、reset、Undo、reconnect、reduced motion 直接恢復權威狀態，清除排隊及 pulse。重複事件不重播。配對、counts、固定 footprint 及限制見 [Meter handoff](handoffs/archive/meter-variety.md)。
+Snapshot、reset、Undo 同重連即時恢復保存狀態。減少動態模式用即時畫面。輪換結果維持全城氣氛及固定嘅 mixed 街區背景，Q01 沿用 NW 三個焦點模型。其他地塊見 [輪換模型及地塊](QUESTION_ROTATION_PLAN.md)。
 
 ## Guest、單站與 A/B
 
@@ -215,60 +67,14 @@ A/B 按 server transaction 提交順序累積，容許舊 city revision、拒絕
 
 Admin 只限 server 電腦 loopback，POST 另檢查 same-origin。City reset 開新城市、保留總人數；full reset 清零展示計數但保留 append-only 歷史。保留中的 reset 可取消。Undo 只可撤銷最後一份已完成提案、且下一位開始前；新草稿即使稍後取消亦不重開舊 Undo。保存不可變撤銷標記，還原提交前狀態／counts／seeds。
 
-目前 question-set **version4**、SQLite **schema 8**、algorithm／CityView **v2**；schema 3 轉換曾結束 v1 run 並保留歷史，schema 7 保留現有 v2 城市及歷史。重啟使用原 SQLite，不刪資料。Root／survey 配合更新，尤其 slotSeeds。`module-swap` 只接受 legacy v1，不是展覽城市。
+現行題組為 `kind: rotation`、題組 version 1。SQLite **schema 9**，proposal algorithm／CityView **v2**。沿用原 SQLite 重啟可恢復城市同歷史。切換題組後，用 Admin 嘅 city reset 開新 run。
 
 Admin Day／Night／Auto 保存為獨立 display setting：12:00／22:00／180 秒日循環。Reset 不改照明；City `?hour` 優先。多 viewer 的 Auto 時鐘不作跨裝置同步。
 
-## 開發工具與待完成驗收
+## 展覽待驗收
 
-在 `survey/` 執行 `npm run dev:auto`提供 fresh scratch DB 及 localhost `/guest?dev-auto`；Meter tests 可重用。DEV-ONLY panel／endpoint／launcher 須在展覽前移除或另行安排；普通 Guest 自動交接規則不因移走開發工具而回復舊 staff-exit lock。詳見 [survey guide](../survey/README.md)。
-
-**S5／Odaiba P6 尚待展覽驗收**：現場完整 Guest → City 流程、兩部 iPad 同時運作、場地閱讀與理解、展覽日 reset／recovery 同長時間穩定性。既有 stage checks／CI／Mac 測量分別見 [VALIDATION](VALIDATION.md)，不等於 S5 已通過。尚未達成的 Dream Loop target 亦不能因程式已整合而宣稱視覺目標通過。
-
-## 已完成階段與歷史
-
-| 階段 | 結果／證據 |
-| --- | --- |
-| S1–S4 | [S1](handoffs/archive/exhibition-s1.md)、[S2](handoffs/archive/exhibition-s2.md)、[S3](handoffs/archive/exhibition-s3.md)、[S4](handoffs/archive/exhibition-s4.md)：分開保留當時實作及驗收 |
-| Lifecycle、display、Undo、A/B | [lifecycle](handoffs/archive/exhibition-lifecycle.md)、[day/night](handoffs/archive/admin-day-night.md)、[Undo](handoffs/archive/admin-undo.md)、[雙站](handoffs/archive/two-guest-devices.md) |
-| Odaiba 換場 | [P0–P5 transition record](history/ODAIBA_VENUE_TRANSITION.md)，整合 `e6c7966` |
-| Odaiba art／district | [art](handoffs/archive/odaiba-art-direction-01.md)、[Dream Loop](handoffs/archive/odaiba-dream-loop.md)、[district](handoffs/archive/odaiba-district.md) |
-| Meter variety | [P0–P12](handoffs/archive/meter-variety.md)，整合 `e7afbee`，published main `68b669a` |
-
-原 MVP 規劃存於 [歷史快照](history/EXHIBITION_MVP.md)；其中 Shibuya、single-only、site-only 與待實作文字已被以上決策取代。後續任務只從本規格及現行 handoff 建立。
-
-### 能源模型 polish 恢復（2026-10-25）
-
-獨立本機 clone 已恢復水庭／能源島與富士前置儲能環首輪 source，沿用原生成 target；僅續作儲能環／原固定承托三輪批次，三輪本機實作gate已完成，等待總指揮視覺review。保留劇場、工作翼、斜街與原權威配置／歷史。恢復 provenance、逐輪驗收及總指揮視覺review狀態見 [儲能環交接](handoffs/archive/storage-ring-polish.md)；沒有發布／整合，不能據此宣稱 target、工程或展覽驗收完成。
-
-
-### 接收翼局部打磨 — 2026-10-25（本機續作）
-
-沿用能源Q3及既有接收翼，僅細化雙葉表面、承托接點／服務頸，保留原位置／包絡／大小配置語義與已接受水庭／環／島；沒有新用途、容量或工程宣稱。三輪Plus實作及owner實際驗收分開記在[接收翼交接](handoffs/archive/receiver-wing-polish.md)，沒有push或main整合。生成target只作工藝reference，不依賴強光或背景／UI漂移證明軌道身份。
-
-
-### 儲能環夜間可讀性一次跟進 — 2026-10-25（候選不採用）
-
-已批准的一次局部材質試驗未達原hour22 hero「完整環周與兩組固定承托連續可讀」要求；owner保留原已接受baseline及完整trial證據，夜間可讀性缺口仍在。沒有新產品方向、source變更、工程／target達成或發布宣稱；只交coordinator review，[實測與checkpoint](handoffs/archive/ring-night-readability.md)。
-
-
-2026-10-25 發布更新：使用者已明確要求推送能源polish及整合main，先前本機-only狀態由[本次整合交接](handoffs/archive/energy-polish-integration.md)取代。既有runtime未再修改；root test/build／正式scratch browser已重跑PASS，整合後驗證、main CI與安全刪分支的實際結果統一記在該交接，原target／夜間可讀性／硬件限制保留。
-
-
-### 住宅方案A — 2026-10-27 決定
-
-人類已採固定背景A：M輕材架空／共享住宅、P植物膜／藻類設備、U交換骨架／完整小屋及複合外皮共同存在於正式城市，U固定停泊A。90秒多年更新壓縮循環只留DEV。住宅不是任何回答或Meter造成的變化，不加入提案結果，四題與權威資料契約保持。依後續人類決定保留既有服務館，將M原構造由`(-135,-175)`平移到`(-165,-165)`，其餘住宅位置、數量與輪廓保持。驗證／搬位原圖見[本批報告](../artifacts/housing-background/README.md)；H3中的「待選A/B/C」已由本決定取代。實機／訪客及工程驗收仍另列。
-
-## 問卷介面配色 — 2026-11-07 獨立分支
-
-使用者確認問卷採石墨灰背景、柔和青綠選取色、暖琥珀主按鈕與 5px 圓角，呼應深灰金屬、青色燈條及橙黃裝飾的展台參考。`feat/guest-ui-graphite` 將此視覺延伸至開始、四題、核對、等待、結果與交接畫面。選項新增簡短日文標題，正式問題與完整選項原文持續顯示。操作沿用既有問卷與探索流程。此為獨立 UI 分支，實際 iPad 與現場照明舒適度仍待驗收。實作與驗證見[交接](handoffs/guest-ui-graphite.md)。
-
-SE 塔＋pod district 近鏡候選（2026-11-12）喺既有尺寸內呈現水邊分散設施同集中塔樓。東、南舞台用同一鏡位展示各自嘅變化前後。視覺仍待 owner 驗收，見 [交接](handoffs/se-stage-closeup-polish.md)。
-
-Sky Ring Blender polish R4（2026-11-08）仍是待 owner 接受嘅候選；原沿岸航線與支柱相撞後，owner 決定局部調整航線，採樣驗證及逐項視覺改善見交接。詳見 [交接](handoffs/skyring-closeup-polish.md)。
+雙 iPad 同時用手勢、現場閱讀距離、長時間運作同復原流程見 [驗收指引](VALIDATION.md#ipad住民の窓實測與回歸) 同 [P5 實機交接](handoffs/resident-experience-p5.md)。單站 iPad Air 已有試用紀錄。
 
 ## 居民情景方向 — 2026-11-12（owner 採納；runtime 仍是 DEV 演示）
 
-Owner 採納方向 A：城市變化保持細緻，戲劇性放在居民生活。每個投票結果的目標次序是「投票 → 推近建築看變化 → 再推近看一位居民的行動」；每個變化單位先完成建築／變化元素的打磨並由 owner 收貨，再做人物情景故事。單位總表、四位居民、台詞、owner 決定及未核對項目以 [RESIDENT_SCENE_PLAN](RESIDENT_SCENE_PLAN.md) 為準。
-
-現況：只有 NW focal（デックス西）有人物一拍，並且只在 Vite DEV 加 `?residentDemo` 時出現（[交接](handoffs/resident-minato.md)）。正式展覽流程、13 秒閱讀時段、lease、A/B 排程及 iPad 畫面均未更改；把人物一拍接入正式流程會把返回 hero 的時間由約 15 秒延長至約 20 秒，屬產品契約改動，須另開任務並由 owner 批准。
+每個變化單位先打磨建築同變化，經 owner 驗收後，先做有名居民演出生活影響嘅情景。現行進度同台詞見 [居民情景計劃](RESIDENT_SCENE_PLAN.md)。正式接入人物情景及延長結果時段需要另行批准。

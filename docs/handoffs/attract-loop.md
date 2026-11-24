@@ -56,7 +56,7 @@ DEV 預覽：`/?meters=&attract&attractVoices=40`（冇 server；seeded 40 位�
 ## Important decisions
 
 - 2026-11-20 owner：主鏡頭可以自己郁，但只限 idle 時喺 hero 附近慢慢漂，唔做 site tour（取代「主鏡頭唔郁」規則，只限 idle）。
-- 2026-11-20 owner：中段唔重播建築（27 個模型翻來覆去會重複），改做「声の灯」：今日每份提案化成一粒光喺投票站升起並累積，加今日四條 Meter 曲線同一句總結。取代 [day-replay](day-replay.md) 嘅建築快轉方向。
+- 2026-11-20 owner：中段唔重播建築（27 個模型翻來覆去會重複），改做「声の灯」：今日每份提案化成一粒光喺投票站升起並累積，加今日四條 Meter 曲線同一句總結。取代 [day-replay](archive/day-replay.md) 嘅建築快轉方向。
 - 居民場景（凪／湊／葵）做空檔小片段：延後，要 owner 批正式接入。
 
 ## Next expected step

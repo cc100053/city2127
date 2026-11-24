@@ -3,11 +3,11 @@
 - Owner：cc100053。
 - 狀態：A 位街道 R2 紅線修訂已合併至 `main`（`4440da51`）；下方保留原置入與移位兩輪記錄。業主決定日後回應投票，Meter／各態／觸發留待後續設計。
 - Base：`1fcc1dc409a187f880c97a14847492363261f6a6`，與 `origin/codex/nw-focal-connections` 一致，領先 `origin/main` 一個待驗收 NW 接駁提交。保留既有 `Dev_QA.md`。
-- [R2 Blender](../../asset/models/drawer-housing-2127/drawer-housing-2127.blend) · [GLB](../../asset/models/drawer-housing-2127/drawer-housing-2127.glb) · [實景](../../artifacts/change-review/index.html#drawer-housing) · [佐伯澪故事](../BUILDING_STORIES.md#drawer-housing)
+- [R2 Blender](../../../asset/models/drawer-housing-2127/drawer-housing-2127.blend) · [GLB](../../../asset/models/drawer-housing-2127/drawer-housing-2127.glb) · [實景](../../../artifacts/change-review/index.html#drawer-housing) · [佐伯澪故事](../../BUILDING_STORIES.md#drawer-housing)
 
 A 位在フジテレビ西南側與アクアシティ內陸草地之間。GLB 原點 `(-115.375, 0, 99.680)`，yaw π，正面朝 −Z。R2 1:1 包絡 X −140…−90.75、Z 86…111.465、頂高 30.073 m。定案前，含前場 6 m 的 `SCAN_LOT=49.25,31.465,-115.375,95.7325` 回報 CLEAR。在建築基座下補 36 cm 薄地台，銜接取樣為 −0.35…−0.079 m 的地表。6 m 前場保留作後續車道及人行接駁。
 
-正式城市與一般 DEV Meter 預覽均載入同一座住宅。不透明網格合批，透明玻璃仍獨立排序。version4 run 中住宅沒有投票 carrier、升降動畫或居民情景；抽題輪換 run 中由 Q03 驅動（2026-11-19，A 顯示，B／C 暫為空置：住宅連基座淡出、環道保留），見 [question-rotation](question-rotation.md)。Q03-A 是作品編號，問卷 Q3 仍為能源題。
+正式城市與一般 DEV Meter 預覽均載入同一座住宅。不透明網格合批，透明玻璃仍獨立排序。version4 run 中住宅沒有投票 carrier、升降動畫或居民情景；抽題輪換 run 中由 Q03 驅動（2026-11-19，A 顯示，B／C 暫為空置：住宅連基座淡出、環道保留），見 [question-rotation](../question-rotation.md)。Q03-A 是作品編號，問卷 Q3 仍為能源題。
 
 ## 驗證
 
@@ -21,17 +21,17 @@ A 位在フジテレビ西南側與アクアシティ內陸草地之間。GLB �
 - 基準 `fd03bcfd`。fetch 後本機與 `origin/codex/nw-focal-connections` 起點無分歧，領先 `origin/main` 兩筆。保留待驗收 NW 接駁及未追蹤的 `Dev_QA.md`。
 - 以舊日景鏡頭對右側白牆打射線，命中 `megastructures` 的西側梯田巨構（HULL），不是飯店。實際三角網格最近點以 BVH 核對，原位最窄 **0 m**，兩網格在約 `(-139.87, 0.75, 109.36)` 相交。新位原點 `(-104, 0, 81)`，yaw 仍為 π；平移 21.9 m，仍在 A 位。新位對梯田巨構淨距 **15.93 m**；對 Fuji 框架低層的取樣最近距離 **31.96 m**。未動任何鄰樓。
 - 保留 R2 GLB 及兩個載車艙。新包絡 X −128.625…−79.375、Z 67.32…92.785；艙體下緣分別為 4.09、13.74 m。候車線中心 X −113.03、−89.95，與兩艙軸線一致。兩條 5.6 m 候車線接至 12 m 深迴車前場，經 6.2 m 雙向短道接到導軌大道 ② 的外側（沿線第 463 m）。支路繞過既有分散配置艙體，未挪動其位置。3.1 m 步道延續原大道行人道，經標線橫過一條候車線後抵前立面中央。前場沿用街道套件的陶板、淡色鋪面、冷色導光和低植栽。
-- [候選圖集](../../artifacts/change-review/index.html#drawer-housing)：3200 × 1800 / DPR 1 Chrome，原鏡頭固定比較、同角度 12:00／22:00、接駁俯視及主視角。原圖與側錄在 `~/city2127-evidence/q03-a/street/` 和 `street-final/`。
+- [候選圖集](../../../artifacts/change-review/index.html#drawer-housing)：3200 × 1800 / DPR 1 Chrome，原鏡頭固定比較、同角度 12:00／22:00、接駁俯視及主視角。原圖與側錄在 `~/city2127-evidence/q03-a/street/` 和 `street-final/`。
 - Chrome 分散配置 `?meters=se:low`：沿支路與步道中心、近邊及兩條候車線，以約 1 m 間隔驗證 467 個路面樣點，無斷面或障礙；候車線最低上方淨高 4.07 m。測試以固定包絡及路面淨空為準。
 - 根目錄 `npm test` 全套測試通過（從需開 loopback 的 survey 整合測試起，以允許本機埠的環境接續跑）；`npm run build`、`git diff --check` 和圖集連結核對通過。六張截圖及路線抽查零 page error。
 - 候選只供業主審閱。投票觸發、艙體及車輛動畫、實機效能尚未驗證。
 
 ## Gemini 材質候選（2026-11-17）
 
-- 基準 `31372962`，接續 `codex/nw-focal-connections`。業主提供 [Gemini 目標圖](../../artifacts/change-review/drawer-housing/gemini-target.jpg)，以其中暖米色陶板、細金屬收邊、淡青導光和淺灰步道作為材質方向。
+- 基準 `31372962`，接續 `codex/nw-focal-connections`。業主提供 [Gemini 目標圖](../../../artifacts/change-review/drawer-housing/gemini-target.jpg)，以其中暖米色陶板、細金屬收邊、淡青導光和淺灰步道作為材質方向。
 - 導軌大道 ②、住宅支路和候車前場使用同一個陶板材質、貼圖及陰影接收設定。前場沿用街道套件的板縫和照明，導光由支路中心分往兩個候車位。車道、橫道與步道沿用已驗證的接駁，目標圖中的繞樓線屬概念。
 - 鋪面回歸測試核對大道與支路的材質、受光設定及接縫。另以垂直射線核對 448 個導光、光暈與收邊網格的三角形中心，全數落在鋪面。
-- 日夜近鏡使用相同鏡頭，連同接駁俯視及城市主視角更新至 [候選圖集](../../artifacts/change-review/index.html#drawer-housing)。原圖及側錄在 `~/city2127-evidence/q03-a/material-final/`，五張截圖均無 page error。根目錄 `npm test`、`npm run build`、`git diff --check` 及圖集連結核對通過。展覽機效能留待現場驗證。
+- 日夜近鏡使用相同鏡頭，連同接駁俯視及城市主視角更新至 [候選圖集](../../../artifacts/change-review/index.html#drawer-housing)。原圖及側錄在 `~/city2127-evidence/q03-a/material-final/`，五張截圖均無 page error。根目錄 `npm test`、`npm run build`、`git diff --check` 及圖集連結核對通過。展覽機效能留待現場驗證。
 
 ## 街道 R1 業主判詞
 
@@ -39,7 +39,7 @@ A 位在フジテレビ西南側與アクアシティ內陸草地之間。GLB �
 
 ## 街道 R2 — 由目標反推平面（2026-11-17）
 
-基準 `c0034611`，fetch 後本機與 `origin/codex/nw-focal-connections` 無分歧；相對 `origin/main` 落後 6、領先 4。原下載 JPEG 在本機 Downloads 未找到，以分支內既有 [Gemini 目標](../../artifacts/change-review/drawer-housing/gemini-target.jpg) 為準。比較採 R1 同一鏡位及中午光照。
+基準 `c0034611`，fetch 後本機與 `origin/codex/nw-focal-connections` 無分歧；相對 `origin/main` 落後 6、領先 4。原下載 JPEG 在本機 Downloads 未找到，以分支內既有 [Gemini 目標](../../../artifacts/change-review/drawer-housing/gemini-target.jpg) 為準。比較採 R1 同一鏡位及中午光照。
 
 | 目標可見輪廓 | R2 實地做法 |
 | --- | --- |
@@ -56,7 +56,7 @@ A 位在フジテレビ西南側與アクアシティ內陸草地之間。GLB �
 - 圖面差異：正面左端彎回背面，與 Gemini 的左端延伸不同；大道接入口及原有支路走廊固定，前景接入角度和步道橫道位置亦與 Gemini 不同。這兩點在俯視可看到完整走線。
 - 範圍是實際鋪面、通行包絡及畫面驗證。住宅環道尚無行車／載車艙控制，沒有驗證動態轉向、讓行或室內無障礙入口；投票觸發仍待設計。
 - 右側匯入／退出另以 3.6 × 2.0 m 小車平面包絡測試：從正面向支路的可行走線最小曲率半徑約 7.57 m，121 個姿勢各驗證 9 個點，共 1,089 點全在陶板內。此為低速走線驗證，未模擬車輛控制。
-- Root `npm test`、`npm run build`、`git diff --check` 通過。Chrome 3200 × 1800／DPR 1 日、夜、接駁俯視與主視角截圖均無 page error；原圖、量度腳本及結果在 `~/city2127-evidence/q03-a/r2-final/`。[Gemini／R1／R2 對照](../../artifacts/change-review/drawer-housing/vs-target.jpg)。
+- Root `npm test`、`npm run build`、`git diff --check` 通過。Chrome 3200 × 1800／DPR 1 日、夜、接駁俯視與主視角截圖均無 page error；原圖、量度腳本及結果在 `~/city2127-evidence/q03-a/r2-final/`。[Gemini／R1／R2 對照](../../../artifacts/change-review/drawer-housing/vs-target.jpg)。
 - 本機前景 Chrome、1920 × 1080／DPR 1，NW high 主視角去掉首筆後：日 39.1–41.7 FPS、夜 24.2–35.9 FPS（同時進行截圖，非獨佔測量；R1 無同法基線）。展覽機未測。
 - 業主審閱後指定紅線修訂，見下節。
 

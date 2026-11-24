@@ -1,6 +1,6 @@
 # 企劃組資料
 
-企劃組草稿。使用者喺 2026-11-06 提供，整理做 Markdown，只改格式，內容冇改。**呢度只係參考資料，唔係產品 authority。** 現行展覽嘅題目、Meter、文案同視覺，仍然以 [EXHIBITION_SPEC](../EXHIBITION_SPEC.md)、[RESIDENT_COPY](../RESIDENT_COPY.md)、`survey/src/survey/questions.exhibition.json` 同 [CITY MASTER TASTE](../ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md) 為準。採用入面任何內容都屬於產品決策，要寫入 SPEC。
+企劃組喺 2026-11-06 提供嘅參考資料。[SURVEY_V2](SURVEY_V2.md) 係九題企劃同題庫生成嘅來源。展覽規則以 [EXHIBITION_SPEC](../EXHIBITION_SPEC.md) 為準，實際問卷文案見 [九題題組](../../survey/src/survey/questions.rotation.v1.json)，視覺見 [CITY MASTER TASTE](../ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md)。
 
 | 文件 | 內容 |
 | --- | --- |
@@ -13,12 +13,12 @@
 
 ## 文件之間嘅關係
 
-- SURVEY_V2 嘅 9 個參數，同現行展覽用緊嘅 4 個 Meter（`automation`、`publicSharing`、`environmentalPriority`、`urbanConcentration`）係唔同嘅系統；唔需要一一對應。SURVEY_V2 已經生成做問題池 `survey/src/pool/questionPool.v1.json`（[handoff](../handoffs/question-pool.md)），但未接入展覽流程。改完 SURVEY_V2 之後要行 `npm run pool:build --prefix survey`，否則 `survey` 嘅 test 會失敗。
+- SURVEY_V2 會生成問題池。展覽另讀現行輪換題組 JSON。更改原稿後要重跑 `npm run pool:build --prefix survey`，並核對題庫測試。
 - IMAGE_PROMPTS 每個案 Q0n-A/B/C，對應 SURVEY_V2 Un 題嘅選項 A/B/C 同埋「都市の具体的な変化」。
 - 兩份 HYPOTHESES 嘅仮説，就係 SURVEY_V2 每題「関連仮説」嘅來源。
 - 舊提案 [PROPOSAL_JA](../history/PROPOSAL_JA.md)（同 [PDF](../history/PROPOSAL_JA.pdf)）描述已退役嘅 4 問／4 Meter 展覽。呢個資料夾係新提案，兩者可能有矛盾；同時放入 repo 係為咗對比，唔係將任何一方定為已採用。
 
-## Owner 判斷（2026-11-06）
+## 原始企劃判斷（2026-11-06）
 
 1. 超高層：只禁止冇意義嘅超高層；有都市意義就冇問題（U06-A 已加註）。
 2. Ver.2 嘅 9 個參數唔需要對應現行 4 個 Meter。
@@ -26,6 +26,6 @@
 4. エネルギーメモ：②④ 原樣保留做原始 idea，修正同發展喺 SURVEY_V2（U02）／IMAGE_PROMPTS（Q02）做；③ 不採用，已刪除。
 5. Q09 嘅 B（交流）保持獨立價值，唔係 A 同 C 嘅中間值。
 
-## TODO
+## 原始企劃 TODO（歷史）
 
 - [ ] 27 案 prompt 嘅「未來感有」版本：而家 [IMAGE_PROMPTS](IMAGE_PROMPTS.md) 係「未来感がないバージョン」，要另外諗一套有未來感嘅版本，同現版本並列對比。

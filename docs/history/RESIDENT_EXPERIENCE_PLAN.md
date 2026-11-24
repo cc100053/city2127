@@ -1,8 +1,8 @@
 # 居民體驗計劃 — 2127 台場
 
-> **2026-11-21：version4 四題／四個 Meter 版本已永久退役，現行唯一版本係九題抽題輪換（[SPEC](EXHIBITION_SPEC.md#抽題輪換唯一現行版本)）。** 本文件講 Meter、分數或 ladder 嘅部分只係歷史記錄。
+> **2026-11-21：version4 四題／四個 Meter 版本已永久退役，現行唯一版本係九題抽題輪換（[SPEC](../EXHIBITION_SPEC.md#抽題輪換唯一現行版本)）。** 本文件講 Meter、分數或 ladder 嘅部分只係歷史記錄。
 
-日期：2026-10-02。Owner：Codex。**P1–P3 已實作；P4 軟件驗證已通過，P5 尚待實機驗收。** P2接入證據見 [階段交接](handoffs/archive/resident-experience-p2.md)；P3排程／carrier證據見 [P3交接](handoffs/archive/resident-experience-p3.md)；本文件保留P4／P5計劃，不代表實際裝置驗收已完成。產品契約以 [SPEC](EXHIBITION_SPEC.md) 為準；文案唯一來源是 [RESIDENT_COPY](RESIDENT_COPY.md)，接手入口是 [handoff](handoffs/archive/resident-experience-plan.md)。
+日期：2026-10-02。Owner：Codex。**P1–P3 已實作；P4 軟件驗證已通過，P5 尚待實機驗收。** P2接入證據見 [階段交接](../handoffs/archive/resident-experience-p2.md)；P3排程／carrier證據見 [P3交接](../handoffs/archive/resident-experience-p3.md)；本文件保留P4／P5計劃，不代表實際裝置驗收已完成。產品契約以 [SPEC](../EXHIBITION_SPEC.md) 為準；文案唯一來源是 [RESIDENT_COPY](../RESIDENT_COPY.md)，接手入口是 [handoff](../handoffs/archive/resident-experience-plan.md)。
 
 ## 目標與已確認方向
 
@@ -20,7 +20,7 @@
 
 P1 source `9273f88decbfa4ec8844585d439b8271179421ea` 已由 `2669de628907ef25d13b198c5a387c864b28548c` 整合，發布 main `6ed44dfcd6e9fdf08943bcc5e509bd46e9fda83a`。[main CI 36995697291](https://github.com/cc100053/city2127/actions/runs/36995697291) PASS；這證明原有 package checks 通過，不是新畫面／iPad 驗收。
 
-P2 runtime 使用居民 [question JSON](../survey/src/survey/questions.exhibition.json) version3（ids/effects不變）。Guest 結果只保留保存／等待／站號／編號／抬頭／交接；root 顯示背景／當前focal設施與保守結果卡。P3城市live過渡仍3秒，單站／A-B展示起點最少相隔10秒；Guest按排定時段等待，result接續剩餘10秒slot／handoff5秒。SQLite schema7／CityView與algorithm v2 保持。
+P2 runtime 使用居民 [question JSON](../../survey/src/survey/questions.exhibition.json) version3（ids/effects不變）。Guest 結果只保留保存／等待／站號／編號／抬頭／交接；root 顯示背景／當前focal設施與保守結果卡。P3城市live過渡仍3秒，單站／A-B展示起點最少相隔10秒；Guest按排定時段等待，result接續剩餘10秒slot／handoff5秒。SQLite schema7／CityView與algorithm v2 保持。
 
 ## 畫面分工與完整流程
 
@@ -42,7 +42,7 @@ P2 runtime 使用居民 [question JSON](../survey/src/survey/questions.exhibitio
 
 ### P1 — 居民文案：DONE（documentation only）
 
-交付為 [RESIDENT_COPY](RESIDENT_COPY.md)：居民開場、四題／12 選項、設施卡、結果句型、核對／等待／重試用語。原有 ids／effects／次序已比對，文件與現行設施關係已核對；[P1 handoff](handoffs/archive/resident-copy-p1.md) 保留證據。P1交付時尚未接入；P2現已接入JSON／UI。日文是作者自審，沒有外部語言審核或實測閱讀時間。
+交付為 [RESIDENT_COPY](../RESIDENT_COPY.md)：居民開場、四題／12 選項、設施卡、結果句型、核對／等待／重試用語。原有 ids／effects／次序已比對，文件與現行設施關係已核對；[P1 handoff](../handoffs/archive/resident-copy-p1.md) 保留證據。P1交付時尚未接入；P2現已接入JSON／UI。日文是作者自審，沒有外部語言審核或實測閱讀時間。
 
 ### P2 — 文案接入與畫面分工：DONE
 
@@ -53,11 +53,11 @@ P2 runtime 使用居民 [question JSON](../survey/src/survey/questions.exhibitio
 
 完成門檻：四題居民文案可作答；partial answers 不改城；iPad 結果沒有觀看用表格；大屏幕可讀、城市不被大面積遮擋；單站與 A/B 各自的保存／重試／交接仍工作。提供新畫面證據，不沿用 P1 CI 當 UI 驗收。
 
-2026-10-02實作：question-set version3，原SQLite／version2歷史保留，單站／A-B新預約接續舊草稿；Guest結果精簡，root重用固定卡片。日常卡每12秒、live fallback本機最多10秒；A/B≥3秒仍可覆蓋，並非P3保留閱讀時段。卡片按focal實際數量／塔形態選擇；配對／district因果判斷未接入。新截圖、root/survey checks與三項scratch-DB browser回歸見 [P2 handoff](handoffs/archive/resident-experience-p2.md)。這些checks不等於P4全部案例／P5實機驗收。
+2026-10-02實作：question-set version3，原SQLite／version2歷史保留，單站／A-B新預約接續舊草稿；Guest結果精簡，root重用固定卡片。日常卡每12秒、live fallback本機最多10秒；A/B≥3秒仍可覆蓋，並非P3保留閱讀時段。卡片按focal實際數量／塔形態選擇；配對／district因果判斷未接入。新截圖、root/survey checks與三項scratch-DB browser回歸見 [P2 handoff](../handoffs/archive/resident-experience-p2.md)。這些checks不等於P4全部案例／P5實機驗收。
 
 ### P3 — 真實原因與展示節奏：DONE
 
-每份回答預留 **10秒觀看時段**：0–3秒識別＋位置提示＋現有城市過渡；3–10秒保留一項偏好與真實配置影響。2026-10-02已接入排程／root／Guest／lease／guard／drain，軟件計時證據見 [P3交接](handoffs/archive/resident-experience-p3.md)。這不是已驗證的實際閱讀時間或理解程度。以下保留P3的驗收契約。
+每份回答預留 **10秒觀看時段**：0–3秒識別＋位置提示＋現有城市過渡；3–10秒保留一項偏好與真實配置影響。2026-10-02已接入排程／root／Guest／lease／guard／drain，軟件計時證據見 [P3交接](../handoffs/archive/resident-experience-p3.md)。這不是已驗證的實際閱讀時間或理解程度。以下保留P3的驗收契約。
 
 - A/B 按 server 提交順序呈現；一份結果的閱讀時段未完，不被下一份覆蓋。兩站仍能獨立作答；等待頁清楚顯示回答已保存。
 - 一起調整 server 的 display scheduling、root queue、Guest 等待、result lease、提前交接 guard 與 reset drain。分開管理「3秒過渡」與「10秒觀看」，不能把所有3秒常數盲目改為10秒。
@@ -75,7 +75,7 @@ P2 runtime 使用居民 [question JSON](../survey/src/survey/questions.exhibitio
 
 ### P4 — 軟件與雙屏流程驗證：DONE
 
-2026-10-02 已以 scratch SQLite／Chrome 154.0.8037.93／1280×720／deviceScaleFactor1 完成下列軟件案例；[P4交接](handoffs/archive/resident-experience-p4.md) 逐列列出 native／browser 證據、source/integration commit、展示計時、console/network 記錄及限制。City 固定 hero／`?hour=16`；觸控為桌面 Chromium 模擬，離線租期採明列的 server clock jumps，不作實際閱讀或裝置證據。以下保留驗收契約。
+2026-10-02 已以 scratch SQLite／Chrome 154.0.8037.93／1280×720／deviceScaleFactor1 完成下列軟件案例；[P4交接](../handoffs/archive/resident-experience-p4.md) 逐列列出 native／browser 證據、source/integration commit、展示計時、console/network 記錄及限制。City 固定 hero／`?hour=16`；觸控為桌面 Chromium 模擬，離線租期採明列的 server clock jumps，不作實際閱讀或裝置證據。以下保留驗收契約。
 
 | 驗收案例 | 預期 |
 | --- | --- |
@@ -89,17 +89,17 @@ P2 runtime 使用居民 [question JSON](../survey/src/survey/questions.exhibitio
 | 提前交接、離線站到期、Admin 指定中止 | 不影響另一站或已保存展示；無卡住 admission／租期 |
 | 鍵盤／觸控、保存失敗提示 | 能選擇、返回、核對、重試；焦點與文字提示清楚 |
 
-修改 root／survey 時，各跑 `npm test`、`npm run build` 與 `git diff --check`；為新增非平凡分支留最小可執行檢查，優先擴充現有測試。沿用 [twoStations.browser.mjs](../tests/twoStations.browser.mjs)、[adminUndo.browser.mjs](../tests/adminUndo.browser.mjs) 及相關檢查，按新行為更新必要 assertions；不把 headless pass 當實際 iPad 驗證。
+修改 root／survey 時，各跑 `npm test`、`npm run build` 與 `git diff --check`；為新增非平凡分支留最小可執行檢查，優先擴充現有測試。沿用 [twoStations.browser.mjs](../../tests/twoStations.browser.mjs)、[adminUndo.browser.mjs](../../tests/adminUndo.browser.mjs) 及相關檢查，按新行為更新必要 assertions；不把 headless pass 當實際 iPad 驗證。
 
 完成門檻：自動／browser checks 通過；記錄時間與新截圖；產品文件與 handoff 同步。剩餘硬件、理解程度、長時間穩定性明列未驗，不宣稱 S5 展覽驗收完成。
 
 ### P5 — 展場與實際裝置驗收：IN_PROGRESS
 
-2026-10-02 已開始驗收準備；[P5交接／驗收表](handoffs/resident-experience-p5.md) 記錄實機D0–D10、理解訪談及待決復原政策。使用者預計65吋HDMI主屏、觀看約4米、Mac mini M6，並確認兩部iPad直接接收主機輸出畫面、型號未定。輸出方案／雙路獨立觸控及實際配置須先驗D0，不改成LAN Guest假設。全部實機結果為 NOT RUN；P5及S5未完成。
+2026-10-02 已開始驗收準備；[P5交接／驗收表](../handoffs/resident-experience-p5.md) 記錄實機D0–D10、理解訪談及待決復原政策。使用者預計65吋HDMI主屏、觀看約4米、Mac mini M6，並確認兩部iPad直接接收主機輸出畫面、型號未定。輸出方案／雙路獨立觸控及實際配置須先驗D0，不改成LAN Guest假設。全部實機結果為 NOT RUN；P5及S5未完成。
 
 確認輸入裝置型號／橫向尺寸、Safari／其他 browser、LAN、主屏幕尺寸、觀看距離與實際電腦。使用該固定裝置檢查觸控、焦點、字體、抬頭視線、反光、睡眠／重連與完整單站／A/B 流程；這是指定展覽裝置測試，不增加泛用手機 responsive 或 adaptive camera。
 
-讓現場試用者完成體驗後描述居民身份、生活偏好與城市結果；記錄誤解位置再改短句／提示。最後與展覽 owner 確定 reset／中止／離線復原操作及長時間運行程序；依 [VALIDATION](VALIDATION.md) 留實際 GPU／device 證據，未測 FPS、Windows 或其他平台不作承諾。
+讓現場試用者完成體驗後描述居民身份、生活偏好與城市結果；記錄誤解位置再改短句／提示。最後與展覽 owner 確定 reset／中止／離線復原操作及長時間運行程序；依 [VALIDATION](../VALIDATION.md) 留實際 GPU／device 證據，未測 FPS、Windows 或其他平台不作承諾。
 
 硬件選擇、輸入方式與 exhibition-day recovery policy 仍未定；不妨礙先做 P2，但限制 P5 與 S5 的完成。
 
@@ -107,15 +107,15 @@ P2 runtime 使用居民 [question JSON](../survey/src/survey/questions.exhibitio
 
 | 階段／位置 | 工作 |
 | --- | --- |
-| P2 [questions.exhibition.json](../survey/src/survey/questions.exhibition.json)、[questionLoader](../survey/src/survey/questionLoader.ts) 與其 session/history callers | 居民問題、背景、version／歷史兼容核對 |
-| P2 [guestDebugView](../survey/src/ui/guestDebugView.ts)、[guestFlow](../survey/src/ui/guestFlow.ts)、[debug.css](../survey/src/ui/debug.css) | 輸入、核對、保存／等待／抬頭／交接 |
-| P2/P3 [surveyAtmosphere](../src/surveyAtmosphere.ts)、[style.css](../src/style.css) | 大屏幕背景／設施／結果呈現 |
-| P3 [proposalService](../survey/src/server/proposalService.ts)、[runStore](../survey/src/server/runStore.ts)、[surveyView](../src/surveyView.ts) | 展示排程、等待、lease／guard／recovery callers |
-| P3 [cityChangeManager](../src/cityChangeManager.ts)、[districtMeters](../src/districtMeters.ts)、[siteRuntime](../src/siteBuilders/siteRuntime.ts) | 核實實際 carrier 變化；只改必要資料接線，保留 geometry／共享資源 |
+| P2 [questions.exhibition.json](../../survey/src/survey/questions.exhibition.json)、[questionLoader](../../survey/src/survey/questionLoader.ts) 與其 session/history callers | 居民問題、背景、version／歷史兼容核對 |
+| P2 [guestDebugView](../../survey/src/ui/guestDebugView.ts)、[guestFlow](../../survey/src/ui/guestFlow.ts)、[debug.css](../../survey/src/ui/debug.css) | 輸入、核對、保存／等待／抬頭／交接 |
+| P2/P3 [surveyAtmosphere](../../src/surveyAtmosphere.ts)、[style.css](../../src/style.css) | 大屏幕背景／設施／結果呈現 |
+| P3 [proposalService](../../survey/src/server/proposalService.ts)、[runStore](../../survey/src/server/runStore.ts)、[surveyView](../../src/surveyView.ts) | 展示排程、等待、lease／guard／recovery callers |
+| P3 [cityChangeManager](../../src/cityChangeManager.ts)、[districtMeters](../../src/districtMeters.ts)、[siteRuntime](../../src/siteBuilders/siteRuntime.ts) | 核實實際 carrier 變化；只改必要資料接線，保留 geometry／共享資源 |
 | P4 現有 root／survey tests 與 browser checks | 最小新增邏輯檢查、雙站及恢復回歸 |
 
 這是定位清單，不是必須修改每一檔案；先讀當前 callers，採最小完整差異。`module-swap` 保持 legacy v1 範圍，無需 incidental 改動。
 
 ## 接手順序
 
-先讀 [P2 handoff](handoffs/archive/resident-experience-p2.md) → [P1文案](RESIDENT_COPY.md) → [PROJECT](PROJECT.md) 與當前source。按mandatory preflight核對remote／owner／dirty files／available commits。P4已交付，接手先讀 [P4 handoff](handoffs/archive/resident-experience-p4.md)；下一個可分派階段是 **P5** 指定實際裝置／展場與理解程度驗收。P4軟件驗證不自動啟動P5，亦不代表S5完成。
+先讀 [P2 handoff](../handoffs/archive/resident-experience-p2.md) → [P1文案](../RESIDENT_COPY.md) → [PROJECT](../PROJECT.md) 與當前source。按mandatory preflight核對remote／owner／dirty files／available commits。P4已交付，接手先讀 [P4 handoff](../handoffs/archive/resident-experience-p4.md)；下一個可分派階段是 **P5** 指定實際裝置／展場與理解程度驗收。P4軟件驗證不自動啟動P5，亦不代表S5完成。

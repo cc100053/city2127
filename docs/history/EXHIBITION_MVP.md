@@ -6,7 +6,7 @@
 
 展示城市現為台場；A/B 功能已整合至 main `45fcde7` 並通過 [main CI 36976457465](https://github.com/cc100053/city2127/actions/runs/36976457465)。同一 survey server 的 `/guest?station=A`／`B` 可同時完成四題；各站獨立草稿、冪等提交、結果及交接，按 transaction 順序累積最新城市。Live 變化相隔至少3秒，等待展示時 Guest 顯示已保存，再顯示自己的結果10秒／交接5秒。A/B reset 暫停新開始並等待兩體驗結束；Admin 只可中止指定未提交草稿。單站 `/guest` 保留下一位開始時執行 reset 的規則。Schema 7 保留既有資料。
 
-此更新取代下文單站限定、Admin 必須確認離場及同 revision 只能成功一份的舊要求；原 S1–S4 規劃／證據保留其日期。雙瀏覽器驗證已通過，實體 LAN、展覽 PC／效能和使用者理解驗收仍待完成。操作見 [README](../../README.md#兩部裝置同時作答2026-10-02)，契約見 [PROJECT](PROJECT_2026-10-02.md#concurrent-guest-stations-ab--2026-10-02)，實際證據見 [雙站 handoff](../handoffs/archive/two-guest-devices.md)。
+此更新取代下文單站限定、Admin 必須確認離場及同 revision 只能成功一份的舊要求；原 S1–S4 規劃／證據保留其日期。雙瀏覽器驗證已通過，實體 LAN、展覽 PC／效能和使用者理解驗收仍待完成。操作見 [README](../../README.md#2-各裝置開啟的網址)，契約見 [PROJECT](PROJECT_2026-10-02.md#concurrent-guest-stations-ab--2026-10-02)，實際證據見 [雙站 handoff](../handoffs/archive/two-guest-devices.md)。
 
 - 文件建立日期：2026-09-28；文件 owner：Codex；狀態更新：2026-09-30。
 - 核對基準：`535a3c059302ac6c1059d84aef663b06510ac04c`，當時 `main` 與已 fetch 的 `origin/main` 相同。

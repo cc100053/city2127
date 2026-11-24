@@ -2,7 +2,7 @@
 
 # E4模型接口準備（2026-10-24）
 
-**這不是E4正式接入驗收。** Q3是否替換及保留氣候狀態的產品決定仍待確認；[方案](../../docs/ENERGY_CITY_PLAN.md#e4評審草案四題與能源權威配置2026-10-24待產品決定)／[交接](../../docs/handoffs/energy-city.md)。
+**這不是E4正式接入驗收。** Q3是否替換及保留氣候狀態的產品決定仍待確認；[方案](../../docs/history/ENERGY_CITY_PLAN.md#e4評審草案四題與能源權威配置2026-10-24待產品決定)／[交接](../../docs/handoffs/archive/energy-city.md)。
 
 - Base：`b8bccad9275283fd5aa3a19a1c0d37602345cc95`＋本分支模型接口改動；source hashes見`source-hashes.txt`。Node26.0.0，macOS Codex in-app Chromium／WebGL2，1280×720，預設quality，原hero。
 - Root完整npm test（含實際loopback HTTP／WebSocket及81組原四題）、build、whitespace PASS。36種獨立配置確認水庭數／翼尺寸／環／島及配電條件、目標副本隔離、mesh重用；E3淨空與動態檢查保留。

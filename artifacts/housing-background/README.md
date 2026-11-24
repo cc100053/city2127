@@ -1,6 +1,6 @@
 # Housing A — 正式固定背景與 M 搬位
 
-2026-10-27（Asia/Tokyo）。Owner：Codex，chat `01a17a83-db63-74d1-bc2a-755edb0102e9`；base `d3152b4b4b9d0385b4fe77194ca10062e4777e5b`，branch `codex/housing-background`。[計劃](../../docs/HOUSING_CITY_PLAN.md)／[交接](../../docs/handoffs/housing-city.md)。
+2026-10-27（Asia/Tokyo）。Owner：Codex，chat `01a17a83-db63-74d1-bc2a-755edb0102e9`；base `d3152b4b4b9d0385b4fe77194ca10062e4777e5b`，branch `codex/housing-background`。[計劃](../../docs/history/HOUSING_CITY_PLAN.md)／[交接](../../docs/handoffs/archive/housing-city.md)。
 
 人類先選方案A，收到原M與低automation服務館相交報告後，再選「保留服務館，重新選 M 住宅位置並提供對照圖」。M由`(-135,-175)`平移至`(-165,-165)`，距離31.62m；P/U、三類主／次設計、複合外皮、數量／輪廓及所有既有服務館保持。
 

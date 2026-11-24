@@ -1,6 +1,6 @@
 # SE district target candidates
 
-Visual authority: [CITY MASTER TASTE](../../docs/ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md). Reuse the material and technology language of the [accepted SE focal family](../../docs/handoffs/archive/se-closeup-polish.md). The three [Q4 preferences](../../docs/RESIDENT_COPY.md#q4--functions-2127urbanconcentration) are separate errands in low waterfront buildings, a mix of low and tall buildings, and several errands in a tower reached by going upstairs.
+Visual authority: [CITY MASTER TASTE](../../docs/ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md). Reuse the material and technology language of the [accepted SE focal family](../../docs/handoffs/archive/se-closeup-polish.md). The three [Q4 preferences](../../docs/history/RESIDENT_COPY_2026-11-24.md#q4--functions-2127urbanconcentration) are separate errands in low waterfront buildings, a mix of low and tall buildings, and several errands in a tower reached by going upstairs.
 
 ## Shared edit prompt
 

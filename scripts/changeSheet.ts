@@ -119,7 +119,7 @@ const EXTRA: Record<string, string> = {
   'Q03-A': `<h4 id="drawer-housing">車が引き出しになる住宅 R2 實景 <small>建築已驗收</small></h4>
 <p>フジテレビ西南側。兩個共用載車艙把小車升到住戶樓層，像抽屜一樣推入外牆泊位。住宅與西側梯田巨構相隔 15.9 m。沿立面的暖米色車道從右側繞入樓隙，經背面成環，並接入導軌大道 ②；住宅淡出時環道保留。</p>
 <p lang="ja">満潮で低い道が水に戻るころ、佐伯澪さんの車は外壁の引き出しに収まり、工具が三階の作業台に届きます。地上を歩く場所にしたぶん、住民は二つの昇降台を順番に使います。</p>
-<p><a href="../../docs/BUILDING_STORIES.md#drawer-housing">佐伯澪的故事</a> · <a href="../../docs/handoffs/drawer-housing-placement.md">地塊座標與驗證</a></p>
+<p><a href="../../docs/BUILDING_STORIES.md#drawer-housing">佐伯澪的故事</a> · <a href="../../docs/handoffs/archive/drawer-housing-placement.md">地塊座標與驗證</a></p>
 <div class="frames">
 <figure><img loading="lazy" src="drawer-housing/gemini-target.jpg" alt="目標圖中的貼樓暖色車道、右側彎道和前方步道"><figcaption>Gemini 目標｜貼樓車道及右側彎道</figcaption></figure>
 <figure><img loading="lazy" src="drawer-housing/vs-target.jpg" alt="同角度比較 Gemini 目標、R1 的 T 字前場和 R2 的貼樓環道"><figcaption>同角度｜Gemini、R1、R2</figcaption></figure>
@@ -144,7 +144,7 @@ const articles = set.questions.map(q => {
     const cards = wired ? q.options.filter(f => f.id !== o.id).map(f => {
       const r = resultCard(q.id, f.id, o.id);
       return `<dt>由 ${f.id} 換入：結果卡</dt><dd>${esc(r.preference)}<br>${esc(r.effect)}<br><small>地點標示：${esc(r.place)}</small></dd>`;
-    }).join('') : '<dt>結果卡</dt><dd><small>城市未接此題；文案待計劃 5.2。</small></dd>';
+    }).join('') : '<dt>結果卡</dt><dd><small>此題尚未有輪換模型，城市用探訪或構想地。</small></dd>';
     const card = FACILITY[key] ? RESIDENT_CARDS[FACILITY[key]] : undefined;
     const shots = frames(q.id, o.id, label);
     return `<section class="change" id="${key}"><h3>${key} <small>${esc(kind(o))}${o.id === q.initial ? '，起始版本（暫定）' : ''}</small></h3>
@@ -152,7 +152,7 @@ const articles = set.questions.map(q => {
 <dt>選項</dt><dd><b>「${esc(o.label)}」</b></dd>
 <dt>建築版本（計劃總表）</dt><dd>${md(row[2 + i])}<br><small>模型 ID：${o.modelId ? `<code>${esc(o.modelId)}</code>` : '無'}；地塊：${o.lotId ? `<code>${esc(o.lotId)}</code>` : '未定'}</small></dd>
 ${cards}
-<dt>設施卡</dt><dd>${card ? `<b>${esc(card[0])}</b><br>${esc(card[1])}` : '<small>待計劃 5.3。</small>'}</dd>
+<dt>設施卡</dt><dd>${card ? `<b>${esc(card[0])}</b><br>${esc(card[1])}` : '<small>此選項尚未有專用設施卡。</small>'}</dd>
 </dl><div class="frames">${shots || '<p><small>未有實時截圖。</small></p>'}</div></div>
 ${resident(key)}${EXTRA[key] ?? ''}</section>`;
   }).join('\n');
@@ -164,6 +164,9 @@ ${options}</article>`;
 
 const count = (k: string) => versions.filter(v => kind(v.o) === k).length;
 const out = join(OUT, 'index.html');
+const exhibitionDate = new Intl.DateTimeFormat('en-CA', {
+  timeZone: 'Asia/Tokyo', year: 'numeric', month: '2-digit', day: '2-digit',
+}).format(new Date());
 writeFileSync(out, `<!doctype html><html lang="zh-Hant"><meta charset="utf-8"><title>變化總覽 — city2127</title>
 <style>body{font:15px/1.6 system-ui,"Noto Sans JP",sans-serif;margin:24px auto;max-width:1500px;padding:0 20px;background:#f4f3ee;color:#222}
 h1{font-size:26px}h2{font-size:21px;margin:0 0 8px}h3{font-size:16px;margin:18px 0 6px}h4{font-size:15px;margin:16px 0 6px}small{color:#667;font-weight:400}code{background:#e6e4da;padding:0 4px;border-radius:3px}
@@ -173,14 +176,14 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #d6d4c8;padding
 dt{color:#667;font-size:13px;margin-top:8px}dd{margin:0}.frames{display:grid;grid-template-columns:1fr 1fr;gap:6px;align-content:start}
 p.intro{background:#f4f3ee;border-radius:6px;padding:8px 12px;margin:10px 0}figure{margin:0}figure img{width:100%;display:block;border-radius:4px;background:#ddd}figcaption{font-size:12px;color:#667}</style>
 <h1>變化總覽：${set.questions.length} 題 × 3 選項＝${versions.length} 個建築版本</h1>
-<p>生成：${new Date().toISOString().slice(0, 10)}，<code>scripts/changeSheet.ts</code>。題目、選項、模型及地塊來自輪換題組 <code>questions.rotation.v1.json</code>（version ${set.version}${set.draft ? '，草稿：題目文字仍為 SURVEY_V2 暫定稿' : ''}）；狀態來自 QUESTION_ROTATION_PLAN 第 2 節總表；居民來自 RESIDENT_SCENE_PLAN；日文結果卡及設施卡文案由程式生成。Q01 截圖取自 <code>scripts/closeupSheet.mjs</code>，其餘為輪換實時測試的畫面（含 guest 所見的結果卡）。</p>
-<p class="intro"><b>變化成因（抽題輪換）：</b>題組共 ${set.questions.length} 題，每題三個選項各對應一個建築版本。每位 guest 按城市狀態抽答其中 ${DRAW_COUNT} 題，最久未變的題優先。提交時，在答案與城市現況不同的題中選出最久未變的一題，城市直接換成 guest 所選選項的版本；每份提案只換一個版本，其餘答案只計入群眾比例。若抽到的題都已顯示 guest 的選擇，則為保底，城市不變。結果卡附群眾比例，即該題選同一選項的百分比（含本人）；回答未滿 ${CROWD_SHARE_MIN_VOTES} 票時改用不含數字的句子。未有模型的選項：如地塊已定，地塊顯示空置態；如未定地塊，城市暫無變化。</p>
+<p>生成：${exhibitionDate}，<code>scripts/changeSheet.ts</code>。題目、選項、模型及地塊來自輪換題組 <code>questions.rotation.v1.json</code>（version ${set.version}${set.draft ? '，草稿：題目文字仍為 SURVEY_V2 暫定稿' : ''}）；狀態來自 QUESTION_ROTATION_PLAN 第 2 節總表；居民來自 RESIDENT_SCENE_PLAN；日文結果卡及設施卡文案由程式生成。Q01 截圖取自 <code>scripts/closeupSheet.mjs</code>，其餘為輪換實時測試的畫面（含 guest 所見的結果卡）。</p>
+<p class="intro"><b>抽題輪換。</b>每位觀眾從 ${set.questions.length} 題中回答 ${DRAW_COUNT} 題，優先抽取最久未變的題目。四個答案均按題目分別計入，大屏幕聚焦其中一個選擇，最多切換一個模型。沒有可見變化時，鏡頭探訪已顯示觀眾所選模型的地塊，或前往構想地展示「構想中」。iPad 交接頁可逐張揭示同題同選項的比例（含本人）；每題未滿 ${CROWD_SHARE_MIN_VOTES} 票時顯示收集進度。</p>
 <p>現況：${versions.length} 個版本中，${count('有模型')} 個有模型，${count('空置（地塊已定）')} 個為空置地塊，${count('未有模型及地塊')} 個未有模型及地塊。</p>
 <table><tr><th>題</th><th>選項</th><th>建築版本（計劃總表）</th><th>類別</th></tr>
 ${versions.map(({ q, o }, i) => `<tr>${i % 3 ? '' : `<td rowspan="3"><a href="#${q.id}">${q.id}</a><br><small>${esc(q.text)}</small></td>`}<td><a href="#${q.id}-${o.id}">${o.id}</a>「${esc(o.label)}」</td><td>${md(planRows.find(c => c[0] === q.id)![2 + OPTIONS.indexOf(o.id)])}</td><td>${esc(kind(o))}</td></tr>`).join('\n')}</table>
 ${articles.join('\n')}
 <article id="others"><h2>不在新題組內的現有資產 <small>QUESTION_ROTATION_PLAN 第 2 節</small></h2>
-<p>新 run 上線（計劃 6.6）前，version4 四題 Meter 系統照常運作，以下資產仍隨 version4 投票變化。</p>
+<p>下表記錄已轉為背景或待確認去留的資產。城市輪換規則見<a href="../../docs/EXHIBITION_SPEC.md#抽題輪換唯一現行版本">展覽規格</a>。</p>
 <table><tr><th>資產</th><th>處理建議</th></tr>${otherAssets.map(c => `<tr>${c.map(x => `<td>${md(x)}</td>`).join('')}</tr>`).join('')}</table></article>
 </html>`);
 console.log(`${set.questions.length} questions, ${versions.length} versions, ${copied} frames refreshed → ${out}`);

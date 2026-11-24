@@ -14,7 +14,7 @@
 
 ## Decisions and target
 
-The owner confirmed the GLB is the target, it follows votes, other states use another building, and it keeps its original size. They approved the Q3 orbital-supply proposal and the land site with “近鏡跟去新址 is fine. go”. The target inventory is [spec.md](../../artifacts/rectenna-farm-placement/spec.md). The source/export and measured bounds are in the [asset handoff](rectenna-building.md).
+The owner confirmed the GLB is the target, it follows votes, other states use another building, and it keeps its original size. They approved the Q3 orbital-supply proposal and the land site with “近鏡跟去新址 is fine. go”. The target inventory is [spec.md](../../../artifacts/rectenna-farm-placement/spec.md). The source/export and measured bounds are in the [asset handoff](rectenna-building.md).
 
 | Q3 orbital votes | Receiver |
 | --- | --- |
@@ -22,7 +22,7 @@ The owner confirmed the GLB is the target, it follows votes, other states use an
 | At least 2 votes, 20% to less than 40% | Existing small offshore wing at (125, 0, −424) m |
 | At least 2 votes and at least 40% | Rectenna terrace farm at (−117.75, 0, 82.4) m |
 
-Percentages divide orbital votes by all Q3 energy votes plus four. Keep the existing rule in [energy.ts](../../survey/src/shared/energy.ts) and preserve independent energy facilities. Existing small wing and absent states need no new visual target.
+Percentages divide orbital votes by all Q3 energy votes plus four. Keep the existing rule in [energy.ts](../../../survey/src/shared/energy.ts) and preserve independent energy facilities. Existing small wing and absent states need no new visual target.
 
 Placement starts at unit scale and yaw π about +Y, an axis-aligned orientation intended to turn the GLB ramp side toward the Fuji-side approach (−Z). This is an R1 orientation choice, not an owner decision. Confirm the actual lower ramp landing in the scene before tying in access. Show the terrain-to-ramp connection in close-up. Story: orbital microwave reception on the membrane, conversion and distribution to the district, and an accessible terrace farm underneath.
 
@@ -44,7 +44,7 @@ Placement starts at unit scale and yaw π about +Y, an axis-aligned orientation 
 | Explanation | Align the actual result and ambient card with the displayed location and state. Show the canopy and farm together in the day and night headline frames. |
 | Evidence | Capture day, night, overview, access and mechanism keyframes at 3200 × 1800; compare against the GLB target and existing wing baseline. Record headed Chrome FPS and any short rows for the owner. |
 
-Trace the energy runtime, state/activity targeting, headline camera, asset loading and result copy together. Start with [PROJECT](../PROJECT.md), [VALIDATION](../VALIDATION.md), [asset library](../../asset/models/LIBRARY.md) and the [target inventory](../../artifacts/rectenna-farm-placement/spec.md). Use existing loading and energy paths, keep other headline and survey behavior, and run focused energy checks then the required full checks. Follow place-building for capture, commit, push and owner review. Update the change sheet when the accepted work or changed result copy requires it.
+Trace the energy runtime, state/activity targeting, headline camera, asset loading and result copy together. Start with [PROJECT](../../PROJECT.md), [VALIDATION](../../VALIDATION.md), [asset library](../../../asset/models/LIBRARY.md) and the [target inventory](../../../artifacts/rectenna-farm-placement/spec.md). Use existing loading and energy paths, keep other headline and survey behavior, and run focused energy checks then the required full checks. Follow place-building for capture, commit, push and owner review. Update the change sheet when the accepted work or changed result copy requires it.
 
 ## R1 (2026-11-15)
 

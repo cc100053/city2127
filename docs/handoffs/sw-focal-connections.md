@@ -15,7 +15,7 @@
 ## 驗證與交接
 
 - 根目錄 `npm test`、`npm run build`、`git diff --check` 通過。以本分支接駁改動驗證，未整合 main。
-- 場景測試對照實際地形，檢查新支路兩側和中心、主路接縫、棚前交會、庭園步道到入口。日夜三態六張圖已更新到 [change review](../../artifacts/change-review/index.html#SW%20focal)。
+- 場景測試對照實際地形，檢查新支路兩側和中心、主路接縫、棚前交會、庭園步道到入口。日夜三態六張圖已更新到 [change review](../../artifacts/change-review/index.html#Q08-C)。
 - 2026-11-17 Mac headless Chrome、1600 × 900、固定時間，近鏡和俯視擷取無 page error。完整支路主要喺[俯視](../../artifacts/sw-focal-connections/plan.jpg)可見。原近鏡因視角只見前景一段。東側路軌的部分枕木在新地台內，仍可見雙軌的走向。
 - 新支路屬固定場景幾何，未新增車流或行人路線。展覽機性能及 live 問卷畫面未測。
 - 如需再評估畫面，可比對 Gemini 目標、俯視圖和 change review 三態。

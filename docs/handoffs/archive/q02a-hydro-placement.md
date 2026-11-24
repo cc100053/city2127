@@ -18,8 +18,8 @@
 
 ## 建築背景
 
-- 出處：規劃組 Survey v2 的 U02（「お台場の電力設備を更新するなら、新技術をどこまで導入する？」）選項 A「既存の電力設備を中心に更新する」，即以實績為先，更新既有變電設備與地面電網（[SURVEY_V2](../planning-team/SURVEY_V2.md#q02技術受容性)）。畫像為 Q02-A「古い変電所をまたいで育った、空中の水の棚田」（`Q02-A_imag_v2.png`，存於 noifex 的工作機，本 repo 未收錄）。
-- 素材：[q02a-hydro-terrace](q02a-hydro-terrace.md)。六支 Y 形腳柱跨越舊變電所，其上為四層錯開的圓形抽水蓄能水池、瀑布、四架 7.6 m 水車及發電機房，下沉蓄水池經堰出海。尺寸 64.8 × 65.1 m，地面以上 32.2 m（蓄水池及海面低至 −3.4 m）。原點為地面中心，正面為 three.js +z，海側為 +x。約 30 萬三角面、23 種材質、8.5 MB。GLB 為靜態，水流及水車轉動須另行製作（[q02a-water-threejs](q02a-water-threejs.md)）。
+- 出處：規劃組 Survey v2 的 U02（「お台場の電力設備を更新するなら、新技術をどこまで導入する？」）選項 A「既存の電力設備を中心に更新する」，即以實績為先，更新既有變電設備與地面電網（[SURVEY_V2](../../planning-team/SURVEY_V2.md#q02技術受容性)）。畫像為 Q02-A「古い変電所をまたいで育った、空中の水の棚田」（`Q02-A_imag_v2.png`，存於 noifex 的工作機，本 repo 未收錄）。
+- 素材：[q02a-hydro-terrace](q02a-hydro-terrace.md)。六支 Y 形腳柱跨越舊變電所，其上為四層錯開的圓形抽水蓄能水池、瀑布、四架 7.6 m 水車及發電機房，下沉蓄水池經堰出海。尺寸 64.8 × 65.1 m，地面以上 32.2 m（蓄水池及海面低至 −3.4 m）。原點為地面中心，正面為 three.js +z，海側為 +x。約 30 萬三角面、23 種材質、8.5 MB。GLB 為靜態，水流及水車轉動須另行製作（[q02a-water-threejs](../q02a-water-threejs.md)）。
 - 與現行城市的關係：Q3 能源題（`energy-2127`）的 `water-storage` 選項已有「水庭儲能」模型。水庭一號位於 (−310, −151)，直徑約 28 m；水庭二號位於 (30, −395)，0.72 倍。Q02-A 同屬抽水蓄能，概念上與水庭重疊。
 
 ## Important decisions（owner 2026-11-17）
@@ -59,7 +59,7 @@
 | 效能 | 載入前後以 `fps.sh` 量度 hero 日夜 FPS，記錄為 R1 基準。下降超過 10% 列為 short row，下一輪再討論減面。 |
 | Evidence | `$CITY2127_EVIDENCE_ROOT/q02a-hydro-placement/r1/`：`focal-day`、`focal-night`、`overview`、`access`（岸邊連接）、`neighbour`（與水庭一號並列）、`hero`；另附與 GLB 單獨渲染的對比圖一張。 |
 
-由 [PROJECT](../PROJECT.md)、[VALIDATION](../VALIDATION.md)、[asset library](../../asset/models/LIBRARY.md) 及 [target inventory](../../artifacts/q02a-hydro-placement/spec.md) 開始。沿用 `modelAssets.ts` 的載入路徑及現有步道材質，不改動能源 runtime、Meter 或問卷。按 place-building **Rounds** 完成 capture、commit、push 及 owner review。角色確定後，Meter 接線另開任務。
+由 [PROJECT](../../PROJECT.md)、[VALIDATION](../../VALIDATION.md)、[asset library](../../../asset/models/LIBRARY.md) 及 [target inventory](../../../artifacts/q02a-hydro-placement/spec.md) 開始。沿用 `modelAssets.ts` 的載入路徑及現有步道材質，不改動能源 runtime、Meter 或問卷。按 place-building **Rounds** 完成 capture、commit、push 及 owner review。角色確定後，Meter 接線另開任務。
 
 ## R1（2026-11-17）
 
@@ -103,4 +103,4 @@ Owner 指示在 decide session 內直接完成 R1（「做埋 R1，喺呢度做�
 
 ## Next expected step
 
-本任務完成。角色（跟隨哪個 Meter）確定後另開任務接線；水流及水車動畫見 [q02a-water-threejs](q02a-water-threejs.md)。
+本任務完成。角色（跟隨哪個 Meter）確定後另開任務接線；水流及水車動畫見 [q02a-water-threejs](../q02a-water-threejs.md)。

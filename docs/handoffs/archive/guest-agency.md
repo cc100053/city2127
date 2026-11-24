@@ -17,9 +17,9 @@
 
 ## 現況（main `2050883` 實測，唔係推測）
 
-近鏡只喺 `pickHeadline` 有結果先播（[cityChangeManager.ts](../../src/cityChangeManager.ts) line 125、[main.ts](../../src/main.ts) line 199）。`pickHeadline` 只睇 before／after layout，**唔睇呢位 Guest 投咗乜**（[cityView.ts](../../survey/src/shared/cityView.ts) line 240）。
+近鏡只喺 `pickHeadline` 有結果先播（[cityChangeManager.ts](../../../src/cityChangeManager.ts) line 125、[main.ts](../../../src/main.ts) line 199）。`pickHeadline` 只睇 before／after layout，**唔睇呢位 Guest 投咗乜**（[cityView.ts](../../../survey/src/shared/cityView.ts) line 240）。
 
-當時 agencySim 原型（真 reducer＋當時 `ladderStep`，200 run × 40 位偏向型 Guest，唔係真人數據；現行 gate 見 [agencySim](../../survey/scripts/agencySim.ts)）：
+當時 agencySim 原型（真 reducer＋當時 `ladderStep`，200 run × 40 位偏向型 Guest，唔係真人數據；現行 gate 見 [agencySim](../../../survey/scripts/agencySim.ts)）：
 
 | 每份提案結果 | 現行 |
 | --- | --- |
@@ -36,7 +36,7 @@
 - **每份最多一格**：好處係穩，壞處係有 gap 嘅 site 可能唔係 Guest 投嗰個。
 - **揀 site 先睇 gap 大小，後睇 Guest 方向**：Guest 方向只係加 2 分。
 
-能源：每類要 ≥2 票同 ≥20% 先出現（[energy.ts](../../survey/src/shared/energy.ts) line 28），規格寫明「第一票可沒有可見設備差異」。所以能源幫唔到「每票有反應」。
+能源：每類要 ≥2 票同 ≥20% 先出現（[energy.ts](../../../survey/src/shared/energy.ts) line 28），規格寫明「第一票可沒有可見設備差異」。所以能源幫唔到「每票有反應」。
 
 ## 方案總覽
 
@@ -46,8 +46,8 @@
 | G1 | Guest 主導 ladder 一步 | `survey/src/shared/cityView.ts` | G0-1 |
 | G2 | 冇 tier 可移時嘅保底變化 | 能源或 site 微狀態 | G0-2 |
 | G3 | Headline 一定揀 Guest 嗰個變化 | `pickHeadline`、`cityChangeManager.ts` | 無 |
-| G4 | 近鏡入面變化夠明顯 | 沿用 [closeup-zoom](closeup-zoom.md) T／F／A，加 ±1／±2 檢查 | 無（closeup-zoom 已批） |
-| G5 | 結果卡講「你嘅聲音」 | `surveyAtmosphere.ts`、[RESIDENT_COPY](../RESIDENT_COPY.md) | G0-3（日文文案） |
+| G4 | 近鏡入面變化夠明顯 | 沿用 [closeup-zoom](../closeup-zoom.md) T／F／A，加 ±1／±2 檢查 | 無（closeup-zoom 已批） |
+| G5 | 結果卡講「你嘅聲音」 | `surveyAtmosphere.ts`、[RESIDENT_COPY](../../RESIDENT_COPY.md) | G0-3（日文文案） |
 | G6 | 驗證：sim gate、browser、真人 2 秒 | tests、artifacts | G0-4 |
 | G7 | 近鏡唔再限四個區域：飛去實際有變化嘅位置 | `headlineCamera.ts`、`districtMeters.ts`、`cityChangeManager.ts` | 已批（owner 2026-10-29） |
 
@@ -104,22 +104,22 @@
 - `EnergyConfiguration` 加每類 `progress`（0–N 段，未過門檻時用）。改 `energyConfiguration`、`sameEnergyConfiguration`、`pickHeadline` 嘅能源分支、root 能源模型。
 - 視覺：地基／框架逐段出現。重用現有能源部件材質，唔加素材包；draw calls 增幅 ≤ 10%。
 - 近鏡沿用五個能源 shot。
-- 改 `EXHIBITION_SPEC` 能源段同 [ENERGY_CITY_PLAN](../ENERGY_CITY_PLAN.md)。
+- 改 `EXHIBITION_SPEC` 能源段同 [ENERGY_CITY_PLAN](../../history/ENERGY_CITY_PLAN.md)。
 
 ## G3 — Headline 一定係 Guest 嗰個變化
 
 - `pickHeadline(before, after, votes?)`：有 votes 時，先揀向 Guest 方向移嘅 site；其次能源（如果該 Guest 能源類別有變）；之後先用現有規則。
-- Root 已經收到 `latestProposal.votes`（[main.ts](../../src/main.ts) line 197），`cityChangeManager` 要將 votes 傳入。Survey 端用 `pickHeadline` 嘅地方（`artifacts/closeup-polish/formal.mjs`、tests）都要跟。
+- Root 已經收到 `latestProposal.votes`（[main.ts](../../../src/main.ts) line 197），`cityChangeManager` 要將 votes 傳入。Survey 端用 `pickHeadline` 嘅地方（`artifacts/closeup-polish/formal.mjs`、tests）都要跟。
 - 測試：一個 Guest 同時令 site 變同能源變 → headline 係 site；site 向反方向變 → 唔揀佢做 headline（如果有其他選擇）。
 
 ## G4 — 近鏡入面要明顯
 
-前提係 [closeup-zoom](closeup-zoom.md) T（先推近、後變化；`feat/closeup-zoom` 已有 `967f5e5`）同 F（推近構圖）。G1 之後 ±1 同 ±2 嘅比例會變多，所以要額外檢查：
+前提係 [closeup-zoom](../closeup-zoom.md) T（先推近、後變化；`feat/closeup-zoom` 已有 `967f5e5`）同 F（推近構圖）。G1 之後 ±1 同 ±2 嘅比例會變多，所以要額外檢查：
 
 - 每個 site 嘅 0↔±1、±1↔±2、±2↔±3，**兩個方向**（包括退後，例如 +2→+1）都要喺同一個近鏡構圖內睇得出。
 - 退後（反向移動 54%）都要有 pulse／marker，唔可以變成「靜靜消失」。
 - 檢查 `?shot=` + `metersTo`，每對相鄰狀態並排截圖，日（12:00）夜（22:00）。
-- A/B 排隊：第二份結果要攞到完整 13 s 近鏡，唔可以因為 `displayMs < DISPLAY_MS−100` 跌入 catch-up 即時 hero（[surveyView.ts](../../src/surveyView.ts) line 285–328）。未確認係咪問題，G4 要用 3 s 內兩份提案實測。
+- A/B 排隊：第二份結果要攞到完整 13 s 近鏡，唔可以因為 `displayMs < DISPLAY_MS−100` 跌入 catch-up 即時 hero（[surveyView.ts](../../../src/surveyView.ts) line 285–328）。未確認係咪問題，G4 要用 3 s 內兩份提案實測。
 
 ## G5 — 結果卡
 
@@ -130,14 +130,14 @@
 
 ### 現況
 
-近鏡而家只有 13 個固定 shot（[headlineCamera.ts](../../src/headlineCamera.ts) line 11）：
+近鏡而家只有 13 個固定 shot（[headlineCamera.ts](../../../src/headlineCamera.ts) line 11）：
 
 - 4 個 site × `focal`／`district`：`district` shot 係一個好闊嘅鏡頭，對住成個 district，唔係對住實際變咗嘅位置。
 - 5 個能源 shot。
 
 但係 ±2／±3 嘅變化其實散落喺 district 好多個 slot：
 
-| Site | 會變嘅 slot（[PROJECT](../PROJECT.md) district layer） | 而家近鏡 |
+| Site | 會變嘅 slot（[PROJECT](../../PROJECT.md) district layer） | 而家近鏡 |
 | --- | --- | --- |
 | nw 自動化 | 11 個服務灣；±3 仲有全城街道 pods、飛行器、行人數 | 只有 `nw:district` 闊鏡 |
 | sw 共有 | 6 個 water rooms＋10 個庭院；同 nw／ne 配對時有 kiosk／果園 | 只有 `sw:district` |
@@ -145,12 +145,12 @@
 | ne 環境 | 17 個氣候灣；E4 之後凍結喺 mixed，唔會因答案變 | 唔需要 |
 | 住宅 | 固定背景，唔受投票影響 | 唔加入 |
 
-District 本身已經知道邊啲 slot 變咗，因為佢要喺嗰啲位置放 pulse 光圈（例如 [districtMeters.ts](../../src/districtMeters.ts) line 353–358 嘅 `roomSlots`／`courtSlots`）。所以「變咗喺邊」嘅資料已經有，只係冇交俾鏡頭用。
+District 本身已經知道邊啲 slot 變咗，因為佢要喺嗰啲位置放 pulse 光圈（例如 [districtMeters.ts](../../../src/districtMeters.ts) line 353–358 嘅 `roomSlots`／`courtSlots`）。所以「變咗喺邊」嘅資料已經有，只係冇交俾鏡頭用。
 
 ### 做法
 
 1. **交出變化位置**：每個 district 嘅 `setTarget` 將今次變咗嘅 slot 世界座標記錄落嚟（同 pulse 用同一組），`CityChangeManager` 放入 `CarrierChange.points`。只喺 root 入面，唔改 survey 協議。
-2. **預先寫好嘅 viewpoint 表，唔用即場計鏡頭**：以前自動／即場鏡頭試過出現遮擋同跨 near plane（[closeup-next](closeup-next.md) A1／A2）。所以每個 district 預先寫 3–4 個 viewpoint，每個負責附近一組 slot，總共大約 10–12 個新 shot。另外為 nw ±3 加 1–2 個街道／空中航線 viewpoint。每個 viewpoint 記住佢覆蓋嘅 slot index。
+2. **預先寫好嘅 viewpoint 表，唔用即場計鏡頭**：以前自動／即場鏡頭試過出現遮擋同跨 near plane（[closeup-next](../closeup-next.md) A1／A2）。所以每個 district 預先寫 3–4 個 viewpoint，每個負責附近一組 slot，總共大約 10–12 個新 shot。另外為 nw ±3 加 1–2 個街道／空中航線 viewpoint。每個 viewpoint 記住佢覆蓋嘅 slot index。
 3. **即場揀 viewpoint**：headline 係 district 變化（±2／±3）時，揀覆蓋最多今次變咗 slot 嘅 viewpoint；打和就揀最近最少用嘅，令每位 Guest 睇到唔同地方。±1 照用 focal shot。能源照用能源 shot（G2 嘅建設中狀態都用佢哋）。
 4. **時間線同 closeup-zoom 一致**：先推近、settle、後變化。Hold 期間嘅慢推照 closeup-zoom F。
 5. **同 closeup-zoom 協調**：closeup-zoom F 將 `district` shot 重新定義為「拉闊嘅 focal」。G7 開工時，district 變化改用新 viewpoint 表，`*:district` 只做冇 slot 資料時嘅 fallback。要喺 closeup-zoom handoff 記低，避免兩邊重複調 district pose。
@@ -216,11 +216,11 @@ G7 未達完整視覺驗收：64 個保守目標包圍盒只排除自身跨 near
 
 2026-11-01 court3／street 鏡頭：`sw:court3` 改為 [-122,60,360]→[-110,3,230]（原 [-145,113,330]，太貼近俯視、前景柱）；`nw:street` 改為 [213,75,-345]→[113,4,-333]（原 [203,65,-423]，前景大樓佔左邊，海面少）。各試 8 個 130／100 m 方位候選，靜態 high 狀態日（12:00）與夜（22:00）檢視；court3 日間地面仍偏白、僅靠紅傘分辨，街道左側仍有屋頂佔約 1/4。未測 live 過場、遮擋／near plane 全程。root `npm test`、`npm run build` 通過。
 
-2026-11-10 頻率統計及鏡頭表修正（branch `chore/closeup-frequency-sheet`）：新增 [closeupFrequencySim](../../scripts/closeupFrequencySim.ts)，用正式 ladder／`pickHeadline`、真實 district `changedPoints` 及 `HeadlineCamera.play`，200×40 偏向模型（同 agencySim，唔係真人數據）統計每份提案觸發邊個 shot。8000 份提案全部有 shot：focal 5 個 shot 合共約 32%（`sw:focal` 10.5%，其餘四個各 5.1–5.6%）；district viewpoint 約 64%，最高 `nw:bay1` 5.6%、`nw:bay2` 4.3%，其餘每個 0.5–3.1%；能源 4 個 shot 合共約 4.5%，當中約九成係 G2 activity 輪替。`focal` 以「band 有變」近似，未建立真 focal controller。
+2026-11-10 頻率統計及鏡頭表修正（branch `chore/closeup-frequency-sheet`）：新增 [closeupFrequencySim](../../../scripts/closeupFrequencySim.ts)，用正式 ladder／`pickHeadline`、真實 district `changedPoints` 及 `HeadlineCamera.play`，200×40 偏向模型（同 agencySim，唔係真人數據）統計每份提案觸發邊個 shot。8000 份提案全部有 shot：focal 5 個 shot 合共約 32%（`sw:focal` 10.5%，其餘四個各 5.1–5.6%）；district viewpoint 約 64%，最高 `nw:bay1` 5.6%、`nw:bay2` 4.3%，其餘每個 0.5–3.1%；能源 4 個 shot 合共約 4.5%，當中約九成係 G2 activity 輪替。`focal` 以「band 有變」近似，未建立真 focal controller。
 
 統計同時發現 P1 r3（`cd67a86`）清走 megastructure／hero 範圍內嘅塔、pod、水庭之後，鏡頭表冇跟住改：SE 只剩 4 座塔＋10 個 pod，但 `se:tower3`／`tower4` 同全部 10 個 `se:pod*` 仍係舊編號嘅 pose，鏡頭目標離實際 slot 158–592 單位（約佔模擬提案 14%）；另有 22 個 SE viewpoint 已無對應 slot；`sw:court4`／`court6`／`court7` 水庭移位後鏡頭偏離 63–125 單位。修正：SE 改用對應現存 slot 嘅舊 pose（`se:pod4` 因 pod 由 207,37 移到 182,37，整個 pose 平移），刪去 22 個死 viewpoint，三個水庭鏡頭連目標一齊平移；固定 shot 由 74 減至 52（district viewpoint 59 → 37）。`tests/headlineCamera.test.ts` 新增檢查：每個現存 slot 都有 viewpoint，而且鏡頭目標離 slot 不超過 40 單位，鏡頭表亦不可列出已不存在嘅 slot（舊表會喺 `sw:court4` 失敗）。平移／改鍵後嘅 pose 只做咗靜態畫面檢視，未驗證 live 過場、遮擋同 near plane。
 
-對照表：[closeupSheet](../../scripts/closeupSheet.mjs) 用 Vite DEV `?meters=&shot=`（slot seed 0、其他 site 喺 0、`reviewTime=20`）拍 43 行 before／after，日 12:00、夜 22:00，1600×900 headless Chrome，輸出喺 `~/city2127-evidence/closeup-frequency-sheet/`（`index.html`、`contact-*.jpg`）。屬靜態分流工具，唔代表 live 過場；能源近鏡未包括。
+對照表：[closeupSheet](../../../scripts/closeupSheet.mjs) 用 Vite DEV `?meters=&shot=`（slot seed 0、其他 site 喺 0、`reviewTime=20`）拍 43 行 before／after，日 12:00、夜 22:00，1600×900 headless Chrome，輸出喺 `~/city2127-evidence/closeup-frequency-sheet/`（`index.html`、`contact-*.jpg`）。屬靜態分流工具，唔代表 live 過場；能源近鏡未包括。
 
 對照表初步分流（2026-11-10，Claude 睇靜態日夜圖，唔係 owner 驗收；行號係對照表次序）：
 - 變化清楚：7 個 focal 行（1–3、5–7，合共約 32% 提案）全部一眼睇到；district 入面 `nw:bay1`、`nw:bay6`、`sw:room1`／`room2`／`room3`／`room4`、`sw:court2`／`court3`／`court7`／`court8` 清楚。
@@ -234,6 +234,6 @@ G7 未達完整視覺驗收：64 個保守目標包圍盒只排除自身跨 near
 
 舞台對照表（14 行，日 12:00／夜 22:00，`~/city2127-evidence/stage-closeups/sheet/`；Claude 睇靜態圖，唔係 owner 驗收）：八個舞台都冇前景遮擋；`nw:stage-west`、`nw:stage-mid`、`se:stage-south` 變化清楚。但闊鏡之下每一格變化喺單一舞台入面通常只郁 1–2 個 slot，所以「成排一齊變」未做到：`se:stage-east`（佔比最高）-2→-3 幾乎睇唔出，`sw:stage-rooms-east` 日間有反光而且 room 細，`sw:stage-courts-west`／`rooms-west`／`courts-south` 只係一個細物件變。要令同一舞台嘅 slot 喺同一格一齊變，須改 slot 排序（`ladderCut` 嘅 rank），屬規則改動，待 owner 決定。未驗證 live 過場、near plane 同 FPS。
 
-2026-11-11 舞台排序（同一 branch，owner 當日批准改排序）：新增 [stages.ts](../../src/stages.ts)（舞台 → slot 表，鏡頭同 district 共用）同 `stageRanks`（[districtMeters.ts](../../src/districtMeters.ts)）：同一舞台嘅 slot 攞相鄰排名，所以喺同一格一齊變；slot seed 只調換「成個舞台」嘅次序，唔再逐個 slot 洗牌，每格變動嘅 slot 數目不變。SW hybrid 同 SE mid-rise 用相反次序，留喺未開放／未起塔嘅 slot。seed 0 每格喺單一舞台變動嘅 slot：`se:stage-east` 2–4、`sw:stage-rooms-west` 1–3、`nw:stage-west`／`sw:stage-courts-west`／`rooms-east`／`courts-south` 1–2、`nw:stage-mid`／`se:stage-south` 1。`se:stage-east` 改為由東面低角度近鏡 [400,90,20]→[225,5,20]，pod 先夠大。closeupFrequencySim：district 變化跌入 fallback 由 9 升至 104／8000（1.3%，舞台以外嘅 slot 而家亦係一齊變）。測試：`districtMeters` 新增舞台排序檢查；mixed 狀態有人群嘅水庭由 2 個變 4 個（`plazaPeople` 24 → 48，排序改變嘅直接結果）。Root `npm test`、`npm run build`、`git diff --check` 通過。
+2026-11-11 舞台排序（同一 branch，owner 當日批准改排序）：新增 [stages.ts](../../../src/stages.ts)（舞台 → slot 表，鏡頭同 district 共用）同 `stageRanks`（[districtMeters.ts](../../../src/districtMeters.ts)）：同一舞台嘅 slot 攞相鄰排名，所以喺同一格一齊變；slot seed 只調換「成個舞台」嘅次序，唔再逐個 slot 洗牌，每格變動嘅 slot 數目不變。SW hybrid 同 SE mid-rise 用相反次序，留喺未開放／未起塔嘅 slot。seed 0 每格喺單一舞台變動嘅 slot：`se:stage-east` 2–4、`sw:stage-rooms-west` 1–3、`nw:stage-west`／`sw:stage-courts-west`／`rooms-east`／`courts-south` 1–2、`nw:stage-mid`／`se:stage-south` 1。`se:stage-east` 改為由東面低角度近鏡 [400,90,20]→[225,5,20]，pod 先夠大。closeupFrequencySim：district 變化跌入 fallback 由 9 升至 104／8000（1.3%，舞台以外嘅 slot 而家亦係一齊變）。測試：`districtMeters` 新增舞台排序檢查；mixed 狀態有人群嘅水庭由 2 個變 4 個（`plazaPeople` 24 → 48，排序改變嘅直接結果）。Root `npm test`、`npm run build`、`git diff --check` 通過。
 
 重拍對照表（Claude 睇靜態圖，唔係 owner 驗收）：`se:stage-east` -1→-2 三個 pod 一齊出現；`nw:stage-west` 兩個 bay 一齊轉形；`sw:stage-rooms-west` 兩個 room 一齊變；`sw:stage-courts-south` 兩個水庭一齊變成樹蔭廣場；`nw:stage-mid`、`se:stage-south` 各一個清楚變化；`sw:stage-courts-west` 兩個水庭變但物件細。影響：每個狀態嘅 slot 分佈同以前唔同，所有舊截圖同舊 run 重播出嚟嘅 district 會唔一樣。未驗證：非 0 seed 嘅畫面、live 過場、near plane、FPS。
