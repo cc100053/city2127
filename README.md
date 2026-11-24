@@ -14,6 +14,8 @@
 
 兩個 terminal 視窗在展覽期間均須保持開啟。
 
+**Windows 一鍵啟動：** 在 repo 根目錄雙擊 `start-windows.cmd`。它會自動使用 Node 24（即使 PATH 上有較舊的 Node 亦會改用 nvm 的版本）、在依賴缺少或過時時執行 `npm ci`、在兩個獨立視窗啟動下列兩個伺服器，然後以獨立 Chrome profile 加 `--force_high_performance_gpu` 開啟大屏幕，令 Intel + NVIDIA 雙顯卡手提電腦使用獨立顯卡。`survey/data/tls/` 有憑證時以 LAN／HTTPS 模式啟動，否則只限本機。可加 `-Low`（`&quality=low`）、`-Kiosk`（全螢幕）或 `-NoBrowser`。
+
 **Terminal 1 — 問卷伺服器**（API、WebSocket、Guest／Admin 頁面及 SQLite 資料）
 
 Mac：

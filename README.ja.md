@@ -14,6 +14,8 @@
 
 展示中は二つのターミナルを開いたままにします。
 
+**Windows ワンクリック起動：** リポジトリ直下の `start-windows.cmd` をダブルクリックします。Node 24 を使い（PATH 上に古い Node があれば nvm の版に切り替え）、依存関係が無いか古ければ `npm ci` を実行し、下記の二つのサーバーを別々のウィンドウで起動したうえで、専用 Chrome プロファイルに `--force_high_performance_gpu` を付けて大画面を開きます。Intel + NVIDIA のノート PC でも外部 GPU を使います。`survey/data/tls/` に証明書があれば LAN／HTTPS モード、無ければローカルのみで起動します。オプション：`-Low`（`&quality=low`）、`-Kiosk`（全画面）、`-NoBrowser`。
+
 **ターミナル 1 — アンケートサーバー**（API、WebSocket、Guest／Admin ページ、SQLite データ）
 
 Mac：

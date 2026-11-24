@@ -14,6 +14,8 @@ An exhibition set in Odaiba in 2127. Each visitor answers four of nine questions
 
 Keep both terminal windows open for the whole exhibition.
 
+**Windows one-click start:** double-click `start-windows.cmd` at the repo root. It uses Node 24 (switching to nvm's copy when an older Node comes first on PATH), runs `npm ci` when dependencies are missing or stale, starts the two servers below in their own windows, then opens the shared screen in a dedicated Chrome profile with `--force_high_performance_gpu`, so Intel + NVIDIA laptops use the discrete GPU. With certificates in `survey/data/tls/` it starts in LAN/HTTPS mode, otherwise loopback only. Options: `-Low` (`&quality=low`), `-Kiosk` (full screen) and `-NoBrowser`.
+
 **Terminal 1 — survey server** (API, WebSocket, Guest/Admin pages and SQLite data)
 
 Mac:
