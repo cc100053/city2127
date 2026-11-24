@@ -4,7 +4,7 @@
 
 ## 可重跑方法
 
-先按[啟動流程](../../README.md#展覽啟動mac--windows) build survey，再開root loopback Vite；不用展覽SQLite。沿用已安裝Chrome與Playwright，不新增dependency：
+先按[啟動流程](../../README.md#1-啟動兩個伺服器) build survey，再開root loopback Vite；不用展覽SQLite。沿用已安裝Chrome與Playwright，不新增dependency：
 
 ```sh
 node tests/energyE5.browser.mjs --self-test

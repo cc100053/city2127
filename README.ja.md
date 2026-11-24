@@ -1,116 +1,79 @@
 # Mind craft― 選択の積み重ねでつくる都市 ―
 
-> **2026-11-21：展示の現行版は9問の抽題輪換（9問 × 3モデル）のみです。** 新しい run は `SURVEY_QUESTIONS=src/survey/questions.rotation.v1.json` で起動してください（サーバーの既定値はまだ旧ファイルです）。
-
-## 作品について
-
-**「マイン」ではなく「マインド」クラフト**
-
-この町お台場の未来をあなたの選択で変えていこう！100年後の街は個人が決める！
-
-舞台は、2127年のお台場です。来場者は住民の一人として、暮らしにまつわる九つの問いのうち四つに答えます。四つの回答はすべて、問いごとに「住民の声」として集計されます。大画面では一つの選択に焦点を当て、目に見える変化がある場合は一か所の施設が切り替わります。同じ問いへの回答が十分に集まると、iPad の交代画面のカードで、同じ選択をした住民の割合を確認できます。次の来場者は、その時点の街を引き継ぎます（[RESIDENT_COPY](docs/RESIDENT_COPY.md)）。
-
-## iPad「住民の窓」とジェスチャー操作
-
-iPad の Safari で `https://<展示PCのLAN IP>:8443/guest?hand` を開きます。2台の場合は `/guest?station=A&hand` と `/guest?station=B&hand` を使います。カメラの利用には、iPad が信頼する HTTPS 証明書とカメラの使用許可が必要です。ビルド前に `survey/` で `npm run fetch:hand-model` を実行します。[セットアップ手順](survey/README.md#ipad住民の窓與手勢操作)を参照してください。
-
-手のひらを開いてカーソルを動かし、親指と人差し指でつまんで選びます。送信・ランドマークの案内・開始画面への移動は 0.8 秒つまみ続けます。全画面をタッチでも操作できます。大画面での表示が終わったら、iPad の声のカードにカーソルを合わせるか、指で長押しすると、その問いの割合を見られます。
-
-## 2台で同時に回答
-
-同じ信頼できる LAN の survey server に接続し、1台で `http://<展示PCのLAN IP>:8787/guest?station=A`、もう1台で `http://<展示PCのLAN IP>:8787/guest?station=B` を開きます。各ステーション同時1体験なので、同じステーションのページを複数開かないでください。`SURVEY_HOST=0.0.0.0` で起動すると server が A/B の `LAN Guest:` URL を表示します。ルーター／iPad の設定は [LAN 2台 handoff](docs/handoffs/lan-guest-stations.md) を参照。server は `SURVEY_HOST=0.0.0.0`（PowerShell：`$env:SURVEY_HOST='0.0.0.0'`）で起動します。各ステーションの四問・草稿・結果・交代は独立し、提案は server の受信順に累積、再送は一度だけ加算します。Cityの結果は13秒以上の閲覧枠を予約し（都市転換は3秒）、提案番号と A/B を表示します。再接続は最新 snapshot に復元します。既存 `/guest` の単独モードは維持し、体験中の A/B と混在させないでください。
-
-A/B のリセットは新しい開始を停止し、両方の回答・結果・交代が終わるまで保留します。Admin は指定した未完了ステーションだけを終了できます。通信断の草稿は開始から5分、記録済みの結果は予定の展示開始から18秒で解放されます（結果復元は元の枠の残り時間を接続し、租期は延長しません）。survey を build／再起動し Guest／City／Admin を更新してください。schema 9 は既存データを保持します。[handoff](docs/handoffs/archive/two-guest-devices.md)を参照。
-
 **言語：** [繁體中文](README.md) · [English](README.en.md) · [日本語](README.ja.md)
 
-来場者が一緒に未来のお台場をつくる展示です。各来場者は四つの質問に答え、一つの提案を送信します。次の来場者は、それまでの選択が反映された街を引き継ぎます。展示用の街はリポジトリ直下の Three.js シーン（`src/`）です。`survey/` サーバーが質問、状態、SQLite データベース、WebSocket 配信を管理します。`module-swap/` は旧 v1 の因果デモで、現在の v2 CityView には対応していません。
+2127年のお台場を舞台にした展示作品です。来場者は iPad で9問のうち4問に答え、大画面の街が変わり、次の来場者は積み重なった街を引き継ぎます。このファイルは展示の起動ガイドです。作品内容と仕様は[ドキュメント索引](docs/README.md)を参照してください。
 
-## 展示をローカルで起動する
+## 事前準備
 
-開発用自動回答（DEV-ONLY）：`cd survey && npm run dev:auto` で新しい独立テスト SQLite を起動し、`http://127.0.0.1:8788/guest?dev-auto` を開きます。街はルート Vite の `http://127.0.0.1:5173/?survey=ws://127.0.0.1:8788/ws` に接続します。localhost 専用の任意起動パネルが既存 Guest フローを繰り返し、次の質問開始時に自動で交代します。展示前に開発パネルを削除、または Admin に移してください。詳細は[アンケートの説明](survey/README.md)を参照。
+- 展示用PC（Mac または Windows）：Git、**Node.js 24 以上**、WebGL 2 対応のデスクトップブラウザ。
+- iPad：展示用PCと同じ信頼できる LAN に接続し、HTTPS 証明書をインストール・信頼済みにします（mkcert の `rootCA.pem`。iPadOS の「証明書信頼設定」で完全な信頼を有効化）。
+- 初回セットアップ時と lockfile 更新後は、リポジトリ直下で `npm ci`、`survey/` で `npm ci` と `npm run fetch:hand-model` を実行します。証明書と秘密鍵は `survey/data/tls/` に置きます。詳しくは [survey ガイド](survey/README.md#ipad住民の窓與手勢操作)を参照してください。
 
-Git と **Node.js 24 以上**（npm を含む）、WebGL 2 対応のデスクトップブラウザーが必要です。二つのターミナルタブを起動したままにします。特記がなければ、リポジトリのルートから実行してください。公開デプロイの設定はありません。
+## 1. 二つのサーバーを起動
 
-Admin の **直前の提案を取り消す** は、次の来場者が開始する前に、直前の完了した提案だけを取り消します。変更前の街と参加人数を復元し、元の提案は取消済みとして保存します。再回答は新しい四問の体験として開始します。survey を再ビルド・再起動し、City／Guest／Admin を更新してください。Undo は schema 6 で導入され、現在の SQLite はデータを削除せず schema 9 に移行します。A/B の新しい草稿を開始した後は、その草稿を中止しても古い提案の Undo は再び使えません。
+展示中は二つのターミナルを開いたままにします。
 
-### Mac — ターミナルを二つ開く
+**ターミナル 1 — アンケートサーバー**（API、WebSocket、Guest／Admin ページ、SQLite データ）
 
-**タブ 1：アンケートサーバー** — API、WebSocket、guest／monitor／admin 画面、SQLite の状態を提供します。起動前に画面をビルドします。
+Mac：
 
 ```sh
 cd survey
-npm ci
 npm run build
-SURVEY_QUESTIONS=src/survey/questions.rotation.v1.json npm run server
+SURVEY_HOST=0.0.0.0 \
+  SURVEY_QUESTIONS=src/survey/questions.rotation.v1.json \
+  SURVEY_TLS_CERT=data/tls/ipad.pem \
+  SURVEY_TLS_KEY=data/tls/ipad-key.pem \
+  npm run server
 ```
 
-**タブ 2：3D の街** — リポジトリのルートで新しいタブを開きます。Vite が Three.js シーンを提供します。
-
-```sh
-npm ci
-npm run dev -- --port 5173
-```
-
-### Windows — PowerShell を二つ開く
-
-**タブ 1：アンケートサーバー** — リポジトリのルートから開始します。
+Windows PowerShell：
 
 ```powershell
 Set-Location survey
-npm ci
 npm run build
+$env:SURVEY_HOST='0.0.0.0'
 $env:SURVEY_QUESTIONS='src/survey/questions.rotation.v1.json'
+$env:SURVEY_TLS_CERT='data/tls/ipad.pem'
+$env:SURVEY_TLS_KEY='data/tls/ipad-key.pem'
 npm run server
 ```
 
-**タブ 2：3D の街** — リポジトリのルートで別の PowerShell タブを開きます。
+サーバーの既定値はまだ退役した旧質問セットのため、`SURVEY_QUESTIONS` で9問の抽題輪換セットを必ず指定します。起動するとターミナルに iPad 用の `LAN Guest:` URL が表示されます。
 
-```powershell
-npm ci
+**ターミナル 2 — 3D の街**（リポジトリ直下で実行）
+
+```sh
 npm run dev -- --port 5173
 ```
 
-サーバーの標準アドレスは `127.0.0.1:8787` です。5173 番ポートが使用中の場合、街には Vite が実際に表示した URL を使ってください。サーバーのポートを変更した場合は、街の URL に WebSocket のアドレスを明示します。
+## 2. 各デバイスで開く URL
 
-### ブラウザーのタブと画面
-
-| タブ | 標準 URL | 役割 |
+| デバイス | URL | 用途 |
 | --- | --- | --- |
-| Guest（単独） | `http://127.0.0.1:8787/guest` | 四つの質問への回答、確認、一つの提案の送信。 |
-| Guest A/B（2台） | `http://<展示PCのLAN IP>:8787/guest?station=A` ／ `?station=B` | 独立した四問の体験で同じ街に提案します。 |
-| City | `http://127.0.0.1:5173/?survey` | 展示用の 2127 年のお台場。`ws://127.0.0.1:8787/ws` から変化を受信します。`?survey` を付けて開きます。 |
-| Admin | `http://127.0.0.1:8787/admin` | スタッフが状態を確認し、未完了の体験を終了し、リセットを要求・取消します。サーバー PC の localhost からのみ利用可能です。 |
-| Monitor（任意） | `http://127.0.0.1:8787/monitor` | 現在の状態と、画面を開いてから受信した提案・WebSocket イベントを文字で確認する画面。3D の街ではありません。 |
+| 大画面（展示用PC） | `http://127.0.0.1:5173/?survey` | 街の表示。GPU が弱い場合は `&quality=low` を追加 |
+| iPad A | `https://<展示用PCの LAN IP>:8443/guest?station=A&hand` | 来場者の回答（ハンドジェスチャーとタッチ） |
+| iPad B | `https://<展示用PCの LAN IP>:8443/guest?station=B&hand` | 二台目の回答ステーション |
+| スタッフ（展示用PC） | `http://127.0.0.1:8787/admin` | 状態、リセット、取り消し、昼夜設定。localhost のみ |
+| モニター（任意） | `http://127.0.0.1:8787/monitor` | 状態とイベントをテキストで確認 |
 
-City を展示スクリーン、Guest を入力スクリーンで開き、Admin はスタッフ用 PC に置きます。以下の次の開始時にリセットする規則は単独 `/guest` 用です。A/B は上記の通り新規開始を停止し、両体験の終了を待ちます。提案後、次の来場者は **はじめる** で開始できます。Admin の退出確認は不要です。保留中のリセットは次の開始時に実行されます。Admin の **未完了の体験を終了** は未完了の質問を中止するための操作です。サーバーはビルド済み画面と API を同じ origin で提供し、Vite は街を別に提供します。標準の DB は `survey/data/survey.sqlite` で、サーバーを再起動しても街の状態は残ります。`npm ci` は初回と lockfile 更新時に実行します。通常の再起動ではタブ 1 の build／server とタブ 2 の dev を実行してください。
+iPad が一台の場合は `https://<展示用PCの LAN IP>:8443/guest?hand` を開きます。未完了の体験がある間は単独ステーションと A／B を混在させず、同じステーションで複数のページを開かないでください。URL から `hand` を外すとタッチ専用画面になります。
 
-**信頼できる同一 LAN** の別端末から Guest／City を開く場合は、survey を LAN に公開し（City も別端末で開く場合だけ Vite も公開）、URL の `127.0.0.1` をホスト PC の LAN IP に置き換えます。
+## 3. 展示中の操作
 
-```sh
-# Mac: survey/ で実行（タブ 1）
-SURVEY_HOST=0.0.0.0 npm run server
-# リポジトリのルートで実行（タブ 2）
-npm run dev -- --host 0.0.0.0 --port 5173
-```
+- **引き継ぎ：** 送信後、iPad に結果と引き継ぎ画面が表示されます。次の来場者が「はじめる」を押すと、スタッフの確認なしで引き継がれます。
+- **Admin：** 「未完了の体験を終了」は未完了のアンケートを終了します。「直前の提案を取り消す」は次の来場者が始める前に限り、最後の提案を取り消します。「昼／夜／自動」は大画面の時刻を固定するか、昼夜サイクルに戻します。City reset は総人数を保持し、full reset は人数をゼロにしますが履歴は残します。
+- **データ：** SQLite は `survey/data/survey.sqlite` に保存され、再起動しても積み重なった街を引き継ぎます。旧質問セットから抽題輪換セットに切り替えるときは、先に Admin で街をリセットします。
+- **コード更新後：** ターミナル 1 の build と起動コマンドを再実行し、大画面、iPad、Admin を再読み込みします。
+- **サーバーのポートを変える場合（例：8790）：** 大画面で `http://127.0.0.1:5173/?survey=ws://127.0.0.1:8790/ws` を開きます。
 
-```powershell
-# Windows PowerShell: survey/ で実行（タブ 1）
-$env:SURVEY_HOST='0.0.0.0'; npm run server
-# リポジトリのルートで実行（タブ 2）
-npm run dev -- --host 0.0.0.0 --port 5173
-```
+## ローカルでの試用（iPad なし）
 
-両ポートに接続できる必要があります。Admin は引き続きサーバー PC の localhost 専用です。Guest には認証がないため、信頼できる展示 LAN で利用してください。例えばサーバーを 8790 番で動かす場合、街の URL は `http://127.0.0.1:5173/?survey=ws://127.0.0.1:8790/ws` です（LAN ではホスト名も置き換えます）。
+ターミナル 1 で `survey/` に移動して `npm run build` を実行し、続けて `SURVEY_QUESTIONS=src/survey/questions.rotation.v1.json npm run server` を実行します。ターミナル 2 は上記と同じです。同じPCで `http://127.0.0.1:8787/guest` を開いて回答し、`http://127.0.0.1:5173/?survey` で街を確認します。`http://127.0.0.1:5173/` だけを開くと、提案を受け取らない街のプロトタイプになります。
 
-アンケートに接続しない街の単独表示は `http://127.0.0.1:5173/` で開けます。この場合、タブ 1 は不要です。旧 v1 の module-swap デモは[引き継ぎ文書](docs/handoffs/archive/causal-city-mvp.md)を参照してください。展示用の街ではありません。
+## 関連ドキュメント
 
-## 関連文書
-
-- [Agent の作業手順](AGENTS.md)、[Git の運用](docs/CONTRIBUTING.md)、[構成](docs/PROJECT.md)、[検証](docs/VALIDATION.md)。
-- [現行展示仕様](docs/EXHIBITION_SPEC.md)と[S4 引き継ぎ](docs/handoffs/archive/exhibition-s4.md)は、現行契約と当時の S4 検証記録をそれぞれ記載しています。
-- [繁體中文 README](README.md)には DEV-only review tools の説明があります。過去の Plan 02 と証拠は文書索引の「歴史」を参照してください。
-
-## 現在の方針
-
-2127年のお台場を舞台とする展示です。[抽題輪換の一覧](docs/QUESTION_ROTATION_PLAN.md)で各選択肢のモデルと設置場所を確認できます。開発資料と旧版の記録は[文書索引](docs/README.md)にまとめています。
+- [展示仕様](docs/EXHIBITION_SPEC.md) · [検証ガイド](docs/VALIDATION.md)（展示用PC、iPad 二台、長時間運用）· [LAN 二台設定](docs/handoffs/lan-guest-stations.md)
+- 開発者・AI agent 向け：[AGENTS.md](AGENTS.md) · [構成](docs/PROJECT.md) · [ドキュメント索引](docs/README.md) · DEV 自動回答は [survey ガイド](survey/README.md)
+- `module-swap/` は保存されている v1 デモで、展示用の街ではありません。

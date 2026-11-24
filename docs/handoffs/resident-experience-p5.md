@@ -28,7 +28,7 @@
 
 ## In-scope files and dependencies
 
-本交接兼作驗收表，沿用 [P4](archive/resident-experience-p4.md)、[VALIDATION](../VALIDATION.md) 及 [README啟動流程](../../README.md#展覽啟動mac--windows)。只同步本交接、計劃、驗證入口與索引。實測問題出現後才trace callers並修正；不新增泛用手機responsive／adaptive camera、依賴或服務，不改展覽DB。
+本交接兼作驗收表，沿用 [P4](archive/resident-experience-p4.md)、[VALIDATION](../VALIDATION.md) 及 [README啟動流程](../../README.md#1-啟動兩個伺服器)。只同步本交接、計劃、驗證入口與索引。實測問題出現後才trace callers並修正；不新增泛用手機responsive／adaptive camera、依賴或服務，不改展覽DB。
 
 ## 裝置與場地記錄
 

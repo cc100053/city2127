@@ -22,6 +22,8 @@
 - 變化總覽導言及「其他資產」說明改回書面語（owner 2026-11-13 規則），由生成器重建。
 - QUESTION_ROTATION_PLAN 加註：程式註解所引的舊章節編號以 2026-11-24 快照為準。
 - 交接歸檔索引為六份狀態未標完成的交接註明取代來源。
+- 三語 README 改寫為精簡的展覽啟動指南（伺服器、各裝置網址、現場操作），並修正指向舊 README 錨點的連結。
+- owner 的 Dev Q&A 移入 [history/DEV_QA.md](../history/DEV_QA.md)，內容不變，只更新連結。
 - 驗證：root `npm test`、`npm run build`、`git diff --check`，以及全 repo Markdown 連結與錨點檢查。
 
 ## 接續

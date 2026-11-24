@@ -1,117 +1,79 @@
 # Mind craft― 選択の積み重ねでつくる都市 ―
 
-> **2026-11-21: the nine-question rotation (9 questions × 3 models) is the only exhibition version.** Start a run with `SURVEY_QUESTIONS=src/survey/questions.rotation.v1.json` (the server default is still the old file).
-
-## About the work
-
-In *Mind craft*, each visitor becomes a resident of Odaiba in 2127 and answers four of nine questions about everyday life. All four answers count toward the response totals for their questions. The shared screen focuses on one choice and shows a single site change when one is available. Once enough residents have answered a question, visitors can reveal the share who made the same choice on an iPad handoff card. The next visitor inherits the city as it stands. The opening city card asks who gets to shape a city (see [RESIDENT_COPY](docs/RESIDENT_COPY.md)).
-
-## iPad resident window and hand controls
-
-Open `https://<exhibition-PC LAN IP>:8443/guest?hand` in iPad Safari. For two stations, use `/guest?station=A&hand` and `/guest?station=B&hand`. Camera tracking requires trusted HTTPS and camera permission. Run `npm run fetch:hand-model` in `survey/` before building. See the [survey setup guide](survey/README.md#ipad住民の窓與手勢操作).
-
-Move the cursor with an open palm and pinch your thumb and index finger to select. Hold the pinch for 0.8 seconds to submit, open a landmark tour, or return to the start screen. Touch works throughout. After the shared-screen result, hover over a voice card or press and hold it on the iPad to reveal the share for that question.
-
-## Two concurrent Guest devices
-
-Use one survey server on the trusted LAN. Open `http://<exhibition-PC LAN IP>:8787/guest?station=A` on one device and `http://<exhibition-PC LAN IP>:8787/guest?station=B` on the other. Use only one page per station; each station admits one active experience. With `SURVEY_HOST=0.0.0.0` the server prints the full A/B `LAN Guest:` URLs to type on the iPads; router/iPad setup is in the [LAN station handoff](docs/handoffs/lan-guest-stations.md). Bind the survey server with `SURVEY_HOST=0.0.0.0` (PowerShell: `$env:SURVEY_HOST='0.0.0.0'`). Each station has its own four-question draft/result/handoff; submissions accumulate in server arrival order and retries count once. Live City results reserve 13-second reading slots with three-second transitions and proposal/station labels. City reconnect restores the latest snapshot immediately. The existing `/guest` single-station flow remains; do not mix it with active A/B experiences.
-
-A/B reset stops new starts and waits for both experiences, including results/handoffs. Admin can end only the named unfinished station. Disconnected questionnaires expire after five minutes; submitted result leases finish 18 seconds after their scheduled display starts (retry resumes the remaining slot without renewing the lease). Rebuild/restart survey and refresh Guest/City/Admin; schema 9 preserves existing data. See [handoff](docs/handoffs/archive/two-guest-devices.md).
-
 **Language:** [繁體中文](README.md) · [English](README.en.md) · [日本語](README.ja.md)
 
-Guests collectively shape a futuristic Odaiba. Each guest answers four questions and submits one proposal; the next guest inherits the accumulated city. The root Three.js scene (`src/`) is the exhibition city. The `survey/` server owns the questions, state, SQLite database, and live WebSocket updates. The separate `module-swap/` viewer is a legacy v1 causal demo and does not accept the current v2 CityView.
+An exhibition set in Odaiba in 2127. Each visitor answers four of nine questions on an iPad, the city on the shared screen changes, and the next visitor inherits the accumulated city. This file is the exhibition start-up guide; the work and its specification are in the [document index](docs/README.md).
 
-## Start the exhibition locally
+## Before you start
 
-Development auto-answer (DEV-ONLY): run `cd survey && npm run dev:auto`, open `http://127.0.0.1:8788/guest?dev-auto`, and connect root Vite at `http://127.0.0.1:5173/?survey=ws://127.0.0.1:8788/ws`. Every launch creates a new retained scratch SQLite; it never uses the exhibition DB. The opt-in localhost panel drives the existing Guest flow and uses the same automatic next-session handoff as normal guests. Remove the development panel or move it to Admin before exhibition use. See the [survey guide](survey/README.md).
+- Exhibition PC (Mac or Windows): Git, **Node.js 24+**, and a desktop browser with WebGL 2.
+- iPads: on the same trusted LAN as the exhibition PC, with the HTTPS certificate installed and trusted (mkcert `rootCA.pem`, with full trust enabled in iPadOS Certificate Trust Settings).
+- On first setup and after lockfile changes, run `npm ci` at the repository root, and `npm ci` and `npm run fetch:hand-model` in `survey/`. Put the certificate and key in `survey/data/tls/`; see the [survey guide](survey/README.md#ipad住民の窓與手勢操作).
 
-Install Git and **Node.js 24+** (including npm). Use a desktop browser with WebGL 2. Keep both terminal tabs running. Run each command from the repository root unless a step changes directory. The project has no public deployment setup.
+## 1. Start the two servers
 
-Admin **直前の提案を取り消す** undoes only the latest completed proposal before the next guest starts. It restores the previous city and counts, keeps the proposal marked as undone, and lets the guest start a fresh four-question session. Rebuild/restart the survey server and refresh City/Guest/Admin. Undo was introduced in schema 6; the current SQLite migrates to schema 9 without deleting data. A newer A/B draft closes Undo for an older proposal even if that draft is later cancelled.
+Keep both terminal windows open for the whole exhibition.
 
-### macOS — two Terminal tabs
+**Terminal 1 — survey server** (API, WebSocket, Guest/Admin pages and SQLite data)
 
-**Tab 1: survey server** — hosts the API, WebSocket, guest/monitor/admin pages, and SQLite state. Build the pages before starting the server.
+Mac:
 
 ```sh
 cd survey
-npm ci
 npm run build
-SURVEY_QUESTIONS=src/survey/questions.rotation.v1.json npm run server
+SURVEY_HOST=0.0.0.0 \
+  SURVEY_QUESTIONS=src/survey/questions.rotation.v1.json \
+  SURVEY_TLS_CERT=data/tls/ipad.pem \
+  SURVEY_TLS_KEY=data/tls/ipad-key.pem \
+  npm run server
 ```
 
-**Tab 2: 3D city** — open a fresh tab at the repository root. Vite hosts the root Three.js scene.
-
-```sh
-npm ci
-npm run dev -- --port 5173
-```
-
-### Windows — two PowerShell tabs
-
-**Tab 1: survey server** — start at the repository root.
+Windows PowerShell:
 
 ```powershell
 Set-Location survey
-npm ci
 npm run build
+$env:SURVEY_HOST='0.0.0.0'
 $env:SURVEY_QUESTIONS='src/survey/questions.rotation.v1.json'
+$env:SURVEY_TLS_CERT='data/tls/ipad.pem'
+$env:SURVEY_TLS_KEY='data/tls/ipad-key.pem'
 npm run server
 ```
 
-**Tab 2: 3D city** — open a fresh PowerShell tab at the repository root.
+`SURVEY_QUESTIONS` must name the nine-question rotation set, because the server default is still the retired question set. On start the terminal prints `LAN Guest:` URLs for the iPads.
 
-```powershell
-npm ci
+**Terminal 2 — 3D city** (at the repository root)
+
+```sh
 npm run dev -- --port 5173
 ```
 
-The survey server uses `127.0.0.1:8787` by default. Use the actual URL printed by Vite for the city if port 5173 is busy. If you change the survey port, use an explicit WebSocket URL in the city URL.
+## 2. What each device opens
 
-### Browser tabs and screens
-
-| Browser tab | Default URL | Purpose |
+| Device | URL | Purpose |
 | --- | --- | --- |
-| Guest (single station) | `http://127.0.0.1:8787/guest` | Guest answers four questions, reviews the choices, and submits one proposal. |
-| Guest A/B (two stations) | `http://<exhibition-PC LAN IP>:8787/guest?station=A` / `?station=B` | Independent four-question experiences share the accumulated city. |
-| City | `http://127.0.0.1:5173/?survey` | Exhibition's 2127 Odaiba scene; receives live state through `ws://127.0.0.1:8787/ws`. Keep `?survey` in the URL. |
-| Admin | `http://127.0.0.1:8787/admin` | Staff view the lifecycle, end an unfinished experience, and request/cancel resets. Available only on the server computer through localhost. |
-| Monitor (optional) | `http://127.0.0.1:8787/monitor` | Text view of current state and proposals/WebSocket events received since the tab opened; it is not the 3D city. |
+| Shared screen (exhibition PC) | `http://127.0.0.1:5173/?survey` | The city; add `&quality=low` on a weak GPU |
+| iPad A | `https://<exhibition-PC LAN IP>:8443/guest?station=A&hand` | Visitor questions (hand gestures and touch) |
+| iPad B | `https://<exhibition-PC LAN IP>:8443/guest?station=B&hand` | Second station |
+| Staff (exhibition PC) | `http://127.0.0.1:8787/admin` | Status, resets, Undo, day/night; localhost only |
+| Monitor (optional) | `http://127.0.0.1:8787/monitor` | Text view of state and events |
 
-Put City on the exhibition display and Guest on the input screen. Keep Admin on the staff computer. The following next-start reset rule applies to unlabelled `/guest`; A/B reset blocks admission and drains both experiences as described above. After a proposal, the next guest can press **はじめる** without Admin confirmation. Any queued reset runs at that next start; otherwise the accumulated city continues. Admin’s **未完了の体験を終了** only ends unfinished questionnaires. The survey server hosts its built pages and API on the same origin; Vite hosts the city separately. The default database is `survey/data/survey.sqlite`, so restarting the server retains the city. `npm ci` is needed on first setup and after lockfile changes; on subsequent starts, keep the build and server commands in Tab 1 and the dev command in Tab 2.
+With a single iPad, open `https://<exhibition-PC LAN IP>:8443/guest?hand`. Do not mix the single station with A/B stations while an experience is unfinished, and open only one page per station. Drop `hand` from the URL for the touch-only interface.
 
-For Guest devices on a **trusted local network**, bind survey to the network. Bind Vite too if City is on a separate device (it may stay loopback when City runs on the host) and replace `127.0.0.1` in Guest and City URLs with the host computer's LAN IP:
+## 3. During the exhibition
 
-```sh
-# macOS, in survey/ (Tab 1)
-SURVEY_HOST=0.0.0.0 npm run server
-# repository root (Tab 2)
-npm run dev -- --host 0.0.0.0 --port 5173
-```
+- **Handoff:** after a visitor submits, the iPad shows the result and handoff page; the next visitor presses 「はじめる」 and the handoff happens without staff confirmation.
+- **Admin:** 「未完了の体験を終了」 ends an unfinished questionnaire; 「直前の提案を取り消す」 undoes the latest proposal only before the next visitor starts; 「昼／夜／自動」 fixes the shared screen's time or restores the day cycle. City reset keeps the total count; full reset clears it but keeps history.
+- **Data:** SQLite lives at `survey/data/survey.sqlite`, and a restart keeps the accumulated city. When switching from the old question set to the rotation set, reset the city in Admin first.
+- **After a code update:** rerun Terminal 1's build and start commands, then reload the shared screen, iPads and Admin.
+- **Different server port (for example 8790):** open `http://127.0.0.1:5173/?survey=ws://127.0.0.1:8790/ws` on the shared screen.
 
-```powershell
-# Windows PowerShell, in survey/ (Tab 1)
-$env:SURVEY_HOST='0.0.0.0'; npm run server
-# repository root (Tab 2)
-npm run dev -- --host 0.0.0.0 --port 5173
-```
+## Local trial (no iPad)
 
-Both ports must be reachable. Admin stays restricted to localhost on the server computer. The guest endpoint has no authentication, so use a trusted exhibition LAN. If the survey server instead runs on port 8790, for example, open `http://127.0.0.1:5173/?survey=ws://127.0.0.1:8790/ws` for the city (replace the host for LAN access).
+In Terminal 1, run `npm run build` in `survey/`, then `SURVEY_QUESTIONS=src/survey/questions.rotation.v1.json npm run server`; Terminal 2 is unchanged. On the same computer, open `http://127.0.0.1:8787/guest` to answer and `http://127.0.0.1:5173/?survey` to watch the city. `http://127.0.0.1:5173/` alone is the city prototype, which receives no proposals.
 
-To view the standalone city without survey state, open `http://127.0.0.1:5173/`; Tab 1 is unnecessary in that mode. For the older v1 module-swap demo, see its [handoff](docs/handoffs/archive/causal-city-mvp.md); it is not the exhibition city.
+## More documents
 
-## Current direction
-
-The exhibition city is the Odaiba waterfront in 2127. The [rotation matrix](docs/QUESTION_ROTATION_PLAN.md) tracks the question options, models and fixed lots. The [document index](docs/README.md) links to development references and historical designs.
-
-## Project references
-
-- [Agent workflow](AGENTS.md), [Git workflow](docs/CONTRIBUTING.md), [architecture](docs/PROJECT.md), and [validation](docs/VALIDATION.md).
-- [Current exhibition specification](docs/EXHIBITION_SPEC.md) and [S4 handoff](docs/handoffs/archive/exhibition-s4.md) document the current contract and dated S4 evidence respectively.
-- [Document index](docs/README.md) separates current rules from archived plans and task evidence; [visual direction](docs/ODAIBA_2127_REFERENCES/CITY_MASTER_TASTE.md) and [runtime art rules](docs/ART.md) guide Odaiba changes.
-- The [Traditional Chinese README](README.md) also describes DEV-only review tools. Module-swap rejects current v2 CityViews; use the root city for the exhibition.
-
-Resident P2 (2026-10-02): rebuild/restart survey and refresh Guest/City. Questions now use resident daily-life copy; review remains before submission. Guest results show save/wait status, station/voice ordinal and a look-up prompt; City shows background/current facilities and a conservative recorded message. Question-set version3 preserves SQLite and stored answer text. Use 「新しい予約で草稿を続ける」 for old drafts; A/B releases its own obsolete reservation and carries valid choices forward. Existing3s transitions/display spacing and result10s/handoff5s remain; coordinated reading slots and causal explanations are P3. See [P2 handoff](docs/handoffs/archive/resident-experience-p2.md).
-
-Resident P3 (2026-10-02) supersedes P2 timing: rebuild/restart survey and refresh Guest/City. Each proposal reserves 10s (identity/place and 3s transition, then selected preference plus actual collective configuration). A/B results stay ordered; early handoff/reset/retry cannot truncate or renew the slot. Renderer carrier evidence includes distribution and visible pairings; local increases never imply more population. Reconnect/Undo/reduced motion restore immediately; lighting preserves valid displays. [P3 handoff](docs/handoffs/archive/resident-experience-p3.md); P4/P5 acceptance remains open.
+- [Exhibition specification](docs/EXHIBITION_SPEC.md) · [Validation guide](docs/VALIDATION.md) (exhibition PC, two iPads, long runs) · [LAN station setup](docs/handoffs/lan-guest-stations.md)
+- Developers and AI agents: [AGENTS.md](AGENTS.md) · [Architecture](docs/PROJECT.md) · [Document index](docs/README.md) · DEV auto-answer in the [survey guide](survey/README.md)
+- `module-swap/` is a preserved v1 demonstrator, not the exhibition city.
