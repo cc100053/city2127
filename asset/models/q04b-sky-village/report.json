@@ -1,0 +1,42 @@
+{
+ "households": 20,
+ "bridges": 20,
+ "moved_from_table": {
+  "3": [
+   23,
+   4.5
+  ],
+  "8": [
+   31.5,
+   13.5
+  ],
+  "7": [
+   -7,
+   23.5
+  ],
+  "12": [
+   -19,
+   27
+  ],
+  "14": [
+   -15,
+   -4.5
+  ],
+  "20": [
+   -8,
+   -12
+  ]
+ },
+ "tris_by_group": {
+  "STRUCTURE": 49992,
+  "CORE": 8206,
+  "HOMES": 326194,
+  "BRIDGES": 31732,
+  "PLAZA": 31308
+ },
+ "tris_total": 447432,
+ "unique_mesh_tris": 280696,
+ "objects": 193,
+ "materials": 42,
+ "glb_bytes": 7813848
+}

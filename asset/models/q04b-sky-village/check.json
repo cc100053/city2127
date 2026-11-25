@@ -1,0 +1,65 @@
+{
+ "households": 20,
+ "types": {
+  "second": 1,
+  "gable": 6,
+  "ridge": 5,
+  "gable2": 3,
+  "main": 1,
+  "terrace": 4
+ },
+ "height_m": 49.0,
+ "plan_m": [
+  77.6,
+  57.9
+ ],
+ "triangles_drawn": 447432,
+ "triangles_unique": 280696,
+ "materials": 42,
+ "trees": 49,
+ "glb_bytes": 7813848,
+ "figures": [],
+ "limb_joins": 20,
+ "skeleton_pieces": 3,
+ "house_base_above_lawn_m": [
+  0.04,
+  0.04
+ ],
+ "house_corner_inside_edge_min_m": 0.29,
+ "walk_ok": 20,
+ "walk_step_max_m": 0.0,
+ "walk_problems": {},
+ "bridges_propped_on_limbs": [
+  "01",
+  "02",
+  "03",
+  "04",
+  "07",
+  "09",
+  "10",
+  "12",
+  "14",
+  "15",
+  "16",
+  "17",
+  "19",
+  "20"
+ ],
+ "clashes": [],
+ "glass_materials": [
+  "q04b_house_glass",
+  "q04b_lift_glass",
+  "q04b_rail_glass"
+ ],
+ "lift_cabins_seen_from_main": {
+  "LIFT_CABIN_1": 0.778,
+  "LIFT_CABIN_2": 0.88,
+  "LIFT_CABIN_3": 0.907
+ },
+ "main_house_furniture_seen_from_main": 0.239,
+ "main_house_furniture_seen_from_house": 0.247,
+ "windows_onto_own_garden": 20,
+ "main_lawn_depth_to_rail_side_m": 4.0,
+ "result": "PASS",
+ "failures": []
+}
