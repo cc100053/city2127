@@ -1,0 +1,82 @@
+{
+ "round": 2,
+ "levels": [
+  6.0,
+  11.0,
+  16.0,
+  21.0,
+  26.0
+ ],
+ "sample_level": 2,
+ "beds": [
+  32,
+  32,
+  32,
+  32,
+  32
+ ],
+ "curtains": [
+  32,
+  32,
+  32,
+  32,
+  32
+ ],
+ "chairs": [
+  32,
+  32,
+  32,
+  32,
+  32
+ ],
+ "curtain_states": {
+  "1": {
+   "closed": 10,
+   "half": 12,
+   "tied": 10
+  },
+  "2": {
+   "closed": 10,
+   "half": 12,
+   "tied": 10
+  },
+  "3": {
+   "closed": 9,
+   "half": 12,
+   "tied": 11
+  },
+  "4": {
+   "closed": 11,
+   "half": 12,
+   "tied": 9
+  },
+  "5": {
+   "closed": 10,
+   "half": 10,
+   "tied": 12
+  }
+ },
+ "risers_per_run": [
+  36,
+  30,
+  30,
+  30,
+  30
+ ],
+ "tris_by_group": {
+  "PLAZA": 40666,
+  "LEVEL_1": 158520,
+  "LEVEL_2": 158628,
+  "LEVEL_3": 158904,
+  "LEVEL_4": 158120,
+  "LEVEL_5": 181116,
+  "ROOF": 21920,
+  "STAIR": 30940
+ },
+ "tris_total": 908814,
+ "unique_mesh_tris": 200294,
+ "objects": 662,
+ "meshes": 55,
+ "materials": 47,
+ "glb_bytes": 7506384
+}

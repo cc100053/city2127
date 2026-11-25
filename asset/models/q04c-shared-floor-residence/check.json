@@ -1,0 +1,714 @@
+{
+ "per_floor_bed": {
+  "ok": true,
+  "value": [
+   32,
+   32,
+   32,
+   32,
+   32
+  ]
+ },
+ "per_floor_curtain": {
+  "ok": true,
+  "value": [
+   32,
+   32,
+   32,
+   32,
+   32
+  ]
+ },
+ "per_floor_chair": {
+  "ok": true,
+  "value": [
+   32,
+   32,
+   32,
+   32,
+   32
+  ]
+ },
+ "per_floor_table": {
+  "ok": true,
+  "value": [
+   2,
+   2,
+   2,
+   2,
+   2
+  ]
+ },
+ "total_seats_and_beds": {
+  "ok": true,
+  "value": 160
+ },
+ "discs": {
+  "ok": true,
+  "value": 5
+ },
+ "disc_levels": {
+  "ok": true,
+  "value": [
+   6.0,
+   11.0,
+   16.0,
+   21.0,
+   26.0
+  ]
+ },
+ "disc_radius": {
+  "ok": true,
+  "value": [
+   24.0,
+   24.0,
+   24.0,
+   24.0,
+   24.0
+  ]
+ },
+ "roof_radius": {
+  "ok": true,
+  "value": 27.0
+ },
+ "eave_height": {
+  "ok": true,
+  "value": [
+   32.0,
+   32.3
+  ]
+ },
+ "stair_front_right": {
+  "ok": true,
+  "value": [
+   5.5,
+   -18.05
+  ]
+ },
+ "stair_bottom_top": {
+  "ok": true,
+  "value": [
+   -0.1,
+   27.03
+  ]
+ },
+ "stair_radius_range": [
+  24.22,
+  28.32
+ ],
+ "risers": [
+  36,
+  30,
+  30,
+  30,
+  30
+ ],
+ "tread_going_inner_outer": [
+  0.288,
+  0.312
+ ],
+ "curtain_double_sided": {
+  "ok": true,
+  "value": [
+   "q04c_curtain",
+   "q04c_curtain_sand"
+  ]
+ },
+ "roof_panes_transparent": {
+  "ok": true,
+  "value": [
+   "q04c_roof_pane_clear",
+   "q04c_roof_pane_frost"
+  ]
+ },
+ "clear_width_m": {
+  "L1": {
+   "lift_to_ring": 2.7,
+   "ring_half_turn": 3.3,
+   "stair_landing_to_tables": 1.5,
+   "lift_to_stair": 1.5,
+   "stair_gate": 1.5,
+   "between_tables": 3.3,
+   "behind_table_A_west": 3.3,
+   "behind_table_B_east": 3.3,
+   "centre_aisle": 1.6,
+   "middle_aisle_whole": 2.0,
+   "aisle_east_end_to_ring": 1.6,
+   "aisle_west_end_to_ring": 1.6,
+   "outer_walk_at_column_60": 2.0,
+   "wash_right_door": 0.8,
+   "wash_left_door": 0.9,
+   "lift_to_wash_right": 1.6
+  },
+  "L2": {
+   "lift_to_ring": 2.7,
+   "ring_half_turn": 3.3,
+   "stair_landing_to_tables": 1.5,
+   "lift_to_stair": 1.5,
+   "stair_gate": 1.5,
+   "between_tables": 3.3,
+   "behind_table_A_west": 3.3,
+   "behind_table_B_east": 3.3,
+   "centre_aisle": 1.5,
+   "middle_aisle_whole": 2.0,
+   "aisle_east_end_to_ring": 1.5,
+   "aisle_west_end_to_ring": 1.5,
+   "outer_walk_at_column_60": 2.0,
+   "wash_right_door": 0.8,
+   "wash_left_door": 0.9,
+   "lift_to_wash_right": 1.6
+  },
+  "L3": {
+   "lift_to_ring": 2.7,
+   "ring_half_turn": 3.3,
+   "stair_landing_to_tables": 1.5,
+   "lift_to_stair": 1.5,
+   "stair_gate": 1.5,
+   "between_tables": 3.3,
+   "behind_table_A_west": 3.3,
+   "behind_table_B_east": 3.3,
+   "centre_aisle": 1.5,
+   "middle_aisle_whole": 2.0,
+   "aisle_east_end_to_ring": 1.5,
+   "aisle_west_end_to_ring": 1.5,
+   "outer_walk_at_column_60": 1.9,
+   "wash_right_door": 0.8,
+   "wash_left_door": 0.9,
+   "lift_to_wash_right": 1.6
+  },
+  "L4": {
+   "lift_to_ring": 2.7,
+   "ring_half_turn": 3.3,
+   "stair_landing_to_tables": 1.5,
+   "lift_to_stair": 1.5,
+   "stair_gate": 1.5,
+   "between_tables": 3.3,
+   "behind_table_A_west": 3.3,
+   "behind_table_B_east": 3.3,
+   "centre_aisle": 1.5,
+   "middle_aisle_whole": 2.0,
+   "aisle_east_end_to_ring": 1.5,
+   "aisle_west_end_to_ring": 1.5,
+   "outer_walk_at_column_60": 2.0,
+   "wash_right_door": 0.8,
+   "wash_left_door": 0.9,
+   "lift_to_wash_right": 1.6
+  },
+  "L5": {
+   "lift_to_ring": 2.7,
+   "ring_half_turn": 3.3,
+   "stair_landing_to_tables": 1.5,
+   "lift_to_stair": 1.5,
+   "stair_gate": 1.5,
+   "between_tables": 3.3,
+   "behind_table_A_west": 3.3,
+   "behind_table_B_east": 3.3,
+   "centre_aisle": 1.6,
+   "middle_aisle_whole": 2.0,
+   "aisle_east_end_to_ring": 1.6,
+   "aisle_west_end_to_ring": 1.6,
+   "outer_walk_at_column_60": 1.8,
+   "wash_right_door": 0.8,
+   "wash_left_door": 0.9,
+   "lift_to_wash_right": 1.6
+  }
+ },
+ "L1_width_lift_to_ring": {
+  "ok": true,
+  "value": 2.7
+ },
+ "L1_width_ring_half_turn": {
+  "ok": true,
+  "value": 3.3
+ },
+ "L1_width_stair_landing_to_tables": {
+  "ok": true,
+  "value": 1.5
+ },
+ "L1_width_lift_to_stair": {
+  "ok": true,
+  "value": 1.5
+ },
+ "L1_width_stair_gate": {
+  "ok": true,
+  "value": 1.5
+ },
+ "L1_width_between_tables": {
+  "ok": true,
+  "value": 3.3
+ },
+ "L1_width_behind_table_A_west": {
+  "ok": true,
+  "value": 3.3
+ },
+ "L1_width_behind_table_B_east": {
+  "ok": true,
+  "value": 3.3
+ },
+ "L1_width_centre_aisle": {
+  "ok": true,
+  "value": 1.6
+ },
+ "L1_width_middle_aisle_whole": {
+  "ok": true,
+  "value": 2.0
+ },
+ "L1_width_aisle_east_end_to_ring": {
+  "ok": true,
+  "value": 1.6
+ },
+ "L1_width_aisle_west_end_to_ring": {
+  "ok": true,
+  "value": 1.6
+ },
+ "L1_width_outer_walk_at_column_60": {
+  "ok": true,
+  "value": 2.0
+ },
+ "L1_width_wash_right_door": {
+  "ok": true,
+  "value": 0.8
+ },
+ "L1_width_wash_left_door": {
+  "ok": true,
+  "value": 0.9
+ },
+ "L1_width_lift_to_wash_right": {
+  "ok": true,
+  "value": 1.6
+ },
+ "L1_every_bed_entrance_reached": {
+  "ok": true,
+  "value": []
+ },
+ "L1_every_seat_reached": {
+  "ok": true,
+  "value": []
+ },
+ "L1_entrances_face_middle_aisle": {
+  "ok": true,
+  "value": []
+ },
+ "L1_column_to_furniture_gap": {
+  "ok": true,
+  "value": 0.67
+ },
+ "L1_curtain_on_its_bed": {
+  "ok": true,
+  "value": []
+ },
+ "L2_width_lift_to_ring": {
+  "ok": true,
+  "value": 2.7
+ },
+ "L2_width_ring_half_turn": {
+  "ok": true,
+  "value": 3.3
+ },
+ "L2_width_stair_landing_to_tables": {
+  "ok": true,
+  "value": 1.5
+ },
+ "L2_width_lift_to_stair": {
+  "ok": true,
+  "value": 1.5
+ },
+ "L2_width_stair_gate": {
+  "ok": true,
+  "value": 1.5
+ },
+ "L2_width_between_tables": {
+  "ok": true,
+  "value": 3.3
+ },
+ "L2_width_behind_table_A_west": {
+  "ok": true,
+  "value": 3.3
+ },
+ "L2_width_behind_table_B_east": {
+  "ok": true,
+  "value": 3.3
+ },
+ "L2_width_centre_aisle": {
+  "ok": true,
+  "value": 1.5
+ },
+ "L2_width_middle_aisle_whole": {
+  "ok": true,
+  "value": 2.0
+ },
+ "L2_width_aisle_east_end_to_ring": {
+  "ok": true,
+  "value": 1.5
+ },
+ "L2_width_aisle_west_end_to_ring": {
+  "ok": true,
+  "value": 1.5
+ },
+ "L2_width_outer_walk_at_column_60": {
+  "ok": true,
+  "value": 2.0
+ },
+ "L2_width_wash_right_door": {
+  "ok": true,
+  "value": 0.8
+ },
+ "L2_width_wash_left_door": {
+  "ok": true,
+  "value": 0.9
+ },
+ "L2_width_lift_to_wash_right": {
+  "ok": true,
+  "value": 1.6
+ },
+ "L2_every_bed_entrance_reached": {
+  "ok": true,
+  "value": []
+ },
+ "L2_every_seat_reached": {
+  "ok": true,
+  "value": []
+ },
+ "L2_entrances_face_middle_aisle": {
+  "ok": true,
+  "value": []
+ },
+ "L2_column_to_furniture_gap": {
+  "ok": true,
+  "value": 0.68
+ },
+ "L2_curtain_on_its_bed": {
+  "ok": true,
+  "value": []
+ },
+ "L3_width_lift_to_ring": {
+  "ok": true,
+  "value": 2.7
+ },
+ "L3_width_ring_half_turn": {
+  "ok": true,
+  "value": 3.3
+ },
+ "L3_width_stair_landing_to_tables": {
+  "ok": true,
+  "value": 1.5
+ },
+ "L3_width_lift_to_stair": {
+  "ok": true,
+  "value": 1.5
+ },
+ "L3_width_stair_gate": {
+  "ok": true,
+  "value": 1.5
+ },
+ "L3_width_between_tables": {
+  "ok": true,
+  "value": 3.3
+ },
+ "L3_width_behind_table_A_west": {
+  "ok": true,
+  "value": 3.3
+ },
+ "L3_width_behind_table_B_east": {
+  "ok": true,
+  "value": 3.3
+ },
+ "L3_width_centre_aisle": {
+  "ok": true,
+  "value": 1.5
+ },
+ "L3_width_middle_aisle_whole": {
+  "ok": true,
+  "value": 2.0
+ },
+ "L3_width_aisle_east_end_to_ring": {
+  "ok": true,
+  "value": 1.5
+ },
+ "L3_width_aisle_west_end_to_ring": {
+  "ok": true,
+  "value": 1.5
+ },
+ "L3_width_outer_walk_at_column_60": {
+  "ok": true,
+  "value": 1.9
+ },
+ "L3_width_wash_right_door": {
+  "ok": true,
+  "value": 0.8
+ },
+ "L3_width_wash_left_door": {
+  "ok": true,
+  "value": 0.9
+ },
+ "L3_width_lift_to_wash_right": {
+  "ok": true,
+  "value": 1.6
+ },
+ "L3_every_bed_entrance_reached": {
+  "ok": true,
+  "value": []
+ },
+ "L3_every_seat_reached": {
+  "ok": true,
+  "value": []
+ },
+ "L3_entrances_face_middle_aisle": {
+  "ok": true,
+  "value": []
+ },
+ "L3_column_to_furniture_gap": {
+  "ok": true,
+  "value": 0.69
+ },
+ "L3_curtain_on_its_bed": {
+  "ok": true,
+  "value": []
+ },
+ "L4_width_lift_to_ring": {
+  "ok": true,
+  "value": 2.7
+ },
+ "L4_width_ring_half_turn": {
+  "ok": true,
+  "value": 3.3
+ },
+ "L4_width_stair_landing_to_tables": {
+  "ok": true,
+  "value": 1.5
+ },
+ "L4_width_lift_to_stair": {
+  "ok": true,
+  "value": 1.5
+ },
+ "L4_width_stair_gate": {
+  "ok": true,
+  "value": 1.5
+ },
+ "L4_width_between_tables": {
+  "ok": true,
+  "value": 3.3
+ },
+ "L4_width_behind_table_A_west": {
+  "ok": true,
+  "value": 3.3
+ },
+ "L4_width_behind_table_B_east": {
+  "ok": true,
+  "value": 3.3
+ },
+ "L4_width_centre_aisle": {
+  "ok": true,
+  "value": 1.5
+ },
+ "L4_width_middle_aisle_whole": {
+  "ok": true,
+  "value": 2.0
+ },
+ "L4_width_aisle_east_end_to_ring": {
+  "ok": true,
+  "value": 1.5
+ },
+ "L4_width_aisle_west_end_to_ring": {
+  "ok": true,
+  "value": 1.5
+ },
+ "L4_width_outer_walk_at_column_60": {
+  "ok": true,
+  "value": 2.0
+ },
+ "L4_width_wash_right_door": {
+  "ok": true,
+  "value": 0.8
+ },
+ "L4_width_wash_left_door": {
+  "ok": true,
+  "value": 0.9
+ },
+ "L4_width_lift_to_wash_right": {
+  "ok": true,
+  "value": 1.6
+ },
+ "L4_every_bed_entrance_reached": {
+  "ok": true,
+  "value": []
+ },
+ "L4_every_seat_reached": {
+  "ok": true,
+  "value": []
+ },
+ "L4_entrances_face_middle_aisle": {
+  "ok": true,
+  "value": []
+ },
+ "L4_column_to_furniture_gap": {
+  "ok": true,
+  "value": 0.69
+ },
+ "L4_curtain_on_its_bed": {
+  "ok": true,
+  "value": []
+ },
+ "L5_width_lift_to_ring": {
+  "ok": true,
+  "value": 2.7
+ },
+ "L5_width_ring_half_turn": {
+  "ok": true,
+  "value": 3.3
+ },
+ "L5_width_stair_landing_to_tables": {
+  "ok": true,
+  "value": 1.5
+ },
+ "L5_width_lift_to_stair": {
+  "ok": true,
+  "value": 1.5
+ },
+ "L5_width_stair_gate": {
+  "ok": true,
+  "value": 1.5
+ },
+ "L5_width_between_tables": {
+  "ok": true,
+  "value": 3.3
+ },
+ "L5_width_behind_table_A_west": {
+  "ok": true,
+  "value": 3.3
+ },
+ "L5_width_behind_table_B_east": {
+  "ok": true,
+  "value": 3.3
+ },
+ "L5_width_centre_aisle": {
+  "ok": true,
+  "value": 1.6
+ },
+ "L5_width_middle_aisle_whole": {
+  "ok": true,
+  "value": 2.0
+ },
+ "L5_width_aisle_east_end_to_ring": {
+  "ok": true,
+  "value": 1.6
+ },
+ "L5_width_aisle_west_end_to_ring": {
+  "ok": true,
+  "value": 1.6
+ },
+ "L5_width_outer_walk_at_column_60": {
+  "ok": true,
+  "value": 1.8
+ },
+ "L5_width_wash_right_door": {
+  "ok": true,
+  "value": 0.8
+ },
+ "L5_width_wash_left_door": {
+  "ok": true,
+  "value": 0.9
+ },
+ "L5_width_lift_to_wash_right": {
+  "ok": true,
+  "value": 1.6
+ },
+ "L5_every_bed_entrance_reached": {
+  "ok": true,
+  "value": []
+ },
+ "L5_every_seat_reached": {
+  "ok": true,
+  "value": []
+ },
+ "L5_entrances_face_middle_aisle": {
+  "ok": true,
+  "value": []
+ },
+ "L5_column_to_furniture_gap": {
+  "ok": true,
+  "value": 0.67
+ },
+ "L5_curtain_on_its_bed": {
+  "ok": true,
+  "value": []
+ },
+ "curtain_patterns_differ": {
+  "ok": true,
+  "value": {
+   "1": "thchtchthcthchtcchtcthchtchthcht",
+   "2": "chthcthtchthcthchctchthcthchthct",
+   "3": "htcthchtcthchthttchthctchthcthch",
+   "4": "cthchthctchthchchtchctchthctchth",
+   "5": "tchthcthctchthtccthcthtchtcthcht"
+  }
+ },
+ "planting_differs": {
+  "ok": true,
+  "value": 5
+ },
+ "l5_hangers_supported": {
+  "ok": true,
+  "value": []
+ },
+ "l5_rods_reach_roof_beams": {
+  "ok": true,
+  "value": [
+   504,
+   []
+  ]
+ },
+ "stair_headroom_min": {
+  "ok": true,
+  "value": 4.72
+ },
+ "stair_headroom_clashes": [],
+ "headroom_under_stair_arm": {
+  "ok": true,
+  "value": [
+   2.22,
+   2.22,
+   2.22,
+   2.22
+  ]
+ },
+ "lift_openings_cut_on_every_floor": {
+  "ok": true,
+  "value": {
+   "0": [
+    3.07,
+    1.12
+   ],
+   "1": [
+    1.12,
+    1.12
+   ],
+   "2": [
+    1.12,
+    3.07
+   ],
+   "3": [
+    1.12,
+    1.12
+   ],
+   "4": [
+    1.12,
+    1.12
+   ],
+   "5": [
+    1.12,
+    1.12
+   ]
+  }
+ },
+ "lift_door_open_where_a_car_stands": {
+  "ok": true,
+  "value": [
+   3.07,
+   3.07
+  ]
+ },
+ "tris_drawn": 908814,
+ "glb_bytes": 7506384,
+ "failed": []
+}
