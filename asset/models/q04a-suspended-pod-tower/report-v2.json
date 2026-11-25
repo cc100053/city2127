@@ -1,0 +1,87 @@
+{
+ "pods": 48,
+ "bridges": 48,
+ "turned": {
+  "OUTER_04": 5.0,
+  "OUTER_09": 5.0,
+  "OUTER_10": -5.0,
+  "OUTER_15": -5.0,
+  "OUTER_16": -7.0
+ },
+ "pod_shell_tris": 11166,
+ "piece_tris": {
+  "BED": 456,
+  "DESK": 84,
+  "CHAIR": 176,
+  "CABINET": 216,
+  "LAMP": 204,
+  "BOOK": 56,
+  "SHELF": 60,
+  "PLANT": 264,
+  "ROOM": 62,
+  "ACCENT": 160,
+  "SHUTTER": 208
+ },
+ "windows": {
+  "closed": 17,
+  "open": 16,
+  "half": 15
+ },
+ "layouts": {
+  "desk": [
+   "INNER_06",
+   "INNER_08",
+   "MID_06",
+   "MID_08",
+   "MID_15",
+   "OUTER_06",
+   "OUTER_08",
+   "OUTER_15",
+   "OUTER_17"
+  ],
+  "bed": [
+   "INNER_02",
+   "INNER_09",
+   "INNER_11",
+   "MID_02",
+   "MID_09",
+   "MID_11",
+   "OUTER_02",
+   "OUTER_09",
+   "OUTER_11",
+   "OUTER_18",
+   "OUTER_20"
+  ],
+  "plant": [
+   "INNER_03",
+   "INNER_05",
+   "INNER_12",
+   "MID_03",
+   "MID_05",
+   "MID_12",
+   "MID_14",
+   "OUTER_03",
+   "OUTER_05",
+   "OUTER_12",
+   "OUTER_14"
+  ]
+ },
+ "accents": {
+  "white": 20,
+  "blue": 10,
+  "sage": 9,
+  "sand": 9
+ },
+ "tris_by_group": {
+  "CORE": 40196,
+  "CROWN": 48484,
+  "PODS": 609446,
+  "ACCESS": 52152,
+  "PLAZA": 117432
+ },
+ "tris_total": 867710,
+ "unique_mesh_tris": 225262,
+ "objects": 542,
+ "materials": 43,
+ "glb_bytes": 7449520
+}

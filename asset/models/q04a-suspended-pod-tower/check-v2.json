@@ -1,0 +1,358 @@
+{
+ "pods": 48,
+ "by_ring": {
+  "INNER": 12,
+  "MID": 16,
+  "OUTER": 20
+ },
+ "height_m": 60.0,
+ "crown_and_pods_diameter_m": 55.48,
+ "triangles_drawn": 867710,
+ "triangles_unique": 225262,
+ "glb_bytes": 7449520,
+ "windows": {
+  "closed": 17,
+  "open": 16,
+  "half": 15
+ },
+ "pod_envelope_m": [
+  5.39,
+  5.4,
+  5.335
+ ],
+ "pod_gap_min": [
+  [
+   1.565,
+   "MID_02",
+   "OUTER_03"
+  ],
+  [
+   1.57,
+   "MID_03",
+   "OUTER_04"
+  ],
+  [
+   1.571,
+   "MID_12",
+   "OUTER_15"
+  ],
+  [
+   1.603,
+   "MID_01",
+   "OUTER_01"
+  ],
+  [
+   1.613,
+   "MID_14",
+   "OUTER_18"
+  ]
+ ],
+ "pods_with_neighbour_1_to_2_m": 23,
+ "pod_with_spring_gap_min": [
+  [
+   1.565,
+   "MID_02",
+   "OUTER_03"
+  ],
+  [
+   1.57,
+   "MID_03",
+   "OUTER_04"
+  ],
+  [
+   1.571,
+   "MID_12",
+   "OUTER_15"
+  ]
+ ],
+ "bridge_to_other_dwellings_min": [
+  [
+   0.215,
+   "MID_04",
+   "OUTER_05"
+  ],
+  [
+   0.216,
+   "MID_14",
+   "OUTER_18"
+  ],
+  [
+   0.229,
+   "MID_07",
+   "OUTER_09"
+  ],
+  [
+   0.232,
+   "MID_08",
+   "OUTER_10"
+  ],
+  [
+   0.264,
+   "MID_01",
+   "OUTER_01"
+  ]
+ ],
+ "rod_to_bridge_min": [
+  [
+   0.215,
+   "MID_04",
+   "OUTER_05"
+  ],
+  [
+   0.442,
+   "MID_16",
+   "OUTER_20"
+  ],
+  [
+   0.616,
+   "INNER_08",
+   "OUTER_13"
+  ],
+  [
+   0.648,
+   "MID_10",
+   "OUTER_12"
+  ],
+  [
+   0.759,
+   "INNER_06",
+   "OUTER_09"
+  ]
+ ],
+ "rod_to_other_pod_min": [
+  [
+   0.657,
+   "OUTER_10",
+   "OUTER_09"
+  ],
+  [
+   2.675,
+   "INNER_04",
+   "INNER_03"
+  ],
+  [
+   2.675,
+   "INNER_04",
+   "INNER_05"
+  ]
+ ],
+ "bridge_to_bridge_min": [
+  [
+   0.53,
+   "MID_01",
+   "MID_03"
+  ],
+  [
+   0.53,
+   "MID_02",
+   "MID_16"
+  ],
+  [
+   0.53,
+   "MID_06",
+   "MID_08"
+  ],
+  [
+   0.53,
+   "MID_11",
+   "MID_13"
+  ],
+  [
+   0.579,
+   "INNER_12",
+   "OUTER_18"
+  ]
+ ],
+ "bridge_start_to_core_max": 0.0,
+ "doors_ok": 48,
+ "door_gap_max": 0.004,
+ "door_step_max": 0.0,
+ "arm_rod_spring_connected": 48,
+ "figure_materials": [],
+ "figure_nodes": [],
+ "figure_calls_in_builder": 0,
+ "accents": {
+  "white": 20,
+  "blue": 10,
+  "sage": 9,
+  "sand": 9
+ },
+ "finishes": {
+  "acoustic_wedge": "F1E8D8",
+  "window_titanium": "BDC0C0",
+  "seal_strip": "34393C",
+  "spring_steel": "D2D6D8",
+  "accent_mist_blue": "718CA6",
+  "accent_sage": "839B76",
+  "accent_sand": "CDA676",
+  "accent_white": "F0EFEA"
+ },
+ "furniture_meshes": {
+  "BED": 1,
+  "DESK": 1,
+  "CHAIR": 1,
+  "CABINET": 1,
+  "LAMP": 1,
+  "BOOK": 1,
+  "SHELF": 1,
+  "PLANT": 1
+ },
+ "furniture_objects": {
+  "BED": 31,
+  "DESK": 31,
+  "CHAIR": 31,
+  "CABINET": 31,
+  "LAMP": 9,
+  "BOOK": 11,
+  "SHELF": 11,
+  "PLANT": 11
+ },
+ "furniture_fit_problems": [],
+ "through_window": {
+  "INNER_02 bed": {
+   "BED": 0.257,
+   "DESK": 0.5,
+   "CHAIR": 0.92,
+   "CABINET": 0.0,
+   "BOOK": 1.0
+  },
+  "INNER_05 plant": {
+   "BED": 0.546,
+   "DESK": 0.0,
+   "CHAIR": 0.0,
+   "CABINET": 0.0,
+   "SHELF": 0.183,
+   "PLANT": 0.761
+  },
+  "INNER_08 desk": {
+   "BED": 0.616,
+   "DESK": 0.405,
+   "CHAIR": 0.307,
+   "CABINET": 0.0,
+   "LAMP": 1.0
+  },
+  "INNER_11 bed": {
+   "BED": 0.261,
+   "DESK": 0.583,
+   "CHAIR": 0.92,
+   "CABINET": 0.0,
+   "BOOK": 1.0
+  },
+  "MID_02 bed": {
+   "BED": 0.257,
+   "DESK": 0.5,
+   "CHAIR": 0.92,
+   "CABINET": 0.0,
+   "BOOK": 1.0
+  },
+  "MID_05 plant": {
+   "BED": 0.546,
+   "DESK": 0.0,
+   "CHAIR": 0.0,
+   "CABINET": 0.0,
+   "SHELF": 0.183,
+   "PLANT": 0.761
+  },
+  "MID_08 desk": {
+   "BED": 0.616,
+   "DESK": 0.405,
+   "CHAIR": 0.307,
+   "CABINET": 0.0,
+   "LAMP": 1.0
+  },
+  "MID_11 bed": {
+   "BED": 0.261,
+   "DESK": 0.583,
+   "CHAIR": 0.92,
+   "CABINET": 0.0,
+   "BOOK": 1.0
+  },
+  "MID_14 plant": {
+   "BED": 0.533,
+   "DESK": 0.0,
+   "CHAIR": 0.0,
+   "CABINET": 0.0,
+   "SHELF": 0.183,
+   "PLANT": 0.773
+  },
+  "OUTER_02 bed": {
+   "BED": 0.257,
+   "DESK": 0.5,
+   "CHAIR": 0.92,
+   "CABINET": 0.0,
+   "BOOK": 1.0
+  },
+  "OUTER_05 plant": {
+   "BED": 0.546,
+   "DESK": 0.0,
+   "CHAIR": 0.0,
+   "CABINET": 0.0,
+   "SHELF": 0.183,
+   "PLANT": 0.761
+  },
+  "OUTER_08 desk": {
+   "BED": 0.594,
+   "DESK": 0.417,
+   "CHAIR": 0.307,
+   "CABINET": 0.0,
+   "LAMP": 1.0
+  },
+  "OUTER_11 bed": {
+   "BED": 0.261,
+   "DESK": 0.583,
+   "CHAIR": 0.92,
+   "CABINET": 0.0,
+   "BOOK": 1.0
+  },
+  "OUTER_14 plant": {
+   "BED": 0.533,
+   "DESK": 0.0,
+   "CHAIR": 0.0,
+   "CABINET": 0.0,
+   "SHELF": 0.183,
+   "PLANT": 0.773
+  },
+  "OUTER_17 desk": {
+   "BED": 0.616,
+   "DESK": 0.405,
+   "CHAIR": 0.307,
+   "CABINET": 0.0,
+   "LAMP": 1.0
+  },
+  "OUTER_20 bed": {
+   "BED": 0.257,
+   "DESK": 0.5,
+   "CHAIR": 0.92,
+   "CABINET": 0.0,
+   "BOOK": 1.0
+  }
+ },
+ "from_main_view": {
+  "OUTER_17": {
+   "BED": 0.11,
+   "DESK": 0.31,
+   "CHAIR": 0.0,
+   "CABINET": 0.0,
+   "LAMP": 1.0
+  },
+  "OUTER_20": {
+   "BED": 0.057,
+   "DESK": 0.0,
+   "CHAIR": 0.0,
+   "CABINET": 0.0,
+   "BOOK": 0.0
+  }
+ },
+ "unchanged_from_v1": {
+  "PLAZA": true,
+  "TREE": true,
+  "ARM": true,
+  "HANGER": true,
+  "BRIDGE": true,
+  "CROWN": true,
+  "CORE": true,
+  "POD positions": true
+ },
+ "result": "PASS",
+ "failures": []
+}

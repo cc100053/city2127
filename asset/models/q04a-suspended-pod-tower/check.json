@@ -1,0 +1,173 @@
+{
+ "pods": 48,
+ "by_ring": {
+  "INNER": 12,
+  "MID": 16,
+  "OUTER": 20
+ },
+ "height_m": 60.0,
+ "crown_and_pods_diameter_m": 55.48,
+ "triangles_drawn": 868312,
+ "triangles_unique": 228138,
+ "glb_bytes": 7563940,
+ "windows": {
+  "closed": 17,
+  "open": 16,
+  "half": 15
+ },
+ "pod_envelope_m": [
+  5.39,
+  5.4,
+  5.335
+ ],
+ "pod_gap_min": [
+  [
+   1.565,
+   "MID_02",
+   "OUTER_03"
+  ],
+  [
+   1.57,
+   "MID_03",
+   "OUTER_04"
+  ],
+  [
+   1.571,
+   "MID_12",
+   "OUTER_15"
+  ],
+  [
+   1.603,
+   "MID_01",
+   "OUTER_01"
+  ],
+  [
+   1.613,
+   "MID_14",
+   "OUTER_18"
+  ]
+ ],
+ "pods_with_neighbour_1_to_2_m": 23,
+ "pod_with_spring_gap_min": [
+  [
+   1.565,
+   "MID_02",
+   "OUTER_03"
+  ],
+  [
+   1.57,
+   "MID_03",
+   "OUTER_04"
+  ],
+  [
+   1.571,
+   "MID_12",
+   "OUTER_15"
+  ]
+ ],
+ "bridge_to_other_dwellings_min": [
+  [
+   0.215,
+   "MID_04",
+   "OUTER_05"
+  ],
+  [
+   0.216,
+   "MID_14",
+   "OUTER_18"
+  ],
+  [
+   0.229,
+   "MID_07",
+   "OUTER_09"
+  ],
+  [
+   0.232,
+   "MID_08",
+   "OUTER_10"
+  ],
+  [
+   0.264,
+   "MID_01",
+   "OUTER_01"
+  ]
+ ],
+ "rod_to_bridge_min": [
+  [
+   0.215,
+   "MID_04",
+   "OUTER_05"
+  ],
+  [
+   0.442,
+   "MID_16",
+   "OUTER_20"
+  ],
+  [
+   0.616,
+   "INNER_08",
+   "OUTER_13"
+  ],
+  [
+   0.648,
+   "MID_10",
+   "OUTER_12"
+  ],
+  [
+   0.759,
+   "INNER_06",
+   "OUTER_09"
+  ]
+ ],
+ "rod_to_other_pod_min": [
+  [
+   0.657,
+   "OUTER_10",
+   "OUTER_09"
+  ],
+  [
+   2.675,
+   "INNER_04",
+   "INNER_03"
+  ],
+  [
+   2.675,
+   "INNER_04",
+   "INNER_05"
+  ]
+ ],
+ "bridge_to_bridge_min": [
+  [
+   0.53,
+   "MID_01",
+   "MID_03"
+  ],
+  [
+   0.53,
+   "MID_02",
+   "MID_16"
+  ],
+  [
+   0.53,
+   "MID_06",
+   "MID_08"
+  ],
+  [
+   0.53,
+   "MID_11",
+   "MID_13"
+  ],
+  [
+   0.579,
+   "INNER_12",
+   "OUTER_18"
+  ]
+ ],
+ "bridge_start_to_core_max": 0.0,
+ "doors_ok": 48,
+ "door_gap_max": 0.004,
+ "door_step_max": 0.0,
+ "arm_rod_spring_connected": 48,
+ "result": "PASS",
+ "failures": []
+}
