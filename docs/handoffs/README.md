@@ -25,6 +25,7 @@
 | [NW 接駁](nw-focal-connections.md) · [SW 接駁](sw-focal-connections.md) | 審閱接駁候選同日夜圖 |
 | [SW 活動棚](sw-event-shelf.md) · [水の棚田流動](q02a-water-threejs.md) | 以現行 Q08／Q02 編配同 owner 決定為準 |
 | [原 Q08-C 住宅塔候選](q08c-housing-tower.md) | 另案審閱。現行 Q08-C 已使用活動模組棚 |
+| [Q05 公園降溫](q05-park-cooling.md) | 三態目標圖及故事已定，待選地塊及建模 |
 | [湊](resident-minato.md) · [凪](resident-sw-nagi.md) · [葵](resident-aoi.md) | 人物情景只作 DEV 審閱，按[情景計劃](../RESIDENT_SCENE_PLAN.md)排下一級 |
 | [葵 鏡頭語言](resident-aoi-cinematic.md) | R1 分鏡、演技同逐格片段工具，已計劃未開始 |
 | [道路盤點](road-audit.md) · [道路修整](road-fix.md) · [街景填充](urban-fill.md) · [台場素材](odaiba-assets.md) | 待視覺確認或實際採用決定 |
