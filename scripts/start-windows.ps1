@@ -1,11 +1,14 @@
 # One-click exhibition start on Windows: survey server + 3D city + Chrome on the high-performance GPU.
-# Double-click start-windows.cmd at the repo root, or run: powershell -ExecutionPolicy Bypass -File scripts\start-windows.ps1 [-Low] [-Kiosk] [-NoBrowser] [-Local]
+# Double-click start-windows.cmd at the repo root, or run: powershell -ExecutionPolicy Bypass -File scripts\start-windows.ps1 [-Full] [-Kiosk] [-NoBrowser] [-NoAdmin] [-Local]
+# The city opens at ?survey&quality=low and the admin page opens in the default browser unless -Full / -NoAdmin.
 # LAN/iPad mode (HTTPS 8443 + HTTP 8787 on all interfaces) starts when survey\data\tls\ipad.pem and ipad-key.pem exist; -Local forces loopback only.
 # Windows PowerShell 5.1 compatible. Stop the exhibition by closing the two server windows and the city Chrome window.
 param(
-  [switch]$Low,       # add &quality=low to the city URL (weaker GPUs)
+  [switch]$Full,      # full render quality: drop the default &quality=low from the city URL
+  [switch]$Low,       # kept for old shortcuts; low quality is now the default
   [switch]$Kiosk,     # open the city full screen without browser UI (Alt+F4 closes it)
-  [switch]$NoBrowser, # start the servers only
+  [switch]$NoBrowser, # start the servers only (no city, no admin page)
+  [switch]$NoAdmin,   # do not open the admin page
   [switch]$Local      # loopback only (no iPads) even when the TLS certificate exists
 )
 $ErrorActionPreference = 'Stop'
@@ -78,7 +81,8 @@ while (-not ((Test-Url "http://127.0.0.1:$surveyPort/monitor") -and (Test-Url "h
 # so force it with --force_high_performance_gpu. A dedicated profile keeps this a separate Chrome
 # process: the flag would be ignored if it joined an already running Chrome.
 $cityUrl = "http://127.0.0.1:$cityPort/?survey"
-if ($Low) { $cityUrl += '&quality=low' }
+if (-not $Full) { $cityUrl += '&quality=low' }
+$adminUrl = "http://127.0.0.1:$surveyPort/admin"
 if (-not $NoBrowser) {
   $chrome = (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe' -ErrorAction SilentlyContinue).'(default)'
   if (-not $chrome) { $chrome = (Get-ItemProperty 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe' -ErrorAction SilentlyContinue).'(default)' }
@@ -87,11 +91,13 @@ if (-not $NoBrowser) {
   $chromeArgs = @("--user-data-dir=`"$userData`"", '--force_high_performance_gpu', '--no-first-run', '--no-default-browser-check')
   if ($Kiosk) { $chromeArgs += '--kiosk' } else { $chromeArgs += '--start-maximized' }
   Start-Process $chrome -ArgumentList ($chromeArgs + $cityUrl) | Out-Null
+  # Admin goes to the default browser, outside the city's (possibly kiosk) Chrome profile.
+  if (-not $NoAdmin) { Start-Process $adminUrl }
 }
 
 Write-Host ''
 Write-Host "City:   $cityUrl" -ForegroundColor Cyan
-Write-Host "Admin:  http://127.0.0.1:$surveyPort/admin  (this computer only)"
+Write-Host "Admin:  $adminUrl  (this computer only)"
 if ($lan) {
   $ips = Get-NetIPAddress -AddressFamily IPv4 -AddressState Preferred -ErrorAction SilentlyContinue |
     Where-Object { $_.IPAddress -notlike '127.*' -and $_.IPAddress -notlike '169.254.*' -and $_.InterfaceAlias -notlike 'vEthernet*' } | ForEach-Object { $_.IPAddress }
