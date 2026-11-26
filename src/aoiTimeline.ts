@@ -3,6 +3,9 @@ const ease = (seconds: number, from: number, to: number) => {
   return u * u * (3 - 2 * u);
 };
 
+// Seconds from the first frame to the end of the beat (caption out at 9.4 s); reels default to this length.
+export const AOI_DURATION = 9.6;
+
 export function aoiPose(seconds: number) {
   const lift = ease(seconds, 3.3, 4.65);
   const sow = ease(seconds, 4.9, 5.65);

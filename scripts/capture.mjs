@@ -53,7 +53,8 @@ export function parseArgs(argv, base = 'http://127.0.0.1:5173/') {
   return { opts, jobs };
 }
 
-if (process.argv[2] === '--self-test') {
+const isMain = import.meta.url === pathToFileURL(process.argv[1]).href;
+if (isMain && process.argv[2] === '--self-test') {
   const { opts, jobs } = parseArgs(['--size=3200x1800', '--settle=10', '?shot=nw:e&hour=12', 'nw/r3/day', 'http://127.0.0.1:5174/?hour=22', 'nw/r3/night.jpg'], 'http://127.0.0.1:5173/');
   assert.deepEqual(opts, { width: 3200, height: 1800, settleMs: 10000 });
   assert.deepEqual(jobs, [
@@ -64,7 +65,7 @@ if (process.argv[2] === '--self-test') {
   process.env.CODEX_SANDBOX = 'seatbelt';
   await assert.rejects(launchBrowser, /Chrome capture cannot start in the Codex macOS sandbox/);
   console.log('capture self-test PASS');
-} else if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+} else if (isMain) {
   const { opts, jobs } = parseArgs(process.argv.slice(2), process.env.CITY2127_URL);
   const git = args => execFileSync('git', args, { encoding: 'utf8' }).trim();
   const source = { commit: git(['rev-parse', 'HEAD']), branch: git(['branch', '--show-current']), dirty: git(['status', '--porcelain', '--untracked-files=no']) !== '' };

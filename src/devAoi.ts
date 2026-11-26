@@ -1,5 +1,5 @@
 import * as T from 'three';
-import { aoiPose } from './aoiTimeline.ts';
+import { AOI_DURATION, aoiPose } from './aoiTimeline.ts';
 import { addCityModel } from './modelAssets.ts';
 import type { EnergyRuntime } from './energyRuntime.ts';
 
@@ -143,9 +143,16 @@ export async function startAoi(energy: EnergyRuntime, camera: T.PerspectiveCamer
   controls.enabled = false;
   camera.fov = 53;
   camera.updateProjectionMatrix();
-  let started: number | undefined;
+  let started: number | undefined, sought: number | undefined, shown = false;
+  // DEV reel hook (scripts/beatReel.mjs): holds the beat at `t` seconds until the next seek; the caller waits two
+  // animation frames before capturing. Returns whether the last frame drew the set (false while the farm fades in).
+  if (import.meta.env.DEV) Object.assign(window, { __residentSeek: (t?: number) => {
+    if (t !== undefined) sought = t;
+    return { ready: shown, duration: AOI_DURATION };
+  } });
   const frame = (now: number, darkness: number) => {
-    if (energy.getDiagnostics().farm.opacity < .999) {
+    shown = energy.getDiagnostics().farm.opacity >= .999;
+    if (!shown) {
       set.visible = false;
       caption.hidden = true;
       started = undefined;
@@ -153,7 +160,7 @@ export async function startAoi(energy: EnergyRuntime, camera: T.PerspectiveCamer
     }
     set.visible = true;
     started ??= now;
-    const t = freeze ? held : now - started;
+    const t = sought ?? (freeze ? held : now - started);
     const pose = aoiPose(t);
     const { push, seeds: fall, pullback, pane: lit, beam, sunlight: sun } = pose;
     setPose(pose);
