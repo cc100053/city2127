@@ -1,10 +1,10 @@
 # resident-aoi-cinematic — 葵播種 beat 鏡頭語言同動作打磨
 
 - Owner：cc100053
-- 狀態：IN PROGRESS（R1 第 0–5 步完成：分鏡、時間軸同鏡頭；等 owner 睇新舊並排片段，下一步係第 6–7 步光同景深）
+- 狀態：IN PROGRESS（R1 第 0–7 步完成：分鏡、時間軸、鏡頭、光同景深；等 owner 睇並排片段，未 merge 落 main）
 - 分支：`feat/aoi-cinematic`，由 `714b4ef3`（當時嘅 `origin/main`）開出
 - Base commit：`39725ef2d38efdfae8df74e03d2d57e1c42cba87`（計劃寫入前嘅 `origin/main`）
-- Last verified commit：`04a9ad1a5536b5b5da00ceb4b942baf4f57671ad`（分鏡同時間軸；新版日景片段由呢個 commit 嘅乾淨樹錄製，夜景片段由之後只改文件嘅 `d22d33ec` 錄製）
+- Last verified commit：`9abf0516ed38508b7b9d94973c9b9cbe2447b38c`（光同景深；`light-day`／`light-night` 片段同各鏡頭定格都由呢個 commit 嘅乾淨樹錄製）
 - Remote availability：計劃同 skill 草稿已推上 `origin/main`；R1 進度喺 `origin/feat/aoi-cinematic`
 - 製作指引：[resident-cinematic](../../.agents/skills/resident-cinematic/SKILL.md)（草稿，今次第一次用）
 
@@ -14,6 +14,7 @@
 - 開始時嘅本機改動：只有未追蹤嘅 `.sf/`，唔屬於呢個 task，保持原狀。
 - R1 實作 session（2026-11-26）：開始時喺 `main`，HEAD 係 `714b4ef35af6783fe3a8452ed15018fdbaf9357b`，同 `origin/main` 一致，工作樹乾淨，冇其他 worktree。主 checkout 冇其他 session 嘅改動，所以直接喺度開 `feat/aoi-cinematic`，冇開 worktree。
 - R1 第 3–5 步 session（2026-11-26）：開始時喺 `feat/aoi-cinematic`，HEAD 係 `b28ecc24`，同 `origin/feat/aoi-cinematic` 一致，工作樹乾淨；`origin/main` 冇新 commit（分支領先 3 個）。冇開 worktree。
+- R1 第 6–7 步 session（2026-11-26）：開始時喺 `feat/aoi-cinematic`，HEAD 係 `3cae8549`，同 `origin/feat/aoi-cinematic` 一致，工作樹乾淨，冇其他 worktree。量 FPS 時臨時開咗 `../city2127-aoi-base`（`3cae8549` 嘅 detached worktree，port 5175）做同場基準，量完已經 `git worktree remove` 同 prune。
 - 之後每個 session 開始時，都要重新做 AGENTS.md preflight，然後記錄實際狀態。
 
 ## 目標同驗收
@@ -83,6 +84,13 @@
 
 ## Completed work
 
+- 2026-11-26（R1 第 6–7 步：光同景深，`503d8d50`、`9abf0516`）：
+  - **夜景熱斑嘅成因**：逐盞燈關掉再比較（`light/diag-night-S2-fill-vs-sun.jpg`、`diag-night-S4-fill-vs-sun.jpg`，每張 2×2：左上全開、右上關 fill、左下關 `aoi-archived-sunlight`、右下全關）。S2 同 S4 背後嘅大片暖光**全部來自 `fill` PointLight**：佢擺喺葵同身後 0.93 m 嘅玻璃欄之間（x −186.39），夜晚強度 5.2、範圍 4 m，所以打爆咗玻璃欄同矮牆。`aoi-archived-sunlight` 冇影響，而且佢喺 S4 根本照唔到塊面。
+  - `devAoi.ts`：`fill` 改成一盞窄角 SpotLight（`aoi-fill`），由鏡頭嗰邊（+x）好陡咁照落頭同膊頭，穿過佢嘅光落喺地面、到唔到矮牆；仍然係日夜共用嘅一盞，強度 1.5 → 22（隨 `darkness`）。新增暖色主光 `aoi-face-key`（#ffc27a，由前上方照塊面，強度日 5／夜 8 × `pose.sunlight`）同冷色輪廓光 `aoi-rim`（#9fc6ff，喺玻璃欄後面、頭嘅高度，沿兩個面部鏡頭嘅視線反打，日 60／夜 16）。三盞都唔投影，只改 intensity，唔切 `visible`，所以 beat 中途唔會重新編譯 shader。
+  - 景深：`main.ts` 喺 DEV `energy:aoi` 分支動態 import `BokehPass`，插喺 bloom 前面，預設關。`devAoi.ts` 跟**畫面上嘅鏡頭**（`aoiView` 之後）開關：S2 對焦喺撒種嗰隻手（aperture .004），S4 對焦喺塊面（aperture .005），`maxblur` 都係 .008；焦距每格按相機前向投影計。BokehPass 嘅深度預渲染會將透明物當實心，S2 成個背景都係隔住玻璃欄睇，所以預渲染時暫時隱藏所有透明網格（每 120 格重新掃描）。新增 `aoiNoDof` 關閉景深。
+  - 自我檢查第 1 輪（`9abf0516`）：第一版片段夜景 S2 葵頭後矮牆有一團暖光暈（fill 穿過佢）、矮牆頂有 rim 擦出嘅高光；fill 改由更陡角度、rim 降到頭嘅高度兼減弱之後消失。
+  - `resident-aoi.md` 已同步燈光、景深同 `aoiNoDof`。
+
 - 2026-11-26（R1 第 3–5 步，即任務嘅「第 3–4 步」：分鏡、時間軸、鏡頭）：
   - `aoiTimeline.ts`：新增純函數 `aoiShot(t)`，回傳 `{ shot: 'S1'|'S2'|'S3'|'S4', u }`，`u` 係鏡頭內 0–1 進度；剪接點 `AOI_CUTS = [2.4, 5.7, 8.6]`，`AOI_DURATION = 11`。新增 easing：`anticipate`（ease-in-back）、`overshoot`（ease-out-back）、`swing`（兩者接成一筆，數值同速度連續）、`hold`、`breathe`，同埋常數 `AOI_SEED_RELEASE = 4.86`、`AOI_SEED_LAND = 5.55`、`AOI_CAPTION_FROM = 9`、`AOI_HEAD_LEAD = AOI_TORSO_LAG = .08`。
   - `aoiPose` 改成回傳 `head`／`arms`／`torso` 三組 `{ lift, sow, look }`（頭早 0.08 s、身遲 0.08 s）同 `breath`、`drift`（4 s 同 7.3 s 正弦）、`seeds`、`pane`、`beam`、`sunlight`。S2：2.55–3.6 s 抬頭望天幕；3.55–4.15 s 托手（回彈約 5 %）；4.45–5.1 s 撒種，先向後收約 12 % 再衝過頭約 12 %；5.1 s 起手掌攤開定格到 7.3 s（S2 內 0.6 s）；種子 4.86 s 離手、5.55 s 落地。S3：亮板 6–6.45 s、光束 6.25–6.9 s、暖光 6.7–7.2 s，7.3–8.3 s 收手。S4：8.85–9.65 s 抬頭望光並定住。`push`、`pullback` 已刪除。
@@ -96,6 +104,39 @@
 - 2026-11-26：寫咗呢份計劃同 [resident-cinematic](../../.agents/skills/resident-cinematic/SKILL.md) skill 草稿，並喺 resident-scene、AGENTS.md、docs/README 同 handoffs/README 加連結。
 
 ## Actual validation results
+
+- R1 第 6–7 步（`503d8d50`，第 1 輪修正 `9abf0516`）：
+  - Root 測試 55 條指令逐條跑，54 條通過；唯一失敗仍然係 `tests/assetLibrary.test.ts`（`q04b-sky-village` 冇 LIBRARY.md 行），同之前一樣，與今次無關。`npm run build`、`git diff --check` 通過；`dist/` 冇 `__residentSeek`，亦冇 `BokehShader`／`maxblur`（景深冇入正式版）。
+  - 塊面亮度（1920 × 1080 定格，`npm run capture`，`aoiTime` S2 = 3.5 s、S4 = 9.5 s，隱藏字幕；Rec.709 平均 0–255，括號係 ≥ 250 嘅爆白比例；方框同探針腳本喺 `light/`）：
+
+    | 鏡頭 | 改前 塊面／背後牆 | 改後 塊面／背後牆 |
+    | --- | --- | --- |
+    | S2 日 | 108.0／159.5 | 111.4／150.3 |
+    | S2 夜 | 137.5／211.5（牆 45 % 爆白） | 96.5／85.9（0 %） |
+    | S4 日 | 146.5（10 %）／185.4 | 151.9（19 %）／169.3 |
+    | S4 夜 | 86.5／234.8（牆 94 % 爆白） | 130.4／71.8（0 %） |
+
+    「改前」取自 `new-day`／`new-night` MP4 嘅同一時間格。S1 同 S3 係全景，葵得幾個像素高（S3 根本唔喺畫面），冇量塊面；定格 `light/still-S1..S4-{day,night}.png` 同總覽 `light/stills.jpg`。
+  - FPS（有視窗 Chrome，1920 × 1080／DPR 1，`reviewTime=20`；每個鏡頭用 `__residentSeek` 定格，各取兩段 3 s rAF 樣本；另外重載一次實時播完全段，按鏡頭平均）。基準係同場另開嘅 `3cae8549` worktree，三個版本交替量，日夜各兩輪（原始數據 `light/fps-ab.jsonl`，腳本 `light/fpsProbe.mjs`）：
+
+    | 定格 FPS（日／夜，各 4 個樣本範圍） | S1 | S2 | S3 | S4 |
+    | --- | --- | --- | --- | --- |
+    | 基準 `3cae8549` | 49.3–53.2 | 58.6–60.3 | 51.2–55.9 | 60.1–60.3 |
+    | 加燈（`aoiNoDof`） | 50.0–51.0 | 59.9–60.3 | 53.1–54.2 | 60.1 |
+    | 加燈 + 景深 | 49.5–51.1 | 54.1–54.9 | 53.2–54.9 | 54.4–55.5 |
+
+    加燈：廣角 S1、S3 約 −2 FPS，S2、S4 冇變。景深：S2、S4 約 −5.5 FPS，仍然有 54 以上，所以保留。實時播放按鏡頭平均：S2–S4 51.1–52.7（基準 54.1–54.9）；S1 46.0–46.3，但基準 S1 實時都只有 45.7–48.4，因為 beat 喺農園淡入完就即刻開始，頭 2.4 s 包住載入嘅卡頓（最長一格約 265–300 ms，基準一樣）。第 1 輪修正只郁燈位同強度、燈數唔變，冇重新量。
+  - 片段：`~/city2127-evidence/aoi-cinematic/r1/light-day.*`（`hour=12`）同 `light-night.*`（`hour=22`），commit `9abf0516`，0–11 s、30 fps、331 格，`dirty: false`，`pageErrors` 空。並排：`sbs-light-day.mp4`、`sbs-light-night.mp4`（左 = `new-*` 改光前，右 = 今次；各 960 寬，冇文字標籤）。
+  - 自我檢查清單（skill **Self-critique checklist**，評今次片段）：
+    - [x] 唔睇字幕都知邊個、做緊乜、乜嘢改變咗。
+    - [ ] 每個剪接都落喺動作上、冇跳軸：S2→S3（種子落地）、S3→S4（光照好之後）過；**S1→S2 係反打**（S1 由西入口向東望，S2 由葵 +x 嗰邊向西望），算跳軸，未改（屬分鏡，唔喺今次光／景深範圍，交 owner 決定）。
+    - [x] 冇剛體行路、轉身或者坐低喺畫面上。
+    - [ ] 主要手勢有預備、≥ 0.4 s 定格同四分三側面：預備同定格有；S2 塊面接近側面偏後，唔算四分三。
+    - [x] 喺畫面上嘅時候從來唔會完全靜止（呼吸、頭部漂移）。
+    - [x] 最後一個鏡頭見到塊面喺改變咗嘅光入面，日夜都讀到（夜 130 vs 背景 72）。不過暖光喺 S3 已經亮起，S4 一開始就係亮嘅，鏡頭內冇「亮起」嗰下。
+    - [x] 鏡頭冇漂移，每個鏡頭郁 ≤ 4 %。
+    - [ ] FPS 喺預算內：所有定格樣本 49.5–60.3（只有 S1 夜一個樣本 49.5），S2–S4 實時 ≥ 51；S1 實時 46，同基準一樣低過 50，係原有嘅載入卡頓。
+    - 修咗一輪（夜景光暈同 rim 高光）；剩低三項都唔係光／景深可以解決，所以冇再修。
 
 - R1 第 3–5 步（`04a9ad1a`）：
   - Root 測試 55 條指令，54 條通過；唯一失敗仍然係 `tests/assetLibrary.test.ts`（`q04b-sky-village` 冇 LIBRARY.md 行），同之前一樣，與今次無關。`npm run build`、`git diff --check` 通過，`dist/` 冇 `__residentSeek`。
@@ -114,7 +155,10 @@
 ## Known issues and blockers
 
 - 動畫只喺 DEV 播；正式接入係另一個 task。
-- 景深可能超出 FPS 預算，要實測。
+- 景深已實測（見上），S2／S4 約 −5.5 FPS，保留。
+- S1 實時播放 46 FPS（基準一樣），係 beat 喺農園淡入後即刻開始、包住載入卡頓；正式接入或者重新計時間預算時要處理。
+- 夜景 S2 約 3.0 s，葵頭右邊矮牆頂仲有一點細嘅藍白高光（rim 擦到）。
+- 日景 S4 塊面約 19 % 像素爆白（改前 10 %），主要係原本嘅日光；key 日間只有 5。
 - 片段入面城市時鐘定咗喺 `reviewTime=20`，所以車、水同天空都唔郁。逐格片段只用嚟審動作同鏡頭；sidecar 嘅 canvas FPS 係錄製速度，唔係播放 FPS。第 7 步嘅 FPS 要用實時播放量度。
 - 角色冇表情節點，S4 只能靠抬頭同光去演。
 - 成段長咗約 1.5 s，將來正式接入時要重新計 beat 嘅時間預算。
@@ -128,4 +172,4 @@
 
 ## Next expected step
 
-先等 owner 睇 `sbs-day.mp4`／`sbs-night.mp4` 同新接觸表，記低意見（未 merge 落 main）。之後做 R1 第 6–7 步（光同景深）：葵塊面暖色聚光燈同冷色輪廓光，處理夜景牆身過曝；再試 S2／S4 嘅 BokehPass，量 FPS。
+等 owner 睇 `sbs-light-day.mp4`／`sbs-light-night.mp4`（左改光前、右今次）同 `light-day-sheet.jpg`／`light-night-sheet.jpg`，連埋之前未回覆嘅 `sbs-day`／`sbs-night`（舊 beat 對新分鏡），記低每個鏡頭嘅意見。重點問：S1→S2 反打要唔要改、景深強弱、輪廓光夠唔夠。之後按意見做下一輪（新 session），再做 R1 第 10 步收尾（RESIDENT_SCENE_PLAN、變化總覽、merge main）同 skill **Self-improvement**。未 merge 落 main。
