@@ -1,10 +1,10 @@
 # resident-aoi-cinematic — 葵播種 beat 鏡頭語言同動作打磨
 
 - Owner：cc100053
-- 狀態：IN PROGRESS（R1 第 0–2 步完成，下一步係第 3–4 步分鏡同時間軸）
+- 狀態：IN PROGRESS（R1 第 0–5 步完成：分鏡、時間軸同鏡頭；等 owner 睇新舊並排片段，下一步係第 6–7 步光同景深）
 - 分支：`feat/aoi-cinematic`，由 `714b4ef3`（當時嘅 `origin/main`）開出
 - Base commit：`39725ef2d38efdfae8df74e03d2d57e1c42cba87`（計劃寫入前嘅 `origin/main`）
-- Last verified commit：`f098db5dbbd67c9baaf2f645de53b779bcad52f0`（逐格片段工具；舊版基準片段由呢個 commit 嘅乾淨樹錄製）
+- Last verified commit：`04a9ad1a5536b5b5da00ceb4b942baf4f57671ad`（分鏡同時間軸；新版日景片段由呢個 commit 嘅乾淨樹錄製，夜景片段由之後只改文件嘅 `d22d33ec` 錄製）
 - Remote availability：計劃同 skill 草稿已推上 `origin/main`；R1 進度喺 `origin/feat/aoi-cinematic`
 - 製作指引：[resident-cinematic](../../.agents/skills/resident-cinematic/SKILL.md)（草稿，今次第一次用）
 
@@ -13,6 +13,7 @@
 - 寫計劃嘅 session（2026-11-26）：開始時喺 `main`，HEAD 係 `1c618231ce2056761a25296cd67930a46b809ff7`，落後 `origin/main` 5 個 commit（全部係模型）。用 `--ff-only` 快轉到 `39725ef2`，再開 `docs/resident-cinematic` 寫計劃，合併返 main 後推送。
 - 開始時嘅本機改動：只有未追蹤嘅 `.sf/`，唔屬於呢個 task，保持原狀。
 - R1 實作 session（2026-11-26）：開始時喺 `main`，HEAD 係 `714b4ef35af6783fe3a8452ed15018fdbaf9357b`，同 `origin/main` 一致，工作樹乾淨，冇其他 worktree。主 checkout 冇其他 session 嘅改動，所以直接喺度開 `feat/aoi-cinematic`，冇開 worktree。
+- R1 第 3–5 步 session（2026-11-26）：開始時喺 `feat/aoi-cinematic`，HEAD 係 `b28ecc24`，同 `origin/feat/aoi-cinematic` 一致，工作樹乾淨；`origin/main` 冇新 commit（分支領先 3 個）。冇開 worktree。
 - 之後每個 session 開始時，都要重新做 AGENTS.md preflight，然後記錄實際狀態。
 
 ## 目標同驗收
@@ -82,6 +83,12 @@
 
 ## Completed work
 
+- 2026-11-26（R1 第 3–5 步，即任務嘅「第 3–4 步」：分鏡、時間軸、鏡頭）：
+  - `aoiTimeline.ts`：新增純函數 `aoiShot(t)`，回傳 `{ shot: 'S1'|'S2'|'S3'|'S4', u }`，`u` 係鏡頭內 0–1 進度；剪接點 `AOI_CUTS = [2.4, 5.7, 8.6]`，`AOI_DURATION = 11`。新增 easing：`anticipate`（ease-in-back）、`overshoot`（ease-out-back）、`swing`（兩者接成一筆，數值同速度連續）、`hold`、`breathe`，同埋常數 `AOI_SEED_RELEASE = 4.86`、`AOI_SEED_LAND = 5.55`、`AOI_CAPTION_FROM = 9`、`AOI_HEAD_LEAD = AOI_TORSO_LAG = .08`。
+  - `aoiPose` 改成回傳 `head`／`arms`／`torso` 三組 `{ lift, sow, look }`（頭早 0.08 s、身遲 0.08 s）同 `breath`、`drift`（4 s 同 7.3 s 正弦）、`seeds`、`pane`、`beam`、`sunlight`。S2：2.55–3.6 s 抬頭望天幕；3.55–4.15 s 托手（回彈約 5 %）；4.45–5.1 s 撒種，先向後收約 12 % 再衝過頭約 12 %；5.1 s 起手掌攤開定格到 7.3 s（S2 內 0.6 s）；種子 4.86 s 離手、5.55 s 落地。S3：亮板 6–6.45 s、光束 6.25–6.9 s、暖光 6.7–7.2 s，7.3–8.3 s 收手。S4：8.85–9.65 s 抬頭望光並定住。`push`、`pullback` 已刪除。
+  - `devAoi.ts`：四個固定鏡頭（`SHOTS`），每個只沿視線推近（S1 3.5 %、S2 4 %、S4 3 %）或者向上搖（S3 0.9 m，約 3.3 %），用一個 smoothstep 帶動；S2 視角 40°、S4 35°，其餘 53°。S4 係新嘅低角度近鏡（相機 `(-183.53, 3.24, 399.55)` 對住塊面）。`aoiView=entry|hands|canopy|payoff` 對應 S1–S4，時間夾喺該鏡頭範圍內。字幕只喺 S4 且 t ≥ 9 s 先出。原本寫死嘅 5.18、3.9、3.5／9.4、2.8 全部改用時間軸常數或者姿勢數值。
+  - `tests/aoiTimeline.test.ts` 重寫：easing 端點、鏡頭次序同剪接點、鏡頭內 `u` 連續、所有通道冇跳變（剪接只郁鏡頭）、起點同終點姿勢、呼吸、S2 抬頭／預備／回彈、定格 ≥ 0.4 s 而且一直到剪接、種子喺剪接前落地、頭身錯開 0.05–0.1 s、天氣通道單調喺 [0, 1]。
+  - `resident-aoi.md` 嘅定格時間同 `aoiView` 已同步。
 - 2026-11-26（R1 第 2 步）：`devAoi.ts` 加咗 DEV-only 嘅 `window.__residentSeek(t?)`。佢會將 beat 定喺 `t`，直到下一次 seek；回傳 `{ ready, duration }`，`ready` 表示上一格有冇畫到葵（農園淡入期間係 false）。`aoiTime` 同 `aoiView` 照舊可用。`aoiTimeline.ts` 新增 `AOI_DURATION = 9.6`。新增 [scripts/beatReel.mjs](../../scripts/beatReel.mjs)，用法記錄喺 [VALIDATION](../VALIDATION.md#evidence-storage)；self-test 已加入 `npm test`。`capture.mjs` 改成只有直接執行時先跑自己嘅 self-test，咁 import 佢就唔會觸發。
   - 實測發現：喺呢部 Mac 嘅 headless Chrome，另外開 raw CDP session 會令 viewport 由 1920 × 1080 縮到 1920 × 993，所以改用 Playwright 嘅 `page.screenshot`。
   - 舊版基準片段已錄（見下面驗證）。
@@ -90,6 +97,11 @@
 
 ## Actual validation results
 
+- R1 第 3–5 步（`04a9ad1a`）：
+  - Root 測試 55 條指令，54 條通過；唯一失敗仍然係 `tests/assetLibrary.test.ts`（`q04b-sky-village` 冇 LIBRARY.md 行），同之前一樣，與今次無關。`npm run build`、`git diff --check` 通過，`dist/` 冇 `__residentSeek`。
+  - 新版片段：`~/city2127-evidence/aoi-cinematic/r1/new-day.*`（`hour=12`，commit `04a9ad1a`）同 `new-night.*`（`hour=22`，commit `d22d33ec`），0–11 s、30 fps、331 格，`dirty: false`，`pageErrors` 空。新舊並排：`sbs-day.mp4`、`sbs-night.mp4`（左舊右新，各 960 寬，ffmpeg `hstack`；本機 ffmpeg 冇 `drawtext`，所以冇文字標籤）。定格探針喺 `probe/`。
+  - 自己睇接觸表：S1 全景好穩陣；S2 見到抬頭、托手、撒種同攤開手掌；S3 天幕全景亮板、光束、照菜畦都讀到，但葵喺呢個鏡頭睇唔到；S4 低角度近鏡見到葵抬頭望光，塊面冇被遮，字幕冇蓋臉。夜景 S2 同 S4 背後牆身都有大片過曝暖光（同舊版一樣），塊面偏暗：留畀第 6 步。
+  - 未做：skill 自我檢查清單逐項評分（第 9 步）、實時 FPS（第 7 步）。
 - R1 第 2 步（`f098db5d`）：
   - Root 測試：除咗 `tests/assetLibrary.test.ts`，其餘全部通過。佢失敗係因為 `q04b-sky-village` 冇喺 LIBRARY.md 登記；呢個問題喺 `origin/main` `714b4ef3` 已經存在，同今次改動無關，未修。
   - `npm run build` 同 `git diff --check` 通過，`dist/` 入面冇 `__residentSeek`。
@@ -116,4 +128,4 @@
 
 ## Next expected step
 
-R1 第 3–4 步：喺 `feat/aoi-cinematic` 加 `aoiShot(t)` 同 easing 輔助函數，跟分鏡表重寫 `aoiPose` 同測試。`AOI_DURATION` 改成約 11 s，然後用 `node scripts/beatReel.mjs --to=11 …` 錄新版，同 `old-day` 比較。
+先等 owner 睇 `sbs-day.mp4`／`sbs-night.mp4` 同新接觸表，記低意見（未 merge 落 main）。之後做 R1 第 6–7 步（光同景深）：葵塊面暖色聚光燈同冷色輪廓光，處理夜景牆身過曝；再試 S2／S4 嘅 BokehPass，量 FPS。
