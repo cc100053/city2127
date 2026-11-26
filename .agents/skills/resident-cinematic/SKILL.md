@@ -33,7 +33,7 @@ Each rule has a date and a source. The self-improvement loop below edits this li
 9. **Depth of field only in medium and close shots.** Use a Bokeh pass on the existing composer in `src/main.ts`, enabled only during the beat. Measure FPS with it on and off. If the cost is too high, drop the pass and use rule 8's rim light. *(2026-11-26, analysis)*
 10. **Owner reviews reels, not live captures.** Reviews use frame-exact reels (below), never a screencast. *(2026-11-26, analysis)*
 
-Timing values come from the motion-design skill (LottieFiles, MIT, to be vendored at `.agents/skills/motion-design/` as round 1's first step; link it here once it exists). Read its timing and easing references before writing keys.
+Timing values come from the [motion-design](../motion-design/SKILL.md) skill. Read its [timing and easing tables](../motion-design/reference/timing-easing-tables.md), [Disney principles](../motion-design/director/disney-principles.md) and [narrative structure](../motion-design/director/narrative-structure.md) before writing keys. Its durations are written for UI; for a character beat, use its ratios and easing families, and scale gestures to the dramatic-reveal and ambient rows. It is vendored from [LottieFiles/motion-design-skill](https://github.com/LottieFiles/motion-design-skill) (MIT, commit `d77a9fc`, licence in `motion-design/LICENSE-motion-design-skill`, vendored 2026-11-26 with owner approval). Its Creator MCP handoff (`reference/export-and-render.md`) is not used here: reels come from `scripts/beatReel.mjs`, and an external render service would be a separate owner decision.
 
 ## Steps
 

@@ -31,7 +31,7 @@
 | [PROJECT](PROJECT.md) · [survey 指引](../survey/README.md) | 模組、資料流、開發同測試 |
 | [BLENDER](BLENDER.md) · [素材庫](../asset/models/LIBRARY.md) | 工作站、建模、匯出同重用 |
 | [AGENTS](../AGENTS.md) · [CONTRIBUTING](CONTRIBUTING.md) | 任務、Git 同文檔同步流程 |
-| [新建築](../.agents/skills/place-building/SKILL.md) · [近鏡](../.agents/skills/closeup-polish/SKILL.md) · [兩級打磨](../.agents/skills/polish-ladder/SKILL.md) · [人物情景](../.agents/skills/resident-scene/SKILL.md) · [人物鏡頭語言](../.agents/skills/resident-cinematic/SKILL.md) | 按工作揀製作指引 |
+| [新建築](../.agents/skills/place-building/SKILL.md) · [近鏡](../.agents/skills/closeup-polish/SKILL.md) · [兩級打磨](../.agents/skills/polish-ladder/SKILL.md) · [人物情景](../.agents/skills/resident-scene/SKILL.md) · [人物鏡頭語言](../.agents/skills/resident-cinematic/SKILL.md) · [動態設計（外部，MIT）](../.agents/skills/motion-design/SKILL.md) | 按工作揀製作指引 |
 
 ## Archive
 

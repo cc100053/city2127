@@ -1,8 +1,8 @@
 # resident-aoi-cinematic — 葵播種 beat 鏡頭語言同動作打磨
 
 - Owner：cc100053
-- 狀態：PLANNED（計劃已寫，未開始實作）
-- 分支：未建立；新 session 由 `origin/main` 開 `feat/aoi-cinematic`
+- 狀態：IN PROGRESS（R1 第 0–1 步完成，下一步係第 2 步逐格片段工具）
+- 分支：`feat/aoi-cinematic`，由 `714b4ef3`（當時嘅 `origin/main`）開出
 - Base commit：`39725ef2d38efdfae8df74e03d2d57e1c42cba87`（計劃寫入前嘅 `origin/main`）
 - Last verified commit：NONE（未有實作）
 - Remote availability：計劃同 skill 草稿已推上 `origin/main`
@@ -12,7 +12,8 @@
 
 - 寫計劃嘅 session（2026-11-26）：開始時喺 `main`，HEAD 係 `1c618231ce2056761a25296cd67930a46b809ff7`，落後 `origin/main` 5 個 commit（全部係模型）。用 `--ff-only` 快轉到 `39725ef2`，再開 `docs/resident-cinematic` 寫計劃，合併返 main 後推送。
 - 開始時嘅本機改動：只有未追蹤嘅 `.sf/`，唔屬於呢個 task，保持原狀。
-- 實作 session 開始時要重新做 AGENTS.md preflight，然後記錄實際狀態。
+- R1 實作 session（2026-11-26）：開始時喺 `main`，HEAD 係 `714b4ef35af6783fe3a8452ed15018fdbaf9357b`，同 `origin/main` 一致，工作樹乾淨，冇其他 worktree。主 checkout 冇其他 session 嘅改動，所以直接喺度開 `feat/aoi-cinematic`，冇開 worktree。
+- 之後每個 session 開始時，都要重新做 AGENTS.md preflight，然後記錄實際狀態。
 
 ## 目標同驗收
 
@@ -81,6 +82,7 @@
 
 ## Completed work
 
+- 2026-11-26（R1 第 1 步）：Owner 批准之後，將 LottieFiles/motion-design-skill 嘅 commit `d77a9fc8cb371cab1ba5420df5bfd232cd14c9bb` 放入 `.agents/skills/motion-design/`，原文冇改，授權書係 `LICENSE-motion-design-skill`。來源同埋「唔用 Creator MCP」嘅說明記錄喺 resident-cinematic，docs/README 加咗連結。本機 `.claude/skills/motion-design` symlink 已經建立；`.claude/` 唔入 Git，其他工作站要自己建立。
 - 2026-11-26：寫咗呢份計劃同 [resident-cinematic](../../.agents/skills/resident-cinematic/SKILL.md) skill 草稿，並喺 resident-scene、AGENTS.md、docs/README 同 handoffs/README 加連結。
 
 ## Actual validation results
@@ -104,4 +106,4 @@
 
 ## Next expected step
 
-cc100053 開新 session，用 `resident-cinematic` skill 由 R1 第 0 步開始。第 1 步下載 vendor 檔案前先問 owner。
+R1 第 2 步：喺 `feat/aoi-cinematic` 做 `scripts/beatReel.mjs`，同 `devAoi.ts` 嘅 DEV-only `window.__residentSeek(t)`，然後先錄一段舊版 beat 做基準。
