@@ -3,11 +3,15 @@
 // share the SW lot: C is the event module shelf, A and B have no model yet (owner 2026-11-19), so the lot stands vacant for them. Q03's
 // share the drawer housing lot: A is the drawer housing, B and C have no model yet (owner 2026-11-19), so the housing fades and its
 // loop road stays. Q06's share the pod-frame tower lot (the retired housing U site): B is the tower, A and C have no model yet (owner
-// 2026-11-19), so the tower fades to lawn. Version4 runs never engage it, so their city stays as built: the hydro terrace, drawer
-// housing and pod tower as fixed background, the bay flower vacant, the farm on the energy vote, SW on its Meter band.
+// 2026-11-19), so the tower fades to lawn. Q05's share the NE PARK lot: A is the reverse air conditioner on its own cooled lawn, which
+// stands in place of the NE park; B and C have no model yet, so the NE park comes back for them. Version4 runs never engage it, so
+// their city stays as built: the hydro terrace, drawer housing and pod tower as fixed background, the bay flower vacant, the farm on
+// the energy vote, SW on its Meter band, the NE park.
 import type { Object3D, Scene } from 'three';
 import { fadeFinishes, ownFinishes, type EnergyRuntime } from './energyRuntime.ts';
 import type { CommonsPlazaRuntime } from './siteBuilders/commonsPlaza.ts';
+import type { SharingDistrict } from './districtMeters.ts';
+import { LOTS } from './layout.ts';
 import { BAY_FLOWER_SHOWN } from './bayFlower.ts';
 import { SITE_TRANSITION_SECONDS } from './siteBuilders/siteRuntime.ts';
 
@@ -32,6 +36,10 @@ export const q03Housing = (option: string | undefined) => option !== 'B' && opti
  *  their lot stands vacant lawn; B and no or an unknown option show it (the version4 city). */
 export const q06Tower = (option: string | undefined) => option !== 'A' && option !== 'C';
 
+/** Q05 option → whether the reverse air conditioner stands on the NE PARK lot in place of the NE park: only A has a model (B breathing
+ *  leaf and C snow-cloud fountain are not built yet, owner 2026-11-26), and no or an unknown option keeps the version4 park. */
+export const q05Tower = (option: string | undefined) => option === 'A';
+
 /** One lot's model fading over the shared 3-second site transition. It touches the scene only once set, and gives its meshes their
  *  own materials (ownFinishes) only once the model has loaded, so a version4 run keeps the shared materials. */
 class LotFade {
@@ -46,6 +54,8 @@ class LotFade {
     this.engaged = true; this.from = immediate ? to : this.amount; this.to = to; this.start = now; this.applied = -1;
   }
   get shown() { return this.to; }
+  /** The drawn amount (0 … 1) at the last update. */
+  get level() { return this.amount; }
   update(now: number, reducedMotion: boolean) {
     if (!this.engaged) return;
     const t = reducedMotion ? 1 : Math.min(1, Math.max(0, (now - this.start) / SITE_TRANSITION_SECONDS)), eased = t * t * (3 - 2 * t);
@@ -68,18 +78,25 @@ export class LotRuntime {
   private readonly flower: LotFade;
   private readonly housing: LotFade;
   private readonly tower: LotFade;
+  private readonly reverseAc: LotFade;
+  private readonly nePark: LotFade;
   private engaged = false;
   private q03Engaged = false;
   private q06Engaged = false;
+  private q05Engaged = false;
   private q08Engaged = false;
   private readonly energy?: Pick<EnergyRuntime, 'setFarmOverride'>;
   private readonly commons?: Pick<CommonsPlazaRuntime, 'setVacant'>;
   private readonly flowerDefault: boolean;
-  /** `flowerDefault`: the version4 bay flower state (DEV `?bayFlower=1` shows it, see bayFlowerShown); `commons` the SW focal runtime. */
-  constructor(scene: Scene, energy?: Pick<EnergyRuntime, 'setFarmOverride'>, flowerDefault = false, commons?: Pick<CommonsPlazaRuntime, 'setVacant'>) {
-    this.energy = energy; this.flowerDefault = flowerDefault; this.commons = commons;
+  private readonly sharing?: Pick<SharingDistrict, 'courtAt' | 'setCourtKeep'>;
+  /** `flowerDefault`: the version4 bay flower state (DEV `?bayFlower=1` shows it, see bayFlowerShown); `commons` the SW focal runtime;
+   *  `sharing` the frozen sharing district, whose court on the NE PARK lot follows the NE park (it stands under the Q05 tower's lawn). */
+  constructor(scene: Scene, energy?: Pick<EnergyRuntime, 'setFarmOverride'>, flowerDefault = false, commons?: Pick<CommonsPlazaRuntime, 'setVacant'>,
+    sharing?: Pick<SharingDistrict, 'courtAt' | 'setCourtKeep'>) {
+    this.energy = energy; this.flowerDefault = flowerDefault; this.commons = commons; this.sharing = sharing;
     // Looked up until each GLB has loaded (the roots once, then only their own subtrees).
     let hydro: Object3D | undefined, flower: Object3D | undefined, housing: Object3D | undefined, tower: Object3D | undefined;
+    let reverseAc: Object3D | undefined, nePark: Object3D | undefined;
     this.hydro = new LotFade(() => {
       hydro ??= scene.getObjectByName('q02a-hydro-terrace');
       return hydro && { targets: [hydro], loaded: !!hydro.getObjectByName('q02a-hydro-terrace-glb') };
@@ -98,6 +115,16 @@ export class LotRuntime {
     this.tower = new LotFade(() => {
       tower ??= scene.getObjectByName('pod-frame-tower-2127');
       return tower && { targets: [tower], loaded: true };
+    }, 1);
+    // The reverse air conditioner: main.ts names it once its GLB has loaded and baked; it stands hidden until a rotation run shows Q05-A.
+    this.reverseAc = new LotFade(() => {
+      reverseAc ??= scene.getObjectByName('q05a-reverse-ac-2127');
+      return reverseAc && { targets: [reverseAc], loaded: true };
+    }, 0);
+    // The NE park it replaces (the frozen tier-0 Meter site); its own finishes once the park's tree GLB is in, so the trees fade too.
+    this.nePark = new LotFade(() => {
+      nePark ??= scene.getObjectByName('survey-site-ne');
+      return nePark && { targets: [nePark], loaded: !!nePark.getObjectByName('park-tree-glb-instances') };
     }, 1);
   }
   /** Shows the Q02 lots for `option` (a rotation run's shown option), fading from `now` (held until then when ahead) unless `immediate`;
@@ -131,11 +158,25 @@ export class LotRuntime {
     this.q06Engaged = true;
     this.tower.set(q06Tower(option) ? 1 : 0, now, immediate);
   }
-  getDiagnostics() { return { hydro: this.hydro.shown, flower: this.flower.shown, housing: this.housing.shown, tower: this.tower.shown }; }
+  /** Shows the reverse air conditioner for Q05 `option` (A) in place of the NE park, or brings the park back (B/C), over the shared
+   *  transition from `now` unless `immediate`. Undefined after a rotation run restores the park, and before one leaves it untouched. */
+  setQ05(option: string | undefined, now: number, immediate: boolean) {
+    if (option === undefined && !this.q05Engaged) return;
+    this.q05Engaged = true;
+    const shown = q05Tower(option);
+    this.reverseAc.set(shown ? 1 : 0, now, immediate);
+    this.nePark.set(shown ? 0 : 1, now, immediate);
+  }
+  getDiagnostics() {
+    return { hydro: this.hydro.shown, flower: this.flower.shown, housing: this.housing.shown, tower: this.tower.shown, reverseAc: this.reverseAc.shown };
+  }
   update(now: number, reducedMotion: boolean) {
     this.hydro.update(now, reducedMotion);
     this.flower.update(now, reducedMotion);
     this.housing.update(now, reducedMotion);
     this.tower.update(now, reducedMotion);
+    this.reverseAc.update(now, reducedMotion);
+    this.nePark.update(now, reducedMotion);
+    if (this.q05Engaged) this.sharing?.setCourtKeep(this.sharing.courtAt(LOTS['ne-park'].x, LOTS['ne-park'].z), this.nePark.level);
   }
 }

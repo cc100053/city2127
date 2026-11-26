@@ -8,7 +8,7 @@ import type { CarrierChange } from './cityChangeManager.ts';
 import type { DisplayMode } from './dayCycle.ts';
 import { presets, type WorldState } from './presets.ts';
 import { changeSites } from './layout.ts';
-import { conceptVisit, q01Swap, q02Swap, q03Result, q03Swap, q06Result, q06Swap, q08Result, q08Swap, Q02_RESULTS, Q03_RESULTS, Q06_RESULTS, Q08_RESULTS, rotationLayout, rotationVisit } from './rotationLayout.ts';
+import { conceptVisit, q01Swap, q02Swap, q03Result, q03Swap, q05Result, q05Swap, q06Result, q06Swap, q08Result, q08Swap, Q02_RESULTS, Q03_RESULTS, Q05_RESULTS, Q06_RESULTS, Q08_RESULTS, rotationLayout, rotationVisit } from './rotationLayout.ts';
 import { ALREADY_HERE, crowdShareText, FACILITY_TO_COME } from '../survey/src/shared/rotation.ts';
 import { AXES, connectSurvey, isExhibitionView, supersedes, type CityView, type Decision, type ExhibitionProposal, type ExhibitionView, type SurveyEventKind, type SurveyView, type ExploreLook } from './surveyView.ts';
 
@@ -187,7 +187,7 @@ export function energyChangedPart(before: EnergyConfiguration, after: EnergyConf
 function visitPreference(questionId: string, optionId: string, label?: string) {
   const line = questionId === 'Q01' ? RESIDENT_PREFERENCES[Q01_PREFERENCES[optionId]]
     : questionId === 'Q02' ? Q02_RESULTS[optionId]?.[2]
-    : ({ Q03: Q03_RESULTS, Q06: Q06_RESULTS, Q08: Q08_RESULTS } as Record<string, Record<string, readonly [string, string]>>)[questionId]?.[optionId]?.[1];
+    : ({ Q03: Q03_RESULTS, Q05: Q05_RESULTS, Q06: Q06_RESULTS, Q08: Q08_RESULTS } as Record<string, Record<string, readonly [string, string]>>)[questionId]?.[optionId]?.[1];
   return line ?? (label ? `あなたは「${label.replace(/[。.]$/, '')}」という暮らしを選びました。` : 'あなたの思いが、住民の声に加わりました。');
 }
 
@@ -218,6 +218,9 @@ export function residentResult(proposal: ExhibitionProposal, changes?: readonly 
   // A Q03 swap shows or fades the drawer housing on its lot (src/lotRuntime.ts).
   const q03 = q03Swap(proposal);
   if (q03) return { ...q03Result(q03), kind: 'configuration', ...share };
+  // A Q05 swap shows the reverse air conditioner in place of the NE park, or brings the park back (src/lotRuntime.ts).
+  const q05 = q05Swap(proposal);
+  if (q05) return { ...q05Result(q05), kind: 'configuration', ...share };
   // A Q06 swap shows or fades the pod-frame tower on its lot (src/lotRuntime.ts).
   const q06 = q06Swap(proposal);
   if (q06) return { ...q06Result(q06), kind: 'configuration', ...share };
