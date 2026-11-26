@@ -38,8 +38,12 @@ def build():
     torso.frustum("res_jacket", (0, 0, .173), .34, .37, .235, .48, .048, slope=.015, segments=2)
     torso.box("res_trim", (0, -.115, .12), (.24, .046, .27), 0)
     torso.box("res_jacket", (0, -.145, .115), (.185, .022, .13), 0)
+    # Low collar (Nagi precedent): the neck rises out of the jacket instead of standing on the flat torso top.
+    torso.prism("res_jacket", (0, 0, .39), (0, 0, .44), .082, .074, u=12)
+    torso.ellipsoid("res_jacket", (0, 0, .44), (.076, .072, .012), 16, 6)
     head = part("head", (0, 0, 1.36), torso)
-    head.prism("res_skin", (0, 0, -.02), (0, 0, .145), .049, .055)
+    # Neck base sinks 8 cm below the pivot, so a ±.42 rad nod or look-up never lifts its rim out of the collar.
+    head.prism("res_skin", (0, 0, -.08), (0, 0, .145), .054, .056, u=12)
     head.ellipsoid("res_skin", (0, -.011, .18), (.125, .122, .146), 14, 9)
     head.ellipsoid("res_hair", (0, .039, .217), (.133, .115, .136), 14, 9)
     head.ellipsoid("res_hair", (-.018, .112, .174), (.076, .082, .083), 10, 7)
@@ -56,7 +60,11 @@ def build():
         leg.ellipsoid("res_shoe", (0, -.055, -.802), (.068, .136, .038), 10, 6, n=2.8)
         x = sign * .194
         arm = part(f"upperArm.{side}", (x, 0, 1.303), torso)
-        arm.prism("res_jacket", (0, 0, -.265), (0, 0, .02), .052, .066)
+        arm.prism("res_jacket", (0, 0, -.265), (0, 0, -.03), .052, .066)
+        # Round shoulder just under the pivot: hides the flat top cap through every swing and fills the bevelled torso
+        # corner. Its top (1.31 m) stays under the sloped, bevelled shoulder line (about 1.30–1.33 m there), so the far
+        # shoulder in the low S4 look-up shows no lump above it.
+        arm.ellipsoid("res_jacket", (-sign * .012, 0, -.03), (.07, .072, .042), 12, 8)
         fore = part(f"lowerArm.{side}", (x, 0, 1.038), arm)
         fore.prism("res_jacket", (0, 0, -.207), (0, 0, .017), .041, .055)
         fore.prism("res_trim", (0, 0, -.224), (0, 0, -.196), .044, .048)

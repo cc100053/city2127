@@ -108,13 +108,13 @@ const EXTRA: Record<string, string> = {
 <figure><img loading="lazy" src="../resident-aoi/r3/ramp-plan.jpg" alt="天幕下俯視西坡道及露台出口"><figcaption>俯視｜兩條行走帶通往水平平台</figcaption></figure>
 <figure><img loading="lazy" src="../resident-aoi/r3/terrace-landing.jpg" alt="西坡道頂部的平台、欄杆和露台走道"><figcaption>上端｜沿平台側面轉入露台</figcaption></figure>
 </div>
-<h4>葵借回那一天的陽光 <small>DEV 演示</small></h4>
-<p>細小的種子散落後，鏡頭拉遠。一格六角板亮起，暖光從板下射向原有菜畦。以下定格隱藏字幕，後兩張用同一鏡頭對照菜畦與鄰樹。</p>
+<h4>葵借回那一天的陽光 <small>DEV 演示・鏡頭打磨已驗收</small></h4>
+<p>約 11 秒、四個鏡頭，於動作上剪接：西入口全景；中景中葵抬頭望天幕，托起種子後撒下；種子落地時切至天幕全景，一格六角板亮起，暖光照到本畦；最後以胸口高度的中近景收結，葵抬頭望光，字幕在此鏡頭出現。以下定格隱藏字幕。</p>
 <div class="frames">
-<figure><img loading="lazy" src="../resident-aoi/pullback/palm.jpg" alt="葵攤開掌心托住舊種子"><figcaption>掌心｜葵托起種子</figcaption></figure>
-<figure><img loading="lazy" src="../resident-aoi/pullback/seed-drop.jpg" alt="一撮細種子散開落向菜畦邊"><figcaption>落種｜細粒散開落向菜畦</figcaption></figure>
-<figure><img loading="lazy" src="../resident-aoi/pullback/sun-before.jpg" alt="天幕未啟用時，菜畦和鄰樹同在自然光下"><figcaption>同鏡頭・亮板前｜菜畦及鄰樹</figcaption></figure>
-<figure><img loading="lazy" src="../resident-aoi/pullback/sun-after.jpg" alt="暖光從單格六角板射向菜畦，鄰樹留在自然光下"><figcaption>同鏡頭・亮板後｜本畦復現暖斜陽</figcaption></figure>
+<figure><img loading="lazy" src="../resident-aoi/cinematic/s1-entry.jpg" alt="西入口全景，碎石前地通往天幕農園"><figcaption>S1 入口全景｜0–2.4 秒</figcaption></figure>
+<figure><img loading="lazy" src="../resident-aoi/cinematic/s2-sow.jpg" alt="中景中葵伸手把種子撒向菜畦"><figcaption>S2 撒種｜2.4–5.7 秒</figcaption></figure>
+<figure><img loading="lazy" src="../resident-aoi/cinematic/s3-light.jpg" alt="天幕一格六角板亮起，暖光束射向菜畦"><figcaption>S3 亮板與光束｜5.7–8.6 秒</figcaption></figure>
+<figure><img loading="lazy" src="../resident-aoi/cinematic/s4-payoff.jpg" alt="胸口高度的中近景，葵抬頭望向暖光"><figcaption>S4 抬頭望光｜8.6–11 秒</figcaption></figure>
 </div>`,
   'Q03-A': `<h4 id="drawer-housing">車が引き出しになる住宅 R2 實景 <small>建築已驗收</small></h4>
 <p>フジテレビ西南側。兩個共用載車艙把小車升到住戶樓層，像抽屜一樣推入外牆泊位。住宅與西側梯田巨構相隔 15.9 m。沿立面的暖米色車道從右側繞入樓隙，經背面成環，並接入導軌大道 ②；住宅淡出時環道保留。</p>

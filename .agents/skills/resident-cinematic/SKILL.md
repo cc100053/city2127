@@ -1,13 +1,13 @@
 ---
 name: resident-cinematic
-description: Make a city2127 resident beat read like a game cutscene (shots and cuts, pose-to-pose acting, light that tells the change, frame-exact review reels), without motion capture. Use when a resident scene looks stiff or rough, when asked to polish a resident's animation or camera, or for the Blender armature track. Draft (2026-11-26), first run on Aoi.
+description: Make a city2127 resident beat read like a game cutscene (shots and cuts, pose-to-pose acting, light that tells the change, frame-exact review reels), without motion capture. Use when a resident scene looks stiff or rough, when asked to polish a resident's animation or camera, or for the Blender armature track. Proven on Aoi (owner accepted 2026-11-27).
 ---
 
 # Resident cinematic
 
-Draft, 2026-11-26. Polishes rung 2 of the [polish ladder](../polish-ladder/SKILL.md): it takes a working [resident-scene](../resident-scene/SKILL.md) beat (steps 7–8) and makes it look directed. First run: Aoi, [handoff](../../../docs/handoffs/resident-aoi-cinematic.md). The owner alone accepts; this skill only decides what goes in front of them.
+Written 2026-11-26; owner accepted the first run (Aoi) on 2026-11-27 as proof that this workflow polishes a beat better. Polishes rung 2 of the [polish ladder](../polish-ladder/SKILL.md): it takes a working [resident-scene](../resident-scene/SKILL.md) beat (steps 7–8) and makes it look directed. First run: Aoi, [handoff](../../../docs/handoffs/resident-aoi-cinematic.md). The owner alone accepts; this skill only decides what goes in front of them.
 
-**Owner constraints (2026-11-26):** no motion capture. Low effort, big effect: change camera, timing and light before you touch the model.
+**Owner constraints:** no motion capture. Low effort, big effect: change camera and timing first *(2026-11-26)*. Light and depth of field made little visible difference on Aoi, so skip them unless the owner asks *(2026-11-26, owner on Aoi R1)*. Rigid-part joints and close-up framing are what the owner does notice (rules 11–12).
 
 ## Why beats look rough
 
@@ -25,23 +25,25 @@ Each rule has a date and a source. The self-improvement loop below edits this li
 1. **Shots, not one camera.** Split the action into 3–4 shots: establish (wide), action (medium, on the hands), payoff (close, on the face). *(2026-11-26, analysis)*
 2. **Cut on action.** Cut at the moment something lands, closes or lights. A cut hides the travel between two poses. *(2026-11-26, analysis)*
 3. **Weak motion happens off screen.** Walking, turning on the spot and sitting down happen between cuts. The next shot opens with the resident already there. *(2026-11-26, analysis)*
-4. **End on the face.** The last shot is the resident reacting in the light or space the change gave them. The caption appears in this shot, not before. *(2026-11-26, analysis)*
+4. **End on the resident.** The last shot is the resident reacting in the light or space the change gave them, framed head to hands so face and arms both act (rule 12). The caption appears in this shot, not before. *(2026-11-26, analysis; framing 2026-11-27, owner on Aoi)*
 5. **Pose to pose.** Each gesture has three parts: anticipation (a small move the other way, 0.15–0.3 s), a fast move into the pose with a slight overshoot, and a hold of at least 0.4 s. Head leads, shoulders follow, torso last (offset 0.05–0.1 s). Keep smoothstep for camera blends only. *(2026-11-26, analysis)*
 6. **Never fully still.** Add breathing (torso about 1 % scale or 0.01 rad, 3.5–4.5 s period) and a slow, slight head drift whenever the resident is on screen. *(2026-11-26, analysis)*
 7. **Moving cameras move a little.** Use a slow push-in or a small tilt (≤ 4 % of the distance per shot). If a long move is needed, ease in and out on an arc. Never lerp position and target separately in straight lines. *(2026-11-26, analysis)*
-8. **Light tells the change.** Light the resident's face in the beat's colour change: a warm key on a cool fill, or the other way round. Add a rim light so the silhouette separates from the set. Keep one fill across all states (resident-scene lesson). *(2026-11-26, analysis)*
-9. **Depth of field only in medium and close shots.** Use a Bokeh pass on the existing composer in `src/main.ts`, enabled only during the beat. Measure FPS with it on and off. If the cost is too high, drop the pass and use rule 8's rim light. *(2026-11-26, analysis)*
+8. **Light tells the change (optional).** Only when the owner asks: on Aoi a face key, rim and narrower fill were barely visible *(2026-11-26, owner on Aoi R1)*. Light the resident's face in the beat's colour change: a warm key on a cool fill, or the other way round. Add a rim light so the silhouette separates from the set. Keep one fill across all states (resident-scene lesson). *(2026-11-26, analysis)*
+9. **Depth of field only in medium and close shots (optional).** Same verdict as rule 8 on Aoi; the pass also costs about 5 FPS. Use a Bokeh pass on the existing composer in `src/main.ts`, enabled only during the beat. Measure FPS with it on and off. If the cost is too high, drop the pass and use rule 8's rim light. *(2026-11-26, analysis)*
 10. **Owner reviews reels, not live captures.** Reviews use frame-exact reels (below), never a screencast. *(2026-11-26, analysis)*
+11. **Rigid joints overlap at every angle.** Rigid parts must read as one body in every pose and every shot. Neck: sink its base below the head pivot by more than the nod/look-up swing lifts it (≈ 8 cm for ±0.42 rad), inside a low collar on the torso. Shoulders: a round ball at each arm pivot, its top under the torso's sloped and bevelled shoulder line (a ball above it bulges in low shots), hiding the arm's flat top cap; keep the cap inside the ball. Fix it in `build_<name>.py` with existing nodes, so the joint names and pose code stay the same. *(2026-11-26, owner on Aoi: 「條頸同埋隻手唔連貫」)*
+12. **Close-ups at chest height, arms in frame.** Keep a medium or close shot's camera within about 10° of the resident's chest height; a steep up-angle hides the arms behind the torso. To fit head to hands, widen the lens (≈ 45°) rather than moving the camera back. Before settling a camera position, check foreground set pieces such as crop beds: Aoi's bed sat just beyond the first camera, so every farther or more frontal position looked through it. *(2026-11-27, owner on Aoi: 「向上望嗰下都係有透視，睇唔到人物手臂」)*
 
-Timing values come from the motion-design skill (LottieFiles, MIT, to be vendored at `.agents/skills/motion-design/` as round 1's first step; link it here once it exists). Read its timing and easing references before writing keys.
+Timing values come from the [motion-design](../motion-design/SKILL.md) skill. Read its [timing and easing tables](../motion-design/reference/timing-easing-tables.md), [Disney principles](../motion-design/director/disney-principles.md) and [narrative structure](../motion-design/director/narrative-structure.md) before writing keys. Its durations are written for UI; for a character beat, use its ratios and easing families, and scale gestures to the dramatic-reveal and ambient rows. It is vendored from [LottieFiles/motion-design-skill](https://github.com/LottieFiles/motion-design-skill) (MIT, commit `d77a9fc`, licence in `motion-design/LICENSE-motion-design-skill`, vendored 2026-11-26 with owner approval). Its Creator MCP handoff (`reference/export-and-render.md`) is not used here: reels come from `scripts/beatReel.mjs`, and an external render service would be a separate owner decision.
 
 ## Steps
 
 1. **Preflight.** Run the AGENTS.md startup. The beat already plays in DEV, and its handoff names the current timeline file (`<name>Timeline.ts`) and the DEV scene (`dev<Name>.ts`). Done: a PLANNED handoff that links this skill.
 2. **Shot list.** Write a table in the handoff with one row per shot: seconds, framing (wide, medium or close), what is in frame, and the cut point. Add one row for the action and light inside each shot. Apply rules 1–4. Done: the table, plus a contact sheet of the current beat at 0.5 s steps for comparison.
 3. **Timeline.** Add `<name>Shot(t)` to the timeline file. It is a pure function that returns `{ shot, u }`, where `u` is the time within the shot. Add easing helpers (anticipate, overshoot, hold, breathe) to the same file. Extract them to `src/residentEase.ts` once a second resident uses them. Add unit tests for shot order, cut times, continuity within each shot and the end pose. Done: `npm test` passes.
-4. **Camera and acting.** Drive the shots and the poses from step 3, applying rules 5–7. Keep the existing `<name>Time` and `<name>View` URL parameters working, and add a view for each new shot. Done: a contact sheet at 0.5 s steps that reads as the story with the caption hidden.
-5. **Light and lens.** Apply rules 8–9. Done: face luminance probes per shot, day and night, and FPS with and without depth of field against the scene's baseline.
+4. **Camera and acting.** First hold the extreme poses (deepest nod, highest arm, final look) in the medium and close shots and fix joint gaps (rule 11). Then drive the shots and the poses from step 3, applying rules 5–7 and 12. Keep the existing `<name>Time` and `<name>View` URL parameters working, and add a view for each new shot. Done: a contact sheet at 0.5 s steps that reads as the story with the caption hidden.
+5. **Light and lens (optional).** Only if the owner asks: apply rules 8–9. Done: face luminance probes per shot, day and night, and FPS with and without depth of field against the scene's baseline.
 6. **Reel.** Capture a frame-exact reel at 30 fps with `scripts/beatReel.mjs` (round 1 builds it, see below): the full beat by day and by night, plus a side-by-side of the old and new beat. Done: MP4s and contact sheets in `~/city2127-evidence/<task>/<round>/`.
 7. **Self-critique, at most three passes.** Before the owner sees anything, score the reel against the checklist below. Fix every item that fails, then capture again. After three passes, send what you have and list the items that still fail. Done: the scored checklist in the handoff.
 8. **Finish.** Run `npm test && npm run build && git diff --check`. Update the handoff, regenerate the change sheet (polish-ladder, **Change sheet**) and send the reels. Then run the **Self-improvement** step. Done: the owner accepts the beat or names what to change.
@@ -54,8 +56,10 @@ Timing values come from the motion-design skill (LottieFiles, MIT, to be vendore
 - [ ] Each key gesture has anticipation, a hold of at least 0.4 s and a three-quarter view of the face.
 - [ ] The resident is never fully still while on screen.
 - [ ] The last shot shows the resident's face in the changed light or space, and the face is readable by day and night.
+- [ ] In every medium and close shot, held at the extreme poses, the neck rises out of a collar and both shoulders join the torso with no bump above the shoulder line (rule 11).
+- [ ] The last shot shows both arms; its camera is within about 10° of chest height, and no set piece in the foreground covers the body (rule 12).
 - [ ] No camera drift. Moves are ≤ 4 % per shot, or on an eased arc.
-- [ ] FPS is within the beat budget recorded in the handoff.
+- [ ] FPS is within the beat budget recorded in the handoff, measured as an A/B against the previous commit in a temporary worktree, with the browser pane's own tabs closed and Spotlight idle.
 
 ## Frame-exact reel tool
 
@@ -93,4 +97,6 @@ Commit these changes with the round as `docs(skill): resident-cinematic — <wha
 
 ## Lessons
 
-- (none yet; Aoi R1 is the first run)
+- Aoi (2026-11-27): the light and depth-of-field pass took the longest and the owner barely saw it, while the notes that counted were joints and framing. Next time, check held close-ups of the extreme poses before any light work.
+- Small before/after crops of one held frame (`npm run capture` at the same `<name>Time`/`<name>View`, then an ffmpeg `hstack`) settled each joint and framing question in minutes; record the full reel only after the still is right.
+- FPS on the dev Mac swings 3–15 FPS with Spotlight indexing new reel frames or a preview tab still rendering; only an interleaved A/B against the previous commit is trustworthy.
