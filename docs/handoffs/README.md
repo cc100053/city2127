@@ -27,7 +27,7 @@
 | [原 Q08-C 住宅塔候選](q08c-housing-tower.md) | 另案審閱。現行 Q08-C 已使用活動模組棚 |
 | [Q05 公園降溫](q05-park-cooling.md) | 三態目標圖及故事已定，待選地塊及建模 |
 | [湊](resident-minato.md) · [凪](resident-sw-nagi.md) · [葵](resident-aoi.md) | 人物情景只作 DEV 審閱，按[情景計劃](../RESIDENT_SCENE_PLAN.md)排下一級 |
-| [葵 鏡頭語言](resident-aoi-cinematic.md) | R1 分鏡、演技同逐格片段工具，已計劃未開始 |
+| [葵 鏡頭語言](resident-aoi-cinematic.md) | 2026-11-27 owner 接受；正式接入投票流程係另項任務 |
 | [道路盤點](road-audit.md) · [道路修整](road-fix.md) · [街景填充](urban-fill.md) · [台場素材](odaiba-assets.md) | 待視覺確認或實際採用決定 |
 | [近鏡基準](closeup-polish.md) · [近鏡後續](closeup-next.md) · [近鏡推進](closeup-zoom.md) · [過場](build-transition.md) · [台場 Dream Loop](odaiba-dream-loop-2.md) | 參考既有測量、候選同驗收缺口，按現行輪換選項安排工作 |
 | [Chrome 截圖啟動](chrome-capture-startup.md) | 擷取工作遇到啟動問題時查閱 |
