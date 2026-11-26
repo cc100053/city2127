@@ -24,9 +24,9 @@ const SHOTS: Record<AoiShotName, { position: T.Vector3; target: T.Vector3; fov: 
   S4: { position: FACE, target: FACE_TARGET, fov: 35, push: .03, rise: 0 },
 };
 // Face light intensities (candela, decay 2) by day and at full night; the key also follows `pose.sunlight`.
-const FILL = { day: .8, night: 12 };
+const FILL = { day: 1.5, night: 22 };
 const KEY = { day: 5, night: 8 };
-const RIM = { day: 60, night: 22 };
+const RIM = { day: 60, night: 16 };
 // Depth of field (resident-cinematic rule 9), medium and close shots only: S2 focuses on the sowing hand, S4 on the face.
 // `aperture` is blur per metre off focus and `maxblur` its cap, both in screen widths (BokehShader).
 const LENS: Partial<Record<AoiShotName, { aperture: number; maxblur: number }>> = {
@@ -154,12 +154,12 @@ export async function startAoi(energy: EnergyRuntime, camera: T.PerspectiveCamer
   release.copy(palm);
   // Face lights (resident-cinematic rule 8). Both cameras that show her face (S2, S4) sit on her +x side, the glass rail
   // is 0.93 m behind her on -x and the crops sit between her and the S2 camera. The fill used to be a point light between
-  // her and the rail, and at night it blew out the rail and parapet behind her; it is now one narrow spot from the camera
-  // side on her head and shoulders, still the one fill for day and night. Fill, key and rim never cast shadows and only
-  // change intensity, so no lit material recompiles mid-beat.
-  const fill = new T.SpotLight('#ffd5b3', 0, 5, .3, .8, 2);
+  // her and the rail, and at night it blew out the rail and parapet behind her. It is now one narrow spot from the camera
+  // side, steep enough that the light passing her lands on the floor before the parapet; still the one fill for day and
+  // night. Fill, key and rim never cast shadows and only change intensity, so no lit material recompiles mid-beat.
+  const fill = new T.SpotLight('#ffd5b3', 0, 6, .3, .8, 2);
   fill.name = 'aoi-fill';
-  fill.position.copy(CHARACTER).add(new T.Vector3(1.6, 2.4, 0));
+  fill.position.copy(CHARACTER).add(new T.Vector3(.9, 3.8, 0));
   fill.target.position.copy(FACE_TARGET).setY(3.5);
   set.add(fill, fill.target);
   // Warm key from above and in front, the side the lit pane is on: it comes up with the archived sunlight and carries
@@ -173,7 +173,7 @@ export async function startAoi(energy: EnergyRuntime, camera: T.PerspectiveCamer
   // the rail's and parapet's lit faces look away from it.
   const rim = new T.SpotLight('#9fc6ff', 0, 6, .25, .5, 2);
   rim.name = 'aoi-rim';
-  rim.position.copy(FACE_TARGET).add(new T.Vector3(-2, .7, -.8));
+  rim.position.copy(FACE_TARGET).add(new T.Vector3(-2, .3, -.8));
   rim.target.position.copy(FACE_TARGET).setY(3.7);
   set.add(key, key.target, rim, rim.target);
   // The lens's depth prepass draws every mesh opaque, so glass (the rail, through which S2 sees the whole background) and
