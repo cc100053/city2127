@@ -20,7 +20,7 @@
 
 ## 審閱
 
-啟動 Vite 後開啟 `/?shot=energy:aoi&orbital=3&hour=12&nopanel`。重載重播，改 `hour=22` 看夜景。可定格 `&reviewTime=20&aoiTime=5.45` 檢視落種，或以 `aoiTime=7.25` 與 `aoiTime=8.5` 配合 `aoiView=canopy` 比較同一鏡頭的日照前後。可加 `aoiView=entry|hands|canopy` 選固定構圖、`aoiNoCaption` 隱藏字幕。相片及圖說見[變化總覽](../../artifacts/change-review/index.html#Q02-C)。
+啟動 Vite 後開啟 `/?shot=energy:aoi&orbital=3&hour=12&nopanel`。重載重播，改 `hour=22` 看夜景。可定格 `&reviewTime=20&aoiTime=5.2` 檢視落種，或以 `aoiTime=6` 與 `aoiTime=8` 配合 `aoiView=canopy` 比較同一鏡頭的日照前後。可加 `aoiView=entry|hands|canopy|payoff` 選固定鏡頭（S1–S4，見[鏡頭打磨交接](resident-aoi-cinematic.md)）、`aoiNoCaption` 隱藏字幕。相片及圖說見[變化總覽](../../artifacts/change-review/index.html#Q02-C)。
 
 ## 驗證
 
