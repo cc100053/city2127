@@ -1,11 +1,11 @@
 # q05-park-cooling — Q05 公園降溫三態：目標圖與建築故事
 
 - Owner: repository owner
-- Status: IN_PROGRESS。Q05-A R2 已完成（2026-11-27），等待 owner 評審；B、C 未建模。
+- Status: Q05-A DONE（R2 owner 驗收，2026-11-27，已合併入 main）；B、C 未建模。
 - Branch: `feat/q05a-reverse-ac`（worktree `../city2127-q05a`），自 `origin/main` `bbec76c2`；目標圖記錄見舊分支 `docs/q05-targets`（已合併）。
 - Base commit: `bbec76c26a833a2a5ba24dfc42f3cee3f9a03c0c`
 - Last verified commit: `00f0cd75`（R2；檢查見下文 R2 一節）。
-- Remote availability: `origin/feat/q05a-reverse-ac`（R1 推送後）；未合併入 main，須待 owner 接受。
+- Remote availability: 已合併入 `origin/main`（見下文 R2 verdict）；任務分支已刪除。
 
 ## Session Git state
 
@@ -92,7 +92,7 @@
 
 ## Next step
 
-owner 選定地塊及建模次序後，以 `place-building` 開新一輪會話，從本交接開始建第一個模型。
+見文末「Next step after R2」（Q05-A 已完成）。
 
 ## R1（2026-11-27，Q05-A 逆向冷氣機）
 
@@ -203,6 +203,13 @@ place-building round for `q05a-reverse-ac`: worktree `/Users/fatboy/city2127-q05
 - 冷霧帶是否要再濃。
 - 之後建 B（呼吸巨葉）還是 C（雪雲噴泉）。
 
-## R2 brief（下一輪會話）
+## R2 verdict
 
-place-building round for `q05a-reverse-ac`: worktree `/Users/fatboy/city2127-q05a`, read `docs/handoffs/q05-park-cooling.md` (sections `## R2`). Owner verdict on R2: «…»
+«accept. push main and clean.»（2026-11-27）
+
+- 以 `--no-ff` 合併入 main（基於 `origin/main` `da835136`）；衝突兩處：`asset/models/LIBRARY.md` 的 `q04b-sky-village` 行取 main 版本，變化總覽 `artifacts/change-review/index.html` 取 main 版本後以 `scripts/changeSheet.ts` 重生（0 frames refreshed：Q05 未有近鏡畫格）。
+- 合併結果的檢查及 main CI 見提交記錄；worktree `../city2127-q05a` 及分支 `feat/q05a-reverse-ac`（本地及遠端）已清除。
+
+## Next step after R2
+
+Q05-A 完成。下一步由 owner 決定先建 B（呼吸巨葉）還是 C（雪雲噴泉），以 `place-building` 開新會話；熱浪柱更似火焰、冷霧更濃兩點可留待日後打磨。
