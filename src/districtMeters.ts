@@ -236,6 +236,9 @@ export class SharingDistrict {
   readonly vaulted = this.bays.map((_, i) => i % 2 === 0);
   /** Second carrier, inland: 40 m courts that are walled private gardens or open shared plazas under parasols. */
   readonly courts = COURT_SITES.map(([x, z, yaw]) => ({ x, z, yaw }));
+  /** Question rotation (src/lotRuntime.ts): how much of each court stands (1 as the ladder sets it … 0 cleared), so a rotation model
+   *  standing on a court's ground (Q05-A on NE PARK over court 1) can clear it while it stands. */
+  private readonly courtKeep = new Float32Array(COURT_SITES.length).fill(1);
   private readonly court = new SlotLevels(COURT_SITES.length, buildProgress);
   /** P9 hybrids at mixed: half-open rooms (a half-height vault over the open steps; garden islands gain the steps instead of a halo)
    * and shared garden courts (walls, crowns, paving, parasols). */
@@ -432,6 +435,17 @@ export class SharingDistrict {
   }
   hide(): void { this.root.visible = false; this.pulses.clear(); this.build.clear(); }
   // ponytail: mirrors settled write() transforms; update this projection when adding carrier geometry.
+  /** The court whose 40 m square holds (x, z), or -1. */
+  courtAt(x: number, z: number): number {
+    return this.courts.findIndex(c => Math.abs(c.x - x) < COURT / 2 && Math.abs(c.z - z) < COURT / 2);
+  }
+
+  /** Sets how much of court `i` stands (see courtKeep); redraws only on a change. */
+  setCourtKeep(i: number, keep: number): void {
+    if (i < 0 || this.courtKeep[i] === keep) return;
+    this.courtKeep[i] = keep; this.write();
+  }
+
   getConfiguration() {
     return [Array.from(this.levels.targets, (open, i) => {
       const hybrid = this.hybridRooms.targets[i], vault = Math.max(1 - open, hybrid), vaulted = this.vaulted[i];
@@ -505,21 +519,22 @@ export class SharingDistrict {
     });
     this.courts.forEach(({ x, z, yaw }, i) => {
       // A hybrid (shared garden) court composes the walled garden with the parasol plaza, whatever the slot's own designs.
-      const hybrid = this.hybridCourts.value[i], open = this.court.value[i];
-      const walled = Math.max(HIDDEN, 1 - open, hybrid), shared = Math.max(HIDDEN, open, hybrid);
+      const hybrid = this.hybridCourts.value[i], open = this.court.value[i], keep = this.courtKeep[i];
+      const walled = Math.max(HIDDEN, keep * Math.max(1 - open, hybrid)), shared = Math.max(HIDDEN, keep * Math.max(open, hybrid));
       this.dummy.position.set(x, 0, z); this.dummy.rotation.set(0, yaw, 0);
       // Walls and the garden room sink into the ground; the plaza paving spreads and the parasols open.
       const glasshouse = this.privateDesign[i] === 1, pergola = this.openDesign[i] === 1;
-      this.dummy.scale.set(1, glasshouse ? Math.max(HIDDEN, hybrid) : walled, 1); this.dummy.updateMatrix();
+      const plan = keep > HIDDEN ? 1 : HIDDEN; // a cleared court collapses in plan too, so no flattened wall ring is left on the lot
+      this.dummy.scale.set(plan, glasshouse ? Math.max(HIDDEN, keep * hybrid) : walled, plan); this.dummy.updateMatrix();
       this.courtWalls.setMatrixAt(i, this.dummy.matrix); this.courtPavilions.setMatrixAt(i, this.dummy.matrix);
-      this.dummy.scale.set(1, glasshouse ? Math.max(HIDDEN, (1 - open) * (1 - hybrid)) : HIDDEN, 1); this.dummy.updateMatrix();
+      this.dummy.scale.set(plan, glasshouse ? Math.max(HIDDEN, keep * (1 - open) * (1 - hybrid)) : HIDDEN, plan); this.dummy.updateMatrix();
       this.winterGardens.setMatrixAt(i, this.dummy.matrix); this.winterFrames.setMatrixAt(i, this.dummy.matrix);
       this.dummy.scale.set(shared, 1, shared); this.dummy.updateMatrix(); this.plazaPaving.setMatrixAt(i, this.dummy.matrix);
-      const parasols = pergola ? Math.max(HIDDEN, hybrid) : shared, tables = pergola ? Math.max(HIDDEN, open * (1 - hybrid)) : HIDDEN;
+      const parasols = pergola ? Math.max(HIDDEN, keep * hybrid) : shared, tables = pergola ? Math.max(HIDDEN, keep * open * (1 - hybrid)) : HIDDEN;
       this.dummy.scale.set(parasols, parasols, parasols); this.dummy.updateMatrix(); this.plazaParasols.setMatrixAt(i, this.dummy.matrix);
       this.dummy.scale.set(tables, tables, tables); this.dummy.updateMatrix();
       this.pergolaFrames.setMatrixAt(i, this.dummy.matrix); this.pergolaRoofs.setMatrixAt(i, this.dummy.matrix);
-      const c = Math.cos(yaw), s = Math.sin(yaw), kiosk = Math.max(HIDDEN, this.kiosk.value[i] * open), orchard = Math.max(HIDDEN, this.orchard.value[i] * open);
+      const c = Math.cos(yaw), s = Math.sin(yaw), kiosk = Math.max(HIDDEN, keep * this.kiosk.value[i] * open), orchard = Math.max(HIDDEN, keep * this.orchard.value[i] * open);
       this.dummy.position.set(x + 13 * c + 12 * s, 0, z - 13 * s + 12 * c); this.dummy.scale.setScalar(kiosk); this.dummy.updateMatrix();
       for (const mesh of this.kioskMeshes) mesh.setMatrixAt(i, this.dummy.matrix);
       ORCHARD.forEach(([tx, tz], k) => {

@@ -147,7 +147,7 @@ Standalone uses day-cycle activity and does not create the v2 district layer. `?
 
 ## Rotation models and district background
 
-The exhibition starts with the rotation set. [rotationLayout](../src/rotationLayout.ts) adapts Q01 to the three NW focal models. [lotRuntime](../src/lotRuntime.ts) owns Q02's three lots and the shared lots for Q03, Q06 and Q08. The [model and lot matrix](QUESTION_ROTATION_PLAN.md) tracks A/B/C availability and pending decisions.
+The exhibition starts with the rotation set. [rotationLayout](../src/rotationLayout.ts) adapts Q01 to the three NW focal models. [lotRuntime](../src/lotRuntime.ts) owns Q02's three lots and the shared lots for Q03, Q05, Q06 and Q08. The [model and lot matrix](QUESTION_ROTATION_PLAN.md) tracks A/B/C availability and pending decisions.
 
 Rotation views keep district carriers at mixed tier. Fixed footprints still matter for placement. The retired reducer, ladder, review queries and energy path are mapped in the [implementation archive](history/PROJECT_2026-11-24.md#four-sites-and-district-behavior).
 
@@ -190,13 +190,15 @@ Root checks cover the city and its real survey pipeline. Install survey dependen
 
 `loadOdaiba` 亦加入 [bayFlower](../src/bayFlower.ts)：Q02-B GLB 以原尺寸置於 (−712, −0.8, 300)，`rotation.y = 2.6088`，機房在花正東 110.3 m；模型岸邊機房整組比花的 waterline 低 0.88 m（`SHORE_DY`），鋪面頂 −0.18 m、比步道 −0.19 m 高 1 cm，並向陸地多鋪 1.5 m 壓上步道。平台範圍內的護岸頂（`service_area` 材質，y 0.12）由 `cutUnderPlatform` 在 fragment shader 中捨去。西岸遊船（`bayCruisers` 第六段）移至 (−780, 170)，相位不變。光柱不投影。Q02-B 有效時顯示花、海底管道及光柱。未接 Q02 投票；輪換 run 的顯示切換屬輪換分支。見 [handoff](handoffs/archive/bay-flower-placement.md)。
 
-### Housing background and the Q03, Q06 and Q08 lots
+### Housing background and the Q03, Q05, Q06 and Q08 lots
 
 The city initializes the shared housing assembly once. Housing P remains fixed. M and U are hidden in the city. The isolated DEV housing comparison still demonstrates the 90-second relocation cycle. See the [housing study](history/HOUSING_CITY_PLAN.md) for the original M/P/U arrangement.
 
 Q03-A「車が引き出しになる住宅」在フジテレビ西南側 A 位，由 Q03-A 顯示，B／C 收起住宅及基座，保留街道。保留透明玻璃分件排序，按材質合批不透明網格。兩個外伸載車艙為靜態。A 位街道候選以 `DRAWER_HOUSING` 共用 GLB 與前場定位；`streetNetwork()` 在導軌大道 ② 的外側留出接駁口，車道繞過分散配置艙體。R2 以 6.2 m 車道取代 T 字候車前場；車道沿兩個外伸艙下方橫過立面，從右側樓隙繞到背面，再由另一側回到正面。接駁和環道共用大道的暖米色陶板。按業主標記移除住宅前方及支路旁步道、兩處橫道標線，並在地形材質內取消橫過草地的斜線。抽題輪換 run 中由 Q03 驅動（2026-11-19）：A 顯示住宅，B／C 未有模型時住宅連基座淡出、環道保留（`LotRuntime.setQ03`）；version4 run 照舊固定。[A 位交接](handoffs/archive/drawer-housing-placement.md)
 
 Q06-B 蛋艙塔（2026-11-19，owner）：住宅 U 自城市背景撤走（`background.parts.mobile.visible=false`；DEV `?housing` 研究照舊），`pod-frame-tower-2127` GLB 以固定形態載入其地塊 `POD_TOWER` (−258, −75)，正面朝北，不透明網格合批。獨立預覽顯示固定模型；展覽由 Q06 驅動（B 顯示，A／C 淡出留草地，`LotRuntime.setQ06`）。`streetKit.podTowerAccess` 由道路 ③ 外側接入陶板支路，並以連續步道接北面兩個入口和東側入口。道路、入口平台及夜間導光屬固定街道層，塔淡出後保留。[交接](handoffs/archive/pod-frame-tower.md)
+
+Q05-A 逆向冷氣機（2026-11-26，R1 草稿，未經 owner 驗收）：`q05a-reverse-ac-2127` GLB 隱藏載入 NE PARK 地塊 `LOTS['ne-park']` (−210, −135)，連同自身半徑 20 m 的冷卻草地。不透明網格合批，玻璃芯、熱浪柱及螺旋熱流分件；[reverseAc.ts](../src/reverseAc.ts) 令熱浪柱以加法混合繪製，並轉動螺旋熱流及熱浪柱。展覽由 Q05 驅動（`LotRuntime.setQ05`）：A 時塔淡入，NE 公園（凍結的 tier 0 Meter 站點 `survey-site-ne`）及其下的共享庭園 1（`SharingDistrict.setCourtKeep`）同步淡出；B／C 未有模型，公園及庭園回復。version4 run 不接手，維持公園。[交接](handoffs/q05-park-cooling.md)
 
 Q08-C 南岸活動模組棚的固定支路沿道路 ④ 現有導光過街位接入，平台銜接兩條地軌，中央步道穿過前庭綠籬接到大堂基座。支路、平台、步道及導光屬街道層，模組棚收起後保留。相鄰的共享庭園 3 東移至 (−90, 230)，避開地軌及平台，並清出與新庭園重疊的樹叢。獨立預覽亦使用同一組街道鋪面。[交接](handoffs/question-rotation.md)
 

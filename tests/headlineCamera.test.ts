@@ -64,7 +64,7 @@ assert.ok(Math.abs(reasonDelayMs(DISPLAY_MS,false,SHELF_TRANSITION_SECONDS)-1012
 assert.equal(reasonDelayMs(DISPLAY_MS-101,false),0);
 assert.equal(shotStage(3),'fly-in','the flight starts after the vote journey');
 assert.deepEqual([0,t.flyIn,t.hold,t.flyOut,t.done].map(elapsed=>shotStage(elapsed)),['journey','fly-in','hold','fly-out','done']);
-assert.equal(Object.keys(SHOTS).length,30); // 24 Meter/energy shots + three question-rotation Q02 lots + the Q03 drawer housing + the Q06 pod tower + the interim concept lot
+assert.equal(Object.keys(SHOTS).length,31); // 24 Meter/energy shots + three question-rotation Q02 lots + the Q03 drawer housing + the Q05 reverse air conditioner + the Q06 pod tower + the interim concept lot
 for (const [id, pose] of Object.entries(SHOTS)) {
   const p=new Vector3(...pose.position),target=new Vector3(...pose.target);
   // No elevation or heading rule (owner 2026-11-05): each building's clear sightline decides its angle; only distance is bounded.

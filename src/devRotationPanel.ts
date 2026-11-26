@@ -11,6 +11,7 @@ const MODEL_NAMES: Record<string, string> = {
   'automation-hub-low': 'HUB 人手窓口', 'automation-hub-mixed': 'HUB 人機協作', 'automation-hub-high': 'HUB 全自動',
   'q02a-hydro-terrace': '水の棚田', 'bay-flower-receiver': '湾の花', 'rectenna-farm-canopy': '受電テラス農園',
   'drawer-housing-2127': '車抽屜住宅', 'pod-frame-tower-2127': '蛋艙塔', 'event-shelf-2127': '活動モジュール棚',
+  'q05a-reverse-ac-2127': '逆向き冷房塔',
 };
 
 type Emit = (kind: SurveyEventKind, view: CityView, displayMs?: number) => void;

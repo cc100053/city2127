@@ -69,6 +69,8 @@ const Q02_COLOR = '#75e2c2';
 export const ROTATION_SHARED_LOTS: Readonly<Record<string, { lot: keyof typeof LOTS; axis: CityAxis }>> = {
   Q03: { lot: 'drawer-housing', axis: 'publicSharing' },
   Q06: { lot: 'pod-tower', axis: 'environmentalPriority' },
+  // Q05 (reverse air conditioner; B/C vacant for now) takes the environment axis, the question's 環境調整志向 theme (2026-11-26).
+  Q05: { lot: 'ne-park', axis: 'environmentalPriority' },
 };
 /** Where a rotation outcome lands: ground point, plan extent (lantern halo; the scan ring is 1.15×), swap colour and the guest's lantern slot axis. */
 export type RotationSite = { x: number; z: number; extent: number; color: string; slot: CityAxis };

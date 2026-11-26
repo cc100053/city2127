@@ -44,18 +44,18 @@ def prof(y):
 
 
 Q05A_ROLES = {                                                  # build-only roles (shared ROLES untouched)
-    'silver': ((.86, .89, .92, 1), None, .5),                   # exoskeleton, rings, skirt fins: pale metal
-    'ice': ((.55, .86, 1, 1), (.45, .82, 1, 1), 2.2),            # cold intake glow, ring strips, lawn seams
+    'silver': ((.93, .95, .97, 1), None, .5),                   # exoskeleton, rings, skirt fins: pale near-white metal
+    'ice': ((.30, .80, 1, 1), (.25, .75, 1, 1), 2.6),            # cold intake glow, ring strips, lawn seams
     'heat': ((1, .62, .22, 1), (1, .55, .14, 1), 3.0),           # hot core column
     'spiral': ((1, .74, .32, 1), (1, .66, .20, 1), 4.5),         # the rising heat spiral (animated)
     'gold': ((.93, .70, .32, 1), (1, .62, .22, 1), .35),        # crown fins and band
     'core': ((.80, .90, .96, .16), None, .5),                    # clear glass core
-    'plume': ((1, .72, .40, .22), (1, .62, .28, 1), 1.2),        # heat shimmer column (runtime: additive)
-    'lawn': ((.36, .56, .24, 1), None, .5),
+    'plume': ((1, .70, .42, .13), (1, .60, .30, 1), .55),        # heat shimmer column (runtime: additive, translucent)
+    'lawn': ((.20, .40, .12, 1), None, .5),
     'plinth': ((.90, .90, .87, 1), None, .5),
 }
 ROUGH = {'silver': .28, 'gold': .3, 'core': .05, 'plume': .9, 'lawn': .9, 'plinth': .6}
-METAL = {'silver': .65, 'gold': .8}
+METAL = {'silver': .3, 'gold': .8}
 SMOOTH = {'silver': 40, 'gold': 35, 'core': 60, 'plume': 80, 'spiral': 70, 'heat': 60, 'green': 80, 'leaf_l': 80,
           'ice': 40}
 LEAVES = ('green', 'leaf_l')
@@ -194,20 +194,18 @@ def crown(ctx):
     rb = prof(Y1)
     ring_solid(a['gold'], rb - .3, rb + .55, Y1 - .5, Y1 + .9, 72)
     lofted(a['heat'], [(Y1 + .2, 1.9), (Y1 + 1.6, rb - .5), (Y1 + 1.8, rb - .5)], 40, caps=(True, False))
-    for i in range(30):
+    for i in range(30):                                                      # rounded rods, flaring, tips curling out
         ang = (i + .5) * TAU / 30
         c, s = math.cos(ang), math.sin(ang)
-        pts, outs, side = [], [], []
-        for j in range(7):
-            t = j / 6
-            y = Y1 + .4 + 8.6 * t
-            r = rb - .1 + 2.4 * t ** 1.4 + .3 * math.sin(t * math.pi)
+        tall = 8.2 + (.9 if i % 2 else 0)
+        pts = []
+        for j in range(9):
+            t = j / 8
+            y = Y1 + .4 + tall * t
+            r = rb + .1 + 2.0 * t ** 1.5 + .9 * max(0, t - .8) / .2
             pts.append((r * c, y, r * s))
-            outs.append((c, 0, s))
-            side.append((-s, 0, c))
-        blade(a['gold'], pts, outs, side, .85 - .25 * 0, .3)
-    cyl(a['gold'], 0, 0, rb + 2.55, Y1 + 8.6, Y1 + 9.0, 60)                    # tie ring on the fin tips
-    cyl(a['gold'], 0, 0, rb + 2.2, Y1 + 8.6, Y1 + 9.0, 60)
+        M.limb(a['gold'], pts, .34, .26, 8)
+    ring_solid(a['gold'], rb + .9, rb + 1.25, Y1 + 4.6, Y1 + 5.0, 60)        # tie hoop through the rods
 
 
 def plume(ctx):
@@ -232,11 +230,15 @@ def plume(ctx):
 def park(ctx):
     """Trees round the rim, benches facing the tower, residents resting in the cool."""
     rng = ctx.rng
-    for i in range(12):
-        ang = i * TAU / 12 + rng.uniform(-.12, .12)
-        r = rng.uniform(15.2, 16.8)
-        M.leafy_tree(ctx, (r * math.cos(ang), .48, r * math.sin(ang)), h=rng.uniform(5.5, 7.5), crown=rng.uniform(2.0, 2.6),
-                     roles=('leaf_l', 'green'), n=60, size=.42, branches=4)
+    for i in range(16):                                                      # lush rim grove (owner: green stays lush)
+        ang = i * TAU / 16 + rng.uniform(-.1, .1)
+        r = rng.uniform(15.4, 17.4)
+        M.leafy_tree(ctx, (r * math.cos(ang), .48, r * math.sin(ang)), h=rng.uniform(6.5, 8.5), crown=rng.uniform(3.0, 3.6),
+                     roles=('leaf_l', 'green'), n=150, size=.75, branches=5)
+    for i in range(6):                                                       # a few inner trees for shade on the benches
+        ang = (i + .25) * TAU / 6
+        M.leafy_tree(ctx, (13.2 * math.cos(ang), .48, 13.2 * math.sin(ang)), h=5.5, crown=2.4,
+                     roles=('leaf_l', 'green'), n=90, size=.6, branches=4)
     for i in range(8):
         ang = (i + .5) * TAU / 8
         r = 12.4

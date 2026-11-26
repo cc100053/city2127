@@ -1,11 +1,11 @@
 # q05-park-cooling — Q05 公園降溫三態：目標圖與建築故事
 
 - Owner: repository owner
-- Status: PLANNED。三張目標圖及建築故事已由 owner 接受（2026-11-26），等待建模；未建模、未選地塊、未接線。
-- Branch: `docs/q05-targets`（僅記錄），自 `origin/main` `714b4ef35af6783fe3a8452ed15018fdbaf9357b`。
-- Base commit: `714b4ef35af6783fe3a8452ed15018fdbaf9357b`
-- Last verified commit: 加入本檔的提交（只做文件檢查）。
-- Remote availability: 合併後見 `origin/main`。
+- Status: IN_PROGRESS。Q05-A R1 已建模、放入 NE PARK 並接入輪換（2026-11-27），等待 owner 評審；B、C 未建模。
+- Branch: `feat/q05a-reverse-ac`（worktree `../city2127-q05a`），自 `origin/main` `bbec76c2`；目標圖記錄見舊分支 `docs/q05-targets`（已合併）。
+- Base commit: `bbec76c26a833a2a5ba24dfc42f3cee3f9a03c0c`
+- Last verified commit: 見下文 R1 一節（R1 提交）。
+- Remote availability: `origin/feat/q05a-reverse-ac`（R1 推送後）；未合併入 main，須待 owner 接受。
 
 ## Session Git state
 
@@ -93,3 +93,51 @@
 ## Next step
 
 owner 選定地塊及建模次序後，以 `place-building` 開新一輪會話，從本交接開始建第一個模型。
+
+## R1（2026-11-27，Q05-A 逆向冷氣機）
+
+### 在 owner 授權下作出的決定（owner：「give you the control, no need to ask me for now」；待 owner 確認）
+
+- **地塊：** NE PARK `changeSites.ne` (−210, −135)，40 × 40 m，即 `LOTS['ne-park']`，三個選項共用。`SCAN_LOT=40,40` 只找到 hero 畫面看不到的兩區（x 110–240, z 220–300，hero 0 px）；`SCAN_LOT=40,40,-210,-135` 報 `site:ne`（地塊本身）、`court1`（共享庭園 1，中心 (−220, −140)，舊公園一直與之重疊）及 `CTX_north_utility_service`（地塊東北外的白色箱體，不在草地範圍內），hero 7039 px。
+- **與舊物的關係：** A 顯示時，塔連自身半徑 20 m 的冷卻草地淡入，NE 公園 `survey-site-ne`（凍結的 tier 0 Meter 站點）及共享庭園 1 同步淡出（`LotRuntime.setQ05`、`SharingDistrict.setCourtKeep`）；B、C 未有模型，回復公園及庭園。version4 run 不接手。
+- **題目及選項文案：** 採用本交接原有建議，已改 `questions.rotation.v1.json`：「真夏のお台場の公園、どうやって涼しくしたい？」A「熱を空へ捨てる。」B「植物に涼しさをつくってもらう。」C「公園の上に冷たい雲をつくる。」。結果卡暫定文案在 `src/rotationLayout.ts` `Q05_RESULTS`／`q05Result`。
+- **起始選項：** 維持 A，即輪換 run 開始時城市已有此塔。
+- **近鏡：** `q05:tower` 由西南 (−270, 44, −214) 望 (−210, 27, −135)，畫面包括裙座、草地、三道環及金冠。
+- **旅程：** Q05 orb 落在 NE PARK 地塊，環境軸顏色（`ROTATION_SHARED_LOTS.Q05`）。
+
+### 模型
+
+`asset/models/q05a-reverse-ac-2127/`：`build_reverse_ac.py`（Blender 5.2 headless）、`.blend`、`.glb`（約 56k tris，1.9 MB）、`review_reverse_ac.py`。玻璃芯內有琥珀熱柱及雙螺旋（`q05a_spiral`，執行時轉動）；28 支淡銀螺旋外骨架，沙漏輪廓（半徑 5.0 → 3.75 → 5.25 m）；冰藍進氣裙座（48 片百葉，半徑 8.8 m）；三道穩定環，各有冰藍光帶，其一停泊維修無人機；30 支向外翻的金色輻射棒冠頂，約 46 m；半透明熱浪柱至約 78 m（`q05a_plume`，以加法混合繪製）；半徑 20 m 冷卻草地，帶 16 道冰藍放射冷縫、22 棵樹、8 張長椅及居民。執行時邏輯在 `src/reverseAc.ts`。
+
+### 對照目標的自評（`~/city2127-evidence/q05a/r1/target-vs-r1.jpg`）
+
+| 項目 | 結果 |
+| --- | --- |
+| 玻璃芯、琥珀熱流、底部冰藍 | 達到 |
+| 三道環連光帶 | 達到 |
+| 金色冠頂，向外翻的棒 | 達到，形狀接近；目標的棒較粗、較密 |
+| 冰藍百葉裙座、放射冷縫草地 | 達到 |
+| 外骨架 | 未足：目標為較少而粗的單向螺旋桿，現為較密的菱形網格，顏色偏灰 |
+| 熱浪柱 | 未足：目標是明顯的火焰狀熱流，現時很淡 |
+| 維修無人機 | 未足：近鏡下幾乎看不到 |
+| 樹林 | 未足：目標是濃密樹叢，現為較疏的小樹 |
+
+### 檢查
+
+- 根目錄 `npm test` 通過（2026-11-27，EXIT 0）；`survey` `npm test`、`npm run build`、根目錄 `npm run build`、`git diff --check` 通過。
+- 修改的測試：`tests/lotRuntime.test.ts`（Q05 一節：`q05Tower`、共用地塊、淡入淡出、庭園清除、`q05Swap`／`q05Shot`／文案、近鏡及 orb 落點）、`tests/districtMeters.test.ts`（`setCourtKeep`）、`tests/headlineCamera.test.ts`（近鏡數 31）、`tests/voteJourney.test.ts` 及 `survey/tests/rotation.test.ts`（原先以 Q05 作「無模型／無地塊」題的例子，改用 Q07 或令 Q05 停在 B）。
+- 瀏覽器（Vite 5185，`?rotation`）：A→B 塔淡出、公園及紅傘庭園回復，結果卡「…公園に戻りました」；B→A 塔回來，卡「…塔が立ち…」；console error 0。
+- 截圖（3200 × 1800）：`focal-day`、`focal-night`、`overview`（hero）、`ne-focal-after`；對照 `target-vs-r1.jpg`、`r0-vs-r1.jpg`、`day-night.jpg`；Blender 預覽 `blender/`。
+- FPS：未量度。`fps.sh` 只跑 `?meters`（塔不會出現），瀏覽器面板又在背景。headless 截圖的 data-fps 為 32–60，只作參考。
+- 另修：`asset/models/LIBRARY.md` 補回 `q04b-sky-village` 一行。該資料夾在 `origin/main` 沒有索引行，`assetLibrary.test.ts` 因此失敗。
+- 變化總覽已重生（`artifacts/change-review/index.html`），Q05 未有實時結果畫格。
+
+### 待 owner 決定
+
+- 地塊、取代 NE 公園及庭園 1 的做法、題目文案及近鏡角度。
+- 下一輪方向：外骨架改為較少而粗的單向螺旋、熱浪柱加強、樹林加密、無人機加大，或其他。
+- 之後建 B（呼吸巨葉）還是 C（雪雲噴泉）。
+
+## R1 brief（下一輪會話）
+
+place-building round for `q05a-reverse-ac`: worktree `/Users/fatboy/city2127-q05a`, read `docs/handoffs/q05-park-cooling.md`. Owner verdict on R1: «…»

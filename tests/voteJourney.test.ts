@@ -119,13 +119,13 @@ const flight = (outcome: Parameters<typeof rotationFlights>[0], ordinal = 5, vis
 }
 {
   // Plan 3.4: a swap with no site that visits Q01 lands at NW like a Q01 fallback (the camera's stop), with a neutral lantern.
-  const { scene, frames } = flight({ kind: 'swap', questionId: 'Q05', from: 'A', to: 'B' }, 5, 'Q01');
+  const { scene, frames } = flight({ kind: 'swap', questionId: 'Q07', from: 'A', to: 'B' }, 5, 'Q01');
   assert.ok(frames.some(f => f.big > 0) && Math.max(...frames.map(f => f.scans)) === 1);
   assert.deepEqual(lit(scene).map(l => [l.color, l.scale]), [[neutral, .7]]);
 }
 {
-  // A question without a site (most of the nine today): four fading orbs, no big orb, no scan ring, no lantern.
-  for (const outcome of [{ kind: 'swap', questionId: 'Q05', from: 'A', to: 'B' } as const, { kind: 'fallback', questionId: 'Q04' } as const]) {
+  // A question without a site (Q04, Q07, Q09 today; Q05 has the NE PARK lot since 2026-11-26): four fading orbs, no big orb, no scan ring, no lantern.
+  for (const outcome of [{ kind: 'swap', questionId: 'Q07', from: 'A', to: 'B' } as const, { kind: 'fallback', questionId: 'Q04' } as const]) {
     assert.deepEqual(rotationFlights(outcome, answers).map(f => [f.questionId, f.color, f.site]), answers.map(a => [a.questionId, neutral, undefined]));
     assert.equal(rotationLantern(5, outcome), undefined);
     const { scene, frames } = flight(outcome);
@@ -216,7 +216,7 @@ const flight = (outcome: Parameters<typeof rotationFlights>[0], ordinal = 5, vis
   assert.ok(lanterns.every(l => Math.hypot(l.at.x - nw.x, l.at.z - nw.z) <= Math.max(nw.w, nw.d) * nw.scale * 1.1), 'rotation lanterns sit only at NW');
   assert.deepEqual(snap(live.scene).lanM, snap(rebuilt.scene).lanM); assert.deepEqual(snap(live.scene).lanC, snap(rebuilt.scene).lanC);
   // The 65th guest takes the 1st guest's slots even when its own question has no site, so live matches the 64-guest rebuild.
-  const wrap = { ordinal: 65, answers, rotation: { outcome: { kind: 'swap', questionId: 'Q05', from: 'A', to: 'B' } as const } };
+  const wrap = { ordinal: 65, answers, rotation: { outcome: { kind: 'swap', questionId: 'Q07', from: 'A', to: 'B' } as const } };
   live.j.playRotation(wrap, 100); for (let t = 0; t <= 6; t += .5) live.j.update(100 + t, 0);
   rebuilt.j.setRotationLanterns([...Array.from({ length: 61 }, (_, i) => ({ ordinal: i + 4, answers })), ...history, wrap].sort((a, b) => a.ordinal - b.ordinal));
   assert.deepEqual(lit(live.scene).map(l => l.slot), lit(rebuilt.scene).map(l => l.slot));

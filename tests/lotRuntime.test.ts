@@ -6,7 +6,7 @@ import { Group, Mesh, MeshStandardMaterial, BoxGeometry, Scene } from 'three';
 import { LOTS } from '../src/layout.ts';
 import { FARM_CENTRE, EnergyRuntime } from '../src/energyRuntime.ts';
 import { BAY_FLOWER_SHOWN } from '../src/bayFlower.ts';
-import { LotRuntime, q02Models, q03Housing, q06Tower, q08Vacant } from '../src/lotRuntime.ts';
+import { LotRuntime, q02Models, q03Housing, q05Tower, q06Tower, q08Vacant } from '../src/lotRuntime.ts';
 
 // Exactly one shown model per option; no option is the version4 city.
 for (const option of ['A', 'B', 'C']) {
@@ -64,7 +64,7 @@ assert.equal(hydro.visible, false); assert.ok(nodes.every(node => node.visible))
 // A version4 view after a rotation run restores the built city.
 lots.setQ02(undefined, 30, true); lots.update(30, false);
 assert.equal(hydro.visible, true); assert.ok(nodes.every(node => !node.visible)); assert.equal(farm.at(-1), undefined);
-assert.deepEqual(lots.getDiagnostics(), { hydro: 1, flower: 0, housing: 1, tower: 1 });
+assert.deepEqual(lots.getDiagnostics(), { hydro: 1, flower: 0, housing: 1, tower: 1, reverseAc: 0 });
 
 // EnergyRuntime: the override wins over the receiver vote and survives an immediate energy update; undefined hands it back.
 const energy = new EnergyRuntime(new Scene());
@@ -196,3 +196,46 @@ assert.match(q06Result({ from: 'A', to: 'B' }).effect, /戻りました/);
 { const { rotationSite } = await import('../src/voteJourney.ts'); const lot = LOTS['pod-tower'];
   const site = rotationSite({ kind: 'swap', questionId: 'Q06', from: 'B', to: 'C' } as never, [])!;
   assert.deepEqual([site.x, site.z, site.slot], [lot.x, lot.z, 'environmentalPriority'], 'Q06 orb lands on the tower lot'); }
+
+// Q05 shares the NE PARK lot (park cooling, owner 2026-11-26): A stands the reverse air conditioner on its own lawn in place of the NE
+// park (and clears the sharing court under it); B/C (no model yet) keep the park; version4 never engages it.
+assert.deepEqual(['A', 'B', 'C', undefined].map(q05Tower), [true, false, false, false]);
+const q05set = set.questions.find((q: { id: string }) => q.id === 'Q05');
+assert.deepEqual(q05set.options.map((o: { lotId: string }) => o.lotId), ['ne-park', 'ne-park', 'ne-park'], 'Q05: one shared lot');
+assert.deepEqual(q05set.options.map((o: { modelId: string | null }) => o.modelId), ['q05a-reverse-ac-2127', null, null]);
+{ const { changeSites } = await import('../src/layout.ts'); const lot = LOTS['ne-park'], ne = changeSites.ne;
+  assert.deepEqual([lot.x, lot.z, lot.size], [ne.x, ne.z, ne.w * ne.scale], 'the Q05 lot is the NE PARK site'); }
+{
+  const acScene = new Scene(), ac = new Group(), park = new Group(), parkShared = new MeshStandardMaterial();
+  const keeps: [number, number][] = [];
+  const acLots = new LotRuntime(acScene, undefined, false, undefined, { courtAt: (x, z) => x === -210 && z === -135 ? 0 : -1, setCourtKeep: (i, keep) => { keeps.push([i, keep]); } });
+  park.name = 'survey-site-ne'; park.add(new Mesh(new BoxGeometry(), parkShared)); acScene.add(park);
+  // Version4: nothing touched, the park keeps its shared materials, the court is left alone.
+  acLots.setQ05(undefined, 0, true); acLots.update(0, false);
+  assert.equal(park.visible, true); assert.equal((park.children[0] as Mesh).material, parkShared); assert.deepEqual(keeps, []);
+  // A snapshot at A before the GLB loads: the park and its court clear at once, the tower shows once main.ts names it.
+  acLots.setQ05('A', 1, true); acLots.update(1, false);
+  assert.equal(park.visible, false); assert.deepEqual(keeps.at(-1), [0, 0]);
+  ac.name = 'q05a-reverse-ac-2127'; ac.add(mesh()); ac.visible = false; acScene.add(ac);
+  acLots.update(2, false); assert.equal(ac.visible, true); assert.equal(acLots.getDiagnostics().reverseAc, 1);
+  // Live A→B from t 10: held until 10, both half-way at 11.5, the park and its court back at 13.
+  acLots.setQ05('B', 10, false); acLots.update(9, false); assert.equal(ac.visible, true); assert.equal(park.visible, false);
+  acLots.update(11.5, false);
+  assert.ok(Math.abs(((ac.children[0] as Mesh).material as MeshStandardMaterial).opacity - .5) < 1e-9, 'tower half-way at mid-transition');
+  assert.ok(Math.abs(keeps.at(-1)![1] - .5) < 1e-9, 'court half-way with the park');
+  acLots.update(13, false); assert.equal(ac.visible, false); assert.equal(park.visible, true); assert.deepEqual(keeps.at(-1), [0, 1]);
+  // B→C: nothing visible changes; a version4 view after the run restores the park.
+  acLots.setQ05('C', 20, false); acLots.update(24, false); assert.equal(ac.visible, false); assert.equal(park.visible, true);
+  acLots.setQ05(undefined, 30, true); acLots.update(30, false); assert.equal(ac.visible, false); assert.equal(park.visible, true);
+}
+const { q05Swap, q05Result, q05Shot } = await import('../src/rotationLayout.ts');
+const q05Of = (from: string, to: string) => q05Swap({ rotation: { outcome: { kind: 'swap', questionId: 'Q05', from, to } } } as never)!;
+assert.deepEqual([q05Of('A', 'B').tower, q05Of('C', 'A').tower, q05Of('B', 'C').tower], [true, true, false]);
+assert.equal(q05Shot(q05Of('A', 'C')), 'q05:tower'); assert.equal(q05Shot(q05Of('B', 'C')), null, 'B↔C: nothing to see, stay at hero');
+assert.match(q05Result({ from: 'B', to: 'A' }).effect, /塔が立ち/);
+for (const [from, to] of [['B', 'C'], ['C', 'B']]) assert.doesNotMatch(q05Result({ from, to }).effect, /立ち|現れ|できました|加わり/, `Q05 ${from}→${to} claims no new building`);
+{ const { target } = SHOTS['q05:tower'], lot = LOTS['ne-park'];
+  assert.ok(Math.hypot(target[0] - lot.x, target[2] - lot.z) <= lot.size / 2, 'Q05 shot looks at the NE PARK lot'); }
+{ const { rotationSite } = await import('../src/voteJourney.ts'); const lot = LOTS['ne-park'];
+  const site = rotationSite({ kind: 'swap', questionId: 'Q05', from: 'A', to: 'B' } as never, [])!;
+  assert.deepEqual([site.x, site.z, site.slot], [lot.x, lot.z, 'environmentalPriority'], 'Q05 orb lands on the NE PARK lot'); }

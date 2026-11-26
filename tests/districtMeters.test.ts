@@ -496,3 +496,19 @@ for (const [district, axis] of [
   assert.ok(se.changedPoints.filter(p => ['se:tower1', 'se:tower2', 'se:pod4', 'se:pod5', 'se:pod6', 'se:pod7', 'se:pod8', 'se:pod9', 'se:pod10'].includes(p.slot)).length >= 3, 'SE east stage changes at least three slots on one rung');
   console.log('PASS: stage order keeps each close-up stage on neighbouring ranks under every seed.');
 }
+{
+  // Question rotation Q05-A (src/lotRuntime.ts): the court on the NE PARK lot clears while the reverse air conditioner stands there.
+  const sh = new SharingDistrict(new T.Scene());
+  sh.setTarget(at({ sw: 0 }), 0, true);
+  const i = sh.courtAt(-210, -135);
+  assert.equal(i, 0, 'court 1 stands on the NE PARK lot');
+  assert.equal(sh.courtAt(0, 0), -1);
+  const extent = () => sh.root.children.filter((o): o is T.InstancedMesh => o instanceof T.InstancedMesh && /^sharing-(private-courts|open-plazas)$/.test(o.name))
+    .reduce((max, mesh) => { const m = new T.Matrix4(), v = new T.Vector3(); if (i < mesh.count) { mesh.getMatrixAt(i, m); v.setFromMatrixScale(m); } return Math.max(max, Math.min(v.x, v.y, v.z)); }, 0); // smallest axis: a part collapsed in plan or height is gone
+  assert.ok(extent() > .5, 'the court stands at tier 0');
+  sh.setCourtKeep(i, 0);
+  assert.ok(extent() < 1e-3, 'a cleared court leaves nothing on the lot');
+  sh.setCourtKeep(i, 1);
+  assert.ok(extent() > .5, 'and returns with the park');
+  console.log('PASS: a rotation model clears the sharing court on its lot.');
+}

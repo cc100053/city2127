@@ -2,7 +2,7 @@
   "kind": "rotation",
   "version": 1,
   "draft": true,
-  "source": "Text and labels are SURVEY_V2 P-variant placeholders (questionPool.v1.json) until the plan 5.1 exhibition wording is approved. Owner 2026-11-18: all nine questions are drawn now, Q04 included; a site without a model stays empty until its model is done. Models, lots and initial options follow docs/QUESTION_ROTATION_PLAN.md section 2; null means not built or not sited; initial options are provisional.",
+  "source": "Text and labels are SURVEY_V2 P-variant placeholders (questionPool.v1.json), except Q05 (park cooling, owner 2026-11-26, docs/handoffs/q05-park-cooling.md), until the plan 5.1 exhibition wording is approved. Owner 2026-11-18: all nine questions are drawn now, Q04 included; a site without a model stays empty until its model is done. Models, lots and initial options follow docs/QUESTION_ROTATION_PLAN.md section 2; null means not built or not sited; initial options are provisional.",
   "questions": [
     {
       "id": "Q01",
@@ -110,27 +110,27 @@
     },
     {
       "id": "Q05",
-      "text": "真夏のお台場を歩くなら、暑さにどう対応したい？",
+      "text": "真夏のお台場の公園、どうやって涼しくしたい？",
       "online": true,
       "initial": "A",
       "options": [
         {
           "id": "A",
-          "label": "涼しい時間帯に出かける。",
-          "modelId": null,
-          "lotId": null
+          "label": "熱を空へ捨てる。",
+          "modelId": "q05a-reverse-ac-2127",
+          "lotId": "ne-park"
         },
         {
           "id": "B",
-          "label": "植物や木陰のある道を歩く。",
+          "label": "植物に涼しさをつくってもらう。",
           "modelId": null,
-          "lotId": null
+          "lotId": "ne-park"
         },
         {
           "id": "C",
-          "label": "温度を調整できる歩道を利用する。",
+          "label": "公園の上に冷たい雲をつくる。",
           "modelId": null,
-          "lotId": null
+          "lotId": "ne-park"
         }
       ]
     },

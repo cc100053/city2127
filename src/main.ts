@@ -15,7 +15,8 @@ import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { FullScreenQuad, Pass } from 'three/addons/postprocessing/Pass.js';
 import { bake, cityRig, stone } from './cityRig';
 import { heroCamera, HERO_TARGET } from './heroCamera';
-import { DRAWER_HOUSING, DISTRICT, POD_TOWER } from './layout';
+import { DRAWER_HOUSING, DISTRICT, LOTS, POD_TOWER } from './layout';
+import { prepareReverseAc, REVERSE_AC, reverseAcBakes } from './reverseAc';
 import { createWorldState } from './worldState';
 import { displayHour, type DisplayMode, sunHeight, daylight, moodAt, withNight, nightLighting } from './dayCycle';
 import { overlay } from './overlay';
@@ -28,7 +29,7 @@ import { build2127 } from './odaiba2127';
 import { bayWater, waterLights } from './bayWater';
 import { residentIdentity, scoresToWorldState, startSurveyAtmosphere } from './surveyAtmosphere';
 import { isExhibitionView } from './surveyView';
-import { conceptVisit, q02Swap, q03Shot, q03Swap, q06Shot, q06Swap, q08Shot, q08Swap, Q02_SHOTS, rotationLayout, rotationVisit } from './rotationLayout';
+import { conceptVisit, q02Swap, q03Shot, q03Swap, q05Shot, q05Swap, q06Shot, q06Swap, q08Shot, q08Swap, Q02_SHOTS, rotationLayout, rotationVisit } from './rotationLayout';
 import { LotRuntime } from './lotRuntime';
 import { ConceptHologram } from './conceptHologram';
 import { bayFlowerShown } from './bayFlower';
@@ -189,6 +190,7 @@ try {
   const housing=import.meta.env.DEV&&!surveyUrl&&metersParam===null&&!scaleLab&&!params.has('energy')&&params.has('housing');
   const energyReview=import.meta.env.DEV&&!surveyUrl&&metersParam===null&&!scaleLab&&params.has('energy');
   const shotPreview=import.meta.env.DEV&&!surveyUrl&&metersParam===null&&!scaleLab&&!housing&&!energyReview&&!civicReview&&!streetReview&&params.has('shot');
+  let reverseAcMotion:((now:number)=>void)|undefined;
   if(!housing&&!energyReview){
     // Fixed city background: votes and recovery never retarget the dwellings; the update cycle stays in DEV.
     const background=housingPrototype();background.select('mixed');background.root.name='housing-background';scene.add(background.root);
@@ -216,6 +218,17 @@ try {
       foundation.receiveShadow = true;
       model.add(foundation);
     }).catch(error => console.error('Drawer housing could not load', error));
+    // Q05-A reverse air conditioner on the NE PARK lot: loaded hidden; lotRuntime shows it in place of the NE park in rotation runs.
+    const reverseAcUrl = new URL('../asset/models/q05a-reverse-ac-2127/q05a-reverse-ac-2127.glb', import.meta.url).href;
+    void odaibaReady.then(async ready => {
+      if (!ready) return;
+      const lot = LOTS['ne-park'];
+      const model = await addCityModel(scene, reverseAcUrl, [lot.x, 0, lot.z]);
+      reverseAcMotion = prepareReverseAc(model);
+      // Keep the glass, the plume and the turning spiral separate and batch the static opaque parts; named once complete.
+      model.add(...bake(model, reverseAcBakes));
+      model.name = REVERSE_AC;
+    }).catch(error => console.error('Reverse air conditioner could not load', error));
   }
   // DEV E3 city composition: a separate design comparison, never derived from environment Meter bands.
   let devFrame:((now:number,darkness:number)=>void)|undefined;
@@ -294,8 +307,8 @@ try {
   });
   const attractPreview=import.meta.env.DEV&&!surveyUrl&&params.has('attract')&&params.get('attract')!=='0';
   const journey=surveyUrl||attractPreview?new VoteJourney(scene,camera):null;
-  // Rotation runs: Q02's three lots, the drawer housing (Q03), the pod tower (Q06) and SW (Q08) show the run's options (src/lotRuntime.ts); version4 runs never engage it.
-  const lots=surveyUrl&&cityChanges?new LotRuntime(scene,cityChanges.energy,bayFlowerShown(location.search,import.meta.env.DEV),cityChanges.commonsPlaza):null;
+  // Rotation runs: Q02's three lots, the drawer housing (Q03), the reverse air conditioner (Q05), the pod tower (Q06) and SW (Q08) show the run's options (src/lotRuntime.ts); version4 runs never engage it.
+  const lots=surveyUrl&&cityChanges?new LotRuntime(scene,cityChanges.energy,bayFlowerShown(location.search,import.meta.env.DEV),cityChanges.commonsPlaza,cityChanges.sharingDistrict):null;
   // Interim (owner 2026-11-20): an option without a model yet is shown as a hologram on one concept lot (src/conceptHologram.ts).
   const concept=surveyUrl&&headlineCamera?new ConceptHologram(scene,SHOTS['concept:lot'].position):null;
   // DEV `?survey=…&residentDemo`: a live NW +1 headline visits 湊 after the building change (src/devResidentDemo.ts); everything else keeps the normal timeline.
@@ -341,19 +354,19 @@ try {
       // while the carrier evidence for the resident card is computed now. Snapshots, resets, Undo and reduced motion stay immediate.
       if(kind==='city-state-updated'&&latest&&!cameraMotion.matches&&displayMs>=DISPLAY_MS-100){
         const changeAt=now+(headlineCamera?shotTimeline(displayMs).change:ARRIVAL_SECONDS);
-        lots?.setQ02(view.rotation?.shown.Q02,changeAt,false);lots?.setQ03(view.rotation?.shown.Q03,changeAt,false);lots?.setQ06(view.rotation?.shown.Q06,changeAt,false);lots?.setQ08(view.rotation?.shown.Q08,changeAt,false);
+        lots?.setQ02(view.rotation?.shown.Q02,changeAt,false);lots?.setQ03(view.rotation?.shown.Q03,changeAt,false);lots?.setQ05(view.rotation?.shown.Q05,changeAt,false);lots?.setQ06(view.rotation?.shown.Q06,changeAt,false);lots?.setQ08(view.rotation?.shown.Q08,changeAt,false);
         const changes=cityChanges!.applyExhibitionLayout(layout,kind,changeAt,view.slotSeeds,now,latest.votes);
         // Rotation runs fly one big orb to the outcome question's site and fade the other three answers (src/voteJourney.ts playRotation).
         if(view.rotation)journey!.playRotation(latest,now);
         else journey!.play(latest.votes,latest.ordinal,now,changes[0]?.headline&&changes[0].district&&!changes[0].focalOnly?changes[0]:undefined);
         // DEV demo: the headline shot is held BEAT_SECONDS longer after the building change, so 湊's visit fits before the return to hero.
         const visit=residentDemo&&changes[0]?.socketId==='nw'&&['nw:focal','nw:focal-low'].includes(headlineShot(changes[0])??'');
-        // Q02, Q03, Q06 and Q08 swaps have no Meter carrier: the camera flies to the lot of the model it shows (src/rotationLayout.ts Q02_SHOTS, q03Shot, q06Shot, q08Shot).
+        // Q02, Q03, Q05, Q06 and Q08 swaps have no Meter carrier: the camera flies to the lot of the model it shows (src/rotationLayout.ts Q02_SHOTS, q03Shot, q05Shot, q06Shot, q08Shot).
         // Plan 3.4: when nothing visible changed, it visits a site already showing the guest's answer (rotationVisit) instead.
         // Interim (owner 2026-11-20): nothing new and nothing to visit flies to the concept lot, whose hologram names the guest's option (conceptVisit).
-        const q02=q02Swap(latest),q03=q03Swap(latest),q06=q06Swap(latest),q08=q08Swap(latest),seen=rotationVisit(latest),idea=conceptVisit(latest);
+        const q02=q02Swap(latest),q03=q03Swap(latest),q05=q05Swap(latest),q06=q06Swap(latest),q08=q08Swap(latest),seen=rotationVisit(latest),idea=conceptVisit(latest);
         if(idea&&headlineCamera)concept?.show(idea.label,changeAt,now+displayMs/1000);else concept?.hide();
-        const shot=(seen?headlineCamera?.playShot(seen.shot,now,displayMs):idea?headlineCamera?.playShot(idea.shot,now,displayMs):q02?headlineCamera?.playShot(Q02_SHOTS[q02.to],now,displayMs):q03?headlineCamera?.playShot(q03Shot(q03),now,displayMs):q06?headlineCamera?.playShot(q06Shot(q06),now,displayMs):q08?headlineCamera?.playShot(q08Shot(q08),now,displayMs):headlineCamera?.play(changes,now,visit?(shotTimeline(displayMs).changeEnd+BEAT_SECONDS)*1000:displayMs))??null;
+        const shot=(seen?headlineCamera?.playShot(seen.shot,now,displayMs):idea?headlineCamera?.playShot(idea.shot,now,displayMs):q02?headlineCamera?.playShot(Q02_SHOTS[q02.to],now,displayMs):q03?headlineCamera?.playShot(q03Shot(q03),now,displayMs):q05?headlineCamera?.playShot(q05Shot(q05),now,displayMs):q06?headlineCamera?.playShot(q06Shot(q06),now,displayMs):q08?headlineCamera?.playShot(q08Shot(q08),now,displayMs):headlineCamera?.play(changes,now,visit?(shotTimeline(displayMs).changeEnd+BEAT_SECONDS)*1000:displayMs))??null;
         narration?.play(shot,changes[0],now,displayMs);
         if(shot&&voiceLabel){const t=shotTimeline(displayMs);voiceLabel.show(residentIdentity(latest),SHOTS[shot].target,now+t.hold,now+(visit?t.changeEnd:t.flyOut));}
         if(visit&&(shot==='nw:focal'||shot==='nw:focal-low'))residentDemo!.start(now+shotTimeline(displayMs).changeEnd,layout.bands.nw,prevNw);
@@ -361,10 +374,10 @@ try {
       }
       headlineCamera?.returnHome(now);narration?.cancel();concept?.hide();
       if(view.rotation)journey!.setRotationLanterns(view.recentProposals);else journey!.setLanterns(view.recentProposals);
-      lots?.setQ02(view.rotation?.shown.Q02,now,true);lots?.setQ03(view.rotation?.shown.Q03,now,true);lots?.setQ06(view.rotation?.shown.Q06,now,true);lots?.setQ08(view.rotation?.shown.Q08,now,true);
+      lots?.setQ02(view.rotation?.shown.Q02,now,true);lots?.setQ03(view.rotation?.shown.Q03,now,true);lots?.setQ05(view.rotation?.shown.Q05,now,true);lots?.setQ06(view.rotation?.shown.Q06,now,true);lots?.setQ08(view.rotation?.shown.Q08,now,true);
       return cityChanges!.applyExhibitionLayout(layout,kind==='city-state-updated'?'city-state-snapshot':kind,now,view.slotSeeds);
     }
-    headlineCamera?.returnHome(now);narration?.cancel();concept?.hide();journey!.cancel();lots?.setQ02(undefined,now,true);lots?.setQ03(undefined,now,true);lots?.setQ06(undefined,now,true);lots?.setQ08(undefined,now,true);
+    headlineCamera?.returnHome(now);narration?.cancel();concept?.hide();journey!.cancel();lots?.setQ02(undefined,now,true);lots?.setQ03(undefined,now,true);lots?.setQ05(undefined,now,true);lots?.setQ06(undefined,now,true);lots?.setQ08(undefined,now,true);
     world.blendTo(scoresToWorldState(view.scores),now);
     if(kind==='city-state-updated')cityChanges!.applyIncrementalUpdate(view,now);
     else cityChanges!.restoreFromSnapshot(view,now);
@@ -408,7 +421,7 @@ try {
     attract?.update(now,!!headlineCamera?.active||!!explore?.active||devShot!==null,cameraMotion.matches,voices);
     if(headlineCamera?.active)voiceLabel?.update(camera,now);else voiceLabel?.hide();
     if(import.meta.env.DEV&&devShot){camera.position.set(...devShot.position);controls.target.set(...devShot.target);camera.lookAt(controls.target);}
-    cityChanges?.update(now,dark);lots?.update(now,cameraMotion.matches);concept?.update(now);journey?.update(now,dark);devFrame?.(now,dark);elevatorNear.update(now,dark);ring.update(dark);holo.update(now,dark);rig.update(s,now,dark,cityChanges?.automationLevel,hour);updateOdaiba(dark);updateFloaters(now,dark);updateHoverBeds(now);updateOverlay(hour,dark>.5);renderer.info.reset();
+    cityChanges?.update(now,dark);lots?.update(now,cameraMotion.matches);if(!cameraMotion.matches)reverseAcMotion?.(now);concept?.update(now);journey?.update(now,dark);devFrame?.(now,dark);elevatorNear.update(now,dark);ring.update(dark);holo.update(now,dark);rig.update(s,now,dark,cityChanges?.automationLevel,hour);updateOdaiba(dark);updateFloaters(now,dark);updateHoverBeds(now);updateOverlay(hour,dark>.5);renderer.info.reset();
     // Wall-clock rate, so held review times still redraw shadows as models load and Meter sites change.
     if(performance.now()-shadowDrawn>=1000/quality.shadowHz){renderer.shadowMap.needsUpdate=true;shadowDrawn=performance.now();}
     composer.render();

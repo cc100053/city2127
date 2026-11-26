@@ -72,6 +72,8 @@ export class CityChangeManager {
   readonly energy?: EnergyRuntime;
   /** The SW focal runtime, for question rotation Q08's vacancy override (src/lotRuntime.ts). */
   get commonsPlaza() { return this.sites.dogenzakaSouth.commonsPlaza; }
+  /** The sharing district's courts, for the rotation lot runtime to clear the one under a rotation model (src/lotRuntime.ts). */
+  get sharingDistrict() { return this.sites.dogenzakaSouth.sharingDistrict; }
 
   constructor(sites: BuiltSiteMap, energy?: EnergyRuntime) {
     this.sites = sites; this.energy = energy;
