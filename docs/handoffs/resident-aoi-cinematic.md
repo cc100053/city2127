@@ -1,7 +1,7 @@
 # resident-aoi-cinematic — 葵播種 beat 鏡頭語言同動作打磨
 
 - Owner：cc100053
-- 狀態：IN PROGRESS（R1 第 0–7 步完成：分鏡、時間軸、鏡頭、光同景深；owner 意見「條頸同埋隻手唔連貫」已修模型，等 owner 睇；未 merge 落 main）
+- 狀態：ACCEPTED（owner 2026-11-27 接受；分鏡、時間軸、鏡頭、光同景深、頸同膊頭、S4 胸口高度構圖；已 merge 落 main）
 - 分支：`feat/aoi-cinematic`，由 `714b4ef3`（當時嘅 `origin/main`）開出
 - Base commit：`39725ef2d38efdfae8df74e03d2d57e1c42cba87`（計劃寫入前嘅 `origin/main`）
 - Last verified commit：`d1c29501`（S4 改胸口高度、廣角；`s4-level-day`／`s4-level-night` 片段由呢個 commit 嘅乾淨樹錄製）。之前：`6a2b7501`（膊頭降低）、`3694446a`（頸同膊頭第一版）。之前：`9abf0516`（光同景深）
@@ -84,6 +84,11 @@
 唔包括：正式投票接入、iPad、13 s 閱讀時段、Meter、角色重新建模、面部表情、音效。
 
 ## Completed work
+
+- 2026-11-27（收尾）：**Owner 接受**，並表示呢次證明咗呢套流程可以將居民情景打磨得更好；指示保留或改進 skill，然後 push main。
+  - [resident-cinematic](../../.agents/skills/resident-cinematic/SKILL.md) Self-improvement：由草稿改為已驗證；光同景深（規則 8–9、第 5 步）改為 owner 要求先做；新增規則 11（剛體關節喺任何角度都要重疊：衣領、下沉頸部、圓肩低過肩線）同規則 12（中近景相機喺胸口高度 ±10°、手臂入鏡、先檢查前景佈景）；規則 4 改為收結鏡頭由頭影到手；自我檢查清單加兩項（關節、收結構圖），FPS 一項改為同上一版交替 A/B；Lessons 三條。規則只喺葵用過一次，未推廣到 resident-scene（skill 要求兩個居民都成立先推廣）。
+  - [變化總覽](../../artifacts/change-review/index.html#Q02-C)葵段落改用四個鏡頭嘅定格（`artifacts/resident-aoi/cinematic/`，`hour=12`，隱藏字幕，`d1c29501` 嘅程式），舊 `pullback/` 圖檔保留但總覽唔再引用。
+  - [RESIDENT_SCENE_PLAN](../RESIDENT_SCENE_PLAN.md) 葵一行改為已接受，下一步係正式接入（另項任務）。
 
 - 2026-11-27（owner：「向上望嗰下都係有透視，睇唔到人物手臂」，`d1c29501`）：
   - **成因**：S4 相機（`FACE`）比塊面低 66 cm、距離 2.2 m，仰角約 16°，視角 35°，對準塊面；畫面下緣只到心口，兩隻手臂都喺畫面外或者被軀幹擋住。
@@ -209,5 +214,8 @@
 - skill 每輪結束都要按 owner 意見改寫自己嘅規則同清單（**Self-improvement**）。
 
 ## Next expected step
+
+已完成。下一步係另項任務：將葵段落正式接入投票流程（見 [resident-aoi](resident-aoi.md) 「合併與正式觸發待辦」），屆時要重新計 beat 時間預算同處理 S1 實時載入卡頓；角色接觸表 `artifacts/resident-aoi/character.jpg` 仍係舊模型，可以順手重新生成。以下係接受前嘅記錄：
+
 
 等 owner 睇 `r2/s4-level-before-after.jpg` 同 `s4-level-day.mp4`／`s4-level-night.mp4`：S4 而家係胸口高度嘅中近景，兩隻手臂都見到；同時確認頸同膊頭連貫（`before-after-S4-v3.jpg`、`before-after-S2-v3.jpg`）。之前未回覆嘅問題仍然有效：S1→S2 反打要唔要改、S2 塊面唔係四分三側面。光同景深唔再做（owner，2026-11-26）。之後按意見做下一輪（新 session），再做 R1 第 10 步收尾（RESIDENT_SCENE_PLAN、變化總覽、重新生成角色接觸表、merge main）同 skill **Self-improvement**。未 merge 落 main。
