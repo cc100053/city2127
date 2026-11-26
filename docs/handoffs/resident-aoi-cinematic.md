@@ -1,11 +1,11 @@
 # resident-aoi-cinematic — 葵播種 beat 鏡頭語言同動作打磨
 
 - Owner：cc100053
-- 狀態：IN PROGRESS（R1 第 0–1 步完成，下一步係第 2 步逐格片段工具）
+- 狀態：IN PROGRESS（R1 第 0–2 步完成，下一步係第 3–4 步分鏡同時間軸）
 - 分支：`feat/aoi-cinematic`，由 `714b4ef3`（當時嘅 `origin/main`）開出
 - Base commit：`39725ef2d38efdfae8df74e03d2d57e1c42cba87`（計劃寫入前嘅 `origin/main`）
-- Last verified commit：NONE（未有實作）
-- Remote availability：計劃同 skill 草稿已推上 `origin/main`
+- Last verified commit：`f098db5dbbd67c9baaf2f645de53b779bcad52f0`（逐格片段工具；舊版基準片段由呢個 commit 嘅乾淨樹錄製）
+- Remote availability：計劃同 skill 草稿已推上 `origin/main`；R1 進度喺 `origin/feat/aoi-cinematic`
 - 製作指引：[resident-cinematic](../../.agents/skills/resident-cinematic/SKILL.md)（草稿，今次第一次用）
 
 ## Session Git state
@@ -82,18 +82,28 @@
 
 ## Completed work
 
+- 2026-11-26（R1 第 2 步）：`devAoi.ts` 加咗 DEV-only 嘅 `window.__residentSeek(t?)`。佢會將 beat 定喺 `t`，直到下一次 seek；回傳 `{ ready, duration }`，`ready` 表示上一格有冇畫到葵（農園淡入期間係 false）。`aoiTime` 同 `aoiView` 照舊可用。`aoiTimeline.ts` 新增 `AOI_DURATION = 9.6`。新增 [scripts/beatReel.mjs](../../scripts/beatReel.mjs)，用法記錄喺 [VALIDATION](../VALIDATION.md#evidence-storage)；self-test 已加入 `npm test`。`capture.mjs` 改成只有直接執行時先跑自己嘅 self-test，咁 import 佢就唔會觸發。
+  - 實測發現：喺呢部 Mac 嘅 headless Chrome，另外開 raw CDP session 會令 viewport 由 1920 × 1080 縮到 1920 × 993，所以改用 Playwright 嘅 `page.screenshot`。
+  - 舊版基準片段已錄（見下面驗證）。
 - 2026-11-26（R1 第 1 步）：Owner 批准之後，將 LottieFiles/motion-design-skill 嘅 commit `d77a9fc8cb371cab1ba5420df5bfd232cd14c9bb` 放入 `.agents/skills/motion-design/`，原文冇改，授權書係 `LICENSE-motion-design-skill`。來源同埋「唔用 Creator MCP」嘅說明記錄喺 resident-cinematic，docs/README 加咗連結。本機 `.claude/skills/motion-design` symlink 已經建立；`.claude/` 唔入 Git，其他工作站要自己建立。
 - 2026-11-26：寫咗呢份計劃同 [resident-cinematic](../../.agents/skills/resident-cinematic/SKILL.md) skill 草稿，並喺 resident-scene、AGENTS.md、docs/README 同 handoffs/README 加連結。
 
 ## Actual validation results
 
-- Verification status：NOT RUN（今次只改文件）
+- R1 第 2 步（`f098db5d`）：
+  - Root 測試：除咗 `tests/assetLibrary.test.ts`，其餘全部通過。佢失敗係因為 `q04b-sky-village` 冇喺 LIBRARY.md 登記；呢個問題喺 `origin/main` `714b4ef3` 已經存在，同今次改動無關，未修。
+  - `npm run build` 同 `git diff --check` 通過，`dist/` 入面冇 `__residentSeek`。
+  - Frame-exact 檢查（1920 × 1080／DPR 1 headless Chrome）：同一次載入入面，seek 5.45 s、seek 去其他時間、再 seek 返 5.45 s，同埋 1.5 s 後再截，三張 PNG 嘅 hash 完全相同。用 URL `aoiTime=5.45` 另外載入，或者重新載入一次，畫面就唔再 bit-identical，不過 PSNR 有 48.4 dB，差異放大 8 倍對比度都睇唔到。
+  - 舊版基準：`~/city2127-evidence/aoi-cinematic/r1/old-day.*`（`hour=12`）同 `old-night.*`（`hour=22`），URL 係 `?shot=energy:aoi&orbital=3&nopanel&reviewTime=20`。範圍 0–11 s，30 fps，每段 331 格；有 MP4、0.5 s 接觸表同 sidecar；`dirty: false`，`pageErrors` 係空嘅；每段錄製約 95 s。
+  - 接觸表同上面嘅現況診斷一致。另外睇到：夜景 3–6 s，葵頭頂面牆有一大片過曝白光，第 6 步改光時要處理。
+- 之前：Verification status：NOT RUN（R1 第 1 步只改文件）
 - 文件改動：6 個檔案嘅本機 Markdown 連結檢查，0 條斷鏈；`git diff --check origin/main..HEAD` 通過。以 `bb0248e4` 合併入 main 並推送；純文件推送唔會觸發 CI。
 
 ## Known issues and blockers
 
 - 動畫只喺 DEV 播；正式接入係另一個 task。
 - 景深可能超出 FPS 預算，要實測。
+- 片段入面城市時鐘定咗喺 `reviewTime=20`，所以車、水同天空都唔郁。逐格片段只用嚟審動作同鏡頭；sidecar 嘅 canvas FPS 係錄製速度，唔係播放 FPS。第 7 步嘅 FPS 要用實時播放量度。
 - 角色冇表情節點，S4 只能靠抬頭同光去演。
 - 成段長咗約 1.5 s，將來正式接入時要重新計 beat 嘅時間預算。
 
@@ -106,4 +116,4 @@
 
 ## Next expected step
 
-R1 第 2 步：喺 `feat/aoi-cinematic` 做 `scripts/beatReel.mjs`，同 `devAoi.ts` 嘅 DEV-only `window.__residentSeek(t)`，然後先錄一段舊版 beat 做基準。
+R1 第 3–4 步：喺 `feat/aoi-cinematic` 加 `aoiShot(t)` 同 easing 輔助函數，跟分鏡表重寫 `aoiPose` 同測試。`AOI_DURATION` 改成約 11 s，然後用 `node scripts/beatReel.mjs --to=11 …` 錄新版，同 `old-day` 比較。
