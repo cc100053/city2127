@@ -1,10 +1,10 @@
 # resident-aoi-cinematic — 葵播種 beat 鏡頭語言同動作打磨
 
 - Owner：cc100053
-- 狀態：IN PROGRESS（R1 第 0–7 步完成：分鏡、時間軸、鏡頭、光同景深；等 owner 睇並排片段，未 merge 落 main）
+- 狀態：IN PROGRESS（R1 第 0–7 步完成：分鏡、時間軸、鏡頭、光同景深；owner 意見「條頸同埋隻手唔連貫」已修模型，等 owner 睇；未 merge 落 main）
 - 分支：`feat/aoi-cinematic`，由 `714b4ef3`（當時嘅 `origin/main`）開出
 - Base commit：`39725ef2d38efdfae8df74e03d2d57e1c42cba87`（計劃寫入前嘅 `origin/main`）
-- Last verified commit：`9abf0516ed38508b7b9d94973c9b9cbe2447b38c`（光同景深；`light-day`／`light-night` 片段同各鏡頭定格都由呢個 commit 嘅乾淨樹錄製）
+- Last verified commit：`3694446a`（頸同膊頭修正；`joints-day`／`joints-night` 片段由呢個 commit 嘅乾淨樹錄製）。之前：`9abf0516`（光同景深）
 - Remote availability：計劃同 skill 草稿已推上 `origin/main`；R1 進度喺 `origin/feat/aoi-cinematic`
 - 製作指引：[resident-cinematic](../../.agents/skills/resident-cinematic/SKILL.md)（草稿，今次第一次用）
 
@@ -15,6 +15,7 @@
 - R1 實作 session（2026-11-26）：開始時喺 `main`，HEAD 係 `714b4ef35af6783fe3a8452ed15018fdbaf9357b`，同 `origin/main` 一致，工作樹乾淨，冇其他 worktree。主 checkout 冇其他 session 嘅改動，所以直接喺度開 `feat/aoi-cinematic`，冇開 worktree。
 - R1 第 3–5 步 session（2026-11-26）：開始時喺 `feat/aoi-cinematic`，HEAD 係 `b28ecc24`，同 `origin/feat/aoi-cinematic` 一致，工作樹乾淨；`origin/main` 冇新 commit（分支領先 3 個）。冇開 worktree。
 - R1 第 6–7 步 session（2026-11-26）：開始時喺 `feat/aoi-cinematic`，HEAD 係 `3cae8549`，同 `origin/feat/aoi-cinematic` 一致，工作樹乾淨，冇其他 worktree。量 FPS 時臨時開咗 `../city2127-aoi-base`（`3cae8549` 嘅 detached worktree，port 5175）做同場基準，量完已經 `git worktree remove` 同 prune。
+- 頸同膊頭修正 session（2026-11-26）：開始時喺 `feat/aoi-cinematic`，HEAD 係 `3dcf2427`，同 `origin/feat/aoi-cinematic` 一致，工作樹乾淨；fetch 成功。冇開 worktree。
 - 之後每個 session 開始時，都要重新做 AGENTS.md preflight，然後記錄實際狀態。
 
 ## 目標同驗收
@@ -71,7 +72,7 @@
 ### R2 — Blender 骨架試點（R1 驗收之後）
 
 根據 skill 嘅 **Blender armature track**：
-1. 喺 [build_aoi.py](../../asset/models/resident-aoi/build_aoi.py) 加 armature，骨嘅名同現有關節節點一致（`torso`、`head`、`upperArm.L/R`、`lowerArm.L/R`、`hand.L/R`），每件剛體零件 100 % 綁落對應嘅骨。網格同 2,060 個三角面都唔變。
+1. 喺 [build_aoi.py](../../asset/models/resident-aoi/build_aoi.py) 加 armature，骨嘅名同現有關節節點一致（`torso`、`head`、`upperArm.L/R`、`lowerArm.L/R`、`hand.L/R`），每件剛體零件 100 % 綁落對應嘅骨。網格同 2,620 個三角面（R2 關節修正後）都唔變。
 2. 喺 Blender 用 Graph Editor 同 IK 做 `aoi_sow`、`aoi_lookup` 兩個 action，30 fps，冇 root motion。匯出時帶動畫，然後喺 [LIBRARY.md](../../asset/models/LIBRARY.md) 記錄 clip 名同長度。
 3. `devAoi.ts` 載到 clip 就用 `mixer.setTime()` 跟 beat 時鐘播，載唔到就退返用 `aoiPose`。
 4. 用逐格片段並排比較 TS 版同 Blender 版，由 owner 揀。Blender 方面跟 [BLENDER.md](../BLENDER.md) 同 blender-core。
@@ -83,6 +84,19 @@
 唔包括：正式投票接入、iPad、13 s 閱讀時段、Meter、角色重新建模、面部表情、音效。
 
 ## Completed work
+
+- 2026-11-26（owner 意見：「條頸同埋隻手唔連貫」，S4；`3694446a`）：
+  - **Owner 決定**：光同景深嘅分別唔大，唔再做光／景深。今次只改模型。
+  - **診斷**（`~/city2127-evidence/aoi-cinematic/r2/before-*`，對照 [build_aoi.py](../../asset/models/resident-aoi/build_aoi.py)）：
+    - 頸：一條 8 邊、半徑約 5 cm 嘅皮膚色柱，底部平面喺 1.34 m，只插入平頂嘅軀幹 3 mm；頭嘅樞軸喺 1.36 m。S4 抬頭（約 −0.36 rad）會令頸底一邊翹起約 1.5 cm，低角度見到一塊淺色底面，頸就似一枝獨立嘅柱。軀幹頂冇衣領。
+    - 膊頭：上臂樞軸喺 x ±0.194，喺軀幹半闊（約 0.183）之外；上臂頂係一塊半徑 0.066 嘅平面八角形，而旁邊軀幹嘅膊角被 0.048 倒角同斜肩削低。S4 由下向上望，遠側上臂頂就似一舊方塊，同軀幹之間有一條暗縫。Aoi 冇 Nagi 嗰種圓肩球。
+    - 唔係姿勢、鏡頭或者權重問題（剛體零件，冇 skin）。
+  - **修正**（只改 `build_aoi.py`，共用嘅 `build_nagi.py` 冇郁；節點名、樞軸同 11 個節點不變，所以 `devAoi.ts`、掌心同種子位置照舊）：
+    - 軀幹加一圈矮衣領（12 邊，外徑 0.082→0.074，高 5 cm，加捲邊），做法參考 Nagi。
+    - 頸底下沉到頭樞軸下 8 cm，半徑 0.054–0.056、12 邊；頭點頭或者抬頭 ±0.42 rad 都唔會露出頸底。
+    - 上臂頂降到樞軸，加一粒外套色圓肩（0.072 × 0.072 × 0.05），頂部同軀幹頂齊（約 1.34 m）；第一版圓肩高 1.36 m，S4 遠側膊頭會凸起一舊，已降低。
+    - 用 Blender 5.2.2 headless 重建：GLB 55,260 → 67,352 bytes，三角面 2,060 → 2,620。Asset QA（render profile，torso／head／upperArm.L／R）通過，0 錯誤；只有已接受嘅冇 UV 警告。
+  - 冇改 `aoiTimeline.ts`、燈光、景深或鏡頭。
 
 - 2026-11-26（R1 第 6–7 步：光同景深，`503d8d50`、`9abf0516`）：
   - **夜景熱斑嘅成因**：逐盞燈關掉再比較（`light/diag-night-S2-fill-vs-sun.jpg`、`diag-night-S4-fill-vs-sun.jpg`，每張 2×2：左上全開、右上關 fill、左下關 `aoi-archived-sunlight`、右下全關）。S2 同 S4 背後嘅大片暖光**全部來自 `fill` PointLight**：佢擺喺葵同身後 0.93 m 嘅玻璃欄之間（x −186.39），夜晚強度 5.2、範圍 4 m，所以打爆咗玻璃欄同矮牆。`aoi-archived-sunlight` 冇影響，而且佢喺 S4 根本照唔到塊面。
@@ -104,6 +118,12 @@
 - 2026-11-26：寫咗呢份計劃同 [resident-cinematic](../../.agents/skills/resident-cinematic/SKILL.md) skill 草稿，並喺 resident-scene、AGENTS.md、docs/README 同 handoffs/README 加連結。
 
 ## Actual validation results
+
+- 頸同膊頭修正（`3694446a`）：
+  - Root 測試 55 條指令逐條跑，54 條通過；唯一失敗仍然係 `tests/assetLibrary.test.ts`（`q04b-sky-village` 冇 LIBRARY.md 行），與今次無關。`npm run build`、`git diff --check` 通過；`dist/` 冇 `__residentSeek`。
+  - 前後定格（1920 × 1080，`npm run capture`，`aoiNoCaption`，`aoiView` 固定鏡頭）：S4 `aoiTime=9.8`、S2 `aoiTime=4.0`，日（`hour=12`）夜（`hour=22`）各一張，喺 `~/city2127-evidence/aoi-cinematic/r2/before-*`、`after-*`；總覽 `before-after-S4.jpg`、`before-after-S2.jpg`（每張 2 × 2：上日下夜，左改前右改後）；放大 `crop-S4-day.png`、`crop-S4-night.png`、`crop-S2-day.png`。另外 `after-S2-nod-day.png`／`crop-S2-nod.png`（4.8 s，頭向前點最深）確認下巴冇插穿衣領。`after-*` 喺 commit 前拍（sidecar 標 dirty），模型同 `3694446a` 一樣。
+  - 片段：`joints-day.*`（`hour=12`，`3694446a`，`dirty: false`）同 `joints-night.*`（`hour=22`；sidecar 標 dirty，因為錄製時呢份交接文件未 commit，程式同模型同 `3694446a` 一樣），0–11 s、30 fps、331 格。
+  - FPS（有視窗 Chrome，1920 × 1080／DPR 1，日景，R1 嘅 `light/fpsProbe.mjs`，原始結果喺 `r2/` 之外嘅終端輸出，數字如下）：定格 S1 50.9／50.7、S2 54.9／54.7、S3 54.3／53.8、S4 55.2／54.9；實時 S1 46.3、S2–S4 52.1–52.5。同 R1 加燈加景深嘅數字一樣（S1 實時 46 仍然係原有載入卡頓）。夜景冇重新量。
 
 - R1 第 6–7 步（`503d8d50`，第 1 輪修正 `9abf0516`）：
   - Root 測試 55 條指令逐條跑，54 條通過；唯一失敗仍然係 `tests/assetLibrary.test.ts`（`q04b-sky-village` 冇 LIBRARY.md 行），同之前一樣，與今次無關。`npm run build`、`git diff --check` 通過；`dist/` 冇 `__residentSeek`，亦冇 `BokehShader`／`maxblur`（景深冇入正式版）。
@@ -154,6 +174,9 @@
 
 ## Known issues and blockers
 
+- [角色外觀接觸表](../../artifacts/resident-aoi/character.jpg)仍然係舊模型（冇衣領、平頂上臂），未重新生成。
+- S4 遠側膊頭而家係圓肩，同軀幹連成一體，但由下向上望仍然比軀幹頂高少少（透視）；如果 owner 覺得似墊肩，可以再收細圓肩。
+
 - 動畫只喺 DEV 播；正式接入係另一個 task。
 - 景深已實測（見上），S2／S4 約 −5.5 FPS，保留。
 - S1 實時播放 46 FPS（基準一樣），係 beat 喺農園淡入後即刻開始、包住載入卡頓；正式接入或者重新計時間預算時要處理。
@@ -172,4 +195,4 @@
 
 ## Next expected step
 
-等 owner 睇 `sbs-light-day.mp4`／`sbs-light-night.mp4`（左改光前、右今次）同 `light-day-sheet.jpg`／`light-night-sheet.jpg`，連埋之前未回覆嘅 `sbs-day`／`sbs-night`（舊 beat 對新分鏡），記低每個鏡頭嘅意見。重點問：S1→S2 反打要唔要改、景深強弱、輪廓光夠唔夠。之後按意見做下一輪（新 session），再做 R1 第 10 步收尾（RESIDENT_SCENE_PLAN、變化總覽、merge main）同 skill **Self-improvement**。未 merge 落 main。
+等 owner 睇 `r2/before-after-S4.jpg`、`before-after-S2.jpg` 同 `joints-day.mp4`／`joints-night.mp4`，確認頸同膊頭已經連貫。之前未回覆嘅問題仍然有效：S1→S2 反打要唔要改、S2 塊面唔係四分三側面。光同景深唔再做（owner，2026-11-26）。之後按意見做下一輪（新 session），再做 R1 第 10 步收尾（RESIDENT_SCENE_PLAN、變化總覽、重新生成角色接觸表、merge main）同 skill **Self-improvement**。未 merge 落 main。
