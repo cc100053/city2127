@@ -60,10 +60,11 @@ def build():
         leg.ellipsoid("res_shoe", (0, -.055, -.802), (.068, .136, .038), 10, 6, n=2.8)
         x = sign * .194
         arm = part(f"upperArm.{side}", (x, 0, 1.303), torso)
-        arm.prism("res_jacket", (0, 0, -.265), (0, 0, -.005), .052, .066)
-        # Round shoulder at the pivot: hides the flat top cap through every swing and fills the bevelled torso corner;
-        # its top sits flush with the torso top (1.34 m), so the low S4 angle shows no lump above the shoulder line.
-        arm.ellipsoid("res_jacket", (-sign * .006, 0, -.012), (.072, .072, .05), 12, 8)
+        arm.prism("res_jacket", (0, 0, -.265), (0, 0, -.03), .052, .066)
+        # Round shoulder just under the pivot: hides the flat top cap through every swing and fills the bevelled torso
+        # corner. Its top (1.31 m) stays under the sloped, bevelled shoulder line (about 1.30–1.33 m there), so the far
+        # shoulder in the low S4 look-up shows no lump above it.
+        arm.ellipsoid("res_jacket", (-sign * .012, 0, -.03), (.07, .072, .042), 12, 8)
         fore = part(f"lowerArm.{side}", (x, 0, 1.038), arm)
         fore.prism("res_jacket", (0, 0, -.207), (0, 0, .017), .041, .055)
         fore.prism("res_trim", (0, 0, -.224), (0, 0, -.196), .044, .048)
