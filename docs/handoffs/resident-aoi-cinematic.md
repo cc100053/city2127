@@ -4,7 +4,7 @@
 - 狀態：IN PROGRESS（R1 第 0–7 步完成：分鏡、時間軸、鏡頭、光同景深；owner 意見「條頸同埋隻手唔連貫」已修模型，等 owner 睇；未 merge 落 main）
 - 分支：`feat/aoi-cinematic`，由 `714b4ef3`（當時嘅 `origin/main`）開出
 - Base commit：`39725ef2d38efdfae8df74e03d2d57e1c42cba87`（計劃寫入前嘅 `origin/main`）
-- Last verified commit：`3694446a`（頸同膊頭修正；`joints-day`／`joints-night` 片段由呢個 commit 嘅乾淨樹錄製）。之前：`9abf0516`（光同景深）
+- Last verified commit：`6a2b7501`（膊頭降到肩線以下；`joints-v3-day`／`joints-v3-night` 片段由呢個 commit 嘅乾淨樹錄製）。之前：`3694446a`（頸同膊頭第一版）。之前：`9abf0516`（光同景深）
 - Remote availability：計劃同 skill 草稿已推上 `origin/main`；R1 進度喺 `origin/feat/aoi-cinematic`
 - 製作指引：[resident-cinematic](../../.agents/skills/resident-cinematic/SKILL.md)（草稿，今次第一次用）
 
@@ -85,6 +85,11 @@
 
 ## Completed work
 
+- 2026-11-26（owner：「fix 透視問題」，`6a2b7501`）：
+  - **成因**：S4 相機喺葵左前方、比膊頭低約 35 cm；凸起嗰舊係**遠側（右）膊頭**。量度後發現唔係透視放大：圓肩頂喺 1.34 m，但軀幹膊角經過斜肩同倒角，喺嗰個位只有約 1.30–1.33 m，圓肩高過肩線 3–4 cm，所以喺遠側輪廓凸出。
+  - **修正**：圓肩中心降 3 cm、向內移 6 mm，改扁（0.07 × 0.072 × 0.042），頂部約 1.31 m，低過斜肩線；上臂頂一齊降到樞軸下 3 cm，保持被圓肩遮住。節點同三角面（2,620）不變，GLB 67,348 bytes。Asset QA 通過，0 錯誤。
+  - 檢查：S4 遠側膊頭唔再凸出肩線（`r2/cmp3-S4.png`：左改前、中第一版、右今次）；S2 舉手最高（4.8 s，`cmp-nod-v3.png`）上臂同軀幹仍然連住，近側膊頭收喺膊角下面。
+
 - 2026-11-26（owner 意見：「條頸同埋隻手唔連貫」，S4；`3694446a`）：
   - **Owner 決定**：光同景深嘅分別唔大，唔再做光／景深。今次只改模型。
   - **診斷**（`~/city2127-evidence/aoi-cinematic/r2/before-*`，對照 [build_aoi.py](../../asset/models/resident-aoi/build_aoi.py)）：
@@ -118,6 +123,8 @@
 - 2026-11-26：寫咗呢份計劃同 [resident-cinematic](../../.agents/skills/resident-cinematic/SKILL.md) skill 草稿，並喺 resident-scene、AGENTS.md、docs/README 同 handoffs/README 加連結。
 
 ## Actual validation results
+
+- 膊頭降低（`6a2b7501`）：Root 測試 54／55 通過（只有原有嘅 `assetLibrary.test.ts` 失敗）；`npm run build`、`git diff --check` 通過，`dist/` 冇 `__residentSeek`。定格 `r2/v3-S4-{day,night}.png`、`v3-S2-{day,night}.png`（commit 前拍，模型同 `6a2b7501` 一樣），總覽 `before-after-S4-v3.jpg`、`before-after-S2-v3.jpg`（上日下夜，左改前右今次）。片段 `joints-v3-day.*`、`joints-v3-night.*`（`6a2b7501`，乾淨樹，0–11 s、30 fps、331 格）。有視窗 Chrome 日景 FPS：定格 S1 50.8／50.9、S2 54.5、S3 53.9、S4 55.0／54.9；實時 S1 47.0、S2–S4 52.2–52.4，同之前一樣。
 
 - 頸同膊頭修正（`3694446a`）：
   - Root 測試 55 條指令逐條跑，54 條通過；唯一失敗仍然係 `tests/assetLibrary.test.ts`（`q04b-sky-village` 冇 LIBRARY.md 行），與今次無關。`npm run build`、`git diff --check` 通過；`dist/` 冇 `__residentSeek`。
@@ -175,7 +182,6 @@
 ## Known issues and blockers
 
 - [角色外觀接觸表](../../artifacts/resident-aoi/character.jpg)仍然係舊模型（冇衣領、平頂上臂），未重新生成。
-- S4 遠側膊頭而家係圓肩，同軀幹連成一體，但由下向上望仍然比軀幹頂高少少（透視）；如果 owner 覺得似墊肩，可以再收細圓肩。
 
 - 動畫只喺 DEV 播；正式接入係另一個 task。
 - 景深已實測（見上），S2／S4 約 −5.5 FPS，保留。
@@ -195,4 +201,4 @@
 
 ## Next expected step
 
-等 owner 睇 `r2/before-after-S4.jpg`、`before-after-S2.jpg` 同 `joints-day.mp4`／`joints-night.mp4`，確認頸同膊頭已經連貫。之前未回覆嘅問題仍然有效：S1→S2 反打要唔要改、S2 塊面唔係四分三側面。光同景深唔再做（owner，2026-11-26）。之後按意見做下一輪（新 session），再做 R1 第 10 步收尾（RESIDENT_SCENE_PLAN、變化總覽、重新生成角色接觸表、merge main）同 skill **Self-improvement**。未 merge 落 main。
+等 owner 睇 `r2/before-after-S4-v3.jpg`、`before-after-S2-v3.jpg` 同 `joints-v3-day.mp4`／`joints-v3-night.mp4`，確認頸同膊頭已經連貫、遠側膊頭唔再凸起。之前未回覆嘅問題仍然有效：S1→S2 反打要唔要改、S2 塊面唔係四分三側面。光同景深唔再做（owner，2026-11-26）。之後按意見做下一輪（新 session），再做 R1 第 10 步收尾（RESIDENT_SCENE_PLAN、變化總覽、重新生成角色接觸表、merge main）同 skill **Self-improvement**。未 merge 落 main。
