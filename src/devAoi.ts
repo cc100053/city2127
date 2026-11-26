@@ -15,13 +15,18 @@ const CHARACTER = new T.Vector3(-185.59, 2.25, 398.75);
 const GESTURE = new T.Vector3(-185.31, 3.42, 399.02);
 const FACE = new T.Vector3(-183.53, 3.24, 399.55);
 const FACE_TARGET = new T.Vector3(-185.58, 3.9, 398.76);
+// S4 is a medium close-up, head to hands: from FACE's spot (the crop bed lies just beyond it, farther or more frontal
+// cameras look through it) but at chest height instead of 16° below her face, with a wider lens, so the steep up-angle no
+// longer hides her arms behind the torso.
+const PAYOFF = FACE.clone().setY(3.55);
+const PAYOFF_TARGET = new T.Vector3(-185.58, 3.5, 398.76);
 // Fixed shots cut on action (handoff shot table). Each moves at most 4 % of its distance: `push` slides the camera
 // along its own sight line, `rise` tilts the aim up.
 const SHOTS: Record<AoiShotName, { position: T.Vector3; target: T.Vector3; fov: number; push: number; rise: number }> = {
   S1: { position: ENTRY, target: ENTRY_TARGET, fov: 53, push: .035, rise: 0 },
   S2: { position: MEDIUM, target: GESTURE.clone().setY(3.6), fov: 40, push: .04, rise: 0 },
   S3: { position: BED_VIEW, target: BED_TARGET, fov: 53, push: 0, rise: .9 },
-  S4: { position: FACE, target: FACE_TARGET, fov: 35, push: .03, rise: 0 },
+  S4: { position: PAYOFF, target: PAYOFF_TARGET, fov: 46, push: .03, rise: 0 },
 };
 // Face light intensities (candela, decay 2) by day and at full night; the key also follows `pose.sunlight`.
 const FILL = { day: 1.5, night: 22 };
