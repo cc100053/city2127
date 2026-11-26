@@ -254,8 +254,11 @@ try {
     const shot=params.get('shot');
     if(shot==='energy:aoi') {
       const energy=cityChanges?.energy;
-      if(!surveyUrl&&energy)import('./devAoi').then(async({startAoi})=>{
-        const review=await startAoi(energy,camera,controls,params);
+      if(!surveyUrl&&energy)Promise.all([import('./devAoi'),import('three/addons/postprocessing/BokehPass.js')]).then(async([{startAoi},{BokehPass}])=>{
+        // DEV-only depth of field for the beat's medium and close shots (resident-cinematic rule 9), before bloom; devAoi switches it per shot. `aoiNoDof` leaves it out.
+        const lens=params.has('aoiNoDof')?undefined:new BokehPass(scene,camera,{});
+        if(lens){lens.enabled=false;composer.insertPass(lens,composer.passes.indexOf(bloom));}
+        const review=await startAoi(energy,camera,controls,params,lens);
         aoiEffects=review.effects;devFrame=review.frame;
       });
     }

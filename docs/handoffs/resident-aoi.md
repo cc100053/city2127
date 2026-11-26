@@ -14,13 +14,13 @@
 
 - 西入口沿用 R3 坐標、2× 農園、既有鐵路與步道。從步道平接約 5 m 寬的碎石支路及前地，到 (−200, 408) m 的坡道起點。天幕外的三畦、灌溉溝和外側三棵果樹改為草地與低矮收邊。通行線北側 (−226, 399.95) m 放一架三盤幼苗。
 - 葵站在露台既有內側菜畦旁 (−185.35, 2.25, 398.96) m。開場看步道、鐵路和支路。切到露台內，再推近她攤手與落種，結尾回到可同時看天幕和露台的廣角。托起種子、落種、六角板轉青、菜畦薄霧依次由約 3.3、5.18、5.68、6.1 秒開始。青色層貼在該板下面，霧限於本畦上方。
-- `src/devAoi.ts` 只由 Vite DEV 預覽載入，使用 `aoiTimeline.ts` 驅動剛體關節及天氣特效。農園未完全顯示時，葵與特效隱藏。場景光源跟隨原有日夜，角色用局部補光。天氣特效略過 GTAO 的深度預 pass。
+- `src/devAoi.ts` 只由 Vite DEV 預覽載入，使用 `aoiTimeline.ts` 驅動剛體關節及天氣特效。農園未完全顯示時，葵與特效隱藏。場景光源跟隨原有日夜，角色有一盞日夜共用的補光聚光燈、隨日照亮起的暖色主光及冷色輪廓光，三盞均不投影。天氣特效略過 GTAO 的深度預 pass。S2、S4 有 DEV 專用景深（BokehPass，`main.ts` 僅在 `energy:aoi` 動態載入），其深度預 pass 略過所有透明網格。
 - 視覺方向採用 Gemini 最新[修訂圖](https://gemini.google.com/u/3/app/9d24d8b1e7b7a9cd)的取苗架與局部落霧。角色的藍工作服、髮髻、短字幕和兩次剪接為 R1 審閱選擇。Meter、Q3、headline 及正式投票接入仍待另項任務。
 - Blender 5.2.2 LTS headless。角色資產位於 [resident-aoi](../../asset/models/resident-aoi)，[外觀接觸表](../../artifacts/resident-aoi/character.jpg)供審閱。GLB 是 55,260 bytes，2,060 三角面，11 個剛體網格、7 個材質角色，約 1.71 m 高。匯出使用 Blender 內建 glTF Binary、預設 Y-up、無動畫或壓縮。Asset QA 的 render profile 通過，材質全部使用純色，接受無 UV 的警告。已檢視實色及線框接觸表。
 
 ## 審閱
 
-啟動 Vite 後開啟 `/?shot=energy:aoi&orbital=3&hour=12&nopanel`。重載重播，改 `hour=22` 看夜景。可定格 `&reviewTime=20&aoiTime=5.2` 檢視落種，或以 `aoiTime=6` 與 `aoiTime=8` 配合 `aoiView=canopy` 比較同一鏡頭的日照前後。可加 `aoiView=entry|hands|canopy|payoff` 選固定鏡頭（S1–S4，見[鏡頭打磨交接](resident-aoi-cinematic.md)）、`aoiNoCaption` 隱藏字幕。相片及圖說見[變化總覽](../../artifacts/change-review/index.html#Q02-C)。
+啟動 Vite 後開啟 `/?shot=energy:aoi&orbital=3&hour=12&nopanel`。重載重播，改 `hour=22` 看夜景。可定格 `&reviewTime=20&aoiTime=5.2` 檢視落種，或以 `aoiTime=6` 與 `aoiTime=8` 配合 `aoiView=canopy` 比較同一鏡頭的日照前後。可加 `aoiView=entry|hands|canopy|payoff` 選固定鏡頭（S1–S4，見[鏡頭打磨交接](resident-aoi-cinematic.md)）、`aoiNoCaption` 隱藏字幕、`aoiNoDof` 關閉景深。相片及圖說見[變化總覽](../../artifacts/change-review/index.html#Q02-C)。
 
 ## 驗證
 

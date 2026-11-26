@@ -1,6 +1,7 @@
 import * as T from 'three';
 import { AOI_CAPTION_FROM, AOI_DURATION, AOI_SEED_RELEASE, AOI_SHOTS, aoiPose, aoiShot, smooth } from './aoiTimeline.ts';
 import type { AoiPose, AoiShotName } from './aoiTimeline.ts';
+import type { BokehPass } from 'three/addons/postprocessing/BokehPass.js';
 import { addCityModel } from './modelAssets.ts';
 import type { EnergyRuntime } from './energyRuntime.ts';
 
@@ -22,9 +23,19 @@ const SHOTS: Record<AoiShotName, { position: T.Vector3; target: T.Vector3; fov: 
   S3: { position: BED_VIEW, target: BED_TARGET, fov: 53, push: 0, rise: .9 },
   S4: { position: FACE, target: FACE_TARGET, fov: 35, push: .03, rise: 0 },
 };
+// Face light intensities (candela, decay 2) by day and at full night; the key also follows `pose.sunlight`.
+const FILL = { day: .8, night: 12 };
+const KEY = { day: 5, night: 8 };
+const RIM = { day: 60, night: 22 };
+// Depth of field (resident-cinematic rule 9), medium and close shots only: S2 focuses on the sowing hand, S4 on the face.
+// `aperture` is blur per metre off focus and `maxblur` its cap, both in screen widths (BokehShader).
+const LENS: Partial<Record<AoiShotName, { aperture: number; maxblur: number }>> = {
+  S2: { aperture: .004, maxblur: .008 },
+  S4: { aperture: .005, maxblur: .008 },
+};
 const VIEWS: Record<string, AoiShotName> = { entry: 'S1', hands: 'S2', canopy: 'S3', payoff: 'S4' };
 
-export async function startAoi(energy: EnergyRuntime, camera: T.PerspectiveCamera, controls: { target: T.Vector3; enabled: boolean }, params: URLSearchParams) {
+export async function startAoi(energy: EnergyRuntime, camera: T.PerspectiveCamera, controls: { target: T.Vector3; enabled: boolean }, params: URLSearchParams, lens?: BokehPass) {
   await energy.farmReady;
   const set = new T.Group();
   set.name = 'aoi-weather-library';
@@ -141,9 +152,51 @@ export async function startAoi(energy: EnergyRuntime, camera: T.PerspectiveCamer
   };
   setPose(aoiPose(AOI_SEED_RELEASE));
   release.copy(palm);
-  const fill = new T.PointLight('#ffd5b3', 3, 4, 2);
-  fill.position.copy(CHARACTER).add(new T.Vector3(-.8, 1.75, .65));
-  set.add(fill);
+  // Face lights (resident-cinematic rule 8). Both cameras that show her face (S2, S4) sit on her +x side, the glass rail
+  // is 0.93 m behind her on -x and the crops sit between her and the S2 camera. The fill used to be a point light between
+  // her and the rail, and at night it blew out the rail and parapet behind her; it is now one narrow spot from the camera
+  // side on her head and shoulders, still the one fill for day and night. Fill, key and rim never cast shadows and only
+  // change intensity, so no lit material recompiles mid-beat.
+  const fill = new T.SpotLight('#ffd5b3', 0, 5, .3, .8, 2);
+  fill.name = 'aoi-fill';
+  fill.position.copy(CHARACTER).add(new T.Vector3(1.6, 2.4, 0));
+  fill.target.position.copy(FACE_TARGET).setY(3.5);
+  set.add(fill, fill.target);
+  // Warm key from above and in front, the side the lit pane is on: it comes up with the archived sunlight and carries
+  // the payoff close-up, where the sunlight itself misses her face.
+  const key = new T.SpotLight('#ffc27a', 0, 6, .32, .7, 2);
+  key.name = 'aoi-face-key';
+  key.position.copy(FACE_TARGET).add(new T.Vector3(.7, 2.6, 1.5));
+  key.target.position.copy(FACE_TARGET);
+  // Cool rim from behind the rail at head height, aimed back along both face cameras' sight lines: it grazes the edge of
+  // her hair and shoulders against the set (S4 looks up at her, so a rim from above would only light the hidden top), and
+  // the rail's and parapet's lit faces look away from it.
+  const rim = new T.SpotLight('#9fc6ff', 0, 6, .25, .5, 2);
+  rim.name = 'aoi-rim';
+  rim.position.copy(FACE_TARGET).add(new T.Vector3(-2, .7, -.8));
+  rim.target.position.copy(FACE_TARGET).setY(3.7);
+  set.add(key, key.target, rim, rim.target);
+  // The lens's depth prepass draws every mesh opaque, so glass (the rail, through which S2 sees the whole background) and
+  // the beam would hold the focus depth: hide transparent meshes for that prepass. The list is rescanned every 120 frames.
+  const focus = new T.Vector3(), forward = new T.Vector3();
+  const blur = lens?.uniforms as Record<'focus' | 'aperture' | 'maxblur', { value: number }> | undefined;
+  if (lens) {
+    const draw = lens.render.bind(lens);
+    let clear: T.Object3D[] = [], passes = 0;
+    lens.render = (...args) => {
+      if (passes++ % 120 === 0) {
+        clear = [];
+        lens.scene.traverse(object => {
+          const material = (object as T.Mesh).material;
+          if (material && [material].flat().some(m => m.transparent)) clear.push(object);
+        });
+      }
+      const shown = clear.filter(object => object.visible);
+      shown.forEach(object => { object.visible = false; });
+      draw(...args);
+      shown.forEach(object => { object.visible = true; });
+    };
+  }
   const held = Number(params.get('aoiTime'));
   const freeze = params.has('aoiTime') && Number.isFinite(held);
   const view = VIEWS[params.get('aoiView') ?? ''];
@@ -190,7 +243,9 @@ export async function startAoi(energy: EnergyRuntime, camera: T.PerspectiveCamer
       grain.position.addScaledVector(offset, 1 + 2.6 * drop);
       grain.visible = (pose.arms.lift > .5 || fall > 0) && drop < .99;
     });
-    fill.intensity = .2 + 5 * darkness;
+    fill.intensity = FILL.day + (FILL.night - FILL.day) * darkness;
+    key.intensity = (KEY.day + (KEY.night - KEY.day) * darkness) * sun;
+    rim.intensity = RIM.day + (RIM.night - RIM.day) * darkness;
     const playing = aoiShot(t);
     caption.hidden = params.has('aoiNoCaption') || playing.shot !== 'S4' || t < AOI_CAPTION_FROM || t > AOI_DURATION;
     // aoiView holds one shot's framing; its move follows the beat clock, clamped to that shot's span.
@@ -206,6 +261,17 @@ export async function startAoi(energy: EnergyRuntime, camera: T.PerspectiveCamer
       camera.updateProjectionMatrix();
     }
     camera.lookAt(controls.target);
+    const look = LENS[shot];
+    if (lens && blur) {
+      lens.enabled = !!look;
+      if (look) {
+        if (shot === 'S2') set.localToWorld(focus.copy(palm));
+        else head.getWorldPosition(focus);
+        blur.focus.value = focus.sub(camera.position).dot(camera.getWorldDirection(forward));
+        blur.aperture.value = look.aperture;
+        blur.maxblur.value = look.maxblur;
+      }
+    }
   };
   return { effects, frame };
 }
