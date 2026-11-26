@@ -204,7 +204,28 @@ const q05set = set.questions.find((q: { id: string }) => q.id === 'Q05');
 assert.deepEqual(q05set.options.map((o: { lotId: string }) => o.lotId), ['ne-park', 'ne-park', 'ne-park'], 'Q05: one shared lot');
 assert.deepEqual(q05set.options.map((o: { modelId: string | null }) => o.modelId), ['q05a-reverse-ac-2127', null, null]);
 { const { changeSites } = await import('../src/layout.ts'); const lot = LOTS['ne-park'], ne = changeSites.ne;
-  assert.deepEqual([lot.x, lot.z, lot.size], [ne.x, ne.z, ne.w * ne.scale], 'the Q05 lot is the NE PARK site'); }
+  assert.deepEqual([lot.x, lot.z], [ne.x, ne.z], 'the Q05 lot is centred on the NE PARK site');
+  assert.ok(lot.size >= ne.w * ne.scale, 'the Q05 lot covers the NE PARK site'); }
+{ // The GLB's lawn plinth is the lot (R2: 24 m radius, owner «the playground expand a little»); the moving parts exist, stay out of
+  // the bake and get their blending.
+  const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
+  const { Box3, AdditiveBlending, NormalBlending } = await import('three');
+  const { REVERSE_AC_MOVING, prepareReverseAc, reverseAcBakes } = await import('../src/reverseAc.ts');
+  const bytes = readFileSync(new URL('../asset/models/q05a-reverse-ac-2127/q05a-reverse-ac-2127.glb', import.meta.url));
+  const model = (await new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength), '')).scene;
+  const plinth = new Box3().setFromObject(model.getObjectByName('q05a_plinth')!), lot = LOTS['ne-park'];
+  assert.ok(Math.abs(plinth.max.x - lot.size / 2) < .1 && Math.abs(-plinth.min.z - lot.size / 2) < .1, `plinth radius ${plinth.max.x} = lot/2`);
+  const all = new Box3().setFromObject(model);
+  assert.ok(Math.max(all.max.x, -all.min.x, all.max.z, -all.min.z) < lot.size / 2 + 2.5, 'tree crowns overhang the lot by under 2.5 m');
+  const motion = prepareReverseAc(model);
+  assert.ok(motion, 'every moving mesh is in the GLB');
+  const part = (name: string) => model.getObjectByName(name) as Mesh;
+  assert.equal((part(REVERSE_AC_MOVING.flame).material as MeshStandardMaterial).blending, NormalBlending);
+  for (const name of [REVERSE_AC_MOVING.plume, REVERSE_AC_MOVING.flow]) assert.equal((part(name).material as MeshStandardMaterial).blending, AdditiveBlending, name);
+  for (const name of Object.values(REVERSE_AC_MOVING)) assert.equal(reverseAcBakes(part(name)), false, `${name} stays out of the bake`);
+  motion!(2); assert.ok(part(REVERSE_AC_MOVING.flow).rotation.y > 0, 'cold streams wind inward (positive rotation.y)');
+  assert.equal(model.visible, false);
+}
 {
   const acScene = new Scene(), ac = new Group(), park = new Group(), parkShared = new MeshStandardMaterial();
   const keeps: [number, number][] = [];

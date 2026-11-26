@@ -198,7 +198,7 @@ Q03-A「車が引き出しになる住宅」在フジテレビ西南側 A 位，
 
 Q06-B 蛋艙塔（2026-11-19，owner）：住宅 U 自城市背景撤走（`background.parts.mobile.visible=false`；DEV `?housing` 研究照舊），`pod-frame-tower-2127` GLB 以固定形態載入其地塊 `POD_TOWER` (−258, −75)，正面朝北，不透明網格合批。獨立預覽顯示固定模型；展覽由 Q06 驅動（B 顯示，A／C 淡出留草地，`LotRuntime.setQ06`）。`streetKit.podTowerAccess` 由道路 ③ 外側接入陶板支路，並以連續步道接北面兩個入口和東側入口。道路、入口平台及夜間導光屬固定街道層，塔淡出後保留。[交接](handoffs/archive/pod-frame-tower.md)
 
-Q05-A 逆向冷氣機（2026-11-26，R1 草稿，未經 owner 驗收）：`q05a-reverse-ac-2127` GLB 隱藏載入 NE PARK 地塊 `LOTS['ne-park']` (−210, −135)，連同自身半徑 20 m 的冷卻草地。不透明網格合批，玻璃芯、熱浪柱及螺旋熱流分件；[reverseAc.ts](../src/reverseAc.ts) 令熱浪柱以加法混合繪製，並轉動螺旋熱流及熱浪柱。展覽由 Q05 驅動（`LotRuntime.setQ05`）：A 時塔淡入，NE 公園（凍結的 tier 0 Meter 站點 `survey-site-ne`）及其下的共享庭園 1（`SharingDistrict.setCourtKeep`）同步淡出；B／C 未有模型，公園及庭園回復。version4 run 不接手，維持公園。[交接](handoffs/q05-park-cooling.md)
+Q05-A 逆向冷氣機（2026-11-26 R1，2026-11-27 R2，未經 owner 驗收）：`q05a-reverse-ac-2127` GLB 隱藏載入 NE PARK 地塊 `LOTS['ne-park']` (−210, −135)，連同自身半徑 24 m 的冷卻草地（地塊 48 m）。不透明網格合批，玻璃芯及四個活動件分件；[reverseAc.ts](../src/reverseAc.ts) 令火舌以一般透明、熱浪及草地冷氣流線以加法混合繪製，並轉動螺旋熱流、火舌、熱浪及冷氣流線（流線向塔底捲入）。展覽由 Q05 驅動（`LotRuntime.setQ05`）：A 時塔淡入，NE 公園（凍結的 tier 0 Meter 站點 `survey-site-ne`）及其下的共享庭園 1（`SharingDistrict.setCourtKeep`）同步淡出；B／C 未有模型，公園及庭園回復。version4 run 不接手，維持公園。[交接](handoffs/q05-park-cooling.md)
 
 Q08-C 南岸活動模組棚的固定支路沿道路 ④ 現有導光過街位接入，平台銜接兩條地軌，中央步道穿過前庭綠籬接到大堂基座。支路、平台、步道及導光屬街道層，模組棚收起後保留。相鄰的共享庭園 3 東移至 (−90, 230)，避開地軌及平台，並清出與新庭園重疊的樹叢。獨立預覽亦使用同一組街道鋪面。[交接](handoffs/question-rotation.md)
 

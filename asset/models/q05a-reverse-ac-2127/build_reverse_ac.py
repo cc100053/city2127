@@ -8,9 +8,11 @@ Re-run headless (Blender 5.2):
 Writes q05a-reverse-ac-2127.blend and .glb next to this file (glTF, no Meshopt/Draco).
 
 Units are METRES, three.js axes (x, y up, z), ground-contact centre at the origin, front -z (no strong front: round).
-Lot: NE PARK `changeSites.ne` (40 x 40 m); the lawn disc is 20 m in radius, the crown tops out at ~46 m, the plume
-reaches ~78 m. One node Q05A_REVERSE_AC, one mesh per role named q05a_<role>; the runtime animates two of them:
-q05a_spiral (the amber heat spiral, turned about y) and q05a_plume (the heat column above the crown, drawn additive).
+Lot: NE PARK `LOTS['ne-park']` (48 x 48 m, R2: the owner's «playground expand a little»); the lawn plinth is 24 m in
+radius, the crown tops out at ~46 m, the flame reaches ~78 m. One node Q05A_REVERSE_AC, one mesh per role named
+q05a_<role>; the runtime animates four of them (src/reverseAc.ts): q05a_spiral (the amber heat spiral inside the glass),
+q05a_flame (saturated flame tongues over the crown, alpha-blended), q05a_plume (the soft heat shimmer round them, drawn
+additive) and q05a_flow (ice-blue cold-air streams spiralling over the lawn into the skirt, drawn additive).
 """
 import math
 import os
@@ -25,7 +27,9 @@ import modules as M  # noqa: E402
 
 TAU = math.pi * 2
 Y0, Y1 = 4.2, 37.0            # exoskeleton from the skirt top to the crown band
-LAWN_R, PLINTH_R = 18.6, 20.0
+LAWN_R, PLINTH_R = 22.6, 24.0
+PATHS = [TAU / 8 + i * TAU / 4 for i in range(4)]                # four paths in from the rim, kept clear of trees
+CAM = -2.22                                                      # azimuth of the q05:tower close-up camera (model frame)
 SKIRT_R0, SKIRT_R1, SKIRT_Y = 8.8, 4.9, 4.6
 
 # Exoskeleton radius along the height: wide at the skirt, a waist at ~18 m, opening into the crown (target silhouette).
@@ -44,21 +48,25 @@ def prof(y):
 
 
 Q05A_ROLES = {                                                  # build-only roles (shared ROLES untouched)
-    'silver': ((.93, .95, .97, 1), None, .5),                   # exoskeleton, rings, skirt fins: pale near-white metal
-    'ice': ((.30, .80, 1, 1), (.25, .75, 1, 1), 2.6),            # cold intake glow, ring strips, lawn seams
+    'silver': ((.97, .98, .99, 1), None, .5),                   # exoskeleton, rings, skirt fins: near-white (R2: paler)
+    'ice': ((.30, .80, 1, 1), (.25, .75, 1, 1), 2.6),            # cold intake glow, ring strips
+    'seam': ((.45, .88, 1, 1), (.35, .85, 1, 1), 3.4),           # lawn cold seams and rim light (R2: wider, brighter)
+    'flow': ((.55, .90, 1, .42), (.45, .85, 1, 1), 1.1),          # cold-air streams over the lawn (runtime: additive)
+    'flame': ((1, .48, .08, .55), (1, .42, .05, 1), 1.6),         # flame tongues over the crown (runtime: alpha, no depth write)
+    'drone': ((.16, .18, .21, 1), None, .5),                      # maintenance drone body: dark, so it reads on the white rings
     'heat': ((1, .62, .22, 1), (1, .55, .14, 1), 3.0),           # hot core column
     'spiral': ((1, .74, .32, 1), (1, .66, .20, 1), 4.5),         # the rising heat spiral (animated)
     'gold': ((.93, .70, .32, 1), (1, .62, .22, 1), .35),        # crown fins and band
     'core': ((.80, .90, .96, .16), None, .5),                    # clear glass core
-    'plume': ((1, .70, .42, .13), (1, .60, .30, 1), .55),        # heat shimmer column (runtime: additive, translucent)
+    'plume': ((1, .62, .30, .22), (1, .55, .22, 1), .9),         # heat shimmer round the flame (runtime: additive)
     'lawn': ((.20, .40, .12, 1), None, .5),
     'plinth': ((.90, .90, .87, 1), None, .5),
 }
-ROUGH = {'silver': .28, 'gold': .3, 'core': .05, 'plume': .9, 'lawn': .9, 'plinth': .6}
-METAL = {'silver': .3, 'gold': .8}
-SMOOTH = {'silver': 40, 'gold': 35, 'core': 60, 'plume': 80, 'spiral': 70, 'heat': 60, 'green': 80, 'leaf_l': 80,
-          'ice': 40}
-LEAVES = ('green', 'leaf_l')
+ROUGH = {'silver': .35, 'gold': .3, 'core': .05, 'plume': .9, 'flame': .9, 'flow': .9, 'lawn': .9, 'plinth': .6, 'drone': .4}
+METAL = {'silver': .05, 'gold': .8, 'drone': .3}
+SMOOTH = {'silver': 40, 'gold': 35, 'core': 60, 'plume': 80, 'flame': 80, 'flow': 80, 'spiral': 70, 'heat': 60, 'green': 80,
+          'leaf_l': 80, 'ice': 40, 'drone': 40}
+DOUBLE = ('green', 'leaf_l', 'plume', 'flame', 'flow')                    # drawn from both sides
 
 
 def ring_solid(acc, r_in, r_out, y0, y1, n=64):
@@ -91,17 +99,18 @@ def ground(ctx):
     a = ctx.a
     cyl(a['plinth'], 0, 0, PLINTH_R, 0, .35, 96)
     cyl(a['lawn'], 0, 0, LAWN_R, .35, .48, 96)
-    ring_solid(a['ice'], LAWN_R, LAWN_R + .35, .35, .52, 96)                 # cold rim light round the lawn
+    ring_solid(a['seam'], LAWN_R - .1, LAWN_R + .6, .35, .54, 112)           # cold rim light round the lawn
     ring_solid(a['plinth'], 9.0, 10.4, .35, .55, 72)                         # paved ring round the skirt
+    ring_solid(a['seam'], 10.4, 10.75, .35, .56, 72)                         # cold line at the paving edge
     for i in range(16):                                                      # radial cold seams in the grass
         ang = (i + .5) * TAU / 16
         c, s = math.cos(ang), math.sin(ang)
-        r0, r1 = 10.6, LAWN_R - .5
-        obox(a['ice'], ((r0 + r1) / 2 * c, .5, (r0 + r1) / 2 * s), (r1 - r0, .05, .22), (c, s), (-s, c))
-    for i in range(4):                                                       # four paths in from the rim
-        ang = TAU / 8 + i * TAU / 4
+        r0, r1 = 10.6, LAWN_R - .2
+        obox(a['seam'], ((r0 + r1) / 2 * c, .5, (r0 + r1) / 2 * s), (r1 - r0, .06, .5), (c, s), (-s, c))
+    rm = (10.4 + LAWN_R) / 2
+    for ang in PATHS:                                                        # four paths in from the rim
         c, s = math.cos(ang), math.sin(ang)
-        obox(a['plinth'], (14.6 * c, .5, 14.6 * s), (8.4, .06, 1.8), (c, s), (-s, c))
+        obox(a['plinth'], (rm * c, .5, rm * s), (LAWN_R - 10.4 + .3, .06, 1.8), (c, s), (-s, c))
 
 
 def skirt(ctx):
@@ -150,17 +159,23 @@ def shaft(ctx):
             rr = 1.85 + .5 * t
             pts.append((rr * math.cos(ang), y, rr * math.sin(ang)))
         M.limb(a['spiral'], pts, .22, .42, 8)
-    # Pale exoskeleton: 14 left- and 14 right-hand helical members, from skirt collar to the crown band.
-    for hand in (1, -1):
-        for i in range(14):
-            pts = []
-            for j in range(33):
-                t = j / 32
-                y = Y0 + (Y1 - Y0) * t
-                ang = i * TAU / 14 + hand * t * math.pi * .95
-                r = prof(y)
-                pts.append((r * math.cos(ang), y, r * math.sin(ang)))
-            M.limb(a['silver'], pts, .2, .17, 6)
+    # Near-white exoskeleton (R2, owner: like the target): 12 broad flat members, all one hand, from the skirt collar to the
+    # crown band, about 0.6 of a turn each.
+    for i in range(12):
+        pts, outs, side = [], [], []
+        for j in range(41):
+            t = j / 40
+            y = Y0 + (Y1 - Y0) * t
+            ang = i * TAU / 12 + t * TAU * .6
+            r = prof(y) + .05
+            c, s = math.cos(ang), math.sin(ang)
+            ty, ta = Y1 - Y0, r * TAU * .6                                   # tangent: up ty, round ta (per unit t)
+            ln = math.hypot(ty, ta)
+            w = (-s * ty / ln, -ta / ln, c * ty / ln)                        # across the member, in the skin
+            pts.append((r * c - w[0] * .45, y - w[1] * .45, r * s - w[2] * .45))
+            outs.append(w)
+            side.append((c, 0, s))
+        blade(a['silver'], pts, outs, side, .9, .45)
     # Thin hoops where the lattice meets the collar and the crown.
     for y in (Y0 + .2, Y1 - .3):
         ring_solid(a['silver'], prof(y) - .2, prof(y) + .3, y - .3, y + .3, 56)
@@ -173,19 +188,26 @@ def rings(ctx):
         r = prof(y)
         ring_solid(a['silver'], r + .1, r + 1.15, y - .7, y + .7, 72)
         ring_solid(a['ice'], r + 1.1, r + 1.22, y - .12, y + .12, 72)
-    drone(ctx, (prof(22.5) + 1.7) * math.cos(-2.2), 23.55, (prof(22.5) + 1.7) * math.sin(-2.2), -2.2)
-    drone(ctx, 7.6 * math.cos(-1.4), 19.4, 7.6 * math.sin(-1.4), .4)
+    rd = prof(22.5) + 1.5                                                    # docked on the middle ring, facing the close-up
+    drone(ctx, rd * math.cos(CAM), 23.75, rd * math.sin(CAM), CAM)
+    rf = prof(28.5) + 5.5                                                    # one hovering beside the top ring
+    drone(ctx, rf * math.cos(CAM + .55), 31.0, rf * math.sin(CAM + .55), CAM + .3)
 
 
 def drone(ctx, x, y, z, yaw):
+    """Maintenance quadcopter about 3.5 m across: dark body, white canopy, four ice-blue rotor rings (R2: readable)."""
     a = ctx.a
-    M.ell(a['white'], (x, y, z), (.7, 0, 0), (0, .26, 0), (0, 0, .55), 10, 6)
+    M.ell(a['drone'], (x, y, z), (1.0, 0, 0), (0, .42, 0), (0, 0, .8), 12, 7)
+    M.ell(a['white'], (x, y + .28, z), (.6, 0, 0), (0, .2, 0), (0, 0, .5), 10, 5)
     for dx, dz in ((1, 1), (1, -1), (-1, 1), (-1, -1)):
-        ox, oz = .75 * dx, .6 * dz
+        ox, oz = 1.2 * dx, 1.0 * dz
         px, pz = x + ox * math.cos(yaw) + oz * math.sin(yaw), z - ox * math.sin(yaw) + oz * math.cos(yaw)
-        M.limb(a['slate'], [(x, y + .05, z), (px, y + .12, pz)], .05, .05, 5)
-        cyl(a['dark'], px, pz, .38, y + .14, y + .19, 12)
-    cyl(a['ice'], x, z, .16, y - .32, y - .22, 10)
+        M.limb(a['drone'], [(x, y + .05, z), (px, y + .2, pz)], .11, .09, 6)
+        cyl(a['drone'], px, pz, .16, y + .05, y + .3, 10)
+        sweep(a['ice'], lambda k, px=px, pz=pz: circle_pts(px, pz, .7 - k, 20), [(0, y + .22), (.14, y + .22), (.14, y + .32),
+              (0, y + .32)], closed=True, caps=(False, False))
+        cyl(a['dark'], px, pz, .56, y + .25, y + .29, 16)
+    cyl(a['ice'], x, z, .3, y - .48, y - .36, 12)                              # belly light
 
 
 def crown(ctx):
@@ -208,10 +230,70 @@ def crown(ctx):
     ring_solid(a['gold'], rb + .9, rb + 1.25, Y1 + 4.6, Y1 + 5.0, 60)        # tie hoop through the rods
 
 
+def flame(ctx):
+    """Flame tongues over the crown (R2, owner: far more visible): 10 twisting ribbons from the crown mouth, ~4 m wide at the
+    base, narrowing to points between 58 and 80 m, plus a tapering core; alpha-blended saturated orange at runtime."""
+    acc, rng = ctx.a['flame'], ctx.rng
+    for i in range(10):
+        a0 = i * TAU / 10 + rng.uniform(-.15, .15)
+        top = rng.uniform(58, 80)
+        r0 = rng.uniform(1.6, 3.4)
+        wid = rng.uniform(3.2, 4.6)
+        ph = rng.uniform(0, TAU)
+        verts, faces, rows = [], [], 16
+        for j in range(rows + 1):
+            t = j / rows
+            y = Y1 + .6 + (top - Y1 - .6) * t
+            ang = a0 + t * 1.6 + .25 * math.sin(t * 9 + ph)
+            r = r0 * (1 - .55 * t) + .8 * math.sin(t * 6 + ph)
+            w = wid * (1 - t) ** .8 * (1 + .25 * math.sin(t * 11 + ph)) / 2
+            cx, cz = r * math.cos(ang), r * math.sin(ang)
+            tx, tz = -math.sin(ang), math.cos(ang)
+            verts += [(cx - tx * w, y, cz - tz * w), (cx + tx * w, y, cz + tz * w)]
+        faces = [(j * 2, j * 2 + 1, j * 2 + 3, j * 2 + 2) for j in range(rows)]
+        acc.surface(verts, faces, lambda c: (c[0], 0, c[2]))
+    n, rows = 16, 10                                                         # hot core cone out of the mouth
+    verts = []
+    for j in range(rows + 1):
+        t = j / rows
+        y = Y1 + .4 + 30 * t
+        for i in range(n):
+            ang = i * TAU / n
+            r = 3.4 * (1 - t) ** 1.2 * (1 + .15 * math.sin(ang * 3 + t * 8))
+            verts.append((r * math.cos(ang), y, r * math.sin(ang)))
+    acc.surface(verts, [(j * n + i, j * n + (i + 1) % n, (j + 1) * n + (i + 1) % n, (j + 1) * n + i)
+                        for j in range(rows) for i in range(n)], lambda c: (c[0], 0, c[2]))
+
+
+def flow(ctx):
+    """Cold-air streams (R2, owner: make the cooled lawn read as cold air): 40 ice-blue ribbons spiralling in over the grass
+    from the rim to the skirt, rising into the intake; 16 wider, higher mist wisps. Turned at runtime about y (positive
+    rotation.y winds the pattern inward, so the streams read as flowing into the tower)."""
+    acc, rng = ctx.a['flow'], ctx.rng
+    for i in range(56):
+        mist = i >= 40
+        a0 = (i if not mist else (i - 40) * 2.5) * TAU / (40 if not mist else 40) + rng.uniform(-.06, .06)
+        ro, ri = (LAWN_R - .6, 9.4) if not mist else (rng.uniform(17, 21), 9.8)
+        h0, h1 = (.62, 1.5) if not mist else (1.1, 2.6)
+        wid = .42 if not mist else 1.3
+        rows = 18
+        verts = []
+        for j in range(rows + 1):
+            t = j / rows
+            r = ro + (ri - ro) * t
+            ang = a0 + (ro - r) * .075
+            y = h0 + (h1 - h0) * t ** 2.2 + (.12 if not mist else .3) * math.sin(t * math.pi)
+            w = wid * (.35 + .65 * math.sin(math.pi * min(1, t * 1.15)) ** .6) / 2
+            c, s = math.cos(ang), math.sin(ang)
+            tx, tz = -s, c
+            verts += [(r * c - tx * w, y, r * s - tz * w), (r * c + tx * w, y, r * s + tz * w)]
+        acc.surface(verts, [(j * 2, j * 2 + 1, j * 2 + 3, j * 2 + 2) for j in range(rows)], lambda c: (0, 1, 0))
+
+
 def plume(ctx):
-    """Translucent heat column: three wavy open tubes nested above the crown (runtime draws them additive)."""
+    """Soft heat shimmer: three wavy open tubes nested round the flame (runtime draws them additive)."""
     acc = ctx.a['plume']
-    for k, (r0, r1, top) in enumerate(((3.6, 7.5, 78.0), (2.6, 5.6, 70.0), (1.6, 3.8, 62.0))):
+    for k, (r0, r1, top) in enumerate(((3.6, 7.5, 80.0), (2.6, 5.6, 72.0), (1.6, 3.8, 64.0))):
         n, rows = 28, 12
         verts, faces = [], []
         for j in range(rows + 1):
@@ -219,7 +301,7 @@ def plume(ctx):
             y = Y1 + 2.0 + (top - Y1 - 2.0) * t
             for i in range(n):
                 ang = i * TAU / n + k * .4
-                r = (r0 + (r1 - r0) * t) * (1 + .12 * math.sin(ang * 3 + t * 7 + k) + .06 * math.sin(ang * 5 - t * 11))
+                r = (r0 + (r1 - r0) * t) * (1 - .65 * t ** 2) * (1 + .12 * math.sin(ang * 3 + t * 7 + k) + .06 * math.sin(ang * 5 - t * 11))
                 verts.append((r * math.cos(ang), y, r * math.sin(ang)))
         for j in range(rows):
             for i in range(n):
@@ -227,21 +309,36 @@ def plume(ctx):
         acc.surface(verts, faces, lambda c: (c[0], 0, c[2]))
 
 
+TREES = []
+
+
+def lush_tree(ctx, base, h, crown):
+    """A full round crown like the target's grove (R2): a library leafy_tree with dense cards, plus a solid dark-green
+    body inside the crown so it reads as one mass of leaves, not see-through branches."""
+    TREES.append(base)
+    M.leafy_tree(ctx, base, h=h, crown=crown, roles=('green', 'leaf_l', 'green'), core='green', n=420, size=1.0, branches=5)
+    c = (base[0], base[1] + h * .82, base[2])
+    M.ell(ctx.a['green'], c, (crown * .78, 0, 0), (0, crown * .62, 0), (0, 0, crown * .78), 10, 6)
+
+
 def park(ctx):
-    """Trees round the rim, benches facing the tower, residents resting in the cool."""
+    """A dense grove in two rows round the rim (R2, owner: lush like the target), benches facing the tower, residents."""
     rng = ctx.rng
-    for i in range(16):                                                      # lush rim grove (owner: green stays lush)
-        ang = i * TAU / 16 + rng.uniform(-.1, .1)
-        r = rng.uniform(15.4, 17.4)
-        M.leafy_tree(ctx, (r * math.cos(ang), .48, r * math.sin(ang)), h=rng.uniform(6.5, 8.5), crown=rng.uniform(3.0, 3.6),
-                     roles=('leaf_l', 'green'), n=150, size=.75, branches=5)
-    for i in range(6):                                                       # a few inner trees for shade on the benches
-        ang = (i + .25) * TAU / 6
-        M.leafy_tree(ctx, (13.2 * math.cos(ang), .48, 13.2 * math.sin(ang)), h=5.5, crown=2.4,
-                     roles=('leaf_l', 'green'), n=90, size=.6, branches=4)
+
+    def clear(ang, gap):
+        return all(abs((ang - p + math.pi) % TAU - math.pi) > gap for p in PATHS)
+
+    for row, (count, r0, r1, h0, h1, c0, c1, gap) in enumerate(((26, 19.4, 20.6, 6.2, 8.4, 3.7, 4.4, .2),
+                                                                 (18, 16.2, 17.4, 5.4, 6.8, 3.1, 3.6, .24))):
+        for i in range(count):
+            ang = (i + .5 * row) * TAU / count + rng.uniform(-.08, .08)
+            if not clear(ang, gap):
+                continue
+            r = rng.uniform(r0, r1)
+            lush_tree(ctx, (r * math.cos(ang), .48, r * math.sin(ang)), rng.uniform(h0, h1), rng.uniform(c0, c1))
     for i in range(8):
         ang = (i + .5) * TAU / 8
-        r = 12.4
+        r = 13.4
         x, z = r * math.cos(ang), r * math.sin(ang)
         yaw = math.atan2(-x, -z)                                             # facing the tower
         M.kit_prop(ctx, 'bench', x, .48, z, yaw + math.pi)
@@ -249,7 +346,7 @@ def park(ctx):
             M.seated_person(ctx, x + .35 * math.cos(ang + math.pi / 2), .48 + .45, z + .35 * math.sin(ang + math.pi / 2), yaw)
     for i in range(14):
         ang = rng.uniform(0, TAU)
-        r = rng.uniform(11.0, 14.5)
+        r = rng.uniform(11.2, 15.2)
         M.person(ctx, r * math.cos(ang), .48, r * math.sin(ang))
 
 
@@ -259,7 +356,9 @@ def build(ctx):
     shaft(ctx)
     rings(ctx)
     crown(ctx)
+    flame(ctx)
     plume(ctx)
+    flow(ctx)
     park(ctx)
 
 
@@ -280,7 +379,7 @@ def main():
         bsdf = next(n for n in mat.node_tree.nodes if n.type == 'BSDF_PRINCIPLED')
         if role in METAL:
             bsdf.inputs['Metallic'].default_value = METAL[role]
-        if role in LEAVES or role == 'plume':
+        if role in DOUBLE:
             mat.use_backface_culling = False
         ob = finish_mesh('q05a_' + role, acc, mat, SMOOTH.get(role, 25))
         bpy.context.scene.collection.objects.link(ob)
@@ -298,7 +397,7 @@ def main():
     bpy.ops.export_scene.gltf(filepath=glb, export_format='GLB', use_selection=True, export_yup=True, export_apply=True,
                               export_normals=True, export_materials='EXPORT', export_animations=False,
                               export_cameras=False, export_lights=False, export_extras=False)
-    print('@@BUILD@@', {'tris': tris, 'glb_bytes': os.path.getsize(glb),
+    print('@@BUILD@@', {'tris': tris, 'trees': len(TREES), 'glb_bytes': os.path.getsize(glb),
                         'top': dict(sorted(per.items(), key=lambda kv: -kv[1])[:12])})
 
 

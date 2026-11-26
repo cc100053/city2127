@@ -127,10 +127,11 @@ export const LOTS = {
   'drawer-housing': { x: DRAWER_HOUSING.x, z: 77, size: 50, sea: false },
   // Q06's three options share the pod-frame tower lot: its R4 envelope with the pods is about 56 × 38 m.
   'pod-tower': { x: POD_TOWER.x, z: POD_TOWER.z, size: 56, sea: false },
-  // Q05's three options share the NE PARK lot (owner 2026-11-19; park cooling, 2026-11-26): A's reverse air conditioner stands on
-  // its own 20 m-radius cooled lawn in place of the NE park (src/lotRuntime.ts), so the lot is the 40 m site (changeSites.ne below,
-  // 10 × 4; tests/lotRuntime.test.ts keeps the two equal).
-  'ne-park': { x: -210, z: -135, size: 40, sea: false },
+  // Q05's three options share the NE PARK lot (owner 2026-11-19; park cooling, 2026-11-26), centred on the 40 m NE PARK site
+  // (changeSites.ne below): A's reverse air conditioner stands on its own 24 m-radius cooled lawn in place of the NE park
+  // (src/lotRuntime.ts; R2, owner: «the playground expand a little»), so the lot is 48 m. Its plinth clears the 5 m utility block
+  // west of it by about 1.5 m (CTX_north_utility_service, nearest corner −235.1, −130.2). tests/lotRuntime.test.ts checks the GLB.
+  'ne-park': { x: -210, z: -135, size: 48, sea: false },
 } as const;
 /** Urban fill (owner 2026-11-21: too much bare lawn to read as a city): street blocks on a grid aligned with the ④ boulevard (`axis`, from its
  *  east exit `origin`), `pitch` metres per block along/across it with `street` metres of paving between lots. A block is built only where its
