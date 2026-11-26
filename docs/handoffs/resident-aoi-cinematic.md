@@ -86,7 +86,7 @@
 ## Actual validation results
 
 - Verification status：NOT RUN（今次只改文件）
-- 文件改動做咗本機 Markdown 連結檢查同 `git diff --check`，結果見下面「整合」。
+- 文件改動：6 個檔案嘅本機 Markdown 連結檢查，0 條斷鏈；`git diff --check origin/main..HEAD` 通過。以 `bb0248e4` 合併入 main 並推送；純文件推送唔會觸發 CI。
 
 ## Known issues and blockers
 
