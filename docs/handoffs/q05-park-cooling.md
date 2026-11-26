@@ -4,7 +4,7 @@
 - Status: IN_PROGRESS。Q05-A R2 已完成（2026-11-27），等待 owner 評審；B、C 未建模。
 - Branch: `feat/q05a-reverse-ac`（worktree `../city2127-q05a`），自 `origin/main` `bbec76c2`；目標圖記錄見舊分支 `docs/q05-targets`（已合併）。
 - Base commit: `bbec76c26a833a2a5ba24dfc42f3cee3f9a03c0c`
-- Last verified commit: 見下文 R1 一節（R1 提交）。
+- Last verified commit: `00f0cd75`（R2；檢查見下文 R2 一節）。
 - Remote availability: `origin/feat/q05a-reverse-ac`（R1 推送後）；未合併入 main，須待 owner 接受。
 
 ## Session Git state
