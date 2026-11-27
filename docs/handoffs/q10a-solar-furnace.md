@@ -51,6 +51,10 @@ Owner-judged rounds on the Q10-A sphere furnace (reference: Q10 sheet image A; s
 - Front columns keep flanking the main view (owner, round 2).
 - No figures anywhere.
 
+## DEV showcase (2026-11-27)
+
+Owner chose a DEV-only showcase over a rotation slot or fixed background: `?showcase` ([src/devShowcase.ts](../../src/devShowcase.ts)) loads this GLB as an island on the west bay at (−800, −170), yaw π/2 (land side east, toward the city), static opaque parts baked. [tests/devShowcase.test.ts](../../tests/devShowcase.test.ts) keeps it west of the hero district, clear of the Q02 sea lots, the other draft and every boat by 15 m. Checked in the dev server (Windows, in-app browser): loads with no console error, sits on open water, does not show in production builds. `npm test` on Windows: the new test passes; assertGuard, surveyMeterPipeline, energyPipeline, rotationPipeline and rotationLayout fail the same way on clean main (a doubled drive prefix when the survey question files load on Windows, and the SIGKILL watchdog). `npm run build` and `git diff --check` passed.
+
 ## Next expected step
 
 Owner reviews the round-4 previews; then the next owner-judged round, or placement as its own task.

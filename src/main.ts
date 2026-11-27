@@ -230,6 +230,12 @@ try {
       model.name = REVERSE_AC;
     }).catch(error => console.error('Reverse air conditioner could not load', error));
   }
+  // DEV `?showcase`: the unplaced Q10-A and Q11-C drafts on the west bay (src/devShowcase.ts), outside the rotation.
+  let showcaseFrame:((now:number)=>void)|undefined;
+  if(import.meta.env.DEV&&params.has('showcase'))void odaibaReady.then(async ready=>{
+    if(!ready)return;
+    const {startShowcase}=await import('./devShowcase');showcaseFrame=startShowcase(scene);
+  });
   // DEV E3 city composition: a separate design comparison, never derived from environment Meter bands.
   let devFrame:((now:number,darkness:number)=>void)|undefined;
   if(import.meta.env.DEV&&energyReview)
@@ -424,7 +430,7 @@ try {
     attract?.update(now,!!headlineCamera?.active||!!explore?.active||devShot!==null,cameraMotion.matches,voices);
     if(headlineCamera?.active)voiceLabel?.update(camera,now);else voiceLabel?.hide();
     if(import.meta.env.DEV&&devShot){camera.position.set(...devShot.position);controls.target.set(...devShot.target);camera.lookAt(controls.target);}
-    cityChanges?.update(now,dark);lots?.update(now,cameraMotion.matches);if(!cameraMotion.matches)reverseAcMotion?.(now);concept?.update(now);journey?.update(now,dark);devFrame?.(now,dark);elevatorNear.update(now,dark);ring.update(dark);holo.update(now,dark);rig.update(s,now,dark,cityChanges?.automationLevel,hour);updateOdaiba(dark);updateFloaters(now,dark);updateHoverBeds(now);updateOverlay(hour,dark>.5);renderer.info.reset();
+    cityChanges?.update(now,dark);lots?.update(now,cameraMotion.matches);if(!cameraMotion.matches){reverseAcMotion?.(now);showcaseFrame?.(now);}concept?.update(now);journey?.update(now,dark);devFrame?.(now,dark);elevatorNear.update(now,dark);ring.update(dark);holo.update(now,dark);rig.update(s,now,dark,cityChanges?.automationLevel,hour);updateOdaiba(dark);updateFloaters(now,dark);updateHoverBeds(now);updateOverlay(hour,dark>.5);renderer.info.reset();
     // Wall-clock rate, so held review times still redraw shadows as models load and Meter sites change.
     if(performance.now()-shadowDrawn>=1000/quality.shadowHz){renderer.shadowMap.needsUpdate=true;shadowDrawn=performance.now();}
     composer.render();
