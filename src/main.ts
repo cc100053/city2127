@@ -239,8 +239,9 @@ try {
     }).catch(error => console.error('Reverse air conditioner could not load', error));
   }
   // DEV `?showcase`: the unplaced Q10-A and Q11-C drafts on the west bay (src/devShowcase.ts), outside the rotation.
-  let showcaseFrame:((now:number)=>void)|undefined,showcaseFly:(()=>void)|undefined;
-  if(showcaseCamera)void import('./devShowcase').then(({showcaseKeys})=>{showcaseFly=showcaseKeys(camera,controls.target);});
+  let showcaseFrame:((now:number)=>void)|undefined,showcaseFly:(()=>boolean)|undefined;
+  // `?showcase` and the `?rotation` モデルシーン · DEV panel: WASD / QE fly the camera (devShowcase showcaseKeys).
+  if(showcaseCamera||localRotation)void import('./devShowcase').then(({showcaseKeys})=>{showcaseFly=showcaseKeys(camera,controls.target);});
   if(import.meta.env.DEV&&params.has('showcase'))void odaibaReady.then(async ready=>{
     if(!ready)return;
     const {startShowcase}=await import('./devShowcase');showcaseFrame=startShowcase(scene);
@@ -436,7 +437,10 @@ try {
     scene.environmentIntensity=light.environment;renderer.toneMappingExposure=light.exposure*(1+.16*day);
     waterLights.night.value=nightSky;
     bloom.strength=light.bloom+pulse*.04;vignette.uniforms.offset.value=light.vignette;
-    showcaseFly?.();controls.update();if(!ringReview&&!showcaseCamera){panBack.copy(controls.target).clamp(districtMin,districtMax).sub(controls.target);controls.target.add(panBack);camera.position.add(panBack);}
+    // A rotation-panel fly step frees a pinned close-up (`&shot=`, 即時) or a playing headline camera.
+    // The orbit floor drops to the close-up's distance, or OrbitControls would snap the camera back out to the hero minimum.
+    if(showcaseFly?.()&&localRotation){if(devShot){devShot=null;controls.enabled=true;}if(headlineCamera?.active)headlineCamera.cancel();controls.minDistance=Math.min(controls.minDistance,camera.position.distanceTo(controls.target));}
+    controls.update();if(!ringReview&&!showcaseCamera){panBack.copy(controls.target).clamp(districtMin,districtMax).sub(controls.target);controls.target.add(panBack);camera.position.add(panBack);}
     if(headlineCamera?.active&&cameraMotion.matches)headlineCamera.cancel();else headlineCamera?.update(now);
     narration?.update(now,cameraMotion.matches);explore?.update(now,cameraMotion.matches);
     attract?.update(now,!!headlineCamera?.active||!!explore?.active||devShot!==null,cameraMotion.matches,voices);
