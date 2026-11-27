@@ -1,0 +1,88 @@
+{
+ "tris_by_group": {
+  "STATION": 247208,
+  "ROTORS": 30736,
+  "RINGS": 18072,
+  "VORTEX": 68672,
+  "CLOUD": 17280,
+  "PLAZA": 76258
+ },
+ "tris_total": 458226,
+ "unique_mesh_tris": 225404,
+ "objects": 195,
+ "unique_meshes": 24,
+ "materials": 56,
+ "textures": {
+  "q11c_cloud_disc": [
+   1024,
+   1024
+  ],
+  "q11c_vortex_band": [
+   1024,
+   256
+  ],
+  "q11c_vortex_core": [
+   512,
+   512
+  ],
+  "q11c_vortex_mist": [
+   512,
+   512
+  ],
+  "q11c_vortex_rope": [
+   512,
+   256
+  ],
+  "q11c_vortex_skirt": [
+   512,
+   256
+  ]
+ },
+ "glb_bytes": 8149648,
+ "layout": {
+  "vane_gap_min_m": 4.08,
+  "vane_foot_r_m": [
+   55.16,
+   58.94
+  ],
+  "vane_tip_r_m": 48.03,
+  "vane_turn_deg": 5.0,
+  "turbine_to_wall_clear_m": 0.65,
+  "rings": {
+   "LOW": {
+    "inner_r": 25.0,
+    "z": 57.0,
+    "vortex_r": 20.38,
+    "clear_to_bands_m": 2.8,
+    "clear_measured_m": 2.64
+   },
+   "MID": {
+    "inner_r": 28.0,
+    "z": 83.0,
+    "vortex_r": 22.0,
+    "clear_to_bands_m": 4.07,
+    "clear_measured_m": 3.93
+   },
+   "HIGH": {
+    "inner_r": 32.0,
+    "z": 109.0,
+    "vortex_r": 24.91,
+    "clear_to_bands_m": 4.97,
+    "clear_measured_m": 4.87
+   }
+  },
+  "vortex_r_at_lip_m": 20.0,
+  "vortex_r_at_top_m": 29.0,
+  "levels": {
+   "podium": 3.0,
+   "turbine_centre": 7.0,
+   "roof_walkway": 35.0,
+   "lip": 37.0,
+   "rim": 35.9,
+   "vane_tip": 40.0,
+   "vortex_top": 126.0
+  },
+  "stair_foot_r_m": 66.4,
+  "ramp_slope": "1:12.3"
+ }
+}
