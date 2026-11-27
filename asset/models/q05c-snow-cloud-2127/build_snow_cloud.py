@@ -16,6 +16,8 @@ by (speed * t) mod period loops seamlessly: the stack's top hides in the cloud, 
 (nozzles lit in turn), q05c_arc (flickering ice arcs), q05c_flow_a/b/c (meltwater glints running to the spillway) and
 q05c_fog (cold ground fog, alpha-blended, breathing).
 The only floating element is the cloud (handoff); every glow is ice white, never the concept lot's #5fdcff.
+R2 (2026-11-28): fluffier cumulus (smaller lumpy puffs, edge wisps) with its waist inside the ring, ice-white cloud self-light
+(raised at night by the runtime), blue-shadowed snowfield and frost, larger flakes.
 """
 import math
 import os
@@ -34,7 +36,17 @@ CAM = -2.22                                     # azimuth of the q05 close-up ca
 SNOW_R = 9.5                                    # snowfield
 CHANNEL_R, CHANNEL_W = 13.5, 1.4                # meltwater ring channel
 RING_R, RING_Y, RING_T = 12.0, 19.5, .55        # launch ring: radius, height, tube radius
-CLOUD_BASE = 16.0
+CLOUD_BASE = 16.5
+# R2: the cloud's waist stays inside the ring (tube inner edge 11.45 m, 0.85 m clear) up to WAIST_Y; only billows whose underside
+# is above it may bulge out over the ring, so the ring's whole front half reads wrapped round the cloud (target).
+WAIST_Y, WAIST_R = RING_Y + 1.5, RING_R - RING_T - .85
+# Cloud recipe (cumulus layers, x rx = 14.5 / x h = 14.5): a squashed underside, the waist band, a solid core (hides the snow
+# stacks' top), the wide billows above the ring and a cauliflower crown; puffs 1.4-3.4 m so none reads as a separate ball.
+CLOUD_LAYERS = ((.24, 0.0, .48, .02, .16, .14, .21, .70),
+                (.18, .38, .62, .18, .36, .10, .14, .90),
+                (.10, 0.0, .32, .26, .56, .20, .24, .95),
+                (.30, .42, .80, .55, .74, .16, .24, .88),
+                (.18, 0.0, .48, .72, .88, .15, .23, .95))
 # Screen left of the close-up is +azimuth. The pumps and the main stand at the near left (as in the target), the spillway at
 # the near front, the grove round the back so the falling snow reads against dark green.
 PUMP = CAM + .95
@@ -46,8 +58,9 @@ SNOW_TOP = 20.0                                 # stack top before the move: ins
 FLOW = 3                                        # meltwater glint phases
 
 Q05C_ROLES = {                                                    # build-only roles (shared ROLES untouched)
-    'cloud': ((1, 1, 1, 1), (.80, .86, .92, 1), .10),               # white x vertex colours (blue-grey underside)
-    'haze': ((.96, .98, 1, .14), (.85, .90, .96, 1), .2),           # soft translucent shell round the cloud
+    'cloud': ((1, 1, 1, 1), (.86, .93, 1, 1), .10),                 # white x vertex colours (blue-grey underside); ice-white
+                                                                    # self-light the runtime raises at night (R2)
+    'haze': ((.96, .98, 1, .05), (.85, .90, .96, 1), .2),           # soft translucent shell round the cloud
     'snow_a': ((1, 1, 1, 1), (.92, .97, 1, 1), 2.2),                # flakes (runtime falls them)
     'snow_b': ((1, 1, 1, 1), (.92, .97, 1, 1), 2.2),
     'snow_c': ((1, 1, 1, 1), (.92, .97, 1, 1), 2.2),
@@ -57,9 +70,9 @@ Q05C_ROLES = {                                                    # build-only r
     'ice': ((.86, .95, 1, 1), (.70, .88, 1, 1), 1.8),               # ice-white light bands on pipes and ring
     'pipe': ((.95, .96, .96, 1), None, .5),                         # white pipes, ring, pumps
     'pipe_b': ((.80, .82, .84, 1), None, .5),                       # flanges, pump details
-    'snowfield': ((.97, .98, 1, 1), (.80, .85, .92, 1), .18),       # snow on the ground (a little self-lit so it stays white)
-    'frost': ((.50, .60, .74, 1), None, .5),                        # blue-grey frost halo, the cold shadow under the cloud
-    'fog': ((.94, .97, 1, .16), (.85, .90, .96, 1), .15),            # cold ground fog (runtime: alpha, breathing)
+    'snowfield': ((.97, .98, 1, 1), (.80, .87, 1, 1), .04),         # snow x vertex colours: blue shadows (R2), barely self-lit
+    'frost': ((.30, .44, .68, 1), None, .5),                        # blue frost halo, the cold shadow round the snow (R2)
+    'fog': ((.94, .97, 1, .07), (.85, .90, .96, 1), .15),            # cold ground fog (runtime: alpha, breathing)
     'water': ((.16, .50, .70, 1), (.10, .36, .52, 1), .5),          # channel water
     'flow_a': ((.80, .98, 1, 1), (.62, .92, 1, 1), 2.0),            # meltwater glints, lit in turn toward the spillway
     'flow_b': ((.80, .98, 1, 1), (.62, .92, 1, 1), 2.0),
@@ -114,6 +127,7 @@ def ground(ctx):
         r = rng.uniform(3.0, SNOW_R - .8)
         sz = rng.uniform(.9, 2.0)
         M.ell(a['snowfield'], polar(r, ang, .58), (sz, 0, 0), (0, sz * .22, 0), (0, 0, sz * .7), 12, 5)
+    snow_shade(a['snowfield'], rng)
     # Ring channel: water between two white kerbs, broken nowhere (bridged by the paths below).
     r0, r1 = CHANNEL_R - CHANNEL_W / 2, CHANNEL_R + CHANNEL_W / 2
     annulus(a['water'], r0, r1, .44, 128)
@@ -138,6 +152,22 @@ def ground(ctx):
             cyl(a['fog'], 0, 0, rb, y - .02, y, 72)
         else:
             annulus(a['fog'], ra, rb, y, 96)
+
+
+def snow_shade(acc, rng):
+    """Snowfield vertex colours (R2): light blue-white on the drift tops and the open middle, blue shadows in the hollows
+    between drifts, toward the edge and in a few soft cloud-shadow patches, so the falling white snow reads against it."""
+    light, shadow = (.80, .87, 1.0), (.34, .48, .84)
+    blots = [(rng.uniform(-6, 6), rng.uniform(-6, 6), rng.uniform(2.0, 3.5)) for _ in range(5)]
+    cols = []
+    for x, y, z in acc.v:                                                    # Blender coords: height is z
+        t = .55 + .45 * min(1, max(0, (z - .58) / .3))                       # drift tops light, the flat between them darker
+        t -= .35 * min(1, max(0, (math.hypot(x, y) - 6.0) / (SNOW_R - 6.0)))  # bluer toward the edge
+        for bx, by, br in blots:
+            t -= .4 * max(0, 1 - math.hypot(x - bx, y - by) / br)
+        t = min(1, max(0, t))
+        cols.append(tuple(shadow[k] + (light[k] - shadow[k]) * t for k in range(3)) + (1,))
+    acc.c = cols
 
 
 def flow(ctx):
@@ -251,9 +281,12 @@ def cloud(ctx):
     """Cumulus over the ring: a flattened base inside the ring, billows above it reaching past the ring's radius and a
     cauliflower top; a translucent haze shell softens the edge. Vertex colour (cloud only): white top, blue-grey underside."""
     a, rng = ctx.a, ctx.rng
-    M.cumulus(a['cloud'], (0, CLOUD_BASE, 0), 14.5, 15.0, rng, puffs=72)
-    M.cumulus(a['haze'], (0, CLOUD_BASE - .3, 0), 14.5, 15.2, random.Random(7), puffs=30, swell=1.06)
-    lo, hi = CLOUD_BASE, CLOUD_BASE + 13
+    waist = (WAIST_Y, WAIST_R)
+    M.cumulus(a['cloud'], (0, CLOUD_BASE, 0), 14.5, 14.5, rng, puffs=240, n=12, m=6, layers=CLOUD_LAYERS, lumps=.2, wisps=60,
+              waist=waist)
+    M.cumulus(a['haze'], (0, CLOUD_BASE - .2, 0), 14.5, 14.7, random.Random(7), puffs=60, swell=1.05, n=12, m=6,
+              layers=CLOUD_LAYERS, lumps=.2, waist=waist)
+    lo, hi = CLOUD_BASE, CLOUD_BASE + 12.5
     under, top = (.50, .57, .70), (1, 1, 1)
     cols = []
     for v in a['cloud'].v:                                                   # Blender coords: height is v[2]
@@ -271,7 +304,7 @@ def snow(ctx):
         slab = []
         for _ in range(int(85 * P / 3.7)):
             r = 8.6 * math.sqrt(rng.random()) ** 1.15
-            slab.append((r, rng.uniform(0, TAU), rng.uniform(0, P), rng.uniform(.11, .17)))
+            slab.append((r, rng.uniform(0, TAU), rng.uniform(0, P), rng.uniform(.16, .24)))
         acc = ctx.a['snow_' + 'abc'[k]]
         y0 = -P
         while y0 < SNOW_TOP:

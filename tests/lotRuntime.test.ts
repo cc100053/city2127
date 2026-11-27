@@ -267,6 +267,7 @@ assert.deepEqual(q05set.options.map((o: { modelId: string | null }) => o.modelId
   const { SNOW_CLOUD_MOVING, SNOW_CLOUD_SNOW, prepareSnowCloud, snowCloudBakes, snowCloudGlow, snowDrop } = await import('../src/snowCloud.ts');
   const bytes = readFileSync(new URL('../asset/models/q05c-snow-cloud-2127/q05c-snow-cloud-2127.glb', import.meta.url));
   const model = (await new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength), '')).scene;
+  const part0 = (root: typeof model, name: string) => root.getObjectByName(name) as Mesh;
   const plinth = new Box3().setFromObject(model.getObjectByName('q05c_plinth')!), lot = LOTS['ne-park'];
   assert.ok(Math.abs(plinth.max.x - lot.size / 2) < .1 && Math.abs(-plinth.min.z - lot.size / 2) < .1, `plinth radius ${plinth.max.x} = lot/2`);
   const all = new Box3().setFromObject(model);
@@ -277,8 +278,18 @@ assert.deepEqual(q05set.options.map((o: { modelId: string | null }) => o.modelId
     const snow = new Box3().setFromObject(model.getObjectByName(SNOW_CLOUD_MOVING[key])!);
     assert.ok(snow.max.y < cloudBox.min.y + 6 && snow.min.y < 0, `${key} spans the plinth to inside the cloud`);
   }
+  for (const name of [SNOW_CLOUD_MOVING.cloud, SNOW_CLOUD_MOVING.haze]) {   // R2: below the ring + 1.5 m the cloud stays inside it
+    const pos = (model.getObjectByName(name) as Mesh).geometry.getAttribute('position');
+    let worst = 0;
+    for (let i = 0; i < pos.count; i++) if (pos.getY(i) < 21) worst = Math.max(worst, Math.hypot(pos.getX(i), pos.getZ(i)));
+    assert.ok(worst <= 10.6 + 1e-3, `${name} waist ${worst.toFixed(2)} m clears the launch ring (r 12 m at 19.5 m)`);
+  }
   const motion = prepareSnowCloud(model);
   assert.ok(motion, 'every moving mesh is in the GLB');
+  for (const name of ['q05c_snowfield', 'q05c_frost']) {
+    assert.ok((part0(model, name).material as MeshStandardMaterial).envMapIntensity < .5, `${name} takes little sky reflection`);
+  }
+  assert.ok(part0(model, 'q05c_snowfield').geometry.hasAttribute('color'), 'the snowfield keeps its blue-shadow vertex colours');
   const part = (name: string) => model.getObjectByName(name) as Mesh;
   for (const name of Object.values(SNOW_CLOUD_MOVING)) assert.equal(snowCloudBakes(part(name)), false, `${name} stays out of the bake`);
   for (const name of [SNOW_CLOUD_MOVING.haze, SNOW_CLOUD_MOVING.fog]) {
@@ -294,6 +305,11 @@ assert.deepEqual(q05set.options.map((o: { modelId: string | null }) => o.modelId
     for (const t of [0, 1.7, 9.3, 123.4]) { const y = snowDrop(t, SNOW_CLOUD_SNOW[key]); assert.ok(y <= 0 && y > -period, `${key} drop wraps by one period`); }
   }
   const g = snowCloudGlow(.4); assert.ok(g.nozzleA > g.nozzleB, 'the nozzle sets alternate');
+  assert.ok(snowCloudGlow(3, 1).cloud > 5 * snowCloudGlow(3, 0).cloud && snowCloudGlow(3, 0).cloud === 1, 'the cloud glows at night only');
+  const cloudMat = part(SNOW_CLOUD_MOVING.cloud).material as MeshStandardMaterial, cloudDay = cloudMat.emissiveIntensity;
+  const cloudOpacity = cloudMat.opacity;
+  motion!(2.5, 1);
+  assert.ok(cloudMat.emissiveIntensity > 5 * cloudDay / snowCloudGlow(2.5, 0).cloud && cloudMat.opacity === cloudOpacity, 'night glow, opacity untouched');
   const lit = (t: number) => { const f = snowCloudGlow(t); return [f.flowA, f.flowB, f.flowC].indexOf(Math.max(f.flowA, f.flowB, f.flowC)); };
   assert.deepEqual([0, .5, 1].map(lit), [0, 1, 2], 'meltwater glints step a → b → c');
   assert.equal(model.visible, false);

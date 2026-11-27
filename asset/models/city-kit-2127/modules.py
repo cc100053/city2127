@@ -1316,14 +1316,42 @@ def facet_tree(ctx, base, h=7.0, crown=3.4, trunk='bark', roles=('crown', 'crown
         facet_blob(A[role], p, (rr, rr * rng.uniform(.8, .95), rr), rng, 7, 4)
 
 
-def cumulus(acc, base, rx, h, rng, puffs=40, swell=1.0, n=18, m=10):
-    """Cumulus cloud of smooth ellipsoid puffs over a flat-ish base: a squashed base layer (centres within rx * .5), billows
-    out to about rx at mid height and a cauliflower top; base = (x, y, z) of the cloud's underside centre (three.js), rx the
-    outer radius, h the height (top ≈ base y + h). swell scales every puff (a larger haze shell from the same recipe). About
-    2 n (m - 1) tris per puff (n 18, m 10: ≈ 320). Shade smooth; tint the underside with vertex colours. Metres. (Q05-C)"""
-    layers = ((.40, 0.0, .50, .05, .14, .28, .36, .62),    # (share, r lo, r hi (x rx), y lo, y hi (x h), radius lo, hi (x rx), y squash)
-              (.35, .30, .74, .28, .52, .26, .34, .85),
-              (.25, 0.0, .40, .55, .76, .22, .30, .95))
+CUMULUS_LAYERS = ((.40, 0.0, .50, .05, .14, .28, .36, .62),    # (share, r lo, r hi (x rx), y lo, y hi (x h), radius lo, hi (x rx), y squash)
+                  (.35, .30, .74, .28, .52, .26, .34, .85),
+                  (.25, 0.0, .40, .55, .76, .22, .30, .95))
+
+
+def cumulus(acc, base, rx, h, rng, puffs=40, swell=1.0, n=18, m=10, layers=CUMULUS_LAYERS, lumps=0.0, wisps=0, waist=None):
+    """Cumulus cloud of smooth ellipsoid puffs over a flat-ish base: by default a squashed base layer (centres within rx * .5),
+    billows out to about rx at mid height and a cauliflower top; base = (x, y, z) of the cloud's underside centre (three.js), rx
+    the outer radius, h the height (top ≈ base y + h). layers: rows of (share of puffs, centre radius lo/hi x rx, centre height
+    lo/hi x h, puff radius lo/hi x rx, y squash). swell scales every puff (a larger haze shell from the same recipe). lumps (≈ .1)
+    bulges each puff by coherent low-frequency noise so none reads as a perfect ball; wisps adds that many small (rx * .035-.08)
+    puffs on the outer face of the upper puffs for a broken edge. waist = (y, r): a puff whose underside reaches below height y
+    is kept within radius r of the axis (a ring hung at y round a narrower cloud waist). About 2 n (m - 1) tris per puff (n 18,
+    m 10: ≈ 320; n 12, m 7: 144). Shade smooth; tint the underside with vertex colours. Metres. (Q05-C)"""
+    def place(c, rr, sq, ry):
+        if waist and c[1] - rr * sq * (1 + lumps) < waist[0]:                # hangs below the waist: stay inside its radius
+            ext = rr * max(1.0, ry) * (1 + lumps)
+            d = math.hypot(c[0] - base[0], c[2] - base[2])
+            if d + ext > waist[1]:
+                ext = min(ext, waist[1])
+                rr *= ext / (rr * max(1.0, ry) * (1 + lumps))
+                k = max(0.0, waist[1] - ext) / d if d else 0.0
+                c = (base[0] + (c[0] - base[0]) * k, c[1], base[2] + (c[2] - base[2]) * k)
+        i0 = len(acc.v)
+        ell(acc, c, (rr, 0, 0), (0, rr * sq, 0), (0, 0, rr * ry), n, m)
+        if lumps:                                                            # coherent bulges along three random lobes
+            vs = acc.v[i0:]
+            cen = tuple(sum(v[k] for v in vs) / len(vs) for k in range(3))
+            lobes = [(_unit((rng.gauss(0, 1), rng.gauss(0, 1), rng.gauss(0, 1))), rng.uniform(0, 6.3)) for _ in range(3)]
+            for j, v in enumerate(vs):
+                d = _unit(tuple(v[k] - cen[k] for k in range(3)))
+                f = sum(math.cos(2.6 * sum(d[k] * u[k] for k in range(3)) + ph) for u, ph in lobes) / 3
+                acc.v[i0 + j] = tuple(cen[k] + (v[k] - cen[k]) * (1 + lumps * f) for k in range(3))
+        return c, rr, sq
+
+    upper = []
     for k, (share, r0, r1, y0, y1, s0, s1, sq) in enumerate(layers):
         count = max(1, round(puffs * share))
         for i in range(count):
@@ -1332,7 +1360,16 @@ def cumulus(acc, base, rx, h, rng, puffs=40, swell=1.0, n=18, m=10):
             rr = rx * rng.uniform(s0, s1) * swell
             c = (base[0] + r * math.cos(ang), base[1] + h * rng.uniform(y0, y1) + (rr * sq * .55 if k == 0 else 0),
                  base[2] + r * math.sin(ang))
-            ell(acc, c, (rr, 0, 0), (0, rr * sq, 0), (0, 0, rr * rng.uniform(.9, 1.1)), n, m)
+            got = place(c, rr, sq, rng.uniform(.9, 1.1))
+            if k >= len(layers) // 2:
+                upper.append(got)
+    for _ in range(wisps):                                                   # broken edge: small puffs on the upper billows
+        (cx, cy, cz), rr, sq = rng.choice(upper)
+        ang = math.atan2(cz - base[2], cx - base[0]) + rng.uniform(-.9, .9)
+        el = rng.uniform(-.2, .9)
+        d = rr * rng.uniform(.85, 1.0)
+        c = (cx + d * math.cos(el) * math.cos(ang), cy + d * sq * math.sin(el), cz + d * math.cos(el) * math.sin(ang))
+        place(c, rx * rng.uniform(.035, .08) * swell, rng.uniform(.75, .95), rng.uniform(.9, 1.1))
 
 
 def leaf_strand(ctx, top, ln, out, role='vine', size=.3, step=.22, flowers=(), fl=.3, sway=.25):
