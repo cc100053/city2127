@@ -1316,6 +1316,25 @@ def facet_tree(ctx, base, h=7.0, crown=3.4, trunk='bark', roles=('crown', 'crown
         facet_blob(A[role], p, (rr, rr * rng.uniform(.8, .95), rr), rng, 7, 4)
 
 
+def cumulus(acc, base, rx, h, rng, puffs=40, swell=1.0, n=18, m=10):
+    """Cumulus cloud of smooth ellipsoid puffs over a flat-ish base: a squashed base layer (centres within rx * .5), billows
+    out to about rx at mid height and a cauliflower top; base = (x, y, z) of the cloud's underside centre (three.js), rx the
+    outer radius, h the height (top ≈ base y + h). swell scales every puff (a larger haze shell from the same recipe). About
+    2 n (m - 1) tris per puff (n 18, m 10: ≈ 320). Shade smooth; tint the underside with vertex colours. Metres. (Q05-C)"""
+    layers = ((.40, 0.0, .50, .05, .14, .28, .36, .62),    # (share, r lo, r hi (x rx), y lo, y hi (x h), radius lo, hi (x rx), y squash)
+              (.35, .30, .74, .28, .52, .26, .34, .85),
+              (.25, 0.0, .40, .55, .76, .22, .30, .95))
+    for k, (share, r0, r1, y0, y1, s0, s1, sq) in enumerate(layers):
+        count = max(1, round(puffs * share))
+        for i in range(count):
+            ang = (i + rng.uniform(-.3, .3)) * 2 * math.pi / count + k * .7
+            r = rx * rng.uniform(r0, r1)
+            rr = rx * rng.uniform(s0, s1) * swell
+            c = (base[0] + r * math.cos(ang), base[1] + h * rng.uniform(y0, y1) + (rr * sq * .55 if k == 0 else 0),
+                 base[2] + r * math.sin(ang))
+            ell(acc, c, (rr, 0, 0), (0, rr * sq, 0), (0, 0, rr * rng.uniform(.9, 1.1)), n, m)
+
+
 def leaf_strand(ctx, top, ln, out, role='vine', size=.3, step=.22, flowers=(), fl=.3, sway=.25):
     """Hanging vine strand from top (three.js) ln metres down, leaning out along unit `out`: a thin stem with a leaf
     card every `step` m alternating sides, hanging down and out (tips droop), dotted with flower roles at rate fl per
@@ -1347,5 +1366,5 @@ MODULES = {
     'limb': limb, 'branch_strut': branch_strut, 'egg_pod': egg_pod, 'grid_frame': grid_frame, 'roof_farm': roof_farm,
     'bone_arm': bone_arm, 'ell': ell, 'disc': disc, 'vine_curtain': vine_curtain, 'arch_shell': arch_shell,
     'flower_bed': flower_bed, 'leaf_card': leaf_card, 'leaf_clump': leaf_clump, 'leafy_tree': leafy_tree,
-    'leaf_strand': leaf_strand, 'facet_blob': facet_blob, 'facet_tree': facet_tree,
+    'leaf_strand': leaf_strand, 'facet_blob': facet_blob, 'facet_tree': facet_tree, 'cumulus': cumulus,
 }

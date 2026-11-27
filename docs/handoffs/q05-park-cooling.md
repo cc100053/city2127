@@ -1,7 +1,7 @@
 # q05-park-cooling — Q05 公園降溫三態：目標圖與建築故事
 
 - Owner: repository owner
-- Status: Q05-A DONE（R2 owner 驗收，2026-11-27，已合併入 main）；Q05-B R4 已建，待 owner 評審（分支 `feat/q05b-breathing-leaf`）；C 未建模。
+- Status: Q05-A DONE（R2 owner 驗收，2026-11-27，已合併入 main）；Q05-B R4 已建，待 owner 評審（分支 `feat/q05b-breathing-leaf`）；Q05-C R1 已建，待 owner 評審（分支 `feat/q05c-snow-cloud`，疊在 B 分支之上，見文末 C-R1）。
 - Branch: `feat/q05a-reverse-ac`（worktree `../city2127-q05a`），自 `origin/main` `bbec76c2`；目標圖記錄見舊分支 `docs/q05-targets`（已合併）。
 - Base commit: `bbec76c26a833a2a5ba24dfc42f3cee3f9a03c0c`
 - Last verified commit: `00f0cd75`（A R2）；B-R4 見分支 `feat/q05b-breathing-leaf` 最新提交（檢查見 B-R4 一節）。
@@ -444,3 +444,68 @@ owner 指示：「do b modeling」。地塊、近鏡方位及台座沿用 A 的�
 ## B-R5 round prompt（下一輪會話）
 
 place-building round for `q05b-breathing-leaf`: main checkout `/Users/fatboy/city2127`, branch `feat/q05b-breathing-leaf`, read `docs/handoffs/q05-park-cooling.md` (its `## B-R4 brief` and `## B-R4` sections). Owner verdict on B-R4: «…»
+
+## C-R1 brief（2026-11-28，Q05-C 雪雲噴泉）
+
+owner 指示：「做 Q5 嘅 C model」。地塊、近鏡方位及台座沿用 A／B（NE PARK 48 × 48 m，圓台座半徑 24 m，近鏡由西南望，方位 `CAM` −2.22）。尺寸按目標圖中 1.8 m 居民量度（目標圖寬 2400 px 中，雪地上的大人約 60 px，即約 33 px/m）。
+
+**分支：** C 需要 B 的 Q05 接線（`q05Model`、`?jump=`），故 `feat/q05c-snow-cloud` 由 `feat/q05b-breathing-leaf` 的 `3f13a1c5` 開出（worktree `../city2127-q05c`），不是由 `origin/main`。B 未驗收前 C 不能合併；B 若再改，C 須重新疊上（rebase）。
+
+**對目標的調整：** 目標中抽水泵在海邊、廣場為方形；NE PARK 地塊在內陸，故保留 A／B 的圓形台座，海水總管及融水渠都在台座邊的維修口終止（同 B 的水管做法），表示經地下通往東京灣。發射環由抽水立管撐起，另加兩支幼補給管；只有雲是浮空的。所有發光避開概念地塊 `#5fdcff`，噴嘴及電弧用冰白色。
+
+| # | 目標圖 | 量度目標 |
+| --- | --- | --- |
+| 1 | 懸浮冷雲（主角） | 約 45 個平滑團塊組成的積雲，底約 16 m、頂約 31 m，直徑約 26 m；頂部純白，底部漸變為藍灰（頂點顏色），令雲在淺色城市背景前有立體感；外層半透明薄霧殼令邊緣柔和。執行時慢轉並輕微上下浮動。 |
+| 2 | 發射環 | 半徑 12 m、離地約 19.5 m 的白色水平環管（管半徑 0.55 m），16 個發光冰白噴嘴（兩組交替亮起，似在發射）；環外一圈閃爍的冰白電弧。 |
+| 3 | 抽水泵及管道 | 近鏡左方台座邊的兩台白色抽水泵（主泵馬達直徑約 2.4 m，前面發光圓眼），半徑 0.8 m 的白色總管由台座邊維修口經泵升至約 19 m，再彎入發射環；管上冰白色光帶。另兩支 0.3 m 幼補給管支撐環的另一側。 |
+| 4 | 落雪 | 雪柱半徑約 7–9 m，由雲底落到地面；三組不同周期及速度的雪粒（每粒約 0.18 m，近鏡約 5 px），發光白色，執行時不斷下落並微微旋轉。 |
+| 5 | 雪地及冷霧 | 中心半徑約 9.5 m 的白色雪地（雪堆團塊），外圈藍灰霜帶作陰影對比；地面一層半透明冷霧。小孩在雪下（約 1.2 m 高），大人圍觀，長椅。 |
+| 6 | 融水渠流回海 | 半徑約 13.5 m 的環形水渠（闊約 1.4 m，白色渠邊），一條支渠在近鏡左前方流到台座邊的跌水口；渠中三相水光（執行時輪流亮起，表示水流向海）。 |
+| 7 | 綠化 | 後半圈濃密 `facet_tree` 樹林及白邊花槽（深色背景襯托落雪），近鏡一側只放低矮灌木，不擋雪地。 |
+| 8 | 近鏡 | 新近鏡 `q05:cloud`，由西南略高處望向雲底及雪地，畫面包括雲頂、發射環、泵及雪地。 |
+
+## C-R1（2026-11-28，Q05-C 雪雲噴泉）
+
+### Git 狀態
+
+- 開始時主工作目錄在 `feat/q05b-breathing-leaf`（與遠端同步於 `3f13a1c5`，工作樹乾淨）；`git fetch --prune origin` 成功，`origin/main` 為 `bf359692`，B 分支比它落後 11、超前 4（B 未合併）。主工作目錄留給 B-R5，C 在 worktree `../city2127-q05c` 的 `feat/q05c-snow-cloud`（由 `3f13a1c5` 開出，見 C-R1 brief「分支」）。
+
+### 改動
+
+- **模型** `asset/models/q05c-snow-cloud-2127/`：`build_snow_cloud.py`（Blender 5.2 headless）、`.blend`、`.glb`（約 94k tris，3.7 MB）、`review_snow_cloud.py`。內容見 C-R1 brief；新庫存模組 `cumulus`（`modules.py`，`LIBRARY.md` 加行，lineup 加樣本）。
+- **執行時** `src/snowCloud.ts`：雲慢轉及上下浮動、薄霧殼反轉；三組雪（周期 3.1／3.7／4.3 m，速度 1.6／1.25／1.9 m/s）按餘數下移並微轉；噴嘴兩組交替亮、電弧閃爍、融水光三相流向跌水口、冷霧呼吸；只改位置及發光強度。
+- **輪換**：`q05Model` 加 `'cloud'`；`setQ05` C 時雪雲淡入，公園及庭園 1 淡出；`q05Shot` 改為三選；新近鏡 `q05:cloud` (−256, 36, −196) 望 (−210, 17, −135)；`ROTATION_VISITS.Q05.C`；結果卡暫定文案（地點「お台場海浜公園の雪雲噴水」，出現「…海の水からつくった冷たい雲が浮かび、真夏の広場に雪が降るようになりました。」，離開「…雪雲噴水が外れ、新しい涼しさを待つ公園に戻りました。」）；`questions.rotation.v1.json` Q05-C `modelId`；DEV 面板名「雪雲噴水」。
+- **測試**：`tests/lotRuntime.test.ts`（`q05Model`、C 的 GLB：台座、範圍、雲高、雪層頂藏於雲內、活動件不合批、薄霧及冷霧透明、雪循環、噴嘴交替、水光次序；B→C 交叉淡變、run 後回復公園；`q05Shot`／`q05Result`）、`tests/headlineCamera.test.ts`（近鏡數 33）、`survey/tests/rotation.test.ts`（「無模型」例子由 Q05-C 改用 Q06-A；三態齊全題加 Q05）。
+- **文件**：`PROJECT.md`、`QUESTION_ROTATION_PLAN.md`、`LIBRARY.md`；變化總覽已重生（Q05 未有近鏡畫格）。
+
+### 自評（`~/city2127-evidence/q05c/r1/`，3200 × 1800，`q05:cloud`）
+
+| # | 項目 | 結果 |
+| --- | --- | --- |
+| 1 | 懸浮冷雲 | 大致達到：雲大而立體，頂白、底部略灰，hero 總覽中亦一眼看到（`overview.jpg`）。未足：團塊仍似一個個圓球，未及目標的蓬鬆細碎邊緣；底部藍灰在日間不明顯；夜間雲呈灰色，沒有發光。 |
+| 2 | 發射環 | 大致達到：白色環、發光噴嘴及電弧可見（`row1-cloud-ring.jpg`）。未足：雲底向外鼓出，遮去環的前半部，近鏡只見約四個噴嘴；目標中環在雲外清楚圍住雲腰。 |
+| 3 | 抽水泵及管道 | 達到：近鏡左下兩台白色泵連發光圓眼，總管升至環頂再彎入（`row3-pumps-snowfield.jpg`）。 |
+| 4 | 落雪 | 大致達到：在後方深綠樹林前清楚，夜間閃亮明顯（`focal-night.jpg`）；在白色雪地前幾乎看不到。雪層循環無跳格（`keyframes.jpg`）。 |
+| 5 | 雪地及冷霧 | 大致達到：pass 3 縮細冷霧後，雪地、藍灰霜帶及水渠分得開；居民及小孩在雪地上。未足：雪地與台座仍同屬白色系，對比不及目標的藍影。 |
+| 6 | 融水渠 | 大致達到：深藍環形水渠清楚；支渠在近鏡前方，水光細小，縮細後較難看出。 |
+| 7 | 綠化 | 達到：後方及左右兩側濃密 `facet_tree`，近鏡前方三個低花槽。 |
+| 8 | 近鏡 | 達到：畫面包括雲頂、環、泵及雪地。 |
+
+### 檢查
+
+- 單元：`tests/lotRuntime.test.ts`、`tests/headlineCamera.test.ts`、`tests/assetLibrary.test.ts` 通過；`survey` `npm test` EXIT 0、`npm run build` 通過；根目錄 `npm run build`、`git diff --check` 通過。
+- 根目錄 `npm test` 通過（2026-11-28，EXIT 0，記錄 `~/city2127-evidence/q05c/r1/npm-test.log`）。
+- 瀏覽器（Vite 5187，`?rotation&jump=Q05:C&shot=q05:cloud`）：三輪 capture-compare（pass1 雲太白、薄霧殼似玻璃泡、水渠太淡 → pass2 調暗雲、台座及水渠，加前方花槽 → pass3 冷霧縮至雪地，雲團加至 72 個）。
+- FPS：未量度（`fps.sh` 只跑 `?meters`）。headless 截圖 data-fps 約 22（近鏡）、30（overview），只作參考；B-R4 為 31–33／27。
+
+### 待 owner 決定
+
+- 雲是否要更蓬鬆（較多較細的團塊、柔和邊緣），以及雲底是否應收在環內，令整個發射環露出。
+- 夜間雲是否要從內部發出冷光。
+- 雪地是否要加藍色陰影，令白雪在白台座上更突出。
+- 結果卡文案及 `q05:cloud` 近鏡角度（皆為暫定）。
+- C 疊在 B 分支上：B 驗收合併後，C 才可合併。
+
+## C-R2 round prompt（下一輪會話）
+
+place-building round for `q05c-snow-cloud`: worktree `/Users/fatboy/city2127-q05c`, branch `feat/q05c-snow-cloud`, read `docs/handoffs/q05-park-cooling.md` (its `## C-R1 brief` and `## C-R1` sections). Owner verdict on C-R1: «…»

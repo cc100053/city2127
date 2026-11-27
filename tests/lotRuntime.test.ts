@@ -64,7 +64,7 @@ assert.equal(hydro.visible, false); assert.ok(nodes.every(node => node.visible))
 // A version4 view after a rotation run restores the built city.
 lots.setQ02(undefined, 30, true); lots.update(30, false);
 assert.equal(hydro.visible, true); assert.ok(nodes.every(node => !node.visible)); assert.equal(farm.at(-1), undefined);
-assert.deepEqual(lots.getDiagnostics(), { hydro: 1, flower: 0, housing: 1, tower: 1, reverseAc: 0, breathingLeaf: 0 });
+assert.deepEqual(lots.getDiagnostics(), { hydro: 1, flower: 0, housing: 1, tower: 1, reverseAc: 0, breathingLeaf: 0, snowCloud: 0 });
 
 // EnergyRuntime: the override wins over the receiver vote and survives an immediate energy update; undefined hands it back.
 const energy = new EnergyRuntime(new Scene());
@@ -197,13 +197,13 @@ assert.match(q06Result({ from: 'A', to: 'B' }).effect, /戻りました/);
   const site = rotationSite({ kind: 'swap', questionId: 'Q06', from: 'B', to: 'C' } as never, [])!;
   assert.deepEqual([site.x, site.z, site.slot], [lot.x, lot.z, 'environmentalPriority'], 'Q06 orb lands on the tower lot'); }
 
-// Q05 shares the NE PARK lot (park cooling, owner 2026-11-26): A stands the reverse air conditioner and B the breathing giant leaf, each
-// on its own lawn in place of the NE park (and clearing the sharing court under it); C (no model yet) keeps the park; version4 never
+// Q05 shares the NE PARK lot (park cooling, owner 2026-11-26): A stands the reverse air conditioner, B the breathing giant leaf and C
+// the snow-cloud fountain, each on its own plinth in place of the NE park (and clearing the sharing court under it); version4 never
 // engages it.
-assert.deepEqual(['A', 'B', 'C', undefined].map(q05Model), ['tower', 'leaf', undefined, undefined]);
+assert.deepEqual(['A', 'B', 'C', 'Z', undefined].map(q05Model), ['tower', 'leaf', 'cloud', undefined, undefined]);
 const q05set = set.questions.find((q: { id: string }) => q.id === 'Q05');
 assert.deepEqual(q05set.options.map((o: { lotId: string }) => o.lotId), ['ne-park', 'ne-park', 'ne-park'], 'Q05: one shared lot');
-assert.deepEqual(q05set.options.map((o: { modelId: string | null }) => o.modelId), ['q05a-reverse-ac-2127', 'q05b-breathing-leaf-2127', null]);
+assert.deepEqual(q05set.options.map((o: { modelId: string | null }) => o.modelId), ['q05a-reverse-ac-2127', 'q05b-breathing-leaf-2127', 'q05c-snow-cloud-2127']);
 { const { changeSites } = await import('../src/layout.ts'); const lot = LOTS['ne-park'], ne = changeSites.ne;
   assert.deepEqual([lot.x, lot.z], [ne.x, ne.z], 'the Q05 lot is centred on the NE PARK site');
   assert.ok(lot.size >= ne.w * ne.scale, 'the Q05 lot covers the NE PARK site'); }
@@ -260,6 +260,44 @@ assert.deepEqual(q05set.options.map((o: { modelId: string | null }) => o.modelId
   const g = breathingLeafGlow(1.25); assert.ok(Math.abs(g.mistA + g.mistB - 2) < 1e-9, 'mist sets breathe in antiphase');
   assert.equal(model.visible, false);
 }
+{ // Q05-C: the same 24 m plinth, everything inside the lot (+2.5 m) and under the aerial layers, the moving parts out of the bake,
+  // haze and fog translucent without depth writes; the snow falls and wraps by one period, the glow never touches opacity.
+  const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
+  const { Box3 } = await import('three');
+  const { SNOW_CLOUD_MOVING, SNOW_CLOUD_SNOW, prepareSnowCloud, snowCloudBakes, snowCloudGlow, snowDrop } = await import('../src/snowCloud.ts');
+  const bytes = readFileSync(new URL('../asset/models/q05c-snow-cloud-2127/q05c-snow-cloud-2127.glb', import.meta.url));
+  const model = (await new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength), '')).scene;
+  const plinth = new Box3().setFromObject(model.getObjectByName('q05c_plinth')!), lot = LOTS['ne-park'];
+  assert.ok(Math.abs(plinth.max.x - lot.size / 2) < .1 && Math.abs(-plinth.min.z - lot.size / 2) < .1, `plinth radius ${plinth.max.x} = lot/2`);
+  const all = new Box3().setFromObject(model);
+  assert.ok(Math.max(all.max.x, -all.min.x, all.max.z, -all.min.z) < lot.size / 2 + 2.5, 'crowns overhang the lot by under 2.5 m');
+  const cloudBox = new Box3().setFromObject(model.getObjectByName(SNOW_CLOUD_MOVING.cloud)!);
+  assert.ok(cloudBox.min.y > 14 && cloudBox.max.y < 34, `the cloud floats ${cloudBox.min.y.toFixed(1)}–${cloudBox.max.y.toFixed(1)} m`);
+  for (const key of ['snowA', 'snowB', 'snowC'] as const) {          // each stack's top stays inside the cloud while it falls
+    const snow = new Box3().setFromObject(model.getObjectByName(SNOW_CLOUD_MOVING[key])!);
+    assert.ok(snow.max.y < cloudBox.min.y + 6 && snow.min.y < 0, `${key} spans the plinth to inside the cloud`);
+  }
+  const motion = prepareSnowCloud(model);
+  assert.ok(motion, 'every moving mesh is in the GLB');
+  const part = (name: string) => model.getObjectByName(name) as Mesh;
+  for (const name of Object.values(SNOW_CLOUD_MOVING)) assert.equal(snowCloudBakes(part(name)), false, `${name} stays out of the bake`);
+  for (const name of [SNOW_CLOUD_MOVING.haze, SNOW_CLOUD_MOVING.fog]) {
+    const m = part(name).material as MeshStandardMaterial;
+    assert.ok(m.transparent && !m.depthWrite && part(name).renderOrder === 2, `${name} translucent, drawn last`);
+  }
+  const fogBefore = (part(SNOW_CLOUD_MOVING.fog).material as MeshStandardMaterial).opacity;
+  motion!(2.5);
+  assert.equal((part(SNOW_CLOUD_MOVING.fog).material as MeshStandardMaterial).opacity, fogBefore, 'the glow leaves opacity to the lot fade');
+  assert.ok(part(SNOW_CLOUD_MOVING.snowA).position.y < 0, 'the snow falls');
+  for (const key of ['snowA', 'snowB', 'snowC'] as const) {
+    const [period] = SNOW_CLOUD_SNOW[key];
+    for (const t of [0, 1.7, 9.3, 123.4]) { const y = snowDrop(t, SNOW_CLOUD_SNOW[key]); assert.ok(y <= 0 && y > -period, `${key} drop wraps by one period`); }
+  }
+  const g = snowCloudGlow(.4); assert.ok(g.nozzleA > g.nozzleB, 'the nozzle sets alternate');
+  const lit = (t: number) => { const f = snowCloudGlow(t); return [f.flowA, f.flowB, f.flowC].indexOf(Math.max(f.flowA, f.flowB, f.flowC)); };
+  assert.deepEqual([0, .5, 1].map(lit), [0, 1, 2], 'meltwater glints step a → b → c');
+  assert.equal(model.visible, false);
+}
 {
   const acScene = new Scene(), ac = new Group(), park = new Group(), parkShared = new MeshStandardMaterial();
   const keeps: [number, number][] = [];
@@ -282,21 +320,26 @@ assert.deepEqual(q05set.options.map((o: { modelId: string | null }) => o.modelId
   assert.equal(park.visible, false); assert.deepEqual(keeps.at(-1), [0, 0]);
   acLots.update(13, false); assert.equal(ac.visible, false); assert.equal(leaf.visible, true);
   assert.equal(acLots.getDiagnostics().breathingLeaf, 1);
-  // B→C: the leaf leaves, the park and its court come back; a version4 view after the run keeps the park.
-  acLots.setQ05('C', 20, false); acLots.update(21.5, false); assert.ok(Math.abs(keeps.at(-1)![1] - .5) < 1e-9, 'court half-way with the park');
-  acLots.update(24, false); assert.equal(leaf.visible, false); assert.equal(park.visible, true); assert.deepEqual(keeps.at(-1), [0, 1]);
-  acLots.setQ05(undefined, 30, true); acLots.update(30, false); assert.equal(ac.visible, false); assert.equal(leaf.visible, false); assert.equal(park.visible, true);
+  // B→C: the leaf and the cloud cross over, the park and its court stay cleared; a version4 view after the run brings the park back.
+  const cloud = new Group(); cloud.name = 'q05c-snow-cloud-2127'; cloud.add(mesh()); cloud.visible = false; acScene.add(cloud);
+  acLots.setQ05('C', 20, false); acLots.update(21.5, false);
+  assert.ok(Math.abs(((cloud.children[0] as Mesh).material as MeshStandardMaterial).opacity - .5) < 1e-9, 'cloud half-way at mid-transition');
+  acLots.update(24, false); assert.equal(leaf.visible, false); assert.equal(cloud.visible, true); assert.equal(park.visible, false);
+  assert.deepEqual(keeps.at(-1), [0, 0]); assert.equal(acLots.getDiagnostics().snowCloud, 1);
+  acLots.setQ05(undefined, 30, false); acLots.update(31.5, false); assert.ok(Math.abs(keeps.at(-1)![1] - .5) < 1e-9, 'court half-way with the park');
+  acLots.update(34, false); assert.equal(ac.visible, false); assert.equal(leaf.visible, false); assert.equal(cloud.visible, false);
+  assert.equal(park.visible, true); assert.deepEqual(keeps.at(-1), [0, 1]);
 }
 const { q05Swap, q05Result, q05Shot } = await import('../src/rotationLayout.ts');
 const q05Of = (from: string, to: string) => q05Swap({ rotation: { outcome: { kind: 'swap', questionId: 'Q05', from, to } } } as never)!;
 assert.deepEqual([q05Of('A', 'B').changes, q05Of('C', 'A').changes, q05Of('B', 'C').changes], [true, true, true]);
 assert.deepEqual([['A', 'C'], ['C', 'A'], ['B', 'A'], ['A', 'B'], ['C', 'B'], ['B', 'C']].map(([f, t]) => q05Shot(q05Of(f, t))),
-  ['q05:tower', 'q05:tower', 'q05:tower', 'q05:leaf', 'q05:leaf', 'q05:leaf'], 'the close-up of the model that arrives, else the one that leaves');
+  ['q05:cloud', 'q05:tower', 'q05:tower', 'q05:leaf', 'q05:leaf', 'q05:cloud'], 'the close-up of the model that arrives');
 assert.match(q05Result({ from: 'B', to: 'A' }).effect, /塔が立ち/);
 assert.match(q05Result({ from: 'C', to: 'B' }).effect, /葉をひろげる植物が育ち/);
-for (const [from, to] of [['A', 'C'], ['B', 'C']]) assert.doesNotMatch(q05Result({ from, to }).effect, /立ち|現れ|できました|加わり|育ち/, `Q05 ${from}→${to} claims no new building`);
-assert.match(q05Result({ from: 'B', to: 'C' }).effect, /巨葉の植物が外れ/);
-for (const id of ['q05:tower', 'q05:leaf'] as const) { const { target } = SHOTS[id], lot = LOTS['ne-park'];
+for (const [from, to] of [['A', 'C'], ['B', 'C']]) assert.match(q05Result({ from, to }).effect, /冷たい雲が浮かび.*雪が降る/, `Q05 ${from}→${to}: the cloud arrives`);
+assert.equal(q05Result({ from: 'A', to: 'C' }).place, 'お台場海浜公園の雪雲噴水');
+for (const id of ['q05:tower', 'q05:leaf', 'q05:cloud'] as const) { const { target } = SHOTS[id], lot = LOTS['ne-park'];
   assert.ok(Math.hypot(target[0] - lot.x, target[2] - lot.z) <= lot.size / 2, `${id} looks at the NE PARK lot`); }
 { const { rotationSite } = await import('../src/voteJourney.ts'); const lot = LOTS['ne-park'];
   const site = rotationSite({ kind: 'swap', questionId: 'Q05', from: 'A', to: 'B' } as never, [])!;
