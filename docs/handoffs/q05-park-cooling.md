@@ -1,7 +1,7 @@
 # q05-park-cooling — Q05 公園降溫三態：目標圖與建築故事
 
 - Owner: repository owner
-- Status: Q05-A DONE（R2 owner 驗收，2026-11-27，已合併入 main）；Q05-B R4 已建，待 owner 評審（分支 `feat/q05b-breathing-leaf`）；C 未建模。
+- Status: Q05-A DONE（R2 owner 驗收，2026-11-27，已合併入 main）；Q05-B R5 已建，待 owner 評審（分支 `feat/q05b-breathing-leaf`）；C 未建模。
 - Branch: `feat/q05a-reverse-ac`（worktree `../city2127-q05a`），自 `origin/main` `bbec76c2`；目標圖記錄見舊分支 `docs/q05-targets`（已合併）。
 - Base commit: `bbec76c26a833a2a5ba24dfc42f3cee3f9a03c0c`
 - Last verified commit: `00f0cd75`（A R2）；B-R4 見分支 `feat/q05b-breathing-leaf` 最新提交（檢查見 B-R4 一節）。
@@ -441,6 +441,45 @@ owner 指示：「do b modeling」。地塊、近鏡方位及台座沿用 A 的�
 - 莖是否再加粗、改為較實的綠色，並把水滴虛線改為目標中沿莖外側的一條水色光帶。
 - 葉面是否要加回少量光澤。
 
-## B-R5 round prompt（下一輪會話）
+## B-R4 verdict
 
-place-building round for `q05b-breathing-leaf`: main checkout `/Users/fatboy/city2127`, branch `feat/q05b-breathing-leaf`, read `docs/handoffs/q05-park-cooling.md` (its `## B-R4 brief` and `## B-R4` sections). Owner verdict on B-R4: «…»
+«做霧嘅效果，依家睇落似一條條光，唔似霧水»
+
+## B-R5 brief
+
+| # | owner 原話 | 現況（B-R4） | 本輪做法（3200 × 1800，`q05:leaf`） |
+| --- | --- | --- | --- |
+| 1 | 霧似一條條光，唔似霧水 | 210 條 0.9–1.5 m 闊實邊白帶，只垂至葉高約三至六成，近鏡每條約 30–45 px 闊、邊緣硬直 | 改為 132 幅 2.2–3.4 m 闊、互相重疊的霧簾（每約 1.1 m 葉緣一幅），沿葉緣走向、略向外拱，垂至距草地約 1.2 m 的五成半至八成半；霧簾帶 UV，執行時套程序生成的柔邊 alpha 貼圖：細絲長短濃淡不一，兩側及向地面漸淡，令其讀作水霧而非光帶。 |
+
+## B-R5（2026-11-28，Q05-B 呼吸巨葉）
+
+### Git 狀態
+
+- 與 B-R4 同一會話。開始時 `feat/q05b-breathing-leaf` 與遠端同步於 `3f13a1c5`，工作樹乾淨。
+
+### 改動
+
+- `build_breathing_leaf.py` `mist()`：霧簾重做（見 brief 1），每幅 4 × 7 頂點並寫入 UV（u 橫向 0→1、隨機鏡像；v 由葉緣向下 0→1）；`main()` 為有 `acc.uv` 的角色建立 UV 層。霧物料 alpha 0.34 → 0.45。
+- `src/breathingLeaf.ts`：新增 `breathingLeafMistAlpha()`（256 × 128 `DataTexture`，固定亂數，Node 亦可執行），`prepareBreathingLeaf` 把它設為兩組霧的 `alphaMap`；呼吸仍只改 emissive。
+- `tests/lotRuntime.test.ts`：霧網格須有 UV 及 alpha 貼圖。
+- 模型約 105k tris，GLB 3.3 MB。
+
+### 自評（`~/city2127-evidence/q05b/r5/`）
+
+| # | 項目 | 結果 |
+| --- | --- | --- |
+| 1 | 霧要似霧水 | 大致達到：前左方霧簾已成柔和的細絲水霧，向下漸淡，透出後面樹木（`row1-mist.jpg`、`r4-vs-r5.jpg`）。未足：後方兩塊高葉的霧簾在亮背景前仍隱約見圓筒狀輪廓與側邊直線（霧簾側面對鏡頭時疊加）；整體比目標淡，目標的霧簾更白、更密。 |
+
+### 檢查
+
+- 單元：`tests/lotRuntime.test.ts` 通過。根目錄 `npm test`、`npm run build`、`git diff --check` 見提交前記錄（`~/city2127-evidence/q05b/r5/npm-test.log`）。
+- 瀏覽器（Vite 5186）：三輪 capture-compare（pass1 太淡 → pass2 加濃、霧簾下半才淡出 → pass3 加強兩側淡出及細絲對比）。
+- FPS：未量度；headless data-fps 約 34（日）、25（夜），只作參考。
+
+### 待 owner 決定
+
+- 霧是否要更白更密（如目標），以及後方高葉的霧簾是否減少以免出現圓筒輪廓。
+
+## B-R6 round prompt（下一輪會話）
+
+place-building round for `q05b-breathing-leaf`: main checkout `/Users/fatboy/city2127`, branch `feat/q05b-breathing-leaf`, read `docs/handoffs/q05-park-cooling.md` (its `## B-R5 brief` and `## B-R5` sections). Owner verdict on B-R5: «…»

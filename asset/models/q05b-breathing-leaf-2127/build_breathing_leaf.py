@@ -10,6 +10,7 @@ R3 (owner B-R2 «主力做嗰塊巨型嘅葉…近返 target…有細緻感…�
 pairs), ovate blades on a fine grid with a three-level vein hierarchy, quilting, a wavy margin and a real slab with a light
 rim band, a dark underside and keel, and a margin curling down.
 R4 (owner B-R3): a thin blade with a soft vertex-colour vein glow, and the stems gathered in one bundle that fans out.
+R5 (owner B-R4 «霧…唔似霧水»): the mist as wide overlapping veils with UVs, frayed at runtime into soft falling threads.
 
 Re-run headless (Blender 5.2):
   /Applications/Blender.app/Contents/MacOS/Blender -b --factory-startup --python-exit-code 1 -P build_breathing_leaf.py
@@ -69,8 +70,8 @@ Q05B_ROLES = {                                                    # build-only r
     'pulse_a': ((.75, 1, .96, 1), (.55, 1, .92, 1), 2.0),          # water dashes, three phases lit in turn at runtime
     'pulse_b': ((.75, 1, .96, 1), (.55, 1, .92, 1), 2.0),
     'pulse_c': ((.75, 1, .96, 1), (.55, 1, .92, 1), 2.0),
-    'mist_a': ((.94, .98, 1, .34), (.80, .90, .95, 1), .25),        # mist curtains (runtime: alpha, no depth write)
-    'mist_b': ((.94, .98, 1, .34), (.80, .90, .95, 1), .25),
+    'mist_a': ((.94, .98, 1, .45), (.80, .90, .95, 1), .25),        # mist veils (runtime: soft thread alpha map, no depth write)
+    'mist_b': ((.94, .98, 1, .45), (.80, .90, .95, 1), .25),
     'ring': ((.95, .96, .96, 1), None, .5),                        # root ring and water mains, white
     'aqua': ((.40, .95, .88, 1), (.30, .95, .85, 1), 2.4),         # ring and main light bands
     'stream': ((.42, .76, .86, 1), (.20, .48, .58, 1), .5),        # stream and pool water
@@ -447,39 +448,56 @@ def full_control():
 
 
 def mist(ctx, rims):
-    """Mist curtains from the leaf rims only: narrow hanging ribbons every ~0.7 m of rim, tapering and thinning downward,
-    split between two meshes that breathe in antiphase."""
+    """Mist curtains from the leaf rims only, split between two meshes that breathe in antiphase.
+    R5 (owner B-R4 «霧…似一條條光，唔似霧水»): wide overlapping veils (2.2–3.4 m, one every ~1.1 m of rim) that hang most of
+    the way to the lawn and follow the rim's own direction; each carries UVs (u across 0→1, v down 0→1) so the runtime soft
+    alpha map (src/breathingLeaf.ts) frays them into fine falling threads that fade at the sides and toward the ground."""
     rng = ctx.rng
     k = 0
     for L, out in rims:
         m = len(out)
         pts = [leaf_point(L, u, v, -.1) for u, v in out]
+        cen = leaf_point(L, *CENTRE)
         for i in range(m):
             p, q = pts[i], pts[(i + 1) % m]
             u_mid = (out[i][0] + out[(i + 1) % m][0]) / 2
             if u_mid < .12:                                                  # the outer rim only, not over the stems
                 continue
             seg = math.dist(p, q)
-            for j in range(max(1, int(seg / .6))):
-                t = (j + rng.uniform(.2, .8)) / max(1, int(seg / .6))
+            tx, tz = q[0] - p[0], q[2] - p[2]
+            tl = math.hypot(tx, tz) or 1
+            tx, tz = tx / tl, tz / tl                                        # along the rim
+            nx, nz = tz, -tx                                                 # outward from the leaf centre
+            mx, mz = (p[0] + q[0]) / 2 - cen[0], (p[2] + q[2]) / 2 - cen[2]
+            if nx * mx + nz * mz < 0:
+                nx, nz = -nx, -nz
+            n_here = max(1, round(seg / 1.1))
+            for j in range(n_here):
+                t = (j + rng.uniform(.3, .7)) / n_here
                 x, y, z = (p[0] + (q[0] - p[0]) * t, p[1] + (q[1] - p[1]) * t, p[2] + (q[2] - p[2]) * t)
-                drop = (y - 3.0) * rng.uniform(.30, .62)
-                w0 = rng.uniform(.9, 1.5)
-                ox, oz = x, z
-                rr = math.hypot(ox, oz) or 1
-                tx, tz = -oz / rr, ox / rr                                   # ribbon spans along the rim, faces outward
-                rows = 4
-                verts = []
+                drop = (y - 1.2) * rng.uniform(.55, .85)
+                w0 = rng.uniform(2.2, 3.4)
+                flip = rng.random() < .5                                     # mirrored threads, so neighbours differ
+                rows, cols = 6, 3
+                verts, uvs = [], []
                 for r in range(rows + 1):
                     f = r / rows
-                    w = w0 * (1 - .55 * f) / 2
+                    w = w0 * (1 + .25 * f) / 2                               # the veil spreads a little as it falls
                     yy = y - drop * f
-                    sway = .25 * f * f
-                    verts += [(ox - tx * w + ox / rr * sway, yy, oz - tz * w + oz / rr * sway),
-                              (ox + tx * w + ox / rr * sway, yy, oz + tz * w + oz / rr * sway)]
+                    sway = .6 * f * f
+                    for c in range(cols + 1):
+                        g = c / cols
+                        s = (g * 2 - 1) * w
+                        bow = .15 * (1 - (g * 2 - 1) ** 2)                   # a slight outward bow across the veil
+                        verts.append((x + tx * s + nx * (sway + bow), yy, z + tz * s + nz * (sway + bow)))
+                        uvs.append((1 - g if flip else g, f))
                 acc = ctx.a['mist_a' if k % 2 == 0 else 'mist_b']
-                acc.surface(verts, [(r * 2, r * 2 + 1, r * 2 + 3, r * 2 + 2) for r in range(rows)],
-                            lambda c, ox=ox, oz=oz: (ox, 0, oz))
+                acc.uv = getattr(acc, 'uv', [])
+                acc.uv += uvs
+                W = cols + 1
+                acc.surface(verts, [(r * W + c, r * W + c + 1, (r + 1) * W + c + 1, (r + 1) * W + c)
+                                    for r in range(rows) for c in range(cols)],
+                            lambda c_, nx=nx, nz=nz: (nx, 0, nz))
                 k += 1
     return k
 
@@ -571,6 +589,11 @@ def main():
             assert len(acc.c) == len(acc.v)
             attr = ob.data.color_attributes.new('Col', 'FLOAT_COLOR', 'POINT')
             attr.data.foreach_set('color', [x for rgba in acc.c for x in rgba])
+        if getattr(acc, 'uv', None):                                         # R5: mist veil UVs (glTF v = 1 - Blender v)
+            assert len(acc.uv) == len(acc.v)
+            layer = ob.data.uv_layers.new(name='UVMap')
+            layer.data.foreach_set('uv', [x for lp in ob.data.loops for x in (acc.uv[lp.vertex_index][0],
+                                                                              1 - acc.uv[lp.vertex_index][1])])
         bpy.context.scene.collection.objects.link(ob)
         ob.parent = root
         per[role] = sum(len(p.vertices) - 2 for p in ob.data.polygons)

@@ -247,6 +247,7 @@ assert.deepEqual(q05set.options.map((o: { modelId: string | null }) => o.modelId
   for (const name of [BREATHING_LEAF_MOVING.mistA, BREATHING_LEAF_MOVING.mistB]) {
     const m = part(name).material as MeshStandardMaterial;
     assert.ok(m.transparent && !m.depthWrite && m.opacity < .5, `${name} is a translucent curtain`);
+    assert.ok(m.alphaMap && part(name).geometry.getAttribute('uv'), `${name} frays through the soft mist alpha map (B-R5)`);
   }
   for (const [name, dim] of Object.entries(BREATHING_LEAF_MATTE)) {                  // B-R2: deep-green leaves and crowns stay matte
     assert.equal((part(name).material as MeshStandardMaterial).envMapIntensity, dim, `${name} sky reflection dimmed`);
