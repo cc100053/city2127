@@ -302,9 +302,11 @@ def snow(ctx):
     count = 0
     for k, P in enumerate(SNOW_PERIODS):
         slab = []
-        for _ in range(int(85 * P / 3.7)):
+        for i in range(int(85 * P / 3.7)):
             r = 8.6 * math.sqrt(rng.random()) ** 1.15
-            slab.append((r, rng.uniform(0, TAU), rng.uniform(0, P), rng.uniform(.16, .24)))
+            flake = (r, rng.uniform(0, TAU), rng.uniform(0, P), rng.uniform(.16, .24))
+            if i % 2 == 0:                                                   # owner 2026-11-28: half R2's snowfall (same draws,
+                slab.append(flake)                                           # so the rest of the build keeps its layout)
         acc = ctx.a['snow_' + 'abc'[k]]
         y0 = -P
         while y0 < SNOW_TOP:

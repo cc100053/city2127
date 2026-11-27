@@ -567,6 +567,11 @@ owner 指示：「做 Q5 嘅 C model」。地塊、近鏡方位及台座沿用 A
 - 結果卡文案及 `q05:cloud` 近鏡仍為暫定。
 - C 疊在 B 分支上：B 驗收合併後，C 才可合併（須 rebase）。
 
+### R2 補充（owner 2026-11-28：「落雪量減一半。」）
+
+- 雪粒 1,618 → 823：每組雪層取同一批隨機抽樣的一半，其餘部分（樹林等）佈局不變；約 98k tris，GLB 3.5 MB。截圖 `~/city2127-evidence/q05c/r2/half-snow-day.jpg`。`tests/lotRuntime.test.ts`、`tests/assetLibrary.test.ts`、`npm run build`、`git diff --check` 通過；只改 GLB 及文件，未再跑全套 `npm test`。
+- owner 同時指示另開新 session 處理地塊周邊（見下）。
+
 ## C-R3 round prompt（下一輪會話）
 
 place-building round for `q05c-snow-cloud`: worktree `/Users/fatboy/city2127-q05c`, branch `feat/q05c-snow-cloud`, read `docs/handoffs/q05-park-cooling.md` (its `## C-R2 brief` and `## C-R2` sections). Owner verdict on C-R2: «…»
