@@ -1,0 +1,258 @@
+{
+ "glb": "q11c-vortex-power-station.glb",
+ "glb_bytes": 8149648,
+ "objects": 195,
+ "meshes": 188,
+ "unique_meshes": 24,
+ "triangles": 458226,
+ "materials": 56,
+ "new_materials_on_import": 56,
+ "images": {
+  "q11c_cloud_disc.001": [
+   1024,
+   1024
+  ],
+  "q11c_vortex_band.001": [
+   1024,
+   256
+  ],
+  "q11c_vortex_core.001": [
+   512,
+   512
+  ],
+  "q11c_vortex_mist.001": [
+   512,
+   512
+  ],
+  "q11c_vortex_rope.001": [
+   512,
+   256
+  ],
+  "q11c_vortex_skirt.001": [
+   512,
+   256
+  ]
+ },
+ "bounds_min": [
+  -141.4,
+  -140.0,
+  -0.3
+ ],
+ "bounds_max": [
+  141.7,
+  140.0,
+  130.9
+ ],
+ "station_bounds_min": [
+  -60.06,
+  -63.8,
+  0.0
+ ],
+ "station_bounds_max": [
+  60.06,
+  60.06,
+  40.0
+ ],
+ "roots": [
+  "Q11C_VortexPowerStation"
+ ],
+ "nodes": {
+  "VORTEX_CORE": true,
+  "VORTEX_ROPES": true,
+  "VORTEX_BANDS": true,
+  "VORTEX_MIST": true,
+  "VORTEX_SKIRT": true,
+  "CLOUD_DISC": true,
+  "CLOUD_WISP": true,
+  "RING_LOW": true,
+  "RING_MID": true,
+  "RING_HIGH": true,
+  "STATION": true,
+  "ROTORS": true,
+  "RINGS": true,
+  "VORTEX": true,
+  "CLOUD": true,
+  "PLAZA": true,
+  "STATION_PODIUM": true,
+  "STATION_DRUM": true,
+  "STATION_ROOF": true,
+  "STATION_DECK": true,
+  "STATION_ENTRANCE": true,
+  "PLAZA_GROUND": true
+ },
+ "vanes": 36,
+ "ring_count": 3,
+ "rings": {
+  "RING_HIGH": {
+   "z": 109.0,
+   "inner_r": 31.91,
+   "tube_m": 0.78,
+   "vortex_max_r_near": 27.13,
+   "clearance_m": 4.78
+  },
+  "RING_LOW": {
+   "z": 57.0,
+   "inner_r": 24.91,
+   "tube_m": 0.78,
+   "vortex_max_r_near": 22.36,
+   "clearance_m": 2.56
+  },
+  "RING_MID": {
+   "z": 83.0,
+   "inner_r": 27.91,
+   "tube_m": 0.78,
+   "vortex_max_r_near": 24.07,
+   "clearance_m": 3.84
+  }
+ },
+ "rotors": {
+  "count": 34,
+  "worst_offset_m": 0.0,
+  "worst_axis_error": 0.0
+ },
+ "vortex_textures": {
+  "VORTEX_CORE": {
+   "material": "q11cv_vortex_core.001",
+   "Base Color": [
+    512,
+    512
+   ],
+   "Alpha": null
+  },
+  "VORTEX_ROPES": {
+   "material": "q11cv_vortex_rope.001",
+   "Base Color": [
+    512,
+    256
+   ],
+   "Alpha": null
+  },
+  "VORTEX_BANDS": {
+   "material": "q11cv_vortex_band.001",
+   "Base Color": [
+    1024,
+    256
+   ],
+   "Alpha": [
+    1024,
+    256
+   ]
+  },
+  "VORTEX_MIST": {
+   "material": "q11cv_vortex_mist.001",
+   "Base Color": [
+    512,
+    512
+   ],
+   "Alpha": [
+    512,
+    512
+   ]
+  },
+  "VORTEX_SKIRT": {
+   "material": "q11cv_vortex_skirt.001",
+   "Base Color": [
+    512,
+    256
+   ],
+   "Alpha": [
+    512,
+    256
+   ]
+  },
+  "CLOUD_DISC": {
+   "material": "q11cv_cloud_disc.001",
+   "Base Color": [
+    1024,
+    1024
+   ],
+   "Alpha": [
+    1024,
+    1024
+   ]
+  },
+  "CLOUD_WISP": {
+   "material": "q11cv_cloud_disc.001",
+   "Base Color": [
+    1024,
+    1024
+   ],
+   "Alpha": [
+    1024,
+    1024
+   ]
+  }
+ },
+ "entrance_walk": [
+  {
+   "offset_m": -3.0,
+   "h": 1.0,
+   "first": "q11cv_rail_glass.001",
+   "dist_m": 9.96
+  },
+  {
+   "offset_m": -3.0,
+   "h": 1.8,
+   "first": "q11cv_rail_glass.001",
+   "dist_m": 9.96
+  },
+  {
+   "offset_m": 0.0,
+   "h": 1.0,
+   "first": "q11cv_frame_silver.001",
+   "dist_m": 9.76
+  },
+  {
+   "offset_m": 0.0,
+   "h": 1.8,
+   "first": "q11cv_frame_silver.001",
+   "dist_m": 9.76
+  },
+  {
+   "offset_m": 3.0,
+   "h": 1.0,
+   "first": "q11cv_rail_glass.001",
+   "dist_m": 9.96
+  },
+  {
+   "offset_m": 3.0,
+   "h": 1.8,
+   "first": "q11cv_rail_glass.001",
+   "dist_m": 9.96
+  }
+ ],
+ "stair_tread_z": [
+  2.55,
+  1.65,
+  0.45,
+  -0.0
+ ],
+ "people_nodes": [],
+ "transparent_materials": {
+  "q11cv_cloud_disc.001": {
+   "alpha": 0.5,
+   "method": "BLENDED"
+  },
+  "q11cv_rail_glass.001": {
+   "alpha": 0.25,
+   "method": "BLENDED"
+  },
+  "q11cv_vortex_band.001": {
+   "alpha": 0.5,
+   "method": "BLENDED"
+  },
+  "q11cv_vortex_mist.001": {
+   "alpha": 0.5,
+   "method": "BLENDED"
+  },
+  "q11cv_vortex_skirt.001": {
+   "alpha": 0.5,
+   "method": "BLENDED"
+  }
+ },
+ "main_view": {
+  "vortex_share": 0.102,
+  "cloud_share": 0.076,
+  "turbine_share": 0.0008
+ }
+}
