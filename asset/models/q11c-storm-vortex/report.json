@@ -1,0 +1,44 @@
+{
+ "tris_by_group": {
+  "STRUCTURE": 96356,
+  "TURBINES": 46680,
+  "VORTEX": 19708,
+  "RINGS": 25344,
+  "DECK": 15978,
+  "PLAZA": 79940
+ },
+ "tris_total": 284006,
+ "unique_mesh_tris": 208564,
+ "objects": 90,
+ "materials": 41,
+ "glb_bytes": 5628504,
+ "layout": {
+  "vane_gap_min_m": 6.77,
+  "vane_outer_edge_root_r_m": 64.43,
+  "rings": {
+   "LOW": {
+    "radius": 27.0,
+    "z": 47.0,
+    "clear_to_streaks_m": 5.93
+   },
+   "MID": {
+    "radius": 30.0,
+    "z": 78.0,
+    "clear_to_streaks_m": 6.09
+   },
+   "HIGH": {
+    "radius": 34.0,
+    "z": 110.0,
+    "clear_to_streaks_m": 2.13
+   }
+  },
+  "funnel_r_at_lip_m": 17.41,
+  "levels": {
+   "podium": 5.0,
+   "roof_walkway": 31.0,
+   "vane_tip": 39.0,
+   "cap_top": 125.4
+  },
+  "stair_foot_r_m": 79.54
+ }
+}
