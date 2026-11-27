@@ -1,7 +1,8 @@
 """Review renders of the Q05-B breathing giant leaf (EEVEE, one sun, fixed cameras).
 
   /Applications/Blender.app/Contents/MacOS/Blender -b --factory-startup --python-exit-code 1 -P review_breathing_leaf.py -- <out_dir>
-Writes target.png (the target image's oblique), low.png (pedestrian view) and top.png (plan) into <out_dir>.
+Writes target.png (the target image's oblique), low.png (pedestrian view), top.png (plan), side.png and closeup.png (the
+q05:leaf close-up) into <out_dir>.
 """
 import math
 import os
@@ -14,7 +15,10 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = sys.argv[sys.argv.index('--') + 1] if '--' in sys.argv else HERE
 # Blender coordinates (x, y = -three z, z up).
 CAMERAS = {'target': ((-36, 48, 40), (0, 0, 12), 30), 'low': ((-9, 12, 2.2), (0, 0, 14), 20), 'top': ((0, -1, 120), (0, 0, 0), 50),
-           'side': ((60, 10, 22), (0, 0, 14), 35)}
+           'side': ((60, 10, 22), (0, 0, 14), 35),
+           # R3: the q05:leaf close-up (src/headlineCamera.ts, three (-252, 40, -192) -> (-210, 9, -135), lot centre (-210, -135)),
+           # vertical FOV 42 deg as the hero camera; lens < 0 means a vertical field of view in degrees.
+           'closeup': ((-42, 57, 40), (0, 0, 9), -42)}
 
 
 def main():
@@ -48,7 +52,12 @@ def main():
     for name, (pos, tgt, lens) in CAMERAS.items():
         cam.location = pos
         cam.rotation_euler = (Vector(tgt) - Vector(pos)).to_track_quat('-Z', 'Y').to_euler()
-        cam.data.lens = lens
+        if lens < 0:
+            cam.data.sensor_fit = 'VERTICAL'
+            cam.data.angle = math.radians(-lens)
+        else:
+            cam.data.sensor_fit = 'AUTO'
+            cam.data.lens = lens
         sc.render.filepath = os.path.join(OUT, name + '.png')
         bpy.ops.render.render(write_still=True)
 

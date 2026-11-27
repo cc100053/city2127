@@ -15,7 +15,9 @@ export const BREATHING_LEAF_MOVING = {
 export const BREATHING_LEAF_PERIOD = { pulse: 1.2, breath: 5 } as const;
 const MIST = new Set<string>([BREATHING_LEAF_MOVING.mistA, BREATHING_LEAF_MOVING.mistB]);
 /** Matte meshes whose sky reflection is dimmed (owner B-R1: the deep-green leaves read pale by day from the bright city sky). */
-export const BREATHING_LEAF_MATTE = { q05b_leaf: .3, q05b_leaf_u: .4, q05b_crown: .45, q05b_crown_l: .45 } as const;
+export const BREATHING_LEAF_MATTE = {
+  q05b_leaf: .3, q05b_leaf_u: .4, q05b_leaf_rim: .4, q05b_leaf_v: .3, q05b_crown: .45, q05b_crown_l: .45,   // B-R3: rim band and vein halo
+} as const;
 /** The translucent glass-green stems (alpha from the GLB), drawn after the opaque plant and before the mist. */
 export const BREATHING_LEAF_STEM = 'q05b_stem';
 const moving = new Set<string>(Object.values(BREATHING_LEAF_MOVING));

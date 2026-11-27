@@ -1,10 +1,10 @@
 # q05-park-cooling — Q05 公園降溫三態：目標圖與建築故事
 
 - Owner: repository owner
-- Status: Q05-A DONE（R2 owner 驗收，2026-11-27，已合併入 main）；Q05-B R2 已建，待 owner 評審（分支 `feat/q05b-breathing-leaf`）；C 未建模。
+- Status: Q05-A DONE（R2 owner 驗收，2026-11-27，已合併入 main）；Q05-B R3 已建，待 owner 評審（分支 `feat/q05b-breathing-leaf`）；C 未建模。
 - Branch: `feat/q05a-reverse-ac`（worktree `../city2127-q05a`），自 `origin/main` `bbec76c2`；目標圖記錄見舊分支 `docs/q05-targets`（已合併）。
 - Base commit: `bbec76c26a833a2a5ba24dfc42f3cee3f9a03c0c`
-- Last verified commit: `00f0cd75`（A R2）；B-R2 見分支 `feat/q05b-breathing-leaf` 最新提交（檢查見 B-R2 一節）。
+- Last verified commit: `00f0cd75`（A R2）；B-R3 見分支 `feat/q05b-breathing-leaf` 最新提交（檢查見 B-R3 一節）。
 - Remote availability: 已合併入 `origin/main`（見下文 R2 verdict）；任務分支已刪除。
 
 ## Session Git state
@@ -335,6 +335,61 @@ owner 指示：「do b modeling」。地塊、近鏡方位及台座沿用 A 的�
 - `facet_tree` 是否亦換到 Q05-A 的樹林（A 已驗收，本輪未改）。
 - 近鏡新角度（較高較近）是否接受。
 
-## B-R3 round prompt（下一輪會話）
+## B-R2 verdict
 
-place-building round for `q05b-breathing-leaf`: main checkout branch `feat/q05b-breathing-leaf`, read `docs/handoffs/q05-park-cooling.md`. Owner verdict on B-R2: «…»
+«開新嘅 session，主力做嗰塊巨型嘅葉。我要做得近返 target 嘅圖片，有細緻感，同埋有厚度嘅感覺»（2026-11-27）
+
+## B-R3 brief
+
+像素以 3200 × 1800 的 `q05:leaf` 近鏡量度：鏡距約 77 m、垂直 FOV 42°，植物中心約 30 px/m（近葉約 38、後葉約 27）。目標圖按寬 3200 px 量度。本輪只改巨葉（`build_breathing_leaf.py` 葉片部分、`src/breathingLeaf.ts` 物料）；小溪、樹、莖、近鏡不改。
+
+| # | owner 原話 | R2 現況 | 量度目標 |
+| --- | --- | --- | --- |
+| 1 | 近返 target 嘅圖片 | 五片葉左右對稱成「四葉草」（±1.2／±2.0 rad 兩對，下層約 12 m、上層約 22 m）；全部同一 `TILT` .55 傾向鏡頭，葉面正對鏡頭似圓碟；上層兩片葉耳被後方葉遮去；葉闊等於葉長（圓形） | 五片葉五個高度，不成鏡像：後左約 22 m、後右約 20 m、中左約 15.5 m、後方小葉約 13.5 m（低於上層，令上層葉耳露出）、近右最大最低約 10.5 m 並下垂；每片葉各自的傾角（0.24–0.34，即 13–19°）及偏轉；葉闊降至葉長 0.8 倍（卵心形，如目標）。五片葉在近鏡中均見到兩個葉耳及凹口。 |
+| 2 | 有細緻感 | 葉脈只有中脈及每邊七條近乎平行的直側脈（似梳）；輪廓 24 點，邊呈多邊形；葉面平滑無變化 | 三級葉脈：凸起發光中脈（闊約 0.6 m，近鏡約 8 px）、每邊七條向葉尖彎掃的二級脈（約 0.24 m，近鏡約 4–7 px）及葉耳基脈，下面墊一條較淺綠的光暈帶；三級脈（二級脈之間及葉邊脈）較暗較幼（約 0.1 m，近鏡約 2–3 px）。輪廓重採樣至約 100 點、22 環，葉邊輕微波浪；二級脈之間的葉面略為鼓起（約 0.15 m），令光影有變化。 |
+| 3 | 有厚度嘅感覺 | 葉厚 0.28 m，邊緣收窄至約 0.08 m（近鏡約 2–3 px），邊與葉底同色，幾乎看不到 | 葉片為 0.42 m（邊）至 0.60 m（中）的實心板，近鏡邊帶 ≥ 12 px；葉邊獨立淺綠色邊帶物料 `q05b_leaf_rim`，葉底改深綠；中脈下加龍骨；葉片兩半由中脈向外略斜下、葉邊向下捲、葉尖下垂，令葉底及厚邊在近鏡中可見。 |
+
+另一讀法：「厚度」亦可解作葉片肉質、飽滿的感覺（表面鼓起、邊緣圓潤），而非字面上的板厚。本輪兩者都做：以實心板及邊帶表達板厚，以葉面鼓起及下捲邊表達飽滿感。
+
+## B-R3（2026-11-27，Q05-B 呼吸巨葉）
+
+### Git 狀態
+
+- 開始時 `feat/q05b-breathing-leaf` 與遠端同步於 `07311d3b`，工作樹乾淨；`git fetch --prune origin` 成功。沒有上一輪的伺服器或 `playwright-cli` 仍在運行。
+
+### 改動
+
+- **葉的排列**（brief 1）：`LEAVES` 每片葉增加傾角（tilt）及葉尖下垂（droop）兩個參數，取代全域 `TILT`；五片葉的方位、高度、長度、偏轉均不同（見 brief 1）。葉闊 `NARROW` .80。
+- **葉片網格及細節**（brief 2）：輪廓以 Catmull-Rom 由原 13 個控制點重採樣（每段 4 點，全葉約 98 點），由中心至輪廓 22 環；葉邊輕微波浪。葉面高度加入二級脈之間的鼓起（`relief`）、中脈凸脊、葉邊細小起伏。葉脈：`q05b_vein`（中脈、每邊七條彎掃二級脈、葉耳基脈，執行時呼吸）、新角色 `q05b_leaf_v`（脈下較淺綠光暈帶）、`q05b_vein_t`（三級脈及葉邊脈，較暗、不呼吸，靜態並可合批）。
+- **厚度**（brief 3）：葉片為 0.42–0.60 m 實心板；邊帶改用新角色 `q05b_leaf_rim`（淺綠，法線向外，修正 R2 邊面以 (0,−1,0) 判斷方向的問題）；葉底 `q05b_leaf_u` 改深綠並加龍骨；兩半由中脈斜下、葉邊下捲。
+- **霧簾**仍由原 13 點控制輪廓垂下（不隨新網格加密），條數 256 → 209（葉形變了）。
+- **執行時**（`src/breathingLeaf.ts`）：`BREATHING_LEAF_MATTE` 加入 `q05b_leaf_rim` .4、`q05b_leaf_v` .3。
+- **其他**：`review_breathing_leaf.py` 加 `closeup` 鏡（與 `q05:leaf` 相同，垂直 FOV 42°）。霧簾消耗的亂數變了，樹的位置隨之略有不同（仍為 31 棵）。
+- 模型約 123k tris（R2 約 55k），GLB 3.8 MB（R2 2.3 MB）；葉片上下面各約 21–22k、葉脈約 31k。
+
+### 自評（`~/city2127-evidence/q05b/r3/`，3200 × 1800，`q05:leaf`）
+
+| # | 項目 | 結果 |
+| --- | --- | --- |
+| 1 | 近返 target | 大致達到：五片葉五個高度，後左、後右、中左、後方小葉、近右下垂，不再是對稱四葉草（`row1-shape.jpg`、`target-vs-r3.jpg`）；五片葉均見到葉耳及凹口（後方小葉的葉耳部分被莖擋住）。未足：葉仍比目標大而密，莖在目標中長而顯眼，近鏡中大半被葉遮住；近右葉遮去右方部分樹林。 |
+| 2 | 細緻感 | 達到：中脈約 8 px，二級脈彎向葉尖，三級脈及葉邊脈較暗作為第二層，脈下有淺綠光暈，葉面鼓起有明暗變化，葉邊波浪（`row2-detail.jpg`）。三級脈在 3200 px 下可見，縮細後較難看出。 |
+| 3 | 厚度 | 達到：葉邊淺綠邊帶加深綠葉底合共約 15–20 px，每片葉的近緣都見到厚度，葉邊下捲（`row3-thickness.jpg`）。 |
+
+### 檢查
+
+- 單元：`tests/lotRuntime.test.ts`、`tests/assetLibrary.test.ts` 通過。
+- 根目錄 `npm test` 通過（2026-11-27，EXIT 0，記錄 `~/city2127-evidence/q05b/r3/npm-test.log`）；`npm run build`、`git diff --check` 通過。`survey` 未改動，未重跑。
+- 瀏覽器（Vite 5186，`?rotation&jump=Q05:B&shot=q05:leaf`）：截圖 page error 0；兩輪 capture-compare（pass1 → 三級脈太亮，pass2 調暗）。
+- FPS：未量度（`fps.sh` 只跑 `?meters`）。headless 截圖 data-fps 約 38（近鏡）、33（overview），R2 為 40／31，只作參考。
+- 變化總覽：Q05 未有近鏡畫格，未重生。
+
+### 待 owner 決定
+
+- 葉是否再縮細（例如長 12–14 m），令莖更長更顯眼，更接近目標的比例。
+- 葉片可否收錄入資產庫作 `heart_leaf` 模組（LIBRARY 原註「accepted 後」）。
+- 三級脈是否要更明顯，或保持現在的低調。
+- 近鏡角度是否接受（本輪未改）。
+
+## B-R4 round prompt（下一輪會話）
+
+place-building round for `q05b-breathing-leaf`: main checkout `/Users/fatboy/city2127`, branch `feat/q05b-breathing-leaf`, read `docs/handoffs/q05-park-cooling.md` (its `## B-R3 brief` and `## B-R3` sections). Owner verdict on B-R3: «…»

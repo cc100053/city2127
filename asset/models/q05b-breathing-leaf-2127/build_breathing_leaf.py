@@ -6,13 +6,16 @@ from the ring and a dense grove round the rim.
 R2 (owner B-R1 verdict, 2026-11-27): matte deep-green leaves (runtime dims the sky reflection), deeper heart lobes and two
 tiers of leaves tipped toward the close-up, thinner translucent stems spread apart, the stream moved to the near left clear of
 the trees, and the grove rebuilt from the library facet_tree (low-poly faceted crowns, as in the target).
+R3 (owner B-R2 «主力做嗰塊巨型嘅葉…近返 target…有細緻感…有厚度嘅感覺»): five leaves at five heights and sizes (no mirror
+pairs), ovate blades on a fine grid with a three-level vein hierarchy, quilting, a wavy margin and a real slab with a light
+rim band, a dark underside and keel, and a margin curling down.
 
 Re-run headless (Blender 5.2):
   /Applications/Blender.app/Contents/MacOS/Blender -b --factory-startup --python-exit-code 1 -P build_breathing_leaf.py
 Writes q05b-breathing-leaf-2127.blend and .glb next to this file (glTF, no Meshopt/Draco).
 
 Units are METRES, three.js axes (x, y up, z), ground-contact centre at the origin. Lot: NE PARK `LOTS['ne-park']` (48 x 48 m,
-shared with Q05-A); the plinth is 24 m in radius, the leaves reach ~23.5 m out and ~22 m up. One node Q05B_BREATHING_LEAF, one
+shared with Q05-A); the plinth is 24 m in radius, the leaves stay inside the lot + 2.5 m and reach ~22 m up. One node Q05B_BREATHING_LEAF, one
 mesh per role named q05b_<role>; the runtime (src/breathingLeaf.ts) animates the emissive glow of six of them: q05b_pulse_a/b/c
 (water dashes climbing the stems, lit in turn), q05b_vein (the leaf veins breathing) and q05b_mist_a/b (the mist curtains,
 alpha-blended, breathing in antiphase). The mist hangs only from the leaf rims (owner: never a cloud, which is Q05-C).
@@ -41,18 +44,25 @@ STONES = CAM + .55                               # stepping-stone path azimuth (
 STREAM = (CAM + .12, CAM + 1.12)                 # stream arc between the wall and the rim, near left
 STREAM_R = 17.0
 
-# Five leaves: (azimuth offset from the camera azimuth, stem-top height, leaf length, attach radius, yaw twist, pitch).
-# Laid out like the target: a low leaf out to the near right, a broad one to the left, two high at the back, one behind.
-# R2 (owner «後面三片葉似平頂傘»): as in the target, the leaves point out to the close-up's left and right in two tiers (lower
-# pair front, upper pair back, one behind), and every blade tips its top face to the camera (TILT), so all five show the heart.
-LEAVES = [(1.25, 11.5, 14.5, 8.6, 0, .12), (-1.20, 12.5, 15.0, 8.6, 0, .12), (2.00, 21.5, 14.5, 7.4, 0, .16),
-          (-2.00, 22.5, 15.0, 7.4, 0, .16), (3.14, 17.0, 13.0, 6.4, 0, .14)]
-TILT = .55                                       # blade drop per metre toward the camera (≈ 29°)
+# Five leaves: (azimuth offset from the camera azimuth, stem-top height, leaf length, attach radius, yaw twist, pitch, tilt toward
+# the camera per metre, tip droop). Screen left of the close-up is +azimuth.
+# R3 (owner B-R2 «近返 target 嘅圖片»): five distinct heights and sizes, no mirror pairs, as in the target: two high leaves at the
+# back pointing up-left and up-right, a small low one between the stems behind, a broad mid leaf out to the left and the
+# largest, lowest leaf drooping out to the near right. Each blade has its own tilt toward the camera (R2's single TILT shear
+# turned the five into a flat four-leaf clover).
+LEAVES = [(2.25, 22.0, 14.0, 7.6, -.15, .10, .32, .30),    # back left, highest
+          (-2.35, 20.0, 13.5, 7.2, .20, .12, .34, .30),    # back right
+          (3.05, 13.5, 10.5, 5.6, .10, .14, .30, .28),     # behind, low, small (between the stems)
+          (1.30, 15.5, 15.0, 8.4, .12, .08, .24, .32),     # mid left, broad
+          (-1.10, 10.5, 16.0, 8.6, -.10, .05, .24, .44)]   # near right, lowest and largest, drooping
 
 Q05B_ROLES = {                                                    # build-only roles (shared ROLES untouched)
     'leaf': ((.025, .16, .05, 1), None, .5),                        # leaf blade, deep green (runtime dims the sky reflection)
-    'leaf_u': ((.12, .32, .12, 1), None, .5),                     # leaf underside and rim, lighter
+    'leaf_u': ((.07, .22, .08, 1), None, .5),                     # leaf underside and keel, darker (R3)
+    'leaf_rim': ((.20, .44, .13, 1), None, .5),                   # R3: the slab edge, a lighter band that shows the thickness
+    'leaf_v': ((.10, .34, .11, 1), None, .5),                     # R3: lighter blade under the main veins (halo)
     'vein': ((.62, 1, .36, 1), (.50, 1, .28, 1), 1.6),            # lit veins (runtime breathes the glow)
+    'vein_t': ((.15, .40, .13, 1), (.20, .50, .14, 1), .12),       # R3: tertiary and marginal veins, dimmer, steady
     'stem': ((.40, .72, .40, .5), (.16, .40, .20, 1), .3),       # stems: translucent glass green, the water core shows through
     'root': ((.30, .52, .28, 1), None, .5),                        # roots over the soil, opaque
     'water': ((.40, .95, .88, 1), (.30, .95, .85, 1), 1.4),        # aqua water line up each stem (not the concept #5fdcff)
@@ -68,9 +78,9 @@ Q05B_ROLES = {                                                    # build-only r
     'lawn': ((.20, .40, .12, 1), None, .5),
     'plinth': ((.90, .90, .87, 1), None, .5),
 }
-ROUGH = {'leaf': .85, 'leaf_u': .85, 'stem': .3, 'crown': .9, 'crown_l': .9, 'ring': .4, 'stream': .1, 'mist_a': .9, 'mist_b': .9, 'lawn': .9, 'plinth': .6,
+ROUGH = {'leaf': .85, 'leaf_u': .85, 'leaf_rim': .85, 'leaf_v': .85, 'stem': .3, 'crown': .9, 'crown_l': .9, 'ring': .4, 'stream': .1, 'mist_a': .9, 'mist_b': .9, 'lawn': .9, 'plinth': .6,
          'rock': .8}
-SMOOTH = {'leaf': 60, 'leaf_u': 60, 'vein': 50, 'stem': 60, 'water': 60, 'pulse_a': 60, 'pulse_b': 60, 'pulse_c': 60, 'ring': 40,
+SMOOTH = {'leaf': 60, 'leaf_u': 60, 'leaf_rim': 60, 'leaf_v': 60, 'vein': 50, 'vein_t': 50, 'stem': 60, 'water': 60, 'pulse_a': 60, 'pulse_b': 60, 'pulse_c': 60, 'ring': 40,
           'aqua': 40, 'green': 80, 'leaf_l': 80, 'rock': 35, 'root': 60, 'crown': 1, 'crown_l': 1}
 DOUBLE = ('green', 'leaf_l', 'mist_a', 'mist_b', 'stem')                   # drawn from both sides
 
@@ -209,7 +219,7 @@ def along(pts, t):
 
 def stems(ctx):
     a = ctx.a
-    for k, (daz, top, ln, rad, _, _) in enumerate(LEAVES):
+    for k, (daz, top, ln, rad, *_) in enumerate(LEAVES):
         az = CAM + daz
         pts = stem_path(az, top, rad)
         M.limb(a['stem'], pts, .50, .28, 14)
@@ -225,54 +235,168 @@ def stems(ctx):
             M.limb(a['root'], [b, (2.4 * c, RING_H - .1, 2.4 * s), (3.9 * c, RING_H - .12, 3.9 * s)], .38, .14, 8)
 
 
-# Leaf outline (right half, normalised to length 1): tip at u = 1, petiole sinus at u = 0, two basal lobes behind it.
+# Leaf outline control points (right half, normalised to length 1): tip at u = 1, petiole sinus near u = 0, two basal lobes.
+# R3 (owner B-R2 «有細緻感，同埋有厚度嘅感覺»): the blade is resampled smooth (≈ 100 outline points, 22 rings) so it can carry
+# relief; a three-level vein hierarchy (raised midrib, swept secondaries, tertiaries and a marginal vein) with a lighter halo
+# under the main veins; quilted panels between the secondaries; a wavy margin; a real 0.42–0.60 m slab with a lighter rim
+# band, a keel under the midrib, the halves falling away from the midrib and the margin curling down so the thickness shows.
 OUTLINE = [(1.0, 0), (.90, .12), (.76, .27), (.58, .40), (.38, .48), (.18, .50), (.0, .48), (-.15, .43), (-.28, .34),
-           (-.37, .22), (-.37, .11), (-.26, .05), (-.08, 0)]    # R2: deeper basal lobes and sinus (heart reads from afar)
-CENTRE = (.33, 0)
-RINGS = 7
+           (-.37, .22), (-.37, .11), (-.26, .05), (-.08, 0)]
+CENTRE = (.30, 0)
+RINGS = 22
+SPAN = 4                                         # resampled points per outline span
+NARROW = .80                                     # R3: blade width .8 of R2's (ovate like the target, not round)
+SP = .13                                         # secondary vein spacing along the midrib (normalised)
 
 
-def leaf_frame(daz, top, rad, twist, pitch):
+def _crspan(p0, p1, p2, p3, t):
+    return tuple(.5 * (2 * p1[k] + (-p0[k] + p2[k]) * t + (2 * p0[k] - 5 * p1[k] + 4 * p2[k] - p3[k]) * t * t
+                       + (-p0[k] + 3 * p1[k] - 3 * p2[k] + p3[k]) * t ** 3) for k in range(2))
+
+
+def _right_half():
+    """Smooth right half from the tip to the sinus (Catmull-Rom through OUTLINE), the margin gently wavy."""
+    c = [OUTLINE[0]] + OUTLINE + [OUTLINE[-1]]
+    pts = []
+    for i in range(len(OUTLINE) - 1):
+        for j in range(SPAN):
+            pts.append(_crspan(c[i], c[i + 1], c[i + 2], c[i + 3], j / SPAN))
+    pts.append(OUTLINE[-1])
+    out = []
+    for i, (u, v) in enumerate(pts):                                     # undulate across the blade, never at tip or sinus
+        f = math.sin(math.pi * i / (len(pts) - 1))
+        k = 1 + .018 * f * math.sin(i * .62)
+        out.append((CENTRE[0] + (u - CENTRE[0]) * k, v * k * NARROW))
+    out[0], out[-1] = OUTLINE[0], OUTLINE[-1]
+    return out
+
+
+RIGHT = _right_half()
+FULL = RIGHT + [(u, -v) for u, v in reversed(RIGHT[1:-1])]
+
+
+def half_width(u):
+    """Outer half-width of the blade at u (largest v of the right half where it crosses u)."""
+    best = 0.0
+    for (ua, va), (ub, vb) in zip(RIGHT, RIGHT[1:]):
+        if min(ua, ub) <= u <= max(ua, ub) and ua != ub:
+            best = max(best, va + (vb - va) * (u - ua) / (ub - ua))
+    return best or 1e-3
+
+
+def inside(u, v, shrink=1.0):
+    """Point-in-outline test, the outline scaled by `shrink` about CENTRE."""
+    poly = [(CENTRE[0] + (a - CENTRE[0]) * shrink, b * shrink) for a, b in FULL]
+    hit = False
+    for (ua, va), (ub, vb) in zip(poly, poly[1:] + poly[:1]):
+        if (va > v) != (vb > v) and u < ua + (v - va) * (ub - ua) / (vb - va):
+            hit = not hit
+    return hit
+
+
+def _smooth(a, b, x):
+    t = min(1, max(0, (x - a) / (b - a)))
+    return t * t * (3 - 2 * t)
+
+
+def sweep_g(s):
+    """How far a secondary vein has run toward the tip once it is s out from the midrib (they sweep forward)."""
+    return .30 * s + 2.0 * s * s
+
+
+def relief(u, s, w):
+    """Quilted panels between the veins (normalised height): secondaries swept from the midrib, basal veins fanning into
+    the lobes from the petiole; zero at the midrib and along the margin."""
+    phi = (u - sweep_g(s) - .02) / SP
+    sec = math.sin(math.pi * phi) ** 2
+    th = math.atan2(s, .06 - u + 1e-6)
+    lobe = math.sin(math.pi * th / .36) ** 2
+    b = _smooth(.06, -.06, u)
+    return .010 * ((1 - b) * sec + b * lobe) * _smooth(.02, .08, s) * (1 - _smooth(.82, 1, w))
+
+
+def leaf_frame(spec):
+    daz, top, ln, rad, twist, pitch, tilt, droop = spec
     az = CAM + daz
-    origin = (rad * math.cos(az), top, rad * math.sin(az))
     head = az + twist
-    d = (math.cos(head), 0, math.sin(head))
-    side = (-math.sin(head), 0, math.cos(head))
-    return origin, d, side, pitch
+    return {'o': (rad * math.cos(az), top, rad * math.sin(az)), 'd': (math.cos(head), 0, math.sin(head)),
+            's': (-math.sin(head), 0, math.cos(head)), 'ln': ln, 'pitch': pitch, 'tilt': tilt, 'droop': droop}
 
 
 CAM_DIR = (math.cos(CAM), math.sin(CAM))
 
 
-def leaf_point(frame, ln, u, v, lift=0.0):
-    """A point on the leaf: midrib along d, width along side; arched (rises then the tip droops), edges droop; the whole
-    blade tipped down toward the close-up camera by TILT so its top face shows."""
-    origin, d, side, pitch = frame
-    w = abs(v) / .50
-    toward = (u * d[0] + v * side[0]) * CAM_DIR[0] + (u * d[2] + v * side[2]) * CAM_DIR[1]
-    y = ln * (pitch * u - .34 * max(0, u) ** 2 - .06 * w ** 2 - TILT * toward) + lift
-    return (origin[0] + ln * (u * d[0] + v * side[0]), origin[1] + y, origin[2] + ln * (u * d[2] + v * side[2]))
+def leaf_point(L, u, v, lift=0.0, under=False):
+    """A point on the leaf's top face (or, `under`, the smooth face the slab hangs from): the midrib arches then the tip
+    droops, the halves fall away from the midrib, the margin curls down, panels quilt between the veins, a ridge runs
+    along the midrib, and the whole blade tips toward the close-up camera by the leaf's tilt so its top face shows."""
+    o, d, sd, ln = L['o'], L['d'], L['s'], L['ln']
+    s = abs(v)
+    w = min(1.0, s / half_width(u))
+    toward = (u * d[0] + v * sd[0]) * CAM_DIR[0] + (u * d[2] + v * sd[2]) * CAM_DIR[1]
+    y = (L['pitch'] * u - L['droop'] * max(0, u) ** 2 - .10 * s - .25 * s * s - .035 * _smooth(.78, 1, w)
+         - L['tilt'] * toward + .008 * w ** 3 * math.sin(17 * u + 11 * s))
+    if not under:
+        y += relief(u, s, w) + .010 * math.exp(-(s / .028) ** 2) * (1 - .6 * max(0, min(1, u)))
+    return (o[0] + ln * (u * d[0] + v * sd[0]), o[1] + ln * y + lift, o[2] + ln * (u * d[2] + v * sd[2]))
 
 
-def full_outline():
-    """Closed outline: the right half from the tip to the sinus, then the left half back toward the tip."""
-    return OUTLINE + [(u, -v) for u, v in reversed(OUTLINE[1:-1])]
+def _trace(u0, step, shrink=.92):
+    """Normalised (u, v) points of a vein starting on the midrib at u0, swept toward the tip, until it nears the margin."""
+    pts, s = [], .012
+    while True:
+        u = u0 + sweep_g(s)
+        if u > .97 or not inside(u, s, shrink):
+            break
+        pts.append((u, s))
+        s += step
+    return pts
+
+
+def _fan(theta, step=.02, shrink=.92):
+    """Basal vein fanning from the petiole into a lobe at angle theta from the backward midline."""
+    pts, r = [], .02
+    while True:
+        u, s = .06 - r * math.cos(theta), r * math.sin(theta)
+        if not inside(u, s, shrink):
+            break
+        pts.append((u, s))
+        r += step
+    return pts
+
+
+def _strip(acc, L, uv, width, lift):
+    """Flat ribbon of `width` (normalised) lying on the blade along uv points."""
+    verts = []
+    for i, (u, v) in enumerate(uv):
+        a, b = uv[max(0, i - 1)], uv[min(len(uv) - 1, i + 1)]
+        tu, tv = b[0] - a[0], b[1] - a[1]
+        n = math.hypot(tu, tv) or 1
+        nu, nv = -tv / n * width / 2, tu / n * width / 2
+        verts += [leaf_point(L, u - nu, v - nv, lift), leaf_point(L, u + nu, v + nv, lift)]
+    acc.surface(verts, [(i * 2, i * 2 + 1, i * 2 + 3, i * 2 + 2) for i in range(len(uv) - 1)], lambda c: (0, 1, 0))
+
+
+def _vein(acc, L, uv, r0, r1, lift, flat=.6, n=6):
+    if len(uv) >= 2:
+        M.limb(acc, [leaf_point(L, u, v, lift) for u, v in uv], r0, r1, n, flat)
 
 
 def leaves(ctx):
     a = ctx.a
-    rim_all = []
-    for k, (daz, top, ln, rad, twist, pitch) in enumerate(LEAVES):
-        fr = leaf_frame(daz, top, rad, twist, pitch)
-        out = full_outline()
-        m = len(out)
-        grid = []                                                            # rings from the centre point to the outline
-        for r in range(RINGS + 1):
-            f = r / RINGS
-            grid.append([(CENTRE[0] + (u - CENTRE[0]) * f, CENTRE[1] + (v - CENTRE[1]) * f) for u, v in out])
-        th = .28
-        top_v = [leaf_point(fr, ln, u, v) for row in grid for u, v in row]
-        bot_v = [leaf_point(fr, ln, u, v, -th * (1 - .7 * (r / RINGS))) for r, row in enumerate(grid) for u, v in row]
+    rims = []
+    m = len(FULL)
+    for spec in LEAVES:
+        L = leaf_frame(spec)
+        ln = L['ln']
+        grid = [[(CENTRE[0] + (u - CENTRE[0]) * r / RINGS, v * r / RINGS) for u, v in FULL] for r in range(RINGS + 1)]
+        top_v = [leaf_point(L, u, v) for row in grid for u, v in row]
+        bot_v = []
+        for row in grid:
+            for u, v in row:
+                p = leaf_point(L, u, v, under=True)
+                w = min(1.0, abs(v) / half_width(u))
+                bot_v.append((p[0], p[1] - (.42 + .18 * (1 - w)), p[2]))
         nv = len(top_v)
         faces_t, faces_b = [], []
         for r in range(RINGS):
@@ -282,35 +406,42 @@ def leaves(ctx):
                 faces_b.append(tuple(nv + x for x in reversed(q)))
         rim = [(RINGS * m + i, RINGS * m + (i + 1) % m, nv + RINGS * m + (i + 1) % m, nv + RINGS * m + i) for i in range(m)]
         verts = top_v + bot_v
+        cen = leaf_point(L, *CENTRE)
         a['leaf'].surface(verts, faces_t, lambda c: (0, 1, 0))
-        a['leaf_u'].surface(verts, faces_b + rim, lambda c: (0, -1, 0))
-        # Veins: a lit midrib and seven curved laterals per side, plus a basal vein into each lobe; raised over the blade.
-        lift = .07
-        M.limb(a['vein'], [leaf_point(fr, ln, u, 0, lift) for u in [i / 12 * .95 - .04 for i in range(13)]], .2, .05, 6)
+        a['leaf_u'].surface(verts, faces_b, lambda c: (0, -1, 0))
+        a['leaf_rim'].surface(verts, rim, lambda c, cen=cen: (c[0] - cen[0], 0, c[2] - cen[2]))   # the slab edge, outward
+        # Keel under the midrib.
+        M.limb(a['leaf_u'], [(p[0], p[1] - .5, p[2]) for p in (leaf_point(L, u, 0, under=True) for u in
+                                                                 [-.04 + i * .07 for i in range(13)])], ln * .022, ln * .006, 8, .7)
+        # Vein hierarchy: lit raised midrib, swept secondaries and the main basal veins (q05b_vein, breathing), a halo of
+        # lighter blade under them (leaf_v), tertiaries between the secondaries plus the marginal vein (vein_t, dimmer).
+        mid = [(-.05 + i * .085, 0) for i in range(12)]
+        _strip(a['leaf_v'], L, mid, .055, .03)
+        _vein(a['vein'], L, mid, ln * .02, ln * .005, .07, .55, 8)
         for i in range(7):
-            u0 = .06 + i * .12
             for sg in (-1, 1):
-                pts = []
-                for j in range(7):
-                    t = j / 6
-                    u = u0 + (.10 + .05 * (1 - u0)) * t
-                    wid = half_width(u) * .88
-                    pts.append(leaf_point(fr, ln, u, sg * wid * t, lift))
-                M.limb(a['vein'], pts, .11, .035, 5)
+                uv = [(u, sg * s) for u, s in _trace(.02 + i * SP, .018)]
+                if len(uv) < 3:
+                    continue
+                _strip(a['leaf_v'], L, uv, .03, .025)
+                _vein(a['vein'], L, uv, ln * .008, ln * .003, .05)
+                uv = [(u, sg * s) for u, s in _trace(.02 + (i + .5) * SP, .022)]
+                _vein(a['vein_t'], L, uv, ln * .0035, ln * .0025, .04, .6, 5)
         for sg in (-1, 1):
-            pts = [leaf_point(fr, ln, u, sg * v, lift) for u, v in ((-.02, .02), (-.09, .10), (-.17, .18), (-.24, .25))]
-            M.limb(a['vein'], pts, .1, .04, 5)
-        rim_all.append((fr, ln, out))
-    return rim_all
+            uv = [(u, sg * s) for u, s in _fan(.36)]
+            _strip(a['leaf_v'], L, uv, .03, .025)
+            _vein(a['vein'], L, uv, ln * .008, ln * .003, .05)
+            for th in (.72, 1.08, .18):
+                _vein(a['vein_t'], L, [(u, sg * s) for u, s in _fan(th)], ln * .0035, ln * .0025, .04, .6, 5)
+            marg = [(CENTRE[0] + (u - CENTRE[0]) * .93, sg * v * .93) for u, v in RIGHT if v > .07 or u > .5]
+            _vein(a['vein_t'], L, marg, ln * .003, ln * .003, .04, .6, 5)
+        rims.append((L, [p for p in full_control()]))
+    return rims
 
 
-def half_width(u):
-    """Leaf half-width at u along the midrib (outline, right half)."""
-    pts = OUTLINE[:7]
-    for (ua, va), (ub, vb) in zip(pts, pts[1:]):
-        if ub <= u <= ua:
-            return va + (vb - va) * (ua - u) / (ua - ub)
-    return .50
+def full_control():
+    """Coarse closed outline (the control points) the mist hangs from, so ribbon density stays as in R2."""
+    return OUTLINE + [(u, -v) for u, v in reversed(OUTLINE[1:-1])]
 
 
 def mist(ctx, rims):
@@ -318,9 +449,9 @@ def mist(ctx, rims):
     split between two meshes that breathe in antiphase."""
     rng = ctx.rng
     k = 0
-    for fr, ln, out in rims:
+    for L, out in rims:
         m = len(out)
-        pts = [leaf_point(fr, ln, u, v, -.1) for u, v in out]
+        pts = [leaf_point(L, u, v, -.1) for u, v in out]
         for i in range(m):
             p, q = pts[i], pts[(i + 1) % m]
             u_mid = (out[i][0] + out[(i + 1) % m][0]) / 2
