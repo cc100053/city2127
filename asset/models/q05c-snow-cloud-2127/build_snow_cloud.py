@@ -18,6 +18,8 @@ q05c_fog (cold ground fog, alpha-blended, breathing).
 The only floating element is the cloud (handoff); every glow is ice white, never the concept lot's #5fdcff.
 R2 (2026-11-28): fluffier cumulus (smaller lumpy puffs, edge wisps) with its waist inside the ring, ice-white cloud self-light
 (raised at night by the runtime), blue-shadowed snowfield and frost, larger flakes.
+R2b (2026-11-28): the two paths turn to the shared park surround's north-west and south-east link walks (Q05-A's bearings) and
+the grove leaves all four of its gates open.
 """
 import math
 import os
@@ -51,7 +53,10 @@ CLOUD_LAYERS = ((.24, 0.0, .48, .02, .16, .14, .21, .70),
 # the near front, the grove round the back so the falling snow reads against dark green.
 PUMP = CAM + .95
 SPILL = CAM + .30
-PATHS = [CAM - .55, CAM - .55 + math.pi]
+# C-R2b (owner 2026-11-28, «一個共通周邊»): the paths across the channel line up with the shared park surround's link walks on Q05-A's
+# path bearings (asset/models/q05-park-surround-2127): north-west and south-east; the grove also keeps the other two gates open.
+PATHS = [-3 * math.pi / 4, math.pi / 4]
+GATES = [*PATHS, 3 * math.pi / 4, -math.pi / 4]
 # Falling snow: three stacks with their own repeat period (m) and speed (m/s); the runtime reads the same numbers.
 SNOW_PERIODS = (3.1, 3.7, 4.3)
 SNOW_TOP = 20.0                                 # stack top before the move: inside the cloud
@@ -326,7 +331,7 @@ def greenery(ctx):
     """Grove and white-rimmed planters round the back half (a dark ground the snow reads against); low shrubs only on the
     close-up side so the snowfield stays open."""
     a, rng = ctx.a, ctx.rng
-    keep = [*PATHS, PUMP, SPILL]
+    keep = [*GATES, PUMP, SPILL]
 
     def clear(ang, gap):
         return all(ang_gap(ang, p) > gap for p in keep)

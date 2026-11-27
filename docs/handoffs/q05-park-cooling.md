@@ -572,6 +572,83 @@ owner 指示：「做 Q5 嘅 C model」。地塊、近鏡方位及台座沿用 A
 - 雪粒 1,618 → 823：每組雪層取同一批隨機抽樣的一半，其餘部分（樹林等）佈局不變；約 98k tris，GLB 3.5 MB。截圖 `~/city2127-evidence/q05c/r2/half-snow-day.jpg`。`tests/lotRuntime.test.ts`、`tests/assetLibrary.test.ts`、`npm run build`、`git diff --check` 通過；只改 GLB 及文件，未再跑全套 `npm test`。
 - owner 同時指示另開新 session 處理地塊周邊（見下）。
 
+## C-R2b owner 決定（2026-11-28，地塊周邊）
+
+owner 指示（原文）：「落雪量減一半。 then new session do the surrounding.」
+
+本輪先問「周邊」指台座上模型自身的周邊，抑或地塊外的城市背景。owner 回覆（原文）：「你分析一下 A、B、C 三個模型，佢哋嘅周邊會唔會都係一樣？最緊要係相連嘅道路。如果係一樣，就可以整一個共通；如果唔一樣，就要分開每個整一個專屬嘅周邊。」
+
+分析（俯視圖 `~/city2127-evidence/q05c/r2b/analysis/links-map.jpg`，上方為北，即 −Z）：A、B、C 同在 NE PARK 地塊（中心 −210, −135），同用半徑 24 m 圓台座，台座外的城市環境完全相同；附近有四條可連接的路：海濱步道東段終點（−178, −173，東北，離台座邊約 26 m）、海濱步道西段起點（−259, −145，西，約 26 m；兩段步道正好在本地塊前斷開）、① 車道（最近中心線 −182.6, −102.6，東南，約 18 m）、往 pod tower 的小路（西南）。三個模型現時都沒有接上任何一條路；台座邊入口方位各異：A 四條斜角徑（±π/4、±3π/4），B 兩條（−2.57、0.57），C 兩條（−2.77、0.37）另加北面的泵及跌水口。
+
+owner 選擇（原文選項）：「一個共通周邊 (Recommended)」——「整一套共用周邊模型（台座外：四條連接路接返海濱步道兩端、① 車道行人路、pod tower 小路，加綠化同居民）；再微調 B、C（同 A 一條）嘅台座入口，對準同一組四個入口方位。做一次，三個模型都用。」；以及「常駐，四個狀態都見 (Recommended)」——「連接路當城市基建常駐，海濱步道唔再喺地塊前斷開；原本 NE 公園都接得上。」
+
+## C-R2b brief（地塊周邊，共用）
+
+量度方法：在 Vite 5187 的場景中，以 1.5 m 格網由上而下射線取樣地塊中心半徑 48 m 內的地面（排除 Q05 模型及 `survey-site-ne`），方位以世界座標 `atan2(dz, dx)` 計（0° 為 +X 東，90° 為 +Z 南，270° 為北海邊；與模型內 `CAM` −2.22 rad＝233° 同一座標系）。
+
+| 項目 | 量度 |
+| --- | --- |
+| 地面 | 草地 `TERRAIN_LOW_DENSITY` y −0.15 至 −0.35；三個模型的台座頂約 y 0.48–0.62，台座邊比草地高約 0.8 m。 |
+| 北（235°–300°） | 海濱步道鋪地 `WATERFRONT_PROMENADE`（y −0.19）已貼住台座邊，向西連西段、向東北連東段；鋪地本身連續，只是步行者路線 `promenades` 的兩段在 (−178, −173) 及 (−259, −145) 折返。 |
+| 東北（300°–350°） | 台座邊至步道鋪地約 8–10 m 草地。 |
+| 東南（40°–60°） | ① 外側行人路由半徑約 31 m 起；(−186, −115)（39.6°，半徑 31.2 m）有一支高約 26 m 的燈柱。 |
+| 南（60°–125°） | 草地至半徑 44 m 以上；15°、半徑 34–38 m 有沿街樹。 |
+| 西南（125°–150°） | pod tower 車道 `pod-tower-drive` 北緣約在 dz +31（距台座邊約 12–15 m）。 |
+| 西（150°–175°） | 工具盒 `CTX_north_utility_service` 佔 dx −36 至 −25、dz +6 至 +15，最近角在半徑約 26 m（約 167°）。 |
+
+| # | 要求 | 量度目標 |
+| --- | --- | --- |
+| 1 | 共用周邊模型（新目錄 `asset/models/q05-park-surround-2127/`，Blender 5.2 headless，用 city-kit 模組） | 常駐背景，不屬任何 `LotFade`；預設公園、A、B、C 四個狀態都顯示。所有幾何在半徑 24.3 m 以外，不入台座。≤ 約 45k tris。 |
+| 2 | 環台座步道 | 半徑 24.3–27.3 m（闊 3 m）淺色鋪地，頂 y 0.42（與台座邊只差一級），外緣白色路緣及兩條冰白細光縫；外側 27.3–29 m 為斜草坡落回草地，北面與海濱步道相接一段改為鋪地斜坡。工具盒處（155°–178°）斷開，以花槽收口。 |
+| 3 | 四條連接路（闊 3 m，同鋪地及光縫，由 y 0.42 斜落至目的地高度） | 東北 315°：接海濱步道東段鋪地（約 10 m）；西北 225°：接北面步道鋪地（約 3 m）；東南 50°：接 ① 外側行人路（約 5 m，避開 39.6° 燈柱，間距 ≥ 4 m）；西南 135°：接 pod tower 車道北緣（約 12 m），盡頭白色斑馬線。方位與 A 的四條斜角徑相同（A 已驗收，不改）。 |
+| 4 | 綠化及居民 | 連接路之間的草地上：白邊階梯花槽（兩級）、`facet_tree`／`tree_round_*` 樹叢（遠側 0°–125° 可高至約 9 m，作雪的深色背景；近鏡側 200°–270° 只放低矮灌木及長椅，不擋模型）、沿步道外緣長椅面向台座、冰白頂燈的燈柱、步行及坐着的居民。避開步道鋪地、行人路、沿街樹、燈柱、工具盒及 pod tower 車道。 |
+| 5 | C 的台座入口 | `build_snow_cloud.py` `PATHS` 由 CAM−0.55／+π 改為 225°／45°（−3π/4、π/4），對準共用的西北及東南連接路；樹林另避開 135° 及 315°，令四條連接路都落在 C 的開放鋪地上。 |
+
+步行者路線 `promenades` 不改：它同時生成 7.2 m 木棧道及兩邊光線（`skyways.ts`）和草地帶（`odaibaScene.ts`），若在北面把兩段連起來，棧道須離中心 ≥ 28 m，但該處 dx −40 至 −15、dz −30 至 −28 是海水渠 `WATER_MAIN`，放不下；海濱鋪地本身已連續，人可經環台座步道及北面鋪地通過。
+
+不在本輪：B 的入口（B 分支待驗收，本 worktree 的 B 仍是 R4，重建 B 會與 B-R5／R6 衝突；環台座步道令 B 現有入口 213°、33° 亦可接上）；A 不改；台座上 C 自身的加密綠化留待 C-R3。
+
+## C-R2b（2026-11-28，Q05 共用公園周邊）
+
+### Git 狀態
+
+- 開始時 worktree `../city2127-q05c` 在 `feat/q05c-snow-cloud`，與遠端同步於 `8cd6ab43`，工作樹乾淨；`git fetch --prune origin` 成功，本分支與遠端沒有分歧。主工作目錄（B 分支）未有觸碰。
+
+### 改動
+
+- **新模型** `asset/models/q05-park-surround-2127/`：`build_park_surround.py`（Blender 5.2 headless）、`.blend`、`.glb`（約 45k tris，2.1 MB）。內容見 `## C-R2b brief`：環台座步道（半徑 24.3–27.3 m，頂 y 0.42，白路緣、兩條冰白光縫、徑向縫，工具盒處 150°–180° 斷開並以花槽收口）、斜草坡（北面一段為鋪地斜坡接海濱步道）、四條連接路（東北、西北接海濱步道鋪地，東南 50° 接 ① 外側行人路，西南接 pod tower 車道北緣，盡頭白色斑馬線）、兩級白邊花槽、30 棵 `facet_tree`（遠側高、近鏡側矮）、坡上灌木、18 張長椅位置中的長椅、13 支冰白頂燈、居民。`LIBRARY.md` 加行。
+- **接線** `src/main.ts`：以 `PARK_SURROUND`（`src/lotRuntime.ts` 匯出）之名常駐載入地塊中心，不透明網格全部合批；不屬任何 `LotFade`。
+- **C 模型** `build_snow_cloud.py`：`PATHS` 改為 225°／45°（對準西北、東南連接路），樹林避開四個入口方位（`GATES`）；雲、雪不變（隨機次序在其後），樹林、長椅及居民位置因此重排；約 91k tris，GLB 3.1 MB。
+- **測試** `tests/lotRuntime.test.ts`：周邊 GLB 所有頂點在半徑 24.25 m 以外、工具盒平面上沒有地面以上的幾何、沒有 `#5fdcff` 發光；`setQ05` 經 A→B→C→無 之後周邊仍顯示、不透明度 1。
+- **文件**：`PROJECT.md` 加一段；本交接的 owner 決定及 brief。
+
+### 自評（`~/city2127-evidence/q05c/r2b/`，3200 × 1800）
+
+| # | 項目 | 結果 |
+| --- | --- | --- |
+| 1 | 共用、常駐 | 達到：預設公園、A、B、C 四個近鏡都見同一圈步道、連接路及樹叢（`four-states.jpg`）；預設公園的方形地台角位與步道相疊，未見破面。 |
+| 2 | 環台座步道 | 達到：近鏡前景一圈淺色步道、長椅、燈柱及居民，取代 R2 光禿的白色地面邊（`before-vs-after.jpg`、`crop-near-left.jpg`）；夜間兩條冰白光縫清楚勾出圓環（`focal-night.jpg`、`crop-night-ring.jpg`）。 |
+| 3 | 連接路 | 達到：俯視可見四條路由步道伸出並接上海濱步道、① 行人路及 pod tower 車道（`top-before-after.jpg`）；近鏡左方東北連接路及其光縫可見。 |
+| 4 | 綠化 | 大致達到：近鏡左右原本空白的淺色草地加了樹叢及花槽（`crop-near-right.jpg`），hero 總覽中地塊讀成一片公園（`overview.jpg`）。未足：工具盒 `CTX_north_utility_service` 仍是一個白色方盒，只被右側樹叢遮去一角；海邊北面一段仍是淺色鋪地。 |
+| 5 | C 入口 | 達到：近鏡下方的入雪地小徑直對鏡頭方向的西北連接路。 |
+
+- 兩輪 capture-compare：pass 1 周邊加入後四個狀態檢查（`pass1-grid.jpg`）→ pass 2 C 入口改向後日夜近鏡及俯視。
+- 目標對照：`target-vs-r2b.jpg`；分析圖：`analysis/links-map.jpg`。
+
+### 檢查
+
+- 單元：`tests/lotRuntime.test.ts` 通過。根目錄 `npm test` 通過（2026-11-28，EXIT 0，記錄 `~/city2127-evidence/q05c/r2b/npm-test.log`）。`npm run build`、`git diff --check` 通過。survey 未改，未跑。
+- 截圖 sidecar：commit `8cd6ab43`、branch `feat/q05c-snow-cloud`，工作樹有未提交改動（本輪改動）。
+- FPS：未量度。headless 截圖 data-fps 約 19–21（近鏡）、19（overview），只作參考；R2 為 34–36／30（同機不同負載，不可直接比較）。
+- 變化總覽（`artifacts/change-review`）未重生：本輪未改任何已驗收模型、近鏡或文案，只加共用背景。
+
+### 待 owner 決定
+
+- 周邊是否接受作為 Q05 三個模型共用的常駐背景（含預設公園）。
+- B 的入口（213°、33°）是否要在 B 分支改向 225°／45°，與 A、C 一致；現時靠環台座步道接上。
+- 工具盒 `CTX_north_utility_service` 是否另行處理（加綠化包覆或移走），屬地塊外城市背景。
+- 台座上 C 自身的加密綠化（目標中的綠化台階）留待 C-R3。
+
 ## C-R3 round prompt（下一輪會話）
 
-place-building round for `q05c-snow-cloud`: worktree `/Users/fatboy/city2127-q05c`, branch `feat/q05c-snow-cloud`, read `docs/handoffs/q05-park-cooling.md` (its `## C-R2 brief` and `## C-R2` sections). Owner verdict on C-R2: «…»
+place-building round for `q05c-snow-cloud`: worktree `/Users/fatboy/city2127-q05c`, branch `feat/q05c-snow-cloud`, read `docs/handoffs/q05-park-cooling.md` (its `## C-R2 brief`, `## C-R2`, `## C-R2b brief` and `## C-R2b` sections). Open from C-R2: the cloud's mushroom shape, the day snowfield blue short of target; from C-R2b: densify C's own plinth greenery (target's green terraces), B's gates, the utility block. Owner verdict on C-R2 / C-R2b: «…»
