@@ -1,0 +1,76 @@
+{
+ "glb": "q10a-solar-furnace.glb",
+ "glb_bytes": 7083480,
+ "objects": 87,
+ "meshes": 80,
+ "unique_meshes": 35,
+ "triangles": 282452,
+ "materials": 39,
+ "new_materials_on_import": 39,
+ "bounds_min": [
+  -76.0,
+  -76.0,
+  -1.8
+ ],
+ "bounds_max": [
+  76.0,
+  76.0,
+  101.1
+ ],
+ "stage_nodes": {
+  "FEED_CHAIRS_315": true,
+  "FURNACE_SHARDS": true,
+  "FURNACE_SPARKS": true,
+  "POWER_LINES": true,
+  "FURNACE_CORE": true,
+  "FURNACE_SHELL": true,
+  "FEED_TUBE_315": true
+ },
+ "people_nodes": [],
+ "transparent_materials": {
+  "q10a_core_halo.001": {
+   "alpha": 0.14,
+   "method": "BLENDED"
+  },
+  "q10a_core_halo_outer.001": {
+   "alpha": 0.05,
+   "method": "BLENDED"
+  },
+  "q10a_mist.001": {
+   "alpha": 0.09,
+   "method": "BLENDED"
+  },
+  "q10a_ripple.001": {
+   "alpha": 0.38,
+   "method": "BLENDED"
+  },
+  "q10a_shell_glass.001": {
+   "alpha": 0.21,
+   "method": "BLENDED"
+  },
+  "q10a_station_glass.001": {
+   "alpha": 0.22,
+   "method": "BLENDED"
+  },
+  "q10a_tube_glass.001": {
+   "alpha": 0.28,
+   "method": "BLENDED"
+  },
+  "q10a_warm_water.001": {
+   "alpha": 0.5,
+   "method": "BLENDED"
+  }
+ },
+ "chair_through_tube_poolside": {
+  "rays_on_target": 38,
+  "through_glass": 38
+ },
+ "core_through_shell_main": {
+  "rays_on_target": 32,
+  "through_glass": 32
+ },
+ "core_through_shell_furnace": {
+  "rays_on_target": 192,
+  "through_glass": 192
+ }
+}

@@ -1,0 +1,42 @@
+{
+ "tris_by_group": {
+  "STRUCTURE": 20028,
+  "FURNACE": 43004,
+  "FEED": 46360,
+  "POWER": 5968,
+  "POOL": 32384,
+  "PLAZA": 89264
+ },
+ "tris_total": 237008,
+ "unique_mesh_tris": 169238,
+ "objects": 86,
+ "materials": 39,
+ "glb_bytes": 5889880,
+ "layout": {
+  "base_210": {
+   "bridge_clearance_m": null,
+   "base_to_bridge_axis_min_m": 22.64,
+   "tube_clearance_low_m": 8.93
+  },
+  "base_330": {
+   "bridge_clearance_m": null,
+   "base_to_bridge_axis_min_m": 22.64,
+   "tube_clearance_low_m": 8.93
+  },
+  "base_112": {
+   "bridge_clearance_m": 6.95,
+   "base_to_bridge_axis_min_m": 7.9,
+   "tube_clearance_low_m": 12.57
+  },
+  "levels": {
+   "water": -0.15,
+   "base_top": 0.45,
+   "plate_top": 0.75,
+   "column_foot": 0.75
+  },
+  "pads": {
+   "count": 15,
+   "elastomer_inner_face_below_glass_m": 0.04
+  }
+ }
+}
