@@ -6,7 +6,7 @@ import { Group, Mesh, MeshStandardMaterial, BoxGeometry, Scene } from 'three';
 import { LOTS } from '../src/layout.ts';
 import { FARM_CENTRE, EnergyRuntime } from '../src/energyRuntime.ts';
 import { BAY_FLOWER_SHOWN } from '../src/bayFlower.ts';
-import { LotRuntime, q02Models, q03Housing, q05Model, q06Tower, q08Vacant } from '../src/lotRuntime.ts';
+import { LotRuntime, PARK_SURROUND, q02Models, q03Housing, q05Model, q06Tower, q08Vacant } from '../src/lotRuntime.ts';
 
 // Exactly one shown model per option; no option is the version4 city.
 for (const option of ['A', 'B', 'C']) {
@@ -314,11 +314,35 @@ assert.deepEqual(q05set.options.map((o: { modelId: string | null }) => o.modelId
   assert.deepEqual([0, .5, 1].map(lit), [0, 1, 2], 'meltwater glints step a → b → c');
   assert.equal(model.visible, false);
 }
+{ // Q05 shared park surround (C-R2b): nothing inside the 24 m plinths, nothing on the utility block west of the lot, no light in the
+  // concept-lot blue.
+  const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
+  const { Vector3 } = await import('three');
+  const bytes = readFileSync(new URL('../asset/models/q05-park-surround-2127/q05-park-surround-2127.glb', import.meta.url));
+  const model = (await new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength), '')).scene;
+  model.updateMatrixWorld(true);
+  let inner = Infinity, onBlock = 0;
+  const v = new Vector3();
+  model.traverse(o => {
+    if (!(o instanceof Mesh)) return;
+    const pos = o.geometry.getAttribute('position');
+    for (let i = 0; i < pos.count; i++) {
+      v.fromBufferAttribute(pos, i).applyMatrix4(o.matrixWorld);
+      inner = Math.min(inner, Math.hypot(v.x, v.z));
+      if (v.x < -25.6 && v.x > -36 && v.z > 6 && v.z < 15 && v.y > 0) onBlock++;   // the block's plan (occupancy grid)
+    }
+    const m = o.material as MeshStandardMaterial;
+    assert.notEqual(m.emissive.getHexString(), '5fdcff', `${o.name} glows ice white, not the concept-lot blue`);
+  });
+  assert.ok(inner >= 24.25, `the surround stays off the plinths (inner ${inner.toFixed(2)} m)`);
+  assert.equal(onBlock, 0, 'nothing stands on the utility block');
+}
 {
   const acScene = new Scene(), ac = new Group(), park = new Group(), parkShared = new MeshStandardMaterial();
   const keeps: [number, number][] = [];
   const acLots = new LotRuntime(acScene, undefined, false, undefined, { courtAt: (x, z) => x === -210 && z === -135 ? 0 : -1, setCourtKeep: (i, keep) => { keeps.push([i, keep]); } });
   park.name = 'survey-site-ne'; park.add(new Mesh(new BoxGeometry(), parkShared)); acScene.add(park);
+  const surround = new Group(); surround.name = PARK_SURROUND; surround.add(mesh()); acScene.add(surround);
   // Version4: nothing touched, the park keeps its shared materials, the court is left alone.
   acLots.setQ05(undefined, 0, true); acLots.update(0, false);
   assert.equal(park.visible, true); assert.equal((park.children[0] as Mesh).material, parkShared); assert.deepEqual(keeps, []);
@@ -345,6 +369,8 @@ assert.deepEqual(q05set.options.map((o: { modelId: string | null }) => o.modelId
   acLots.setQ05(undefined, 30, false); acLots.update(31.5, false); assert.ok(Math.abs(keeps.at(-1)![1] - .5) < 1e-9, 'court half-way with the park');
   acLots.update(34, false); assert.equal(ac.visible, false); assert.equal(leaf.visible, false); assert.equal(cloud.visible, false);
   assert.equal(park.visible, true); assert.deepEqual(keeps.at(-1), [0, 1]);
+  assert.equal(surround.visible, true, 'the shared park surround is never faded');
+  assert.equal(((surround.children[0] as Mesh).material as MeshStandardMaterial).opacity, 1, 'the surround keeps full opacity through every Q05 state');
 }
 const { q05Swap, q05Result, q05Shot } = await import('../src/rotationLayout.ts');
 const q05Of = (from: string, to: string) => q05Swap({ rotation: { outcome: { kind: 'swap', questionId: 'Q05', from, to } } } as never)!;

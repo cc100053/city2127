@@ -40,6 +40,10 @@ export const q06Tower = (option: string | undefined) => option !== 'A' && option
 
 export { q05Model };
 
+/** The Q05 shared park surround (C-R2b): ring walk, link walks and planting round the NE PARK plinth, loaded by main.ts under this
+ *  name. It is the same for the NE park and all three Q05 models, so LotRuntime never fades it. */
+export const PARK_SURROUND = 'q05-park-surround-2127';
+
 /** One lot's model fading over the shared 3-second site transition. It touches the scene only once set, and gives its meshes their
  *  own materials (ownFinishes) only once the model has loaded, so a version4 run keeps the shared materials. */
 class LotFade {

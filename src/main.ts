@@ -32,7 +32,7 @@ import { bayWater, waterLights } from './bayWater';
 import { residentIdentity, scoresToWorldState, startSurveyAtmosphere } from './surveyAtmosphere';
 import { isExhibitionView } from './surveyView';
 import { conceptVisit, q02Swap, q03Shot, q03Swap, q05Shot, q05Swap, q06Shot, q06Swap, q08Shot, q08Swap, Q02_SHOTS, rotationLayout, rotationVisit } from './rotationLayout';
-import { LotRuntime } from './lotRuntime';
+import { LotRuntime, PARK_SURROUND } from './lotRuntime';
 import { ConceptHologram } from './conceptHologram';
 import { bayFlowerShown } from './bayFlower';
 import { createCityChangeManager } from './createCityChangeManager';
@@ -220,6 +220,16 @@ try {
       foundation.receiveShadow = true;
       model.add(foundation);
     }).catch(error => console.error('Drawer housing could not load', error));
+    // Q05 shared park surround (owner 2026-11-28, C-R2b): the ring walk, link walks and planting round the NE PARK plinth, the same for
+    // the NE park and all three Q05 models, so it stays shown (never one of lotRuntime's fades).
+    const parkSurroundUrl = new URL('../asset/models/q05-park-surround-2127/q05-park-surround-2127.glb', import.meta.url).href;
+    void odaibaReady.then(async ready => {
+      if (!ready) return;
+      const lot = LOTS['ne-park'];
+      const model = await addCityModel(scene, parkSurroundUrl, [lot.x, 0, lot.z]);
+      model.add(...bake(model, mesh => !Array.isArray(mesh.material) && !mesh.material.transparent));
+      model.name = PARK_SURROUND;
+    }).catch(error => console.error('Q05 park surround could not load', error));
     // Q05-A reverse air conditioner on the NE PARK lot: loaded hidden; lotRuntime shows it in place of the NE park in rotation runs.
     const reverseAcUrl = new URL('../asset/models/q05a-reverse-ac-2127/q05a-reverse-ac-2127.glb', import.meta.url).href;
     void odaibaReady.then(async ready => {
