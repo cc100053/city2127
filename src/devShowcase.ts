@@ -16,6 +16,37 @@ const SPIN = { rotor: 2.4, streaks: .25, ring: [.05, -.04, .03] } as const;
 
 const opaque = (mesh: T.Mesh) => !Array.isArray(mesh.material) && !mesh.material.transparent;
 
+/** Keyboard fly for the free showcase camera: W/S along the view (level), A/D sideways, E/Space up, Q/C down, Shift ×4.
+ *  Camera and orbit target move together, so mouse orbit still turns about what is ahead. Speed grows with height (≈ 60 m/s near
+ *  the water). Returns the per-frame step. */
+export function showcaseKeys(camera: T.Camera, target: T.Vector3) {
+  const held = new Set<string>();
+  const typing = (e: KeyboardEvent) => e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement;
+  addEventListener('keydown', e => { if (!typing(e)) held.add(e.code); });
+  addEventListener('keyup', e => held.delete(e.code));
+  addEventListener('blur', () => held.clear());
+  const forward = new T.Vector3(), side = new T.Vector3(), move = new T.Vector3(), up = new T.Vector3(0, 1, 0);
+  let last = performance.now();
+  return () => {
+    const t = performance.now(), dt = Math.min(.1, (t - last) / 1000); last = t;
+    if (!held.size) return;
+    camera.getWorldDirection(forward); forward.y = 0;
+    if (forward.lengthSq() < 1e-6) forward.set(0, 0, -1).applyQuaternion(camera.quaternion).setY(0);
+    forward.normalize(); side.crossVectors(forward, up);
+    const key = (...codes: string[]) => codes.some(c => held.has(c)) ? 1 : 0;
+    move.set(0, 0, 0)
+      .addScaledVector(forward, key('KeyW', 'ArrowUp') - key('KeyS', 'ArrowDown'))
+      .addScaledVector(side, key('KeyD', 'ArrowRight') - key('KeyA', 'ArrowLeft'))
+      .addScaledVector(up, key('KeyE', 'Space') - key('KeyQ', 'KeyC'));
+    if (!move.lengthSq()) return;
+    const speed = (60 + Math.max(0, camera.position.y) * .6) * (key('ShiftLeft', 'ShiftRight') ? 4 : 1);
+    move.normalize().multiplyScalar(speed * dt);
+    // Keep the eye above the water.
+    if (camera.position.y + move.y < 3) move.y = 3 - camera.position.y;
+    camera.position.add(move); target.add(move);
+  };
+}
+
 /** Loads both drafts into `scene`; returns the per-frame motion (turbines, vortex streaks and rings turn once Q11-C is in). */
 export function startShowcase(scene: T.Object3D) {
   let frame: ((now: number) => void) | undefined;
