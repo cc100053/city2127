@@ -27,6 +27,7 @@
 | [原 Q08-C 住宅塔候選](q08c-housing-tower.md) | 另案審閱。現行 Q08-C 已使用活動模組棚 |
 | [Q05 公園降溫](q05-park-cooling.md) | 三態目標圖及故事已定，待選地塊及建模 |
 | [Q10-A 透明球爐](q10a-solar-furnace.md) | 無冠淺碗托座版（R4）待 owner 審閱；未放置 |
+| [Q11-B 隨水位浮升的海岸公共建築](q11b-floating-civic.md) | 正常／高潮兩態模型，待 owner 審閱；未放置 |
 | [Q11-C 人工龍捲風發電所](q11c-storm-vortex.md) | R1 待 owner 審閱；未放置 |
 | [Q11-C 台場白渦發電所](q11c-vortex-power-station.md) | 依設計書另建版本，待 owner 審閱；未放置 |
 | [湊](resident-minato.md) · [凪](resident-sw-nagi.md) · [葵](resident-aoi.md) | 人物情景只作 DEV 審閱，按[情景計劃](../RESIDENT_SCENE_PLAN.md)排下一級 |
