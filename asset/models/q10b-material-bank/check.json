@@ -1,0 +1,119 @@
+{
+ "bridge_cart": {
+  "benches_on_bridge": 1,
+  "bench_feet_z": 30.43,
+  "cart_deck_top_z": 30.38,
+  "cart_seat_top_z": 30.43,
+  "bench_length_m": 2.2,
+  "bench_width_m": 0.58,
+  "bench_top_above_deck_m": 1.27,
+  "vault_clear_height_at_bench_edge_m": 2.64,
+  "end_wall_opening_m": {
+   "width": 4.3,
+   "height": 3.4
+  },
+  "deck_width_between_handrails_m": 3.82
+ },
+ "same_bench_mesh_on_plaza_and_line": [
+  "q10b_regen_bench"
+ ],
+ "plaza_benches": 5,
+ "finished_benches_at_bridge": 1,
+ "objects_on_entrance_route": [],
+ "tube_hood_low_z": 19.1,
+ "unloading_platform_top_z": 19.1,
+ "glb": "q10b-material-bank.glb",
+ "glb_bytes": 3043684,
+ "objects": 1378,
+ "mesh_objects": 1368,
+ "unique_meshes": 56,
+ "triangles_drawn": 415740,
+ "triangles_unique": 77082,
+ "materials": 70,
+ "transparent_materials": {
+  "q10b_cabinet_glass": {
+   "alpha": 0.12,
+   "method": "BLENDED"
+  },
+  "q10b_facade_glass": {
+   "alpha": 0.09,
+   "method": "BLENDED"
+  },
+  "q10b_hopper_glass": {
+   "alpha": 0.5,
+   "method": "BLENDED"
+  },
+  "q10b_tube_glass": {
+   "alpha": 0.24,
+   "method": "BLENDED"
+  }
+ },
+ "bounds_min": [
+  -69.8,
+  -74.58,
+  -0.08
+ ],
+ "bounds_max": [
+  76.62,
+  10.05,
+  50.02
+ ],
+ "size_m": [
+  146.42,
+  84.63,
+  50.1
+ ],
+ "story_nodes": {
+  "STRUCTURE": true,
+  "FACADE": true,
+  "LIBRARY": true,
+  "ROBOTS": true,
+  "INTAKE": true,
+  "FORMING": true,
+  "BRIDGE": true,
+  "GROUND": true,
+  "PLAZA": true,
+  "FINISHED_BENCH": false,
+  "LIBRARY_RAILS_ARMS": true,
+  "FORMING_ROOM": true
+ },
+ "people_nodes": [],
+ "drawers": {
+  "total": 1152,
+  "by_fill": {
+   "full": 621,
+   "half": 381,
+   "empty": 150
+  },
+  "depth_axis_away_from_plaza": 1152,
+  "pulled": 5
+ },
+ "gripped_handles": [
+  {
+   "drawer": "DRAWER_05_03_01",
+   "nearest_finger_m": 0.029
+  },
+  {
+   "drawer": "DRAWER_08_05_01",
+   "nearest_finger_m": 0.029
+  },
+  {
+   "drawer": "DRAWER_12_07_01",
+   "nearest_finger_m": 0.029
+  },
+  {
+   "drawer": "DRAWER_16_09_00",
+   "nearest_finger_m": 0.029
+  },
+  {
+   "drawer": "DRAWER_19_02_00",
+   "nearest_finger_m": 0.029
+  }
+ ],
+ "bridge_deck_top_z": 30.0,
+ "forming_floor_top_z": 30.0,
+ "intake_tubes_deepest_v": -6.15,
+ "intake_tubes_low_z": 1.39,
+ "column_root_low_z": 0.34,
+ "plinth_top_z": 0.42
+}

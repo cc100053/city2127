@@ -1,0 +1,55 @@
+{
+ "tris_by_group": {
+  "STRUCTURE": 33122,
+  "FACADE": 9852,
+  "LIBRARY": 307428,
+  "ROBOTS": 4960,
+  "INTAKE": 26840,
+  "FORMING": 5708,
+  "BRIDGE": 10424,
+  "GROUND": 9686,
+  "PLAZA": 7720
+ },
+ "unique_mesh_tris": 77082,
+ "objects": 1378,
+ "mesh_objects": 1368,
+ "unique_meshes": 56,
+ "drawers": {
+  "total": 1152,
+  "full": 621,
+  "half": 381,
+  "empty": 150,
+  "pulled": 5
+ },
+ "gripped_handles": [
+  [
+   -20.311,
+   -9.297,
+   17.64
+  ],
+  [
+   -12.935,
+   -8.599,
+   23.64
+  ],
+  [
+   -3.068,
+   -8.152,
+   29.64
+  ],
+  [
+   6.809,
+   -8.256,
+   34.14
+  ],
+  [
+   14.205,
+   -8.697,
+   13.14
+  ]
+ ],
+ "bridge_deck_z": 30.0,
+ "forming_floor_z": 30.0,
+ "tris_total": 415740,
+ "glb_bytes": 3043684
+}

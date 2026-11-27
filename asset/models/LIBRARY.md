@@ -1,3 +1,4 @@
+
 # Asset library
 
 The one index of reusable 3D parts. Read it before you model anything. Every new element goes in here first; a site places it afterwards. `tests/assetLibrary.test.ts` fails when a prop, module or `asset/models/` folder exists without a row in this file, or a row exists without its code.
