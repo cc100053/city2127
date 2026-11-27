@@ -31,10 +31,11 @@ for i in range(4):
 M.kit_prop(ctx, 'chair_office', 35, 0, 0, math.pi)
 M.seated_person(ctx, 35, .5, 0, math.pi)                      # seated_person on a kit chair
 M.person(ctx, -7, 0, 0, 1, yaw=0)                             # 1.8 m reference
+M.facet_tree(ctx, (-13, 0, 0), 7, 3.2)                        # facet_tree (Q05-B R2)
 for role, acc in ctx.a.items():
     if acc.v and (eevee or role != 'glass'):
         rgba, emit, st = M.ROLES[role]
-        ob = finish_mesh('review_' + role, acc, material(role, rgba, .6, emit=emit, emit_strength=st))
+        ob = finish_mesh('review_' + role, acc, material(role, rgba, .6, emit=emit, emit_strength=st), 1 if role.startswith('crown') else 25)
         bpy.context.scene.collection.objects.link(ob)
 sc = bpy.context.scene
 # Blender coords: three.js x -> x, three.js z -> -y. Camera looks from three.js -z (the side lift cabins and their amber edges face), slightly above.

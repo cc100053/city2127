@@ -45,6 +45,8 @@ ROLES = {
     'concrete': ((.68, .66, .62, 1), None, .5), 'concrete_j': ((.50, .48, .45, 1), None, .5),
     'pod_y': ((.98, .84, .48, 1), None, .5), 'pod_p': ((.96, .62, .56, 1), None, .5), 'pod_s': ((.68, .84, .62, 1), None, .5), 'pod_in': ((.96, .84, .64, 1), (1, .76, .46, 1), .5),
     'soil': ((.33, .23, .15, 1), None, .5), 'leaf_l': ((.47, .68, .24, 1), None, .5), 'crop': ((.86, .34, .16, 1), None, .5),
+    # Faceted park tree (Q05-B R2, 2026-11-27, draft): deep and mid crown greens (flat-shaded facets), dark bark.
+    'crown': ((.07, .25, .07, 1), None, .5), 'crown_l': ((.14, .36, .10, 1), None, .5), 'bark': ((.20, .15, .11, 1), None, .5),
 }
 # Kit prop material -> module role, so baked props share the site's roles.
 KITMAP = {'kit_dark': 'slate', 'kit_white': 'white', 'kit_wood': 'wood', 'kit_fabric': 'fabric', 'kit_screen': 'glow',
@@ -1266,6 +1268,54 @@ def leafy_tree(ctx, base, h=3.0, crown=1.4, trunk='wood', roles=('leaf_l', 'gree
     leaf_clump(ctx, _v(fork, (0, h * .4, 0)), (crown * .5, crown * .45, crown * .5), roles, core, max(6, n // 6), size, .3, 1)
 
 
+def facet_blob(acc, c, r, rng, n=7, m=4, jit=.2):
+    """Low-poly lumpy ball for faceted foliage: an ellipsoid of semi-axes r = (rx, ry, rz) round c, n around and m rings,
+    each vertex pushed in or out radially by up to `jit` (fraction) so the flat-shaded facets catch the light unevenly.
+    About 2 n (m - 1) tris (n 7, m 4: 42). Metres, three.js."""
+    verts = []
+    for i in range(m + 1):
+        b = math.pi * i / m
+        for k in range(1 if i in (0, m) else n):
+            a = 2 * math.pi * (k + .5 * (i % 2)) / n
+            f = 1 + rng.uniform(-jit, jit)
+            verts.append((c[0] + r[0] * math.sin(b) * math.cos(a) * f, c[1] + r[1] * math.cos(b) * f,
+                          c[2] + r[2] * math.sin(b) * math.sin(a) * f))
+    last = len(verts) - 1
+    faces = [(0, 1 + (k + 1) % n, 1 + k) for k in range(n)]
+    for i in range(m - 2):
+        faces += [(1 + i * n + k, 1 + i * n + (k + 1) % n, 1 + (i + 1) * n + (k + 1) % n, 1 + (i + 1) * n + k) for k in range(n)]
+    faces += [(last, 1 + (m - 2) * n + k, 1 + (m - 2) * n + (k + 1) % n) for k in range(n)]
+    acc.solid(verts, faces)
+
+
+def facet_tree(ctx, base, h=7.0, crown=3.4, trunk='bark', roles=('crown', 'crown_l'), blobs=9):
+    """Low-poly park tree after the Q05-B target (owner R1 «樹唔靚»): a dark trunk with two or three short limbs, and a
+    tall crown built from `blobs` lumpy faceted balls (facet_blob) clustered over an inner core, deep green with lighter
+    upper lumps (roles[1]); flat-shade the crown roles (finish_mesh smooth_deg ≈ 1) so the facets read. base (three.js,
+    ground contact), h metres tall (4–10), crown = crown radius (2–5). About 30 tris per blob plus 70 for the wood:
+    ≈ 500 tris at blobs 9. Replaces leafy_tree + solid body at park scale (Q05-B grove)."""
+    A, rng = ctx.a, ctx.rng
+    rt = .05 * h / 3 + .08
+    cy = h - crown * 1.05
+    fork = _v(base, (rng.uniform(-.15, .15), max(h * .3, cy - crown * .55), rng.uniform(-.15, .15)))
+    limb(A[trunk], [base, _v(base, (0, h * .2, 0)), fork], rt * 1.25, rt * .8, 6)
+    a0 = rng.uniform(0, 6.28)
+    for i in range(3):
+        a = a0 + i * 2.1 + rng.uniform(-.3, .3)
+        tip = _v(fork, (crown * .45 * math.cos(a), crown * .7, crown * .45 * math.sin(a)))
+        limb(A[trunk], [fork, _v(fork, (crown * .15 * math.cos(a), crown * .3, crown * .15 * math.sin(a))), tip], rt * .6, rt * .3, 5)
+    c = _v(base, (0, cy, 0))
+    facet_blob(A[roles[0]], c, (crown * .7, crown * .8, crown * .7), rng, 8, 4, .12)
+    for i in range(blobs):
+        y = -.45 + 1.25 * (i + .5) / blobs                                   # bottom lumps first, up to the crown top
+        a = a0 + i * 2.4 + rng.uniform(-.4, .4)
+        q = math.sqrt(max(.05, 1 - y * y)) * rng.uniform(.55, .75)
+        p = _v(c, (crown * q * math.cos(a), crown * 1.05 * y, crown * q * math.sin(a)))
+        rr = crown * rng.uniform(.38, .52) * (1 - .25 * max(0, y))
+        role = roles[1] if y > .25 and i % 2 == 0 and len(roles) > 1 else roles[0]
+        facet_blob(A[role], p, (rr, rr * rng.uniform(.8, .95), rr), rng, 7, 4)
+
+
 def leaf_strand(ctx, top, ln, out, role='vine', size=.3, step=.22, flowers=(), fl=.3, sway=.25):
     """Hanging vine strand from top (three.js) ln metres down, leaning out along unit `out`: a thin stem with a leaf
     card every `step` m alternating sides, hanging down and out (tips droop), dotted with flower roles at rate fl per
@@ -1297,5 +1347,5 @@ MODULES = {
     'limb': limb, 'branch_strut': branch_strut, 'egg_pod': egg_pod, 'grid_frame': grid_frame, 'roof_farm': roof_farm,
     'bone_arm': bone_arm, 'ell': ell, 'disc': disc, 'vine_curtain': vine_curtain, 'arch_shell': arch_shell,
     'flower_bed': flower_bed, 'leaf_card': leaf_card, 'leaf_clump': leaf_clump, 'leafy_tree': leafy_tree,
-    'leaf_strand': leaf_strand,
+    'leaf_strand': leaf_strand, 'facet_blob': facet_blob, 'facet_tree': facet_tree,
 }

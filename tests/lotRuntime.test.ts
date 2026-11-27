@@ -6,7 +6,7 @@ import { Group, Mesh, MeshStandardMaterial, BoxGeometry, Scene } from 'three';
 import { LOTS } from '../src/layout.ts';
 import { FARM_CENTRE, EnergyRuntime } from '../src/energyRuntime.ts';
 import { BAY_FLOWER_SHOWN } from '../src/bayFlower.ts';
-import { LotRuntime, q02Models, q03Housing, q05Tower, q06Tower, q08Vacant } from '../src/lotRuntime.ts';
+import { LotRuntime, q02Models, q03Housing, q05Model, q06Tower, q08Vacant } from '../src/lotRuntime.ts';
 
 // Exactly one shown model per option; no option is the version4 city.
 for (const option of ['A', 'B', 'C']) {
@@ -64,7 +64,7 @@ assert.equal(hydro.visible, false); assert.ok(nodes.every(node => node.visible))
 // A version4 view after a rotation run restores the built city.
 lots.setQ02(undefined, 30, true); lots.update(30, false);
 assert.equal(hydro.visible, true); assert.ok(nodes.every(node => !node.visible)); assert.equal(farm.at(-1), undefined);
-assert.deepEqual(lots.getDiagnostics(), { hydro: 1, flower: 0, housing: 1, tower: 1, reverseAc: 0 });
+assert.deepEqual(lots.getDiagnostics(), { hydro: 1, flower: 0, housing: 1, tower: 1, reverseAc: 0, breathingLeaf: 0 });
 
 // EnergyRuntime: the override wins over the receiver vote and survives an immediate energy update; undefined hands it back.
 const energy = new EnergyRuntime(new Scene());
@@ -197,12 +197,13 @@ assert.match(q06Result({ from: 'A', to: 'B' }).effect, /戻りました/);
   const site = rotationSite({ kind: 'swap', questionId: 'Q06', from: 'B', to: 'C' } as never, [])!;
   assert.deepEqual([site.x, site.z, site.slot], [lot.x, lot.z, 'environmentalPriority'], 'Q06 orb lands on the tower lot'); }
 
-// Q05 shares the NE PARK lot (park cooling, owner 2026-11-26): A stands the reverse air conditioner on its own lawn in place of the NE
-// park (and clears the sharing court under it); B/C (no model yet) keep the park; version4 never engages it.
-assert.deepEqual(['A', 'B', 'C', undefined].map(q05Tower), [true, false, false, false]);
+// Q05 shares the NE PARK lot (park cooling, owner 2026-11-26): A stands the reverse air conditioner and B the breathing giant leaf, each
+// on its own lawn in place of the NE park (and clearing the sharing court under it); C (no model yet) keeps the park; version4 never
+// engages it.
+assert.deepEqual(['A', 'B', 'C', undefined].map(q05Model), ['tower', 'leaf', undefined, undefined]);
 const q05set = set.questions.find((q: { id: string }) => q.id === 'Q05');
 assert.deepEqual(q05set.options.map((o: { lotId: string }) => o.lotId), ['ne-park', 'ne-park', 'ne-park'], 'Q05: one shared lot');
-assert.deepEqual(q05set.options.map((o: { modelId: string | null }) => o.modelId), ['q05a-reverse-ac-2127', null, null]);
+assert.deepEqual(q05set.options.map((o: { modelId: string | null }) => o.modelId), ['q05a-reverse-ac-2127', 'q05b-breathing-leaf-2127', null]);
 { const { changeSites } = await import('../src/layout.ts'); const lot = LOTS['ne-park'], ne = changeSites.ne;
   assert.deepEqual([lot.x, lot.z], [ne.x, ne.z], 'the Q05 lot is centred on the NE PARK site');
   assert.ok(lot.size >= ne.w * ne.scale, 'the Q05 lot covers the NE PARK site'); }
@@ -226,6 +227,48 @@ assert.deepEqual(q05set.options.map((o: { modelId: string | null }) => o.modelId
   motion!(2); assert.ok(part(REVERSE_AC_MOVING.flow).rotation.y > 0, 'cold streams wind inward (positive rotation.y)');
   assert.equal(model.visible, false);
 }
+{ // Q05-B: the same 24 m plinth, leaves and crowns inside the lot (+2.5 m), the glowing parts out of the bake, the mist translucent
+  // without depth writes, and the breath only ever changing emissive intensity (the dashes climb a → b → c).
+  const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
+  const { Box3 } = await import('three');
+  const { BREATHING_LEAF_MATTE, BREATHING_LEAF_MOVING, BREATHING_LEAF_STEM, breathingLeafBakes, breathingLeafGlow, breathingLeafMistAlpha, breathingLeafMistEnvelope,
+    prepareBreathingLeaf } =
+    await import('../src/breathingLeaf.ts');
+  const bytes = readFileSync(new URL('../asset/models/q05b-breathing-leaf-2127/q05b-breathing-leaf-2127.glb', import.meta.url));
+  const model = (await new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength), '')).scene;
+  const plinth = new Box3().setFromObject(model.getObjectByName('q05b_plinth')!), lot = LOTS['ne-park'];
+  assert.ok(Math.abs(plinth.max.x - lot.size / 2) < .1 && Math.abs(-plinth.min.z - lot.size / 2) < .1, `leaf plinth radius ${plinth.max.x} = lot/2`);
+  const all = new Box3().setFromObject(model);
+  assert.ok(Math.max(all.max.x, -all.min.x, all.max.z, -all.min.z) < lot.size / 2 + 2.5, 'leaves and crowns overhang the lot by under 2.5 m');
+  assert.ok(all.max.y > 20 && all.max.y < 30, `leaves top out at ${all.max.y.toFixed(1)} m`);
+  const motion = prepareBreathingLeaf(model);
+  assert.ok(motion, 'every glowing mesh is in the GLB');
+  const part = (name: string) => model.getObjectByName(name) as Mesh;
+  for (const name of Object.values(BREATHING_LEAF_MOVING)) assert.equal(breathingLeafBakes(part(name)), false, `${name} stays out of the bake`);
+  for (const name of [BREATHING_LEAF_MOVING.mistA, BREATHING_LEAF_MOVING.mistB]) {
+    const m = part(name).material as MeshStandardMaterial;
+    assert.ok(m.transparent && !m.depthWrite && m.opacity < .5, `${name} is a translucent curtain`);
+    assert.ok(m.alphaMap && part(name).geometry.getAttribute('uv'), `${name} frays through the soft mist alpha map (B-R5)`);
+    const colour = part(name).geometry.getAttribute('color');
+    assert.ok(m.vertexColors && colour?.itemSize === 4 && m.alphaMap.channel === 1 && part(name).geometry.getAttribute('uv1'),
+      `${name} keeps its envelope in vertex alpha and reads the falling threads through its metre UV (B-R6)`);
+  }
+  assert.ok(breathingLeafMistEnvelope(.5, .3, Math.cos(-2.22), Math.sin(-2.22)) > .8 && breathingLeafMistEnvelope(.5, .3, -Math.sin(-2.22), Math.cos(-2.22)) === 0
+    && breathingLeafMistEnvelope(0, .3, 1, 0) === 0 && breathingLeafMistEnvelope(.5, 1, 1, 0) === 0, 'the envelope fades at the sides, the ground and edge-on');
+  for (const [name, dim] of Object.entries(BREATHING_LEAF_MATTE)) {                  // B-R2: deep-green leaves and crowns stay matte
+    assert.equal((part(name).material as MeshStandardMaterial).envMapIntensity, dim, `${name} sky reflection dimmed`);
+  }
+  const stem = part(BREATHING_LEAF_STEM), stemMat = stem.material as MeshStandardMaterial;
+  assert.ok(stemMat.transparent && stemMat.opacity < .7 && !breathingLeafBakes(stem) && stem.renderOrder === 1, 'stems are clear glass, drawn before the mist');
+  const before = (part(BREATHING_LEAF_MOVING.mistA).material as MeshStandardMaterial).opacity;
+  motion!(1.25); assert.equal((part(BREATHING_LEAF_MOVING.mistA).material as MeshStandardMaterial).opacity, before, 'the breath leaves opacity to the lot fade');
+  const fallen = breathingLeafMistAlpha().offset.y; motion!(1.75);
+  assert.ok(breathingLeafMistAlpha().offset.y < fallen, 'the mist threads fall (the thread map scrolls down the veils, B-R6)');
+  const lit = (t: number) => { const g = breathingLeafGlow(t); return [g.pulseA, g.pulseB, g.pulseC].indexOf(Math.max(g.pulseA, g.pulseB, g.pulseC)); };
+  assert.deepEqual([0, .4, .8].map(lit), [0, 1, 2], 'water dashes climb a → b → c');
+  const g = breathingLeafGlow(1.25); assert.ok(Math.abs(g.mistA + g.mistB - 2) < 1e-9, 'mist sets breathe in antiphase');
+  assert.equal(model.visible, false);
+}
 {
   const acScene = new Scene(), ac = new Group(), park = new Group(), parkShared = new MeshStandardMaterial();
   const keeps: [number, number][] = [];
@@ -239,24 +282,31 @@ assert.deepEqual(q05set.options.map((o: { modelId: string | null }) => o.modelId
   assert.equal(park.visible, false); assert.deepEqual(keeps.at(-1), [0, 0]);
   ac.name = 'q05a-reverse-ac-2127'; ac.add(mesh()); ac.visible = false; acScene.add(ac);
   acLots.update(2, false); assert.equal(ac.visible, true); assert.equal(acLots.getDiagnostics().reverseAc, 1);
-  // Live A→B from t 10: held until 10, both half-way at 11.5, the park and its court back at 13.
+  const leaf = new Group(); leaf.name = 'q05b-breathing-leaf-2127'; leaf.add(mesh()); leaf.visible = false; acScene.add(leaf);
+  // Live A→B from t 10: held until 10, tower and leaf cross half-way at 11.5 while the park and its court stay cleared.
   acLots.setQ05('B', 10, false); acLots.update(9, false); assert.equal(ac.visible, true); assert.equal(park.visible, false);
   acLots.update(11.5, false);
   assert.ok(Math.abs(((ac.children[0] as Mesh).material as MeshStandardMaterial).opacity - .5) < 1e-9, 'tower half-way at mid-transition');
-  assert.ok(Math.abs(keeps.at(-1)![1] - .5) < 1e-9, 'court half-way with the park');
-  acLots.update(13, false); assert.equal(ac.visible, false); assert.equal(park.visible, true); assert.deepEqual(keeps.at(-1), [0, 1]);
-  // B→C: nothing visible changes; a version4 view after the run restores the park.
-  acLots.setQ05('C', 20, false); acLots.update(24, false); assert.equal(ac.visible, false); assert.equal(park.visible, true);
-  acLots.setQ05(undefined, 30, true); acLots.update(30, false); assert.equal(ac.visible, false); assert.equal(park.visible, true);
+  assert.ok(Math.abs(((leaf.children[0] as Mesh).material as MeshStandardMaterial).opacity - .5) < 1e-9, 'leaf half-way at mid-transition');
+  assert.equal(park.visible, false); assert.deepEqual(keeps.at(-1), [0, 0]);
+  acLots.update(13, false); assert.equal(ac.visible, false); assert.equal(leaf.visible, true);
+  assert.equal(acLots.getDiagnostics().breathingLeaf, 1);
+  // B→C: the leaf leaves, the park and its court come back; a version4 view after the run keeps the park.
+  acLots.setQ05('C', 20, false); acLots.update(21.5, false); assert.ok(Math.abs(keeps.at(-1)![1] - .5) < 1e-9, 'court half-way with the park');
+  acLots.update(24, false); assert.equal(leaf.visible, false); assert.equal(park.visible, true); assert.deepEqual(keeps.at(-1), [0, 1]);
+  acLots.setQ05(undefined, 30, true); acLots.update(30, false); assert.equal(ac.visible, false); assert.equal(leaf.visible, false); assert.equal(park.visible, true);
 }
 const { q05Swap, q05Result, q05Shot } = await import('../src/rotationLayout.ts');
 const q05Of = (from: string, to: string) => q05Swap({ rotation: { outcome: { kind: 'swap', questionId: 'Q05', from, to } } } as never)!;
-assert.deepEqual([q05Of('A', 'B').tower, q05Of('C', 'A').tower, q05Of('B', 'C').tower], [true, true, false]);
-assert.equal(q05Shot(q05Of('A', 'C')), 'q05:tower'); assert.equal(q05Shot(q05Of('B', 'C')), null, 'B↔C: nothing to see, stay at hero');
+assert.deepEqual([q05Of('A', 'B').changes, q05Of('C', 'A').changes, q05Of('B', 'C').changes], [true, true, true]);
+assert.deepEqual([['A', 'C'], ['C', 'A'], ['B', 'A'], ['A', 'B'], ['C', 'B'], ['B', 'C']].map(([f, t]) => q05Shot(q05Of(f, t))),
+  ['q05:tower', 'q05:tower', 'q05:tower', 'q05:leaf', 'q05:leaf', 'q05:leaf'], 'the close-up of the model that arrives, else the one that leaves');
 assert.match(q05Result({ from: 'B', to: 'A' }).effect, /塔が立ち/);
-for (const [from, to] of [['B', 'C'], ['C', 'B']]) assert.doesNotMatch(q05Result({ from, to }).effect, /立ち|現れ|できました|加わり/, `Q05 ${from}→${to} claims no new building`);
-{ const { target } = SHOTS['q05:tower'], lot = LOTS['ne-park'];
-  assert.ok(Math.hypot(target[0] - lot.x, target[2] - lot.z) <= lot.size / 2, 'Q05 shot looks at the NE PARK lot'); }
+assert.match(q05Result({ from: 'C', to: 'B' }).effect, /葉をひろげる植物が育ち/);
+for (const [from, to] of [['A', 'C'], ['B', 'C']]) assert.doesNotMatch(q05Result({ from, to }).effect, /立ち|現れ|できました|加わり|育ち/, `Q05 ${from}→${to} claims no new building`);
+assert.match(q05Result({ from: 'B', to: 'C' }).effect, /巨葉の植物が外れ/);
+for (const id of ['q05:tower', 'q05:leaf'] as const) { const { target } = SHOTS[id], lot = LOTS['ne-park'];
+  assert.ok(Math.hypot(target[0] - lot.x, target[2] - lot.z) <= lot.size / 2, `${id} looks at the NE PARK lot`); }
 { const { rotationSite } = await import('../src/voteJourney.ts'); const lot = LOTS['ne-park'];
   const site = rotationSite({ kind: 'swap', questionId: 'Q05', from: 'A', to: 'B' } as never, [])!;
   assert.deepEqual([site.x, site.z, site.slot], [lot.x, lot.z, 'environmentalPriority'], 'Q05 orb lands on the NE PARK lot'); }

@@ -17,6 +17,7 @@ import { bake, cityRig, stone } from './cityRig';
 import { heroCamera, HERO_TARGET } from './heroCamera';
 import { DRAWER_HOUSING, DISTRICT, LOTS, POD_TOWER } from './layout';
 import { prepareReverseAc, REVERSE_AC, reverseAcBakes } from './reverseAc';
+import { BREATHING_LEAF, breathingLeafBakes, prepareBreathingLeaf } from './breathingLeaf';
 import { createWorldState } from './worldState';
 import { displayHour, type DisplayMode, sunHeight, daylight, moodAt, withNight, nightLighting } from './dayCycle';
 import { overlay } from './overlay';
@@ -198,7 +199,7 @@ try {
   const housing=import.meta.env.DEV&&!surveyUrl&&metersParam===null&&!scaleLab&&!params.has('energy')&&params.has('housing');
   const energyReview=import.meta.env.DEV&&!surveyUrl&&metersParam===null&&!scaleLab&&params.has('energy');
   const shotPreview=import.meta.env.DEV&&!surveyUrl&&metersParam===null&&!scaleLab&&!housing&&!energyReview&&!civicReview&&!streetReview&&params.has('shot');
-  let reverseAcMotion:((now:number)=>void)|undefined;
+  let reverseAcMotion:((now:number)=>void)|undefined,breathingLeafMotion:((now:number)=>void)|undefined;
   if(!housing&&!energyReview){
     // Fixed city background: votes and recovery never retarget the dwellings; the update cycle stays in DEV.
     const background=housingPrototype();background.select('mixed');background.root.name='housing-background';scene.add(background.root);
@@ -237,6 +238,17 @@ try {
       model.add(...bake(model, reverseAcBakes));
       model.name = REVERSE_AC;
     }).catch(error => console.error('Reverse air conditioner could not load', error));
+    // Q05-B breathing giant leaf on the same lot, likewise loaded hidden for rotation runs.
+    const breathingLeafUrl = new URL('../asset/models/q05b-breathing-leaf-2127/q05b-breathing-leaf-2127.glb', import.meta.url).href;
+    void odaibaReady.then(async ready => {
+      if (!ready) return;
+      const lot = LOTS['ne-park'];
+      const model = await addCityModel(scene, breathingLeafUrl, [lot.x, 0, lot.z]);
+      breathingLeafMotion = prepareBreathingLeaf(model);
+      // Keep the mist and the glowing parts separate and batch the static opaque parts; named once complete.
+      model.add(...bake(model, breathingLeafBakes));
+      model.name = BREATHING_LEAF;
+    }).catch(error => console.error('Breathing giant leaf could not load', error));
   }
   // DEV `?showcase`: the unplaced Q10-A and Q11-C drafts on the west bay (src/devShowcase.ts), outside the rotation.
   let showcaseFrame:((now:number)=>void)|undefined,showcaseFly:(()=>boolean)|undefined;
@@ -446,7 +458,7 @@ try {
     attract?.update(now,!!headlineCamera?.active||!!explore?.active||devShot!==null,cameraMotion.matches,voices);
     if(headlineCamera?.active)voiceLabel?.update(camera,now);else voiceLabel?.hide();
     if(import.meta.env.DEV&&devShot){camera.position.set(...devShot.position);controls.target.set(...devShot.target);camera.lookAt(controls.target);}
-    cityChanges?.update(now,dark);lots?.update(now,cameraMotion.matches);if(!cameraMotion.matches){reverseAcMotion?.(now);showcaseFrame?.(now);}concept?.update(now);journey?.update(now,dark);devFrame?.(now,dark);elevatorNear.update(now,dark);ring.update(dark);holo.update(now,dark);rig.update(s,now,dark,cityChanges?.automationLevel,hour);updateOdaiba(dark);updateFloaters(now,dark);updateHoverBeds(now);updateOverlay(hour,dark>.5);renderer.info.reset();
+    cityChanges?.update(now,dark);lots?.update(now,cameraMotion.matches);if(!cameraMotion.matches){reverseAcMotion?.(now);breathingLeafMotion?.(now);showcaseFrame?.(now);}concept?.update(now);journey?.update(now,dark);devFrame?.(now,dark);elevatorNear.update(now,dark);ring.update(dark);holo.update(now,dark);rig.update(s,now,dark,cityChanges?.automationLevel,hour);updateOdaiba(dark);updateFloaters(now,dark);updateHoverBeds(now);updateOverlay(hour,dark>.5);renderer.info.reset();
     // Wall-clock rate, so held review times still redraw shadows as models load and Meter sites change.
     if(performance.now()-shadowDrawn>=1000/quality.shadowHz){renderer.shadowMap.needsUpdate=true;shadowDrawn=performance.now();}
     composer.render();
