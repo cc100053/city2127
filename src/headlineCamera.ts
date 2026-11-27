@@ -56,7 +56,7 @@ export const SHOTS: Record<ShotId, Pose> = {
   'q05:tower': { position: [-270, 44, -214], target: [-210, 27, -135] },
   // Q05-B (2026-11-27): the breathing giant leaf from the same side, lower and closer, so the five leaves, the mist on their rims
   // and the root ring with the residents under them fill the frame; used when the leaf enters or leaves.
-  'q05:leaf': { position: [-246, 27, -182], target: [-210, 12, -135] },
+  'q05:leaf': { position: [-252, 40, -192], target: [-210, 9, -135] },
   // Question rotation Q06 (2026-11-19): the pod-frame tower on the retired housing U lot, from the north-east over the open lawn
   // (owner accepted the placement close-up); used when the tower enters or leaves.
   'q06:tower': { position: [-208, 50, -158], target: [-258, 16, -75] },

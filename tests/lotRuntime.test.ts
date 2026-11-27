@@ -231,7 +231,8 @@ assert.deepEqual(q05set.options.map((o: { modelId: string | null }) => o.modelId
   // without depth writes, and the breath only ever changing emissive intensity (the dashes climb a → b → c).
   const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
   const { Box3 } = await import('three');
-  const { BREATHING_LEAF_MOVING, breathingLeafBakes, breathingLeafGlow, prepareBreathingLeaf } = await import('../src/breathingLeaf.ts');
+  const { BREATHING_LEAF_MATTE, BREATHING_LEAF_MOVING, BREATHING_LEAF_STEM, breathingLeafBakes, breathingLeafGlow, prepareBreathingLeaf } =
+    await import('../src/breathingLeaf.ts');
   const bytes = readFileSync(new URL('../asset/models/q05b-breathing-leaf-2127/q05b-breathing-leaf-2127.glb', import.meta.url));
   const model = (await new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength), '')).scene;
   const plinth = new Box3().setFromObject(model.getObjectByName('q05b_plinth')!), lot = LOTS['ne-park'];
@@ -247,6 +248,11 @@ assert.deepEqual(q05set.options.map((o: { modelId: string | null }) => o.modelId
     const m = part(name).material as MeshStandardMaterial;
     assert.ok(m.transparent && !m.depthWrite && m.opacity < .5, `${name} is a translucent curtain`);
   }
+  for (const [name, dim] of Object.entries(BREATHING_LEAF_MATTE)) {                  // B-R2: deep-green leaves and crowns stay matte
+    assert.equal((part(name).material as MeshStandardMaterial).envMapIntensity, dim, `${name} sky reflection dimmed`);
+  }
+  const stem = part(BREATHING_LEAF_STEM), stemMat = stem.material as MeshStandardMaterial;
+  assert.ok(stemMat.transparent && stemMat.opacity < .7 && !breathingLeafBakes(stem) && stem.renderOrder === 1, 'stems are clear glass, drawn before the mist');
   const before = (part(BREATHING_LEAF_MOVING.mistA).material as MeshStandardMaterial).opacity;
   motion!(1.25); assert.equal((part(BREATHING_LEAF_MOVING.mistA).material as MeshStandardMaterial).opacity, before, 'the breath leaves opacity to the lot fade');
   const lit = (t: number) => { const g = breathingLeafGlow(t); return [g.pulseA, g.pulseB, g.pulseC].indexOf(Math.max(g.pulseA, g.pulseB, g.pulseC)); };

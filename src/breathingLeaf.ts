@@ -14,6 +14,10 @@ export const BREATHING_LEAF_MOVING = {
 /** Seconds per cycle: one water dash step climbs a stem every PULSE / 3 s; the leaf breathes once every BREATH s. */
 export const BREATHING_LEAF_PERIOD = { pulse: 1.2, breath: 5 } as const;
 const MIST = new Set<string>([BREATHING_LEAF_MOVING.mistA, BREATHING_LEAF_MOVING.mistB]);
+/** Matte meshes whose sky reflection is dimmed (owner B-R1: the deep-green leaves read pale by day from the bright city sky). */
+export const BREATHING_LEAF_MATTE = { q05b_leaf: .3, q05b_leaf_u: .4, q05b_crown: .45, q05b_crown_l: .45 } as const;
+/** The translucent glass-green stems (alpha from the GLB), drawn after the opaque plant and before the mist. */
+export const BREATHING_LEAF_STEM = 'q05b_stem';
 const moving = new Set<string>(Object.values(BREATHING_LEAF_MOVING));
 
 /** Whether `bake` may merge this mesh: static, opaque, and none of the glowing parts. */
@@ -28,8 +32,8 @@ export function breathingLeafGlow(now: number) {
   return { pulseA: dash(0), pulseB: dash(1), pulseC: dash(2), vein: .8 + .35 * breath, mistA: 1 + .9 * breath, mistB: 1 - .9 * breath };
 }
 
-/** Finishes a loaded model (before lotRuntime owns its materials): the mist translucent without depth writes, drawn after the
- *  opaque plant; the model hidden. Returns the per-frame motion, or undefined when the GLB lacks a glowing mesh. */
+/** Finishes a loaded model (before lotRuntime owns its materials): the leaves and crowns matte (dimmed sky reflection), the
+ *  stems drawn after the opaque plant, the mist translucent without depth writes, drawn last; the model hidden. Returns the per-frame motion, or undefined when the GLB lacks a glowing mesh. */
 export function prepareBreathingLeaf(model: Object3D) {
   const parts = Object.fromEntries(Object.entries(BREATHING_LEAF_MOVING).map(([key, name]) => [key, model.getObjectByName(name)])) as
     Record<keyof typeof BREATHING_LEAF_MOVING, Object3D | undefined>;
@@ -42,6 +46,12 @@ export function prepareBreathingLeaf(model: Object3D) {
     for (const m of ([] as Material[]).concat(part.material)) { m.transparent = true; m.depthWrite = false; m.needsUpdate = true; }
     part.renderOrder = 2;
   }
+  model.traverse(object => {
+    if (!(object instanceof Mesh)) return;
+    const dim = BREATHING_LEAF_MATTE[object.name as keyof typeof BREATHING_LEAF_MATTE];
+    if (dim !== undefined) for (const m of ([] as Material[]).concat(object.material)) if (m instanceof MeshStandardMaterial) m.envMapIntensity = dim;
+    if (object.name === BREATHING_LEAF_STEM) object.renderOrder = 1;
+  });
   model.visible = false;
   if (Object.values(parts).some(part => !(part instanceof Mesh))) return undefined;
   return (now: number) => {

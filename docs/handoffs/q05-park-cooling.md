@@ -1,10 +1,10 @@
 # q05-park-cooling — Q05 公園降溫三態：目標圖與建築故事
 
 - Owner: repository owner
-- Status: Q05-A DONE（R2 owner 驗收，2026-11-27，已合併入 main）；Q05-B R1 已建，待 owner 評審（分支 `feat/q05b-breathing-leaf`）；C 未建模。
+- Status: Q05-A DONE（R2 owner 驗收，2026-11-27，已合併入 main）；Q05-B R2 已建，待 owner 評審（分支 `feat/q05b-breathing-leaf`）；C 未建模。
 - Branch: `feat/q05a-reverse-ac`（worktree `../city2127-q05a`），自 `origin/main` `bbec76c2`；目標圖記錄見舊分支 `docs/q05-targets`（已合併）。
 - Base commit: `bbec76c26a833a2a5ba24dfc42f3cee3f9a03c0c`
-- Last verified commit: `00f0cd75`（A R2）；B-R1 見分支 `feat/q05b-breathing-leaf` 最新提交（檢查見 B-R1 一節）。
+- Last verified commit: `00f0cd75`（A R2）；B-R2 見分支 `feat/q05b-breathing-leaf` 最新提交（檢查見 B-R2 一節）。
 - Remote availability: 已合併入 `origin/main`（見下文 R2 verdict）；任務分支已刪除。
 
 ## Session Git state
@@ -270,6 +270,71 @@ owner 指示：「do b modeling」。地塊、近鏡方位及台座沿用 A 的�
 - 結果卡文案及 `q05:leaf` 近鏡角度（皆為暫定）。
 - 之後建 C（雪雲噴泉）。
 
-## B-R2 round prompt（下一輪會話）
 
-place-building round for `q05b-breathing-leaf`: main checkout branch `feat/q05b-breathing-leaf`, read `docs/handoffs/q05-park-cooling.md`. Owner verdict on B-R1: «…»
+## B-R1 verdict
+
+«* 日間葉色仍然偏淺綠，應該係天光喺葉面反光；目標係深綠，夜間就接近。
+* 後面三片葉喺近鏡下似平頂傘，睇唔太出心形。
+* 莖係不透明，又比目標粗、集中；目標係半透明。
+* 小溪喺近鏡左邊，大半俾樹同霧遮住。
+* 周遭嗰啲樹應該係上一次做嘅 assets 嚟嘅，但係嗰啲樹唔靚，要重新整過。你根據佢嘅目標重新整過呢個樹嘅模型»（2026-11-27）
+
+## B-R2 brief
+
+像素以 3200 × 1800 的 `q05:leaf` 近鏡量度。
+
+| # | owner 原話 | 量度目標 |
+| --- | --- | --- |
+| 1 | 日間葉色偏淺綠，係天光反光；目標深綠 | 葉面粗糙度 0.45 → 0.85，執行時葉面 `envMapIntensity` 降至 0.3（天光反射約減七成）；基色維持深綠。日間近鏡葉面（避開葉脈）平均 RGB 的綠值 ≤ 110、紅值 ≤ 60。 |
+| 2 | 後面三片葉似平頂傘，睇唔出心形 | 葉形基部葉耳加深：葉耳伸至葉長 −0.37、闊 0.33（R1 為 −0.31、0.29），凹口更深；每片葉向近鏡傾 25–35°（近鏡一側較低），令葉面朝向鏡頭；後排兩片轉向左右兩側（方位 ±1.75 rad），最高葉頂由 22 m 降至約 19 m；近鏡改高 (−252, 40, −192) 望 (−210, 9, −135)，俯角約 25°，與目標圖的高斜角相近。近鏡下五片葉均見到兩個葉耳及凹口。 |
+| 3 | 莖不透明、粗、集中；目標半透明 | 莖半徑 0.78 → 0.50 m（基部）、0.42 → 0.28 m（頂）；改為半透明玻璃綠（不透明度約 0.45，透見內部）；水色光線及水滴移入莖中心；莖基由距中心 1.7 m 分散至 2.4–3.0 m，五支莖在根環內清楚分開。 |
+| 4 | 小溪喺近鏡左邊，大半俾樹同霧遮住 | 小溪移到近鏡前方偏左（方位 CAM+0.15 至 CAM+1.15，即 bench wall 與台座邊之間），闊 1.2–1.8 m，末端水池；該弧段外圈及內圈樹清空，只留低矮蕨類及石；步石改由草地通往小溪；路及水管移到前方偏右。近鏡中小溪可見長度 ≥ 600 px。 |
+| 5 | 周遭樹唔靚，根據目標重新整過樹嘅模型 | 新庫存模組 `facet_tree`（`modules.py`）：目標圖的低多邊形樹，深色樹幹，樹冠由 7–11 個扭曲多面體團塊組成（平面著色、每團約 60–80 tris），深綠及中綠兩色；取代 `lush_tree`（`leafy_tree` 葉片卡加實心體）。每棵約 1–1.5k tris（R1 每棵約 1.6k）。只用於 B；A 已驗收，暫不改，待 owner 決定是否換上。 |
+
+## B-R2（2026-11-27，Q05-B 呼吸巨葉）
+
+### Git 狀態
+
+- 開始時 `feat/q05b-breathing-leaf` 與遠端同步於 `5eed6090`，工作樹乾淨；`git fetch --prune origin` 成功，`origin/main` 為 `28e7727e`（Q10-A 資產提交，本分支未合併，按規定不自動合併）。沒有上一輪的伺服器仍在運行。
+
+### 改動
+
+- **葉色**（brief 1）：葉面粗糙度 0.45 → 0.85、基色略壓暗；`src/breathingLeaf.ts` 新增 `BREATHING_LEAF_MATTE`，載入時把葉面、葉背及樹冠的 `envMapIntensity` 調至 0.3–0.45（地塊淡變沿用來源值）。
+- **葉形**（brief 2）：基部葉耳加深（伸至 −0.37、闊 0.37，葉耳脈加長）；五片葉改為兩層，向近鏡左右伸出（下層約 12 m、上層約 22 m、後方一片 17 m），葉長 13–15 m（R1 為 15–17.5 m，為令葉與葉分開），葉基外移至距中心 6.4–8.6 m，令葉耳不再在中心互相重疊；整片葉向近鏡傾約 29°（`TILT`）。
+- **近鏡** `q05:leaf` 改為 (−252, 40, −192) 望 (−210, 9, −135)，俯角約 25°，與目標圖的高斜角相近。
+- **莖**（brief 3）：半徑 0.78/0.42 → 0.50/0.28 m，半透明玻璃綠（不透明度 0.5，雙面），水色光線及水滴移入莖中心；莖基分散至距中心 2.7 m；根改用不透明 `root` 物料。執行時莖 `renderOrder` 1（霧簾 2）。
+- **小溪**（brief 4）：移到近鏡前方偏左（CAM+0.12 至 +1.12，半徑 17 m），闊約 1.4–1.8 m，末端水池，水色較亮；該弧段樹木清空，外岸只放低矮蕨類；步石改由草地穿過小溪；路及水管移到前方偏右。
+- **樹**（brief 5）：新庫存模組 `facet_blob`、`facet_tree`（`modules.py`，新物料角色 `crown`、`crown_l`、`bark`，`LIBRARY.md` 已加行，lineup `review_modules.py` 加樣本）；樹冠由 8–11 個扭曲多面體團塊組成，平面著色。巨葉樹林改用 `facet_tree`，兩行共 31 棵（R1 25 棵），高 5.2–9 m。A 的樹林未改。
+- 模型約 55k tris（R1 約 69k），GLB 2.3 MB。
+- **測試**：`tests/lotRuntime.test.ts` 加葉面／樹冠天光反射調低，及莖為半透明、不合批、先於霧簾繪製。
+
+### 自評（`~/city2127-evidence/q05b/r2/`，3200 × 1800，`q05:leaf`）
+
+| # | 項目 | 結果 |
+| --- | --- | --- |
+| 1 | 日間葉色深綠 | 達到：葉面取樣 RGB 約 (25, 106, 58)，R1 為 (150, 200, 115)；一處受光位置綠值 122，略高於 110 的目標（`r1-vs-r2.jpg`）。 |
+| 2 | 五片葉見心形 | 大致達到：下層兩片及後方一片清楚見到葉耳及凹口（`row2-hearts.jpg`）；上層兩片的葉耳仍被後方葉部分遮去。整體呈左右對稱的「四葉」排列，比目標規整。 |
+| 3 | 莖半透明、較幼、分散 | 達到：五支莖分開，透見內部水色光線（`row3-stems.jpg`）；日間水色光線仍頗搶眼，莖本身的綠色較淡。 |
+| 4 | 小溪清楚 | 大致達到：小溪連水池在近鏡左前方完全露出，沒有樹或霧遮擋（`row4-stream.jpg`）；可見長度約 550 px，略短於 600 px 目標。 |
+| 5 | 樹按目標重做 | 達到：低多邊形多面體樹冠，風格接近目標（`trees-compare.jpg`）；團塊較目標大，近鏡右前的一叢樹幹被樹冠遮住。左方樹林大多被左下葉遮住。 |
+
+另：葉傾向鏡頭後，霧簾在近鏡中比 R1 少見（主要見於葉的近緣及後方）。
+
+### 檢查
+
+- 單元：`tests/lotRuntime.test.ts`、`tests/headlineCamera.test.ts`、`tests/assetLibrary.test.ts` 通過。
+- 根目錄 `npm test` 通過（2026-11-27，EXIT 0，記錄 `~/city2127-evidence/q05b/r2/npm-test.log`）；`npm run build`、`git diff --check` 通過。`survey` 未改動，未重跑。
+- 瀏覽器（Vite 5186，`?rotation&jump=Q05:B&shot=q05:leaf`）：截圖 page error 0。
+- FPS：未量度（`fps.sh` 只跑 `?meters`）。headless 截圖 data-fps 約 40（近鏡）、31（overview），只作參考；R1 為 20–33。
+- 變化總覽：近鏡座標改了，但 Q05 未有近鏡畫格，未重生。
+
+### 待 owner 決定
+
+- 葉的排列是否要打破左右對稱（例如一邊再低、一片轉向近鏡）。
+- 霧簾在新角度下較少見，是否要加長近緣的霧簾。
+- `facet_tree` 是否亦換到 Q05-A 的樹林（A 已驗收，本輪未改）。
+- 近鏡新角度（較高較近）是否接受。
+
+## B-R3 round prompt（下一輪會話）
+
+place-building round for `q05b-breathing-leaf`: main checkout branch `feat/q05b-breathing-leaf`, read `docs/handoffs/q05-park-cooling.md`. Owner verdict on B-R2: «…»
