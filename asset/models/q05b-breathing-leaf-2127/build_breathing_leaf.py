@@ -9,6 +9,7 @@ the trees, and the grove rebuilt from the library facet_tree (low-poly faceted c
 R3 (owner B-R2 «主力做嗰塊巨型嘅葉…近返 target…有細緻感…有厚度嘅感覺»): five leaves at five heights and sizes (no mirror
 pairs), ovate blades on a fine grid with a three-level vein hierarchy, quilting, a wavy margin and a real slab with a light
 rim band, a dark underside and keel, and a margin curling down.
+R4 (owner B-R3): a thin blade with a soft vertex-colour vein glow, and the stems gathered in one bundle that fans out.
 
 Re-run headless (Blender 5.2):
   /Applications/Blender.app/Contents/MacOS/Blender -b --factory-startup --python-exit-code 1 -P build_breathing_leaf.py
@@ -35,6 +36,7 @@ TAU = math.pi * 2
 LAWN_R, PLINTH_R = 22.6, 24.0
 CAM = -2.22                                     # azimuth of the q05 close-up cameras (model frame), as Q05-A
 RING_R0, RING_R1, RING_H = 6.8, 4.1, 1.9         # root ring: outer, inner radius, height
+BUNDLE = .8                                      # R4: stem bases this far from the centre, one bundle
 WALL_R = 13.6                                    # curved bench wall
 # Screen left of the close-up is +azimuth. R2 (owner «小溪…大半俾樹同霧遮住»): the stream runs across the near left, in front of
 # the leaves and clear of the grove; the path and the water mains move to the near right, as in the target.
@@ -57,13 +59,11 @@ LEAVES = [(2.25, 22.0, 14.0, 7.6, -.15, .10, .32, .30),    # back left, highest
           (-1.10, 10.5, 16.0, 8.6, -.10, .05, .24, .44)]   # near right, lowest and largest, drooping
 
 Q05B_ROLES = {                                                    # build-only roles (shared ROLES untouched)
-    'leaf': ((.025, .16, .05, 1), None, .5),                        # leaf blade, deep green (runtime dims the sky reflection)
+    'leaf': ((1, 1, 1, 1), None, .5),                               # leaf blade: white x vertex colours (R4, leaf_colour)
     'leaf_u': ((.07, .22, .08, 1), None, .5),                     # leaf underside and keel, darker (R3)
-    'leaf_rim': ((.20, .44, .13, 1), None, .5),                   # R3: the slab edge, a lighter band that shows the thickness
-    'leaf_v': ((.10, .34, .11, 1), None, .5),                     # R3: lighter blade under the main veins (halo)
+    'leaf_rim': ((.16, .40, .11, 1), None, .5),                   # the thin blade edge, a lighter line (R4: 0.10 m)
     'vein': ((.62, 1, .36, 1), (.50, 1, .28, 1), 1.6),            # lit veins (runtime breathes the glow)
-    'vein_t': ((.15, .40, .13, 1), (.20, .50, .14, 1), .12),       # R3: tertiary and marginal veins, dimmer, steady
-    'stem': ((.40, .72, .40, .5), (.16, .40, .20, 1), .3),       # stems: translucent glass green, the water core shows through
+    'stem': ((.26, .58, .26, .66), (.12, .34, .15, 1), .3),     # R4: denser glass green so the thick bundle reads       # stems: translucent glass green, the water core shows through
     'root': ((.30, .52, .28, 1), None, .5),                        # roots over the soil, opaque
     'water': ((.40, .95, .88, 1), (.30, .95, .85, 1), 1.4),        # aqua water line up each stem (not the concept #5fdcff)
     'pulse_a': ((.75, 1, .96, 1), (.55, 1, .92, 1), 2.0),          # water dashes, three phases lit in turn at runtime
@@ -78,9 +78,9 @@ Q05B_ROLES = {                                                    # build-only r
     'lawn': ((.20, .40, .12, 1), None, .5),
     'plinth': ((.90, .90, .87, 1), None, .5),
 }
-ROUGH = {'leaf': .85, 'leaf_u': .85, 'leaf_rim': .85, 'leaf_v': .85, 'stem': .3, 'crown': .9, 'crown_l': .9, 'ring': .4, 'stream': .1, 'mist_a': .9, 'mist_b': .9, 'lawn': .9, 'plinth': .6,
+ROUGH = {'leaf': .85, 'leaf_u': .85, 'leaf_rim': .85, 'stem': .3, 'crown': .9, 'crown_l': .9, 'ring': .4, 'stream': .1, 'mist_a': .9, 'mist_b': .9, 'lawn': .9, 'plinth': .6,
          'rock': .8}
-SMOOTH = {'leaf': 60, 'leaf_u': 60, 'leaf_rim': 60, 'leaf_v': 60, 'vein': 50, 'vein_t': 50, 'stem': 60, 'water': 60, 'pulse_a': 60, 'pulse_b': 60, 'pulse_c': 60, 'ring': 40,
+SMOOTH = {'leaf': 60, 'leaf_u': 60, 'leaf_rim': 60, 'vein': 50, 'stem': 60, 'water': 60, 'pulse_a': 60, 'pulse_b': 60, 'pulse_c': 60, 'ring': 40,
           'aqua': 40, 'green': 80, 'leaf_l': 80, 'rock': 35, 'root': 60, 'crown': 1, 'crown_l': 1}
 DOUBLE = ('green', 'leaf_l', 'mist_a', 'mist_b', 'stem')                   # drawn from both sides
 
@@ -197,15 +197,17 @@ def root_ring(ctx):
 
 
 def stem_path(az, top, rad):
-    """Stem centreline from the soil to the leaf attachment: rises near the centre, leans out at the top."""
+    """Stem centreline from the soil to the leaf attachment. R4 (owner B-R3 «聚集喺同一點，然後再散出嚟»): the five stems rise
+    from one bundle at the ring centre (bases 0.8 m from the centre, merged), stay together to ≈ 3–4 m, then fan out."""
     c, s = math.cos(az), math.sin(az)
-    p0 = (2.7 * c, RING_H - .3, 2.7 * s)
-    p1 = (rad * .35 * c, top * .55, rad * .35 * s)
-    p2 = (rad * c, top, rad * s)
+    ctrl = [(BUNDLE, RING_H - .4), (1.0, top * .34), (rad * .42, top * .78), (rad, top)]
     pts = []
-    for j in range(25):
-        t = j / 24
-        pts.append(tuple((1 - t) ** 2 * p0[k] + 2 * (1 - t) * t * p1[k] + t * t * p2[k] for k in range(3)))
+    for j in range(29):
+        t = j / 28
+        b = ((1 - t) ** 3, 3 * (1 - t) ** 2 * t, 3 * (1 - t) * t * t, t ** 3)
+        r = sum(w * q[0] for w, q in zip(b, ctrl))
+        y = sum(w * q[1] for w, q in zip(b, ctrl))
+        pts.append((r * c, y, r * s))
     return pts
 
 
@@ -222,17 +224,19 @@ def stems(ctx):
     for k, (daz, top, ln, rad, *_) in enumerate(LEAVES):
         az = CAM + daz
         pts = stem_path(az, top, rad)
-        M.limb(a['stem'], pts, .50, .28, 14)
+        M.limb(a['stem'], pts[:3], 1.10, .95, 14)                           # R4: swollen foot of the bundle
+        M.limb(a['stem'], pts, .95, .36, 14)
         line = pts                                                           # aqua water core inside the clear stem
-        M.limb(a['water'], line, .15, .09, 8)
+        M.limb(a['water'], line, .18, .09, 8)
         for d in range(18):                                                  # dashes: phase d % 3 of 18 along the stem
             t0, t1 = (d + .15) / 18, (d + .75) / 18
             M.limb(a['pulse_' + 'abc'[d % 3]], [along(line, t0 + (t1 - t0) * q / 3) for q in range(4)], .2, .16, 8)
         for r in range(3):                                                   # roots over the soil to the ring rim
             ra = az + (r - 1) * .55
             c, s = math.cos(ra), math.sin(ra)
-            b = (math.cos(az) * 2.7, RING_H - .2, math.sin(az) * 2.7)
-            M.limb(a['root'], [b, (2.4 * c, RING_H - .1, 2.4 * s), (3.9 * c, RING_H - .12, 3.9 * s)], .38, .14, 8)
+            b = (math.cos(az) * BUNDLE, RING_H - .1, math.sin(az) * BUNDLE)  # R4: roots splay from the bundle foot
+            M.limb(a['root'], [b, (1.6 * c, RING_H - .05, 1.6 * s), (3.0 * c, RING_H - .1, 3.0 * s), (3.9 * c, RING_H - .12, 3.9 * s)],
+                   .42, .12, 8)
 
 
 # Leaf outline control points (right half, normalised to length 1): tip at u = 1, petiole sinus near u = 0, two basal lobes.
@@ -240,13 +244,15 @@ def stems(ctx):
 # relief; a three-level vein hierarchy (raised midrib, swept secondaries, tertiaries and a marginal vein) with a lighter halo
 # under the main veins; quilted panels between the secondaries; a wavy margin; a real 0.42–0.60 m slab with a lighter rim
 # band, a keel under the midrib, the halves falling away from the midrib and the margin curling down so the thickness shows.
+# R4 (owner B-R3 «太厚，唔似一塊葉…紋理唔夠靚»): a thin 0.10–0.20 m blade with a light edge line; five secondaries per side
+# fading before the margin; tertiaries and hard halo strips gone, the glow and the light-to-dark gradient are vertex colours.
 OUTLINE = [(1.0, 0), (.90, .12), (.76, .27), (.58, .40), (.38, .48), (.18, .50), (.0, .48), (-.15, .43), (-.28, .34),
            (-.37, .22), (-.37, .11), (-.26, .05), (-.08, 0)]
 CENTRE = (.30, 0)
 RINGS = 22
 SPAN = 4                                         # resampled points per outline span
 NARROW = .80                                     # R3: blade width .8 of R2's (ovate like the target, not round)
-SP = .13                                         # secondary vein spacing along the midrib (normalised)
+SP = .16                                         # secondary vein spacing along the midrib (normalised)
 
 
 def _crspan(p0, p1, p2, p3, t):
@@ -312,7 +318,25 @@ def relief(u, s, w):
     th = math.atan2(s, .06 - u + 1e-6)
     lobe = math.sin(math.pi * th / .36) ** 2
     b = _smooth(.06, -.06, u)
-    return .010 * ((1 - b) * sec + b * lobe) * _smooth(.02, .08, s) * (1 - _smooth(.82, 1, w))
+    return .005 * ((1 - b) * sec + b * lobe) * _smooth(.02, .08, s) * (1 - _smooth(.82, 1, w))
+
+
+LEAF_LIGHT, LEAF_DARK, LEAF_GLOW = (.06, .25, .065, 1), (.012, .085, .03, 1), (.26, .66, .14, 1)
+
+
+def leaf_colour(u, v):
+    """Top-face vertex colour (linear): lighter green at the midrib and the petiole, deepening toward the margin, with a soft
+    glow either side of the midrib and of each secondary (and the lobe veins) that fades out toward the margin."""
+    s = abs(v)
+    w = min(1.0, s / half_width(u))
+    near = 1 - _smooth(0, .95, w)
+    phi = (u - sweep_g(s) - .05) / SP
+    d_sec = abs(phi - round(phi)) * SP if -.5 < phi < 4.5 else 1
+    th = math.atan2(s, .06 - u + 1e-6)
+    d_lobe = abs(th - .36) * math.hypot(s, .06 - u) if u < .1 else 1
+    glow = max(math.exp(-(s / .030) ** 2), math.exp(-(d_sec / .022) ** 2) * .8, math.exp(-(d_lobe / .022) ** 2) * .8) * (.25 + .75 * near)
+    base = [LEAF_DARK[k] + (LEAF_LIGHT[k] - LEAF_DARK[k]) * (.25 + .75 * near) ** 1.4 for k in range(3)]
+    return tuple([base[k] + (LEAF_GLOW[k] - base[k]) * .55 * glow for k in range(3)] + [1])
 
 
 def leaf_frame(spec):
@@ -334,10 +358,10 @@ def leaf_point(L, u, v, lift=0.0, under=False):
     s = abs(v)
     w = min(1.0, s / half_width(u))
     toward = (u * d[0] + v * sd[0]) * CAM_DIR[0] + (u * d[2] + v * sd[2]) * CAM_DIR[1]
-    y = (L['pitch'] * u - L['droop'] * max(0, u) ** 2 - .10 * s - .25 * s * s - .035 * _smooth(.78, 1, w)
+    y = (L['pitch'] * u - L['droop'] * max(0, u) ** 2 - .10 * s - .25 * s * s - .018 * _smooth(.78, 1, w)
          - L['tilt'] * toward + .008 * w ** 3 * math.sin(17 * u + 11 * s))
     if not under:
-        y += relief(u, s, w) + .010 * math.exp(-(s / .028) ** 2) * (1 - .6 * max(0, min(1, u)))
+        y += relief(u, s, w) + .006 * math.exp(-(s / .028) ** 2) * (1 - .6 * max(0, min(1, u)))
     return (o[0] + ln * (u * d[0] + v * sd[0]), o[1] + ln * y + lift, o[2] + ln * (u * d[2] + v * sd[2]))
 
 
@@ -365,18 +389,6 @@ def _fan(theta, step=.02, shrink=.92):
     return pts
 
 
-def _strip(acc, L, uv, width, lift):
-    """Flat ribbon of `width` (normalised) lying on the blade along uv points."""
-    verts = []
-    for i, (u, v) in enumerate(uv):
-        a, b = uv[max(0, i - 1)], uv[min(len(uv) - 1, i + 1)]
-        tu, tv = b[0] - a[0], b[1] - a[1]
-        n = math.hypot(tu, tv) or 1
-        nu, nv = -tv / n * width / 2, tu / n * width / 2
-        verts += [leaf_point(L, u - nu, v - nv, lift), leaf_point(L, u + nu, v + nv, lift)]
-    acc.surface(verts, [(i * 2, i * 2 + 1, i * 2 + 3, i * 2 + 2) for i in range(len(uv) - 1)], lambda c: (0, 1, 0))
-
-
 def _vein(acc, L, uv, r0, r1, lift, flat=.6, n=6):
     if len(uv) >= 2:
         M.limb(acc, [leaf_point(L, u, v, lift) for u, v in uv], r0, r1, n, flat)
@@ -396,7 +408,7 @@ def leaves(ctx):
             for u, v in row:
                 p = leaf_point(L, u, v, under=True)
                 w = min(1.0, abs(v) / half_width(u))
-                bot_v.append((p[0], p[1] - (.42 + .18 * (1 - w)), p[2]))
+                bot_v.append((p[0], p[1] - (.10 + .10 * (1 - w)), p[2]))       # R4: a thin blade, 0.10–0.20 m
         nv = len(top_v)
         faces_t, faces_b = [], []
         for r in range(RINGS):
@@ -408,33 +420,23 @@ def leaves(ctx):
         verts = top_v + bot_v
         cen = leaf_point(L, *CENTRE)
         a['leaf'].surface(verts, faces_t, lambda c: (0, 1, 0))
+        a['leaf'].c += [leaf_colour(u, v) for row in grid for u, v in row] + [LEAF_DARK] * nv
         a['leaf_u'].surface(verts, faces_b, lambda c: (0, -1, 0))
         a['leaf_rim'].surface(verts, rim, lambda c, cen=cen: (c[0] - cen[0], 0, c[2] - cen[2]))   # the slab edge, outward
         # Keel under the midrib.
-        M.limb(a['leaf_u'], [(p[0], p[1] - .5, p[2]) for p in (leaf_point(L, u, 0, under=True) for u in
-                                                                 [-.04 + i * .07 for i in range(13)])], ln * .022, ln * .006, 8, .7)
-        # Vein hierarchy: lit raised midrib, swept secondaries and the main basal veins (q05b_vein, breathing), a halo of
-        # lighter blade under them (leaf_v), tertiaries between the secondaries plus the marginal vein (vein_t, dimmer).
+        M.limb(a['leaf_u'], [(p[0], p[1] - .2, p[2]) for p in (leaf_point(L, u, 0, under=True) for u in
+                                                                 [-.04 + i * .07 for i in range(13)])], ln * .010, ln * .003, 8, .7)
+        # R4 (owner B-R3 «紋理唔夠靚»): as in the target, a lit midrib and five secondaries per side sweeping to the tip, each
+        # thinning to nothing before the margin, plus the two basal lobe veins; the soft glow beside them and the light-to-dark
+        # blade gradient are vertex colours on the top face (leaf_colour), not hard strips.
         mid = [(-.05 + i * .085, 0) for i in range(12)]
-        _strip(a['leaf_v'], L, mid, .055, .03)
-        _vein(a['vein'], L, mid, ln * .02, ln * .005, .07, .55, 8)
-        for i in range(7):
+        _vein(a['vein'], L, mid, ln * .010, ln * .002, .04, .5, 8)
+        for i in range(5):
             for sg in (-1, 1):
-                uv = [(u, sg * s) for u, s in _trace(.02 + i * SP, .018)]
-                if len(uv) < 3:
-                    continue
-                _strip(a['leaf_v'], L, uv, .03, .025)
-                _vein(a['vein'], L, uv, ln * .008, ln * .003, .05)
-                uv = [(u, sg * s) for u, s in _trace(.02 + (i + .5) * SP, .022)]
-                _vein(a['vein_t'], L, uv, ln * .0035, ln * .0025, .04, .6, 5)
+                uv = [(u, sg * s) for u, s in _trace(.05 + i * SP, .016, .80)]
+                _vein(a['vein'], L, uv, ln * .0055, ln * .0008, .03, .5)
         for sg in (-1, 1):
-            uv = [(u, sg * s) for u, s in _fan(.36)]
-            _strip(a['leaf_v'], L, uv, .03, .025)
-            _vein(a['vein'], L, uv, ln * .008, ln * .003, .05)
-            for th in (.72, 1.08, .18):
-                _vein(a['vein_t'], L, [(u, sg * s) for u, s in _fan(th)], ln * .0035, ln * .0025, .04, .6, 5)
-            marg = [(CENTRE[0] + (u - CENTRE[0]) * .93, sg * v * .93) for u, v in RIGHT if v > .07 or u > .5]
-            _vein(a['vein_t'], L, marg, ln * .003, ln * .003, .04, .6, 5)
+            _vein(a['vein'], L, [(u, sg * s) for u, s in _fan(.36, .02, .80)], ln * .0055, ln * .0008, .03, .5)
         rims.append((L, [p for p in full_control()]))
     return rims
 
@@ -549,6 +551,7 @@ def main():
     root = bpy.data.objects.new('Q05B_BREATHING_LEAF', None)
     bpy.context.scene.collection.objects.link(root)
     ctx = M.Ctx({k: Acc() for k in [*M.ROLES, *Q05B_ROLES]}, random.Random(2127))
+    ctx.a['leaf'].c = []
     info = build(ctx)
     tris, per = 0, {}
     for role, acc in ctx.a.items():
@@ -558,7 +561,16 @@ def main():
         mat = material('q05b_' + role, rgba, ROUGH.get(role, .6), emit=emit, emit_strength=strength)
         if role in DOUBLE:
             mat.use_backface_culling = False
+        if getattr(acc, 'c', None):                                          # R4: the leaf top's vertex colours
+            colour_node = mat.node_tree.nodes.new('ShaderNodeVertexColor')
+            colour_node.layer_name = 'Col'
+            bsdf = next(n for n in mat.node_tree.nodes if n.type == 'BSDF_PRINCIPLED')
+            mat.node_tree.links.new(colour_node.outputs['Color'], bsdf.inputs['Base Color'])
         ob = finish_mesh('q05b_' + role, acc, mat, SMOOTH.get(role, 25))
+        if getattr(acc, 'c', None):
+            assert len(acc.c) == len(acc.v)
+            attr = ob.data.color_attributes.new('Col', 'FLOAT_COLOR', 'POINT')
+            attr.data.foreach_set('color', [x for rgba in acc.c for x in rgba])
         bpy.context.scene.collection.objects.link(ob)
         ob.parent = root
         per[role] = sum(len(p.vertices) - 2 for p in ob.data.polygons)
@@ -573,7 +585,8 @@ def main():
     bpy.context.view_layer.objects.active = root
     bpy.ops.export_scene.gltf(filepath=glb, export_format='GLB', use_selection=True, export_yup=True, export_apply=True,
                               export_normals=True, export_materials='EXPORT', export_animations=False,
-                              export_cameras=False, export_lights=False, export_extras=False)
+                              export_cameras=False, export_lights=False, export_extras=False,
+                              export_vertex_color='MATERIAL')
     print('@@BUILD@@', {'tris': tris, **info, 'glb_bytes': os.path.getsize(glb),
                         'top': dict(sorted(per.items(), key=lambda kv: -kv[1])[:12])})
 

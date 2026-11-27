@@ -1,10 +1,10 @@
 # q05-park-cooling — Q05 公園降溫三態：目標圖與建築故事
 
 - Owner: repository owner
-- Status: Q05-A DONE（R2 owner 驗收，2026-11-27，已合併入 main）；Q05-B R3 已建，待 owner 評審（分支 `feat/q05b-breathing-leaf`）；C 未建模。
+- Status: Q05-A DONE（R2 owner 驗收，2026-11-27，已合併入 main）；Q05-B R4 已建，待 owner 評審（分支 `feat/q05b-breathing-leaf`）；C 未建模。
 - Branch: `feat/q05a-reverse-ac`（worktree `../city2127-q05a`），自 `origin/main` `bbec76c2`；目標圖記錄見舊分支 `docs/q05-targets`（已合併）。
 - Base commit: `bbec76c26a833a2a5ba24dfc42f3cee3f9a03c0c`
-- Last verified commit: `00f0cd75`（A R2）；B-R3 見分支 `feat/q05b-breathing-leaf` 最新提交（檢查見 B-R3 一節）。
+- Last verified commit: `00f0cd75`（A R2）；B-R4 見分支 `feat/q05b-breathing-leaf` 最新提交（檢查見 B-R4 一節）。
 - Remote availability: 已合併入 `origin/main`（見下文 R2 verdict）；任務分支已刪除。
 
 ## Session Git state
@@ -390,6 +390,57 @@ owner 指示：「do b modeling」。地塊、近鏡方位及台座沿用 A 的�
 - 三級脈是否要更明顯，或保持現在的低調。
 - 近鏡角度是否接受（本輪未改）。
 
-## B-R4 round prompt（下一輪會話）
+## B-R3 verdict
 
-place-building round for `q05b-breathing-leaf`: main checkout `/Users/fatboy/city2127`, branch `feat/q05b-breathing-leaf`, read `docs/handoffs/q05-park-cooling.md` (its `## B-R3 brief` and `## B-R3` sections). Owner verdict on B-R3: «…»
+«依家又太厚，唔似一塊葉，同埋上面嘅紋理都唔夠靚，要再執。
+
+然後就係莖部，要跟返佢聚集喺同一點，然後再散出嚟，嗰個粗幼度亦都要留意返。»（2026-11-27；owner 在同一會話選擇「Do it here」，B-R4 於此會話進行）
+
+## B-R4 brief
+
+像素仍以 3200 × 1800 `q05:leaf` 近鏡量度（植物中心約 30 px/m）。目標圖（寬 2400 px）中根環外徑 13.6 m 約 470 px，即約 35 px/m。
+
+| # | owner 原話 | B-R3 現況 | 量度目標 |
+| --- | --- | --- | --- |
+| 1 | 太厚，唔似一塊葉 | 0.42–0.60 m 實心板，邊帶加葉底約 15–20 px；龍骨半徑 ln × 0.022 | 葉片厚 0.10 m（邊）至 0.20 m（中），近鏡邊緣只見 3–5 px 的圓潤淺色邊線（如目標）；龍骨減至 ln × 0.010；葉邊下捲減半。仍保留下垂與葉尖彎曲，令葉似一塊有彈性的薄葉。 |
+| 2 | 紋理唔夠靚 | 每邊七條等粗二級脈加暗三級脈，光暈為硬邊色帶，似條紋布 | 依目標：中脈（近鏡約 8 px）及每邊五條二級脈由葉柄附近向葉尖彎掃，愈近葉邊愈幼、愈淡，未到葉邊即消失；葉耳兩條基脈。刪去三級脈及硬邊光暈帶，改為頂面頂點顏色：近中脈及葉柄處較淺綠，向葉邊漸深；葉脈兩旁柔和淺色光暈，亦隨葉邊減弱。葉面鼓起減半。 |
+| 3 | 莖要聚集喺同一點再散出嚟，粗幼度 | 五支莖基部分散於距中心 2.7 m，半徑 0.50 → 0.28 m | 五支莖於根環中心聚成一束（基部距中心約 0.5 m，互相貼合），約 3–4 m 高後才向外散開至各葉；莖半徑基部約 0.70 m（目標圖約 1.3 m 直徑）漸收至葉柄約 0.30 m，基部略為膨大；根由莖束底部向根環邊散出。 |
+
+## B-R4（2026-11-27，Q05-B 呼吸巨葉）
+
+### Git 狀態
+
+- 與 B-R3 同一會話（owner 選擇「Do it here」）。開始時 `feat/q05b-breathing-leaf` 與遠端同步於 `398c5ff4`，工作樹乾淨；`git fetch --prune origin` 成功。
+
+### 改動
+
+- **葉變薄**（brief 1）：葉片厚 0.42–0.60 → 0.10–0.20 m；邊帶 `q05b_leaf_rim` 只餘一條淺色邊線；龍骨半徑 ln × 0.022 → 0.010；葉邊下捲 0.035 → 0.018；葉面鼓起 0.010 → 0.005、中脈凸脊 0.010 → 0.006。
+- **紋理**（brief 2）：刪去三級脈 `q05b_vein_t` 及硬邊光暈帶 `q05b_leaf_v`；二級脈每邊七條 → 五條（`SP` .16），半徑由 ln × 0.0055 收至 0.0008，未到葉邊（輪廓 0.80 倍）即消失；中脈 ln × 0.010 → 0.002。葉頂面改為白色物料乘頂點顏色（`leaf_colour`，GLB `COLOR_0`，`export_vertex_color='MATERIAL'`）：中脈及葉柄處淺綠 (.06, .25, .065)，向葉邊漸深至 (.012, .085, .03)，中脈、二級脈及葉耳基脈兩旁有柔和淺色光暈，愈近葉邊愈弱。
+- **莖**（brief 3）：`stem_path` 改為三次曲線：五支莖基部距中心 0.8 m 聚成一束，約 4–5 m 高後才散開至各葉；半徑 0.50/0.28 → 0.95/0.36 m，基部另加 1.1 m 的膨大莖腳；莖不透明度 0.5 → 0.66、顏色較深；根由莖束底部向根環邊散出。
+- **執行時**：`BREATHING_LEAF_MATTE` 刪去 `q05b_leaf_v`。
+- 模型約 103k tris（R3 約 123k），GLB 3.3 MB。霧簾 210 條、樹 32 棵（亂數隨葉形變動）。
+
+### 自評（`~/city2127-evidence/q05b/r4/`，3200 × 1800，`q05:leaf`）
+
+| # | 項目 | 結果 |
+| --- | --- | --- |
+| 1 | 唔好太厚，要似一塊葉 | 達到：葉緣只見一條 3–5 px 淺色邊線，葉片似有彈性的薄葉，仍保留下垂及葉尖彎曲（`row1-thin.jpg`）。 |
+| 2 | 紋理要靚 | 大致達到：中脈加每邊五條彎掃二級脈，未到葉邊即淡出，葉面由中心淺綠漸深，脈旁柔和光暈，接近目標（`row2-texture.jpg`、`target-vs-r4.jpg`）。未足：目標葉面有較明顯的光澤反光，現時為霧面（B-R1 為壓天光反射而調暗）。 |
+| 3 | 莖聚集再散開、粗幼 | 大致達到：五支莖在根環中心聚成一束再向外散開，基部明顯較粗（`row3-stems.jpg`）。未足：莖仍比目標幼（目標基部每支約 1.3 m 直徑且較實），半透明莖互相重疊處略見雜點；莖內水滴虛線比目標的單一水色光帶更搶眼。 |
+
+### 檢查
+
+- 單元：`tests/lotRuntime.test.ts`、`tests/assetLibrary.test.ts` 通過。
+- 根目錄 `npm test` 通過（2026-11-27，EXIT 0，記錄 `~/city2127-evidence/q05b/r4/npm-test.log`）；`npm run build`、`git diff --check` 通過。`survey` 未改動，未重跑。
+- 瀏覽器（Vite 5186，`?rotation&jump=Q05:B&shot=q05:leaf`）：截圖 page error 0；三輪 capture-compare（pass1 葉色太淺、莖太淡 → pass2 調深 → pass3 莖加粗）。
+- FPS：未量度。headless 截圖 data-fps 約 31–33（近鏡）、27（overview），只作參考。
+- 變化總覽：Q05 未有近鏡畫格，未重生。
+
+### 待 owner 決定
+
+- 莖是否再加粗、改為較實的綠色，並把水滴虛線改為目標中沿莖外側的一條水色光帶。
+- 葉面是否要加回少量光澤。
+
+## B-R5 round prompt（下一輪會話）
+
+place-building round for `q05b-breathing-leaf`: main checkout `/Users/fatboy/city2127`, branch `feat/q05b-breathing-leaf`, read `docs/handoffs/q05-park-cooling.md` (its `## B-R4 brief` and `## B-R4` sections). Owner verdict on B-R4: «…»
