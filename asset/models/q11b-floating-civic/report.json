@@ -1,0 +1,88 @@
+{
+ "tris_by_group": {
+  "SITE": 120596,
+  "PILLARS": 11264,
+  "WATER": 480,
+  "FLOAT": 223242,
+  "BRIDGE": 2532
+ },
+ "tris_total": 358114,
+ "unique_mesh_tris": 220522,
+ "objects": 139,
+ "unique_meshes": 25,
+ "materials": 64,
+ "glb_bytes": 8180388,
+ "states": {
+  "normal": {
+   "water_z": 0.0,
+   "float_top_z": 4.0,
+   "float_bottom_z": -3.0,
+   "freeboard_m": 4.0,
+   "ground_storey_floor_above_water_m": 4.0,
+   "bridge_length_m": 42.0,
+   "bridge_pitch_deg": 0.0,
+   "shore_end_gap_m": 0.0,
+   "float_end_gap_m": 0.0,
+   "segment_overlaps_m": [
+    1.5,
+    1.5
+   ],
+   "hinge_clear_above_water_m": 4.0,
+   "plaza_levels_under_water": [],
+   "plaza_levels_dry": [
+    4.5,
+    3.5,
+    2.5,
+    1.5,
+    0.5
+   ],
+   "roof_z": 25.0
+  },
+  "high": {
+   "water_z": 3.0,
+   "float_top_z": 7.0,
+   "float_bottom_z": 0.0,
+   "freeboard_m": 4.0,
+   "ground_storey_floor_above_water_m": 4.0,
+   "bridge_length_m": 42.107,
+   "bridge_pitch_deg": 4.09,
+   "shore_end_gap_m": 0.0,
+   "float_end_gap_m": 0.0,
+   "segment_overlaps_m": [
+    1.446,
+    1.446
+   ],
+   "hinge_clear_above_water_m": 1.0,
+   "plaza_levels_under_water": [
+    2.5,
+    1.5,
+    0.5
+   ],
+   "plaza_levels_dry": [
+    4.5,
+    3.5
+   ],
+   "roof_z": 28.0
+  },
+  "pillar_top_above_roof_high_m": 10.0,
+  "pillars": {
+   "NE": [
+    29.7,
+    29.7
+   ],
+   "NW": [
+    -29.7,
+    29.7
+   ],
+   "SW": [
+    -29.7,
+    -29.7
+   ],
+   "SE": [
+    29.7,
+    -29.7
+   ]
+  },
+  "slider_rail_face_r_m": 40.900000000000006
+ }
+}
