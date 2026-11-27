@@ -1,10 +1,10 @@
 # q05-park-cooling — Q05 公園降溫三態：目標圖與建築故事
 
 - Owner: repository owner
-- Status: Q05-A DONE（R2 owner 驗收，2026-11-27，已合併入 main）；B、C 未建模。
+- Status: Q05-A DONE（R2 owner 驗收，2026-11-27，已合併入 main）；Q05-B R1 已建，待 owner 評審（分支 `feat/q05b-breathing-leaf`）；C 未建模。
 - Branch: `feat/q05a-reverse-ac`（worktree `../city2127-q05a`），自 `origin/main` `bbec76c2`；目標圖記錄見舊分支 `docs/q05-targets`（已合併）。
 - Base commit: `bbec76c26a833a2a5ba24dfc42f3cee3f9a03c0c`
-- Last verified commit: `00f0cd75`（R2；檢查見下文 R2 一節）。
+- Last verified commit: `00f0cd75`（A R2）；B-R1 見分支 `feat/q05b-breathing-leaf` 最新提交（檢查見 B-R1 一節）。
 - Remote availability: 已合併入 `origin/main`（見下文 R2 verdict）；任務分支已刪除。
 
 ## Session Git state
@@ -213,3 +213,63 @@ place-building round for `q05a-reverse-ac`: worktree `/Users/fatboy/city2127-q05
 ## Next step after R2
 
 Q05-A 完成。下一步由 owner 決定先建 B（呼吸巨葉）還是 C（雪雲噴泉），以 `place-building` 開新會話；熱浪柱更似火焰、冷霧更濃兩點可留待日後打磨。
+
+## B-R1 brief（2026-11-27，Q05-B 呼吸巨葉）
+
+owner 指示：「do b modeling」。地塊、近鏡方位及台座沿用 A 的決定（NE PARK 48 × 48 m，台座半徑 24 m，近鏡由西南望）；尺寸按目標圖中 1.8 m 居民量度。
+
+| # | 目標圖 | 量度目標 |
+| --- | --- | --- |
+| 1 | 五片心形巨葉，比屋頂大 | 葉長 15–17.5 m、闊約葉長 1.0 倍（半闊 0.5）、兩片基部葉耳；葉頂約 22 m；四周最遠不出台座 2.5 m |
+| 2 | 發光葉脈 | 中脈連每邊七條彎側脈及葉耳脈，凸出葉面，萊姆綠發光（夜間清楚） |
+| 3 | 半透明綠莖，內有上升藍色水流 | 五支莖由根環升起、向外斜至葉柄；每支莖外側一條水色光線及三相水滴（執行時輪流亮起） |
+| 4 | 葉邊霧簾 | 只由葉的外緣垂下（不成雲），每 0.6 m 一條、闊 0.9–1.5 m，垂下約至地面以上 3 m 與葉緣之間的三至六成 |
+| 5 | 白色根環、水管 | 根環外半徑 6.8 m、高 1.9 m，水色光帶；三條白色水管伸至台座邊維修口 |
+| 6 | 葉下長椅、步石、小水道、樹林 | 半徑 13.6 m 彎曲長椅牆、長椅及居民、九塊步石、岩邊小溪及水池、外圈濃密樹林 |
+| 7 | 顏色 | 葉深綠；光線用水色 (0.40, 0.95, 0.88)，避開概念地塊 `#5fdcff` |
+
+## B-R1（2026-11-27，Q05-B 呼吸巨葉）
+
+### Git 狀態
+
+- 開始時 `main` 與 `origin/main` 同步於 `85507f20`，工作樹乾淨；`git fetch --prune origin` 成功。於主工作目錄開 `feat/q05b-breathing-leaf`（主工作目錄當時沒有其他會話的改動）。
+
+### 改動
+
+- **模型** `asset/models/q05b-breathing-leaf-2127/`：`build_breathing_leaf.py`（Blender 5.2 headless）、`.blend`、`.glb`（約 69k tris，2.6 MB）、`review_breathing_leaf.py`。內容見上表；葉片為 0.28 m 厚的實心葉（上面深綠、下面及邊較淺），葉脈 `q05b_vein`，水滴 `q05b_pulse_a/b/c`，霧簾 `q05b_mist_a/b`（256 條）。樹 25 棵，沿用 A 的 `leafy_tree` 加實心樹冠做法；蕨類用 `leaf_clump`。
+- **執行時** `src/breathingLeaf.ts`：只改發光強度（不轉不動）：水滴三相輪流亮（1.2 秒一輪，水沿莖上升），葉脈及兩組霧簾 5 秒一次呼吸，霧簾兩組反相；霧簾透明、不寫深度。不透明度留給地塊淡入淡出（`fadeFinishes`）。
+- **輪換**：`q05Model`（`rotationLayout.ts`，`lotRuntime.ts` 轉出）取代 `q05Tower`；`setQ05` B 時巨葉淡入，公園及共享庭園 1 淡出；A↔B 交叉淡變。`q05Swap` 改為 `changes`（B↔C 現在亦有可見變化）；`q05Shot` 飛向新出現的模型，否則飛向離開的模型；新近鏡 `q05:leaf` (−246, 27, −182) 望 (−210, 12, −135)；`ROTATION_VISITS.Q05.B`；結果卡暫定文案（B 地點「お台場海浜公園の呼吸する巨葉」，出現「…屋根より大きな葉をひろげる植物が育ち、葉のふちから落ちる霧で木陰が涼しくなりました。」，離開「…巨葉の植物が外れ、新しい涼しさを待つ公園に戻りました。」）。`questions.rotation.v1.json` Q05-B `modelId`；DEV 面板名「呼吸する巨葉」。
+- **DEV**：`?rotation&jump=Q05:B`（可逗號分隔多題）於載入時即時設定選項，供截圖。
+- **測試**：`tests/lotRuntime.test.ts`（`q05Model`、B 的 GLB：台座、範圍、高度、發光件不合批、霧簾透明、呼吸不動不透明度、水滴上升次序、霧簾反相；A→B→C 淡變；`q05Shot`／`q05Result`）、`tests/headlineCamera.test.ts`（近鏡數 32）、`survey/tests/rotation.test.ts`（「無模型」例子由 Q05-B 改用 Q05-C）。
+- **文件**：`PROJECT.md`、`QUESTION_ROTATION_PLAN.md`、`asset/models/LIBRARY.md`；變化總覽已重生（Q05 未有近鏡畫格）。
+
+### 自評（`~/city2127-evidence/q05b/r1/`，3200 × 1800，`q05:leaf`）
+
+| # | 項目 | 結果 |
+| --- | --- | --- |
+| 1 | 心形巨葉 | 達到：五片大葉，前右及左兩片清楚見到心形葉耳，葉覆蓋大半個草地。後面三片較高，近鏡下似平頂傘，心形不及目標明顯。 |
+| 2 | 發光葉脈 | 達到：日間淺綠脈清楚，夜間萊姆綠發光明顯（`focal-night`）。 |
+| 3 | 莖及水流 | 大致達到：水色光線及水滴清楚；莖比目標粗而集中，未有目標的半透明感（莖為不透明淺綠）。 |
+| 4 | 葉邊霧簾 | 達到：霧簾只在葉外緣垂下，日間呈白色條狀簾，夜間更明顯；未成雲。 |
+| 5 | 根環、水管 | 達到：白色根環連水色光帶、三條白色水管伸向近鏡。 |
+| 6 | 長椅、步石、小溪、樹林 | 大致達到：長椅牆、居民、步石及樹林清楚；小溪在近鏡左方被樹及霧遮去大半。 |
+| 7 | 顏色 | 未足：日間葉色仍偏淺綠（城市天光令葉面反光），目標為深綠；夜間接近目標。 |
+
+### 檢查
+
+- 單元：`tests/lotRuntime.test.ts`、`tests/headlineCamera.test.ts`、`tests/assetLibrary.test.ts` 通過；`survey` `npm test` EXIT 0。
+- `npm run build`（根目錄）通過；`survey` `npm run build` 先因本機缺 `@mediapipe/tasks-vision` 失敗，`npm ci` 補裝後通過（lockfile 早已列出，非本輪改動）。`git diff --check` 通過。
+- 根目錄 `npm test` 通過（2026-11-27，EXIT 0，記錄 `~/city2127-evidence/q05b/r1/npm-test.log`）。
+- 瀏覽器（Vite 5186，`?rotation&jump=Q05:B&shot=q05:leaf`）：page error 0；`lots` 診斷 `breathingLeaf: 1`、`reverseAc: 0`。
+- FPS：未量度（`fps.sh` 只跑 `?meters`，巨葉不會出現）。headless 截圖的 data-fps 為 20–33，只作參考。
+
+### 待 owner 決定
+
+- 日間葉色是否要更深（可加高葉面粗糙度減少天光反光，或再壓暗基色）。
+- 後排三片葉是否降低或加大傾角，令心形更明顯；莖是否改為半透明、較幼。
+- 結果卡文案及 `q05:leaf` 近鏡角度（皆為暫定）。
+- 之後建 C（雪雲噴泉）。
+
+## B-R2 round prompt（下一輪會話）
+
+place-building round for `q05b-breathing-leaf`: main checkout branch `feat/q05b-breathing-leaf`, read `docs/handoffs/q05-park-cooling.md`. Owner verdict on B-R1: «…»

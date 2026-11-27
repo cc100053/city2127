@@ -1,6 +1,7 @@
 // DEV-only `?rotation` panel: the nine rotation questions × three options. Pressing an option plays one simulated guest who chooses it
 // (src/devRotation.ts): the vote orb, the camera flying to its lot, the model transition and the result card, exactly as a live result.
 // 「即時」 instead sets it at once and pins that option's close-up. Options without a model fly to the concept-lot hologram.
+// `&jump=Q05:B,Q03:A` sets options at once on load (review captures; add `&shot=` for the camera).
 import type { CityView, SurveyEventKind } from './surveyView.ts';
 import { DISPLAY_MS } from '../survey/src/shared/displayTiming.ts';
 import { localRotationRun, ROTATION_SET } from './devRotation.ts';
@@ -12,6 +13,7 @@ const MODEL_NAMES: Record<string, string> = {
   'q02a-hydro-terrace': '水の棚田', 'bay-flower-receiver': '湾の花', 'rectenna-farm-canopy': '受電テラス農園',
   'drawer-housing-2127': '車抽屜住宅', 'pod-frame-tower-2127': '蛋艙塔', 'event-shelf-2127': '活動モジュール棚',
   'q05a-reverse-ac-2127': '逆向き冷房塔',
+  'q05b-breathing-leaf-2127': '呼吸する巨葉',
 };
 
 type Emit = (kind: SurveyEventKind, view: CityView, displayMs?: number) => void;
@@ -19,7 +21,10 @@ type Emit = (kind: SurveyEventKind, view: CityView, displayMs?: number) => void;
 export function mountRotationPanel(emit: Emit, onStatus: (text: string) => void, shot: (id: string) => void, show = true) {
   const run = localRotationRun();
   onStatus('DEV ローカル（サーバーなし）');
-  emit('city-state-snapshot', run.snapshot());
+  const jumps = new URLSearchParams(location.search).get('jump')?.split(',').map(pair => pair.split(':')) ?? [];
+  let start = run.snapshot();
+  for (const [q, o] of jumps) if (ROTATION_SET.questions.some(x => x.id === q && x.options.some(y => y.id === o))) start = run.jump(q, o);
+  emit('city-state-snapshot', start);
   Object.assign(window, { cityRotation: (questionId: string, optionId: string) => emit('city-state-updated', run.play(questionId, optionId), DISPLAY_MS) });
   if (!show) return;
 

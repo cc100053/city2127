@@ -131,41 +131,54 @@ export function q06Result(swap: { from: string; to: string }) {
 /** The Q06 headline shot: the tower's close-up when it enters or leaves; none (stay at hero) when A↔C leaves the lot empty. */
 export const q06Shot = (swap: { tower: boolean }): ShotId | null => swap.tower ? 'q06:tower' : null;
 
-/** Q05 (question rotation, park cooling, owner 2026-11-26): its three options share the NE PARK lot. A is the reverse air conditioner,
- *  which stands on its own cooled lawn in place of the NE park; B (breathing giant leaf) and C (snow-cloud fountain) have no model yet,
- *  so the NE park stays for them. Provisional result copy from the building stories (docs/handoffs/q05-park-cooling.md; owner copy
- *  pending, plan 5.2): option → [place, preference]; the effect depends on whether the tower arrived, left or the park stayed (q05Result). */
+/** Q05 (question rotation, park cooling, owner 2026-11-26): its three options share the NE PARK lot. A is the reverse air conditioner
+ *  on its own cooled lawn and B the breathing giant leaf on its own shaded lawn, each standing in place of the NE park; C (snow-cloud
+ *  fountain) has no model yet, so the NE park stays for it. Provisional result copy from the building stories
+ *  (docs/handoffs/q05-park-cooling.md; owner copy pending, plan 5.2): option → [place, preference]; the effect depends on which model
+ *  arrived or left (q05Result). */
 export const Q05_RESULTS: Readonly<Record<string, readonly [string, string]>> = {
   A: ['お台場海浜公園の逆向き冷房塔', 'あなたは、機械で熱を空へ運び出す涼しさを選びました。'],
-  B: ['お台場海浜公園', 'あなたは、植物の呼吸がつくる涼しさを選びました。'],
+  B: ['お台場海浜公園の呼吸する巨葉', 'あなたは、植物の呼吸がつくる涼しさを選びました。'],
   C: ['お台場海浜公園', 'あなたは、街が天気をつくる涼しさを選びました。'],
 };
 
-/** A rotation proposal's Q05 swap, or undefined. `tower` is whether the reverse air conditioner enters or leaves (B↔C changes nothing visible). */
+/** Q05 option → which model stands on the NE PARK lot in place of the NE park: A the reverse air conditioner, B the breathing giant
+ *  leaf; C (not built yet) and no or an unknown option keep the version4 park. */
+export const q05Model = (option: string | undefined): 'tower' | 'leaf' | undefined =>
+  option === 'A' ? 'tower' : option === 'B' ? 'leaf' : undefined;
+
+/** A rotation proposal's Q05 swap, or undefined. `changes` is whether the lot shows something new (A↔B, A↔C, B↔C all do while C
+ *  keeps the park). */
 export function q05Swap(proposal: ExhibitionProposal) {
   const outcome = proposal.rotation?.outcome;
   if (outcome?.kind !== 'swap' || outcome.questionId !== 'Q05' || !Q05_RESULTS[outcome.to] || !Q05_RESULTS[outcome.from]) return undefined;
-  return { from: outcome.from, to: outcome.to, tower: (outcome.from === 'A') !== (outcome.to === 'A') };
+  return { from: outcome.from, to: outcome.to, changes: q05Model(outcome.from) !== q05Model(outcome.to) };
 }
 
-/** The result card for a Q05 swap: the tower arriving, leaving, or the park staying as it is for a facility still to come. */
+/** The result card for a Q05 swap: the tower or the leaf arriving, or one leaving for the park still waiting for its facility. */
 export function q05Result(swap: { from: string; to: string }) {
   const [place, preference] = Q05_RESULTS[swap.to];
-  const effect = swap.to === 'A' ? 'お台場海浜公園に、地面の熱を吸い込んで空へ噴き上げる塔が立ち、塔の下の芝生が涼しくなりました。'
-    : swap.from === 'A' ? 'お台場海浜公園から逆向き冷房塔が外れ、新しい涼しさを待つ公園に戻りました。'
+  const to = q05Model(swap.to), from = q05Model(swap.from);
+  const effect = to === 'tower' ? 'お台場海浜公園に、地面の熱を吸い込んで空へ噴き上げる塔が立ち、塔の下の芝生が涼しくなりました。'
+    : to === 'leaf' ? 'お台場海浜公園に、屋根より大きな葉をひろげる植物が育ち、葉のふちから落ちる霧で木陰が涼しくなりました。'
+    : from === 'tower' ? 'お台場海浜公園から逆向き冷房塔が外れ、新しい涼しさを待つ公園に戻りました。'
+    : from === 'leaf' ? 'お台場海浜公園から巨葉の植物が外れ、新しい涼しさを待つ公園に戻りました。'
     : 'お台場海浜公園は、新しい涼しさの仕組みを待っています。';
   return { place, effect, preference };
 }
 
-/** The Q05 headline shot: the tower's close-up when it enters or leaves; none (stay at hero) when B↔C leaves the park as it is. */
-export const q05Shot = (swap: { tower: boolean }): ShotId | null => swap.tower ? 'q05:tower' : null;
+/** The Q05 headline shot: the close-up of the model that arrives, or of the one that leaves for the park; none when nothing changes. */
+export function q05Shot(swap: { from: string; to: string; changes: boolean }): ShotId | null {
+  if (!swap.changes) return null;
+  return (q05Model(swap.to) ?? q05Model(swap.from)) === 'leaf' ? 'q05:leaf' : 'q05:tower';
+}
 
 /** Plan 3.4: what the guest's answer already shows at a visited site (a model that stands there): its headline shot and card place. */
 export const ROTATION_VISITS: Readonly<Record<string, Readonly<Record<string, { shot: ShotId; place: string }>>>> = {
   Q01: { A: { shot: 'nw:focal-low', place: 'デックス西 AUTO HUB' }, B: { shot: 'nw:focal', place: 'デックス西 AUTO HUB' }, C: { shot: 'nw:focal', place: 'デックス西 AUTO HUB' } },
   Q02: Object.fromEntries(Object.entries(Q02_RESULTS).map(([option, [place]]) => [option, { shot: Q02_SHOTS[option], place }])),
   Q03: { A: { shot: 'q03:housing', place: Q03_RESULTS.A[0] } },
-  Q05: { A: { shot: 'q05:tower', place: Q05_RESULTS.A[0] } },
+  Q05: { A: { shot: 'q05:tower', place: Q05_RESULTS.A[0] }, B: { shot: 'q05:leaf', place: Q05_RESULTS.B[0] } },
   Q06: { B: { shot: 'q06:tower', place: Q06_RESULTS.B[0] } },
   Q08: { C: { shot: 'sw:focal', place: Q08_RESULTS.C[0] } },
 };
@@ -177,7 +190,7 @@ export const ROTATION_VISITS: Readonly<Record<string, Readonly<Record<string, { 
  */
 export function conceptVisit(proposal: ExhibitionProposal) {
   const outcome = proposal.rotation?.outcome;
-  if (!outcome || rotationVisit(proposal) || q01Swap(proposal) || q02Swap(proposal) || q03Swap(proposal)?.housing || q05Swap(proposal)?.tower || q06Swap(proposal)?.tower || q08Swap(proposal)?.shelf) return undefined;
+  if (!outcome || rotationVisit(proposal) || q01Swap(proposal) || q02Swap(proposal) || q03Swap(proposal)?.housing || q05Swap(proposal)?.changes || q06Swap(proposal)?.tower || q08Swap(proposal)?.shelf) return undefined;
   const answer = proposal.answers.find(item => item.questionId === outcome.questionId);
   return answer && { questionId: answer.questionId, optionId: answer.optionId, label: answer.optionLabel, shot: 'concept:lot' as ShotId };
 }

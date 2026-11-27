@@ -123,7 +123,7 @@
         {
           "id": "B",
           "label": "植物に涼しさをつくってもらう。",
-          "modelId": null,
+          "modelId": "q05b-breathing-leaf-2127",
           "lotId": "ne-park"
         },
         {
