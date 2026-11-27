@@ -480,6 +480,50 @@ owner 指示：「do b modeling」。地塊、近鏡方位及台座沿用 A 的�
 
 - 霧是否要更白更密（如目標），以及後方高葉的霧簾是否減少以免出現圓筒輪廓。
 
-## B-R6 round prompt（下一輪會話）
+## B-R5 verdict
 
-place-building round for `q05b-breathing-leaf`: main checkout `/Users/fatboy/city2127`, branch `feat/q05b-breathing-leaf`, read `docs/handoffs/q05-park-cooling.md` (its `## B-R5 brief` and `## B-R5` sections). Owner verdict on B-R5: «…»
+«好，加飄落效果，霧再白啲密啲»
+
+## B-R6 brief
+
+| # | owner 原話 | 現況（B-R5） | 本輪做法（3200 × 1800，`q05:leaf`，日 12 時及夜 21 時） |
+| --- | --- | --- | --- |
+| 1 | 加飄落效果 | 霧簾靜止；只有 emissive 呼吸，細絲 alpha 貼圖固定 | 把霧拆成兩層：靜態包絡（葉緣柔和、兩側及近地面淡出）改為頂點 alpha，由第一套 UV 於執行時計算；細絲貼圖改為上下左右皆可平鋪，經第二套以米計的 UV（每 6 m 重複一次）讀取，於既有 motion 閉包內每幀把貼圖 offset 向下捲動 1.5 m/s（霧而非瀑布）。呼吸仍只改 emissive，不動 opacity。 |
+| 2 | 霧再白啲密啲 | 132 幅霧簾、約每 1.1 m 一幅；alpha 0.45、emissive 0.25，比目標淡 | 前方葉緣約每 0.75 m 一幅；alpha 0.48（仍 < 0.5）、emissive 0.55 並偏白；細絲貼圖增益及對比提高，強度主要來自貼圖。 |
+| 3 | （B-R5 未足） | 後方兩塊高葉的霧簾在亮背景前隱約見圓筒輪廓及側邊直線 | 後方兩葉霧簾減為約每 1.3 m 一幅、長度六成；包絡另按霧簾法線與近鏡方向 `CAM` 的夾角淡出側面向鏡頭的霧簾。 |
+
+## B-R6（2026-11-28，Q05-B 呼吸巨葉）
+
+### Git 狀態
+
+- 開始時 `feat/q05b-breathing-leaf` 與遠端同步於 `4925eafd`，工作樹乾淨，`git fetch` 成功。
+
+### 改動
+
+- `build_breathing_leaf.py` `mist()`：霧簾共 153 幅（前方葉緣約每 0.75 m 一幅，後方兩高葉約每 1.3 m 一幅、垂長六成）；每幅 7 × 7 頂點；第一套 UV（`UVMap`）為 0→1 的 (橫, 縱)，第二套 UV（`UVThreads`，glTF `TEXCOORD_1`）橫向隨機鏡像、縱向以 `MIST_TILE` = 6 m 為一次重複並帶每幅不同的起始相位。霧物料 alpha 0.45 → 0.48、emissive 0.25 → 0.55、顏色更白。
+- `src/breathingLeaf.ts`：`breathingLeafMistAlpha()` 改為 256 × 256、雙向平鋪的細絲短段貼圖（`RepeatWrapping`，`channel = 1`）；新增 `breathingLeafMistEnvelope()`（兩側、葉緣、近地面及側向鏡頭淡出）寫入霧網格的 `color`（vec4，白色 rgb，`vertexColors`）；新增 `breathingLeafMistFall()`，motion 閉包每幀設定共用貼圖的 `offset.y`，令兩組霧同速向下飄落。lot fade 複製物料時共用同一貼圖，故捲動不受影響。
+- `tests/lotRuntime.test.ts`：霧網格須有 vec4 頂點 alpha、`uv1` 及 `channel = 1` 的貼圖；包絡於兩側、地面及側向鏡頭時為 0；motion 推進時貼圖 offset 向下，而 opacity 不變。
+- 模型約 112k tris，GLB 3.6 MB。
+
+### 自評（`~/city2127-evidence/q05b/r6/`）
+
+| # | 項目 | 結果 |
+| --- | --- | --- |
+| 1 | 加飄落效果 | 達到（機制）：細絲沿霧簾向下捲動，淡出包絡保持不動（`fall-keyframes.jpg`，reviewTime 20.0 / 20.6 / 21.2 / 21.8）。未足：靜態截圖中細絲移動只見紋理位移，方向須在實機動態中由 owner 確認。 |
+| 2 | 霧再白啲密啲 | 大致達到：左前方霧簾明顯更白更密，仍透出後面樹木，細絲可見（`r5-vs-r6.jpg`、`mist-closeup.jpg`）。第二輪曾把增益及 emissive 推得太高，霧變成發光霧團，第三輪已回調。未足：目標中霧簾環繞所有葉緣，本模型右方兩葉下霧簾仍少（多被樹冠遮擋或因側向鏡頭而淡出），整體覆蓋仍比目標少（`target-vs-r6.jpg`）。 |
+| 3 | 後葉圓筒輪廓 | 達到：後方兩葉不再見圓筒輪廓及側邊直線，只餘淡淡細絲（`focal-day.jpg`、`focal-night.jpg`）。 |
+
+### 檢查
+
+- 單元：`tests/lotRuntime.test.ts` 通過。根目錄 `npm test`、`npm run build`、`git diff --check` 見 `~/city2127-evidence/q05b/r6/npm-test.log` 及提交前記錄。
+- 瀏覽器（Vite 5186）：三輪 capture-compare（pass1 機制確認：包絡生效、後葉輪廓消失，但霧仍淡 → pass2 增益及 emissive 過高成發光霧團 → pass3 回調至白而有細絲）。
+- FPS：未量度；headless data-fps 約 36–38（日夜），只作參考。
+
+### 待 owner 決定
+
+- 飄落速度（現為 1.5 m/s）是否合適。
+- 右方兩葉下是否要加霧簾，令覆蓋更接近目標。
+
+## B-R7 round prompt（下一輪會話）
+
+place-building round for `q05b-breathing-leaf`: main checkout `/Users/fatboy/city2127`, branch `feat/q05b-breathing-leaf`, read `docs/handoffs/q05-park-cooling.md` (its `## B-R6 brief` and `## B-R6` sections). Owner verdict on B-R6: «…»
