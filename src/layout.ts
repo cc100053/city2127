@@ -24,10 +24,21 @@ export const guidewayTracks: readonly (readonly P3[])[] = [
   [[-199,14.2,473],[-216,14.2,454],[-231,14.2,434],[-246,14.2,414],[-259,14.2,393],[-273,14.2,372],[-287,14.2,351],[-301,14.2,330],[-315,14.2,310],[-328,14.2,289],[-342,14.2,268],[-352,14.2,245],[-358,14.2,220],[-357,14.2,195],[-349,14.2,171],[-336,14.2,150],[-318,14.2,133],[-297,14.2,119],[-277,14.2,105],[-256,14.2,91],[-235,14.2,77],[-214,14.2,63],[-194,14.2,49],[-172,14.2,36],[-151,14.2,22],[-130,14.2,8],[-110,14.2,-5],[-89,14.2,-19],[-68,14.2,-33],[-47,14.2,-47],[-26,14.2,-61],[-6,14.2,-75],[15,14.2,-89],[36,14.2,-103],[57,14.2,-117],[78,14.2,-130],[98,14.2,-144],[119,14.2,-158],[140,14.2,-172],[161,14.2,-186],[181,14.2,-200],[202,14.2,-214],[222,14.2,-229],[243,14.2,-243],[264,14.2,-256],[284,14.2,-271],[305,14.2,-285],[326,14.2,-299],[347,14.2,-313],[368,14.2,-326],[388,14.2,-340],[409,14.2,-354],[430,14.2,-368],[451,14.2,-382],[470,14.2,-397],[481,14.2,-408]],
 ];
 // Seaside promenades, traced on open ground 10–40 m inland of the north shore: east from DECKS to the park, west from the park to Hilton.
-// The park lot reaches the revetment, so walkers turn back at it instead of crossing.
+// The park lot reaches the revetment, so walkers turn back at it instead of crossing; the boardwalk itself runs on to the lot's ring
+// walk (promenadeTails).
 export const promenades: readonly (readonly P3[])[] = [
   [[1,0,-318],[3,0,-296],[-14,0,-269],[-43,0,-260],[-62,0,-250],[-86,0,-228],[-118,0,-207],[-148,0,-191],[-178,0,-173]],
   [[-259,0,-145],[-273,0,-123],[-288,0,-92],[-310,0,-76],[-347,0,-54],[-375,0,-33],[-411,0,-14],[-427,0,6]],
+];
+/** Boardwalk-only tails (Q05-C R3, owner 2026-11-28: «fix the red circle broken road»): each promenade's boardwalk and lit edge lines
+ *  run on from its end to the outer edge of the NE PARK lot's shared ring walk (asset/models/q05-park-surround-2127, r 24.3–27.3 m round
+ *  (−210, −135)), rising to just under the walk top (0.42 m), so the seaside walk reads continuous via the ring's north arc. East: from
+ *  the east promenade's end, radially in at 309° (the surround's north-east link gives way to it); west: from the west promenade's
+ *  start, curving in at 196°, clear of the utility block's gap (150°–180°). Walkers keep to `promenades` (no walker lane may enter the
+ *  lot's ±21 m box). The surround keeps these footprints clear; tests/lotRuntime.test.ts checks it. */
+export const promenadeTails: readonly (readonly P3[])[] = [
+  [[-178,0,-173],[-181.83,0,-169.79],[-189.23,.16,-160.65],[-193.45,.36,-155.44]],
+  [[-259,0,-145],[-256.31,0,-149.22],[-248.6,.04,-148.7],[-240.76,.2,-143.82],[-235.28,.36,-142.25]],
 ];
 // Street network stage 1 (owner 2026-11-04, artifacts/street-kit-closeup-polish/network-stage1.md): one U route, the street kit's carriageway
 // centre (section A, src/streetKit.ts), traced every ~10 m from the live scene. It runs the guideway avenue ② from its east end west, 4 m north

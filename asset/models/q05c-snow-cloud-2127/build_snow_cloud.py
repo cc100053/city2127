@@ -20,6 +20,8 @@ R2 (2026-11-28): fluffier cumulus (smaller lumpy puffs, edge wisps) with its wai
 (raised at night by the runtime), blue-shadowed snowfield and frost, larger flakes.
 R2b (2026-11-28): the two paths turn to the shared park surround's north-west and south-east link walks (Q05-A's bearings) and
 the grove leaves all four of its gates open.
+R3 (2026-11-28): a flatter, wider cloud (base 17 m, top ~27.5 m, widest just over the ring instead of a cap 5 m above it), a
+bluer snowfield, and a planted plinth: lawn round the near side with a hedge, white-rimmed beds (`terrace_bed`), green path edges.
 """
 import math
 import os
@@ -38,17 +40,21 @@ CAM = -2.22                                     # azimuth of the q05 close-up ca
 SNOW_R = 9.5                                    # snowfield
 CHANNEL_R, CHANNEL_W = 13.5, 1.4                # meltwater ring channel
 RING_R, RING_Y, RING_T = 12.0, 19.5, .55        # launch ring: radius, height, tube radius
-CLOUD_BASE = 16.5
+CLOUD_BASE = 17.0
+CLOUD_RX, CLOUD_H = 12.0, 10.5                 # R3: flat dome, widest (~12 m) just over the ring
 # R2: the cloud's waist stays inside the ring (tube inner edge 11.45 m, 0.85 m clear) up to WAIST_Y; only billows whose underside
 # is above it may bulge out over the ring, so the ring's whole front half reads wrapped round the cloud (target).
 WAIST_Y, WAIST_R = RING_Y + 1.5, RING_R - RING_T - .85
-# Cloud recipe (cumulus layers, x rx = 14.5 / x h = 14.5): a squashed underside, the waist band, a solid core (hides the snow
-# stacks' top), the wide billows above the ring and a cauliflower crown; puffs 1.4-3.4 m so none reads as a separate ball.
-CLOUD_LAYERS = ((.24, 0.0, .48, .02, .16, .14, .21, .70),
-                (.18, .38, .62, .18, .36, .10, .14, .90),
-                (.10, 0.0, .32, .26, .56, .20, .24, .95),
-                (.30, .42, .80, .55, .74, .16, .24, .88),
-                (.18, 0.0, .48, .72, .88, .15, .23, .95))
+# Cloud recipe (cumulus layers, x rx = CLOUD_RX / x h = CLOUD_H): a squashed underside, the waist band filling the ring, a solid
+# core (hides the snow stacks' top), the wide billows whose undersides clear WAIST_Y so they spread just over the ring, and a low
+# rounded crown; puffs 1.4-3.1 m so none reads as a separate ball. R3: the R2 recipe (rx 14.5, h 14.5) put its widest billows 5 m
+# over the ring on a narrow waist, a mushroom; the target's cloud is about twice as wide as it is tall, the ring at its lower third.
+CLOUD_LAYERS = ((.20, 0.0, .62, .02, .12, .14, .22, .62),
+                (.20, .45, .74, .14, .34, .14, .22, .90),
+                (.10, 0.0, .40, .22, .50, .20, .26, .95),
+                (.32, .55, .74, .54, .70, .13, .20, .78),          # pass 3: cap only ~0.7 m past the waist
+                (.18, 0.0, .55, .62, .78, .17, .24, .92),
+                (.10, .50, .70, .40, .52, .14, .20, .85))          # pass 2: fills the step between waist and billows
 # Screen left of the close-up is +azimuth. The pumps and the main stand at the near left (as in the target), the spillway at
 # the near front, the grove round the back so the falling snow reads against dark green.
 PUMP = CAM + .95
@@ -75,7 +81,7 @@ Q05C_ROLES = {                                                    # build-only r
     'ice': ((.86, .95, 1, 1), (.70, .88, 1, 1), 1.8),               # ice-white light bands on pipes and ring
     'pipe': ((.95, .96, .96, 1), None, .5),                         # white pipes, ring, pumps
     'pipe_b': ((.80, .82, .84, 1), None, .5),                       # flanges, pump details
-    'snowfield': ((.97, .98, 1, 1), (.80, .87, 1, 1), .04),         # snow x vertex colours: blue shadows (R2), barely self-lit
+    'snowfield': ((.90, .94, 1, 1), (.80, .87, 1, 1), .04),         # snow x vertex colours: blue shadows (R2, R3 bluer), barely self-lit
     'frost': ((.30, .44, .68, 1), None, .5),                        # blue frost halo, the cold shadow round the snow (R2)
     'fog': ((.94, .97, 1, .07), (.85, .90, .96, 1), .15),            # cold ground fog (runtime: alpha, breathing)
     'water': ((.16, .50, .70, 1), (.10, .36, .52, 1), .5),          # channel water
@@ -162,7 +168,7 @@ def ground(ctx):
 def snow_shade(acc, rng):
     """Snowfield vertex colours (R2): light blue-white on the drift tops and the open middle, blue shadows in the hollows
     between drifts, toward the edge and in a few soft cloud-shadow patches, so the falling white snow reads against it."""
-    light, shadow = (.80, .87, 1.0), (.34, .48, .84)
+    light, shadow = (.68, .79, 1.0), (.30, .44, .86)                         # R3: both ends bluer (day B-R was 10)
     blots = [(rng.uniform(-6, 6), rng.uniform(-6, 6), rng.uniform(2.0, 3.5)) for _ in range(5)]
     cols = []
     for x, y, z in acc.v:                                                    # Blender coords: height is z
@@ -287,11 +293,11 @@ def cloud(ctx):
     cauliflower top; a translucent haze shell softens the edge. Vertex colour (cloud only): white top, blue-grey underside."""
     a, rng = ctx.a, ctx.rng
     waist = (WAIST_Y, WAIST_R)
-    M.cumulus(a['cloud'], (0, CLOUD_BASE, 0), 14.5, 14.5, rng, puffs=240, n=12, m=6, layers=CLOUD_LAYERS, lumps=.2, wisps=60,
-              waist=waist)
-    M.cumulus(a['haze'], (0, CLOUD_BASE - .2, 0), 14.5, 14.7, random.Random(7), puffs=60, swell=1.05, n=12, m=6,
+    M.cumulus(a['cloud'], (0, CLOUD_BASE, 0), CLOUD_RX, CLOUD_H, rng, puffs=240, n=12, m=6, layers=CLOUD_LAYERS, lumps=.2,
+              wisps=60, waist=waist)
+    M.cumulus(a['haze'], (0, CLOUD_BASE - .2, 0), CLOUD_RX, CLOUD_H + .2, random.Random(7), puffs=60, swell=1.05, n=12, m=6,
               layers=CLOUD_LAYERS, lumps=.2, waist=waist)
-    lo, hi = CLOUD_BASE, CLOUD_BASE + 12.5
+    lo, hi = CLOUD_BASE, CLOUD_BASE + 9.0
     under, top = (.50, .57, .70), (1, 1, 1)
     cols = []
     for v in a['cloud'].v:                                                   # Blender coords: height is v[2]
@@ -372,7 +378,51 @@ def greenery(ctx):
         for q in (-1.2, 0, 1.2):
             M.leaf_clump(ctx, (21.0 * c - s * q, 1.6, 21.0 * s + c * q), (1.0, .7, 1.0), roles=('leaf_l', 'green'), core='green',
                          n=30, size=.42, droop=.5, lobes=2)
+    plinth_green(ctx, clear)
     return trees
+
+
+def plinth_green(ctx, clear):
+    """R3 (target's green terraces): lawn round the near half of the plinth rim with a low hedge on its outer edge, single-tier
+    white-rimmed beds between the benches and the lawn, and green edges along both paths; all low (<= 1.2 m), so the close-up
+    still sees the snowfield, and off the gates, pumps and spillway."""
+    a = ctx.a
+    runs, cur = [], None                                                     # lawn sectors, broken at the gates
+    gaps = [(p, .075) for p in GATES] + [(SPILL, .07), (PUMP, .25)]           # path half-width, spillway, pump footprint
+    for i in range(241):
+        ang = CAM - 1.2 + 2.4 * i / 240
+        if all(ang_gap(ang, p) > g for p, g in gaps):
+            cur = [ang, ang] if cur is None else [cur[0], ang]
+        elif cur:
+            runs.append(cur)
+            cur = None
+    if cur:
+        runs.append(cur)
+    for a0, a1 in runs:
+        if a1 - a0 > .05:
+            annulus(a['lawn'], 19.4, PLINTH_R - .7, .505, max(4, int((a1 - a0) * 60)), a0, a1)
+    for i in range(48):                                                      # hedge along the lawn's outer edge, and a lower
+        ang = CAM - 1.2 + 2.4 * i / 47                                       # broken one along its inner edge (pass 3)
+        if clear(ang, .2):
+            M.leaf_clump(ctx, polar(22.6, ang, .85), (.95, .55, .95), roles=('leaf_l', 'green'), core='green', n=24, size=.4,
+                         droop=.5, lobes=2)
+        if i % 2 and clear(ang, .24):
+            M.leaf_clump(ctx, polar(19.9, ang, .75), (.7, .4, .7), roles=('leaf_l', 'green'), core='green', n=20, size=.34,
+                         droop=.5, lobes=2)
+    for off in (-1.15, -.8, -.45, .45, .75, 1.1):                            # white-rimmed beds inside the lawn
+        ang = CAM + off
+        if clear(ang, .28):
+            M.terrace_bed(ctx, ang, 17.1, 4.6, 1.9, tiers=1, y0=.48, rim='pipe', ground='lawn')
+    for path in PATHS:                                                       # green edges along both paths
+        c, s = math.cos(path), math.sin(path)
+        for side in (-1, 1):
+            r0, r1 = CHANNEL_R + 1.0, PLINTH_R - 1.0
+            mid, off = (r0 + r1) / 2, side * 2.1
+            obox(a['lawn'], (mid * c - s * off, .51, mid * s + c * off), (r1 - r0, .06, 1.1), (c, s), (-s, c))
+            for j in range(6):
+                r = r0 + .8 + j * (r1 - r0 - 1.6) / 5
+                M.leaf_clump(ctx, (r * c - s * off, .8, r * s + c * off), (.6, .45, .6), roles=('leaf_l', 'green'), core='green',
+                             n=20, size=.34, droop=.5, lobes=2)
 
 
 def residents(ctx):

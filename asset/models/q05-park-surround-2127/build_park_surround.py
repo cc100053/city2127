@@ -1,7 +1,10 @@
 """Q05 shared park surround (owner 2026-11-28, C-R2b: «一個共通周邊», «常駐，四個狀態都見»): the ground round the NE PARK
 lot's 24 m plinth, the same whichever Q05 model (or the default NE park) stands on it. A paved walk rings the plinth and four
 link walks tie it to the city on the bearings of Q05-A's four paths: the seaside promenade paving to the north-east and
-north-west, avenue (1)'s outside footway to the south-east and the pod-tower drive to the south-west. Between them planted
+north-west, avenue (1)'s outside footway to the south-east and the pod-tower drive to the south-west. C-R3 (owner 2026-11-28,
+«fix the red circle broken road»): the seaside promenade's boardwalk itself now runs on to the ring walk at two tails
+(`promenadeTails` in src/layout.ts, drawn by src/skyways.ts); the north-east tail takes the north-east link's place, and the
+bank, kerb, trees, beds, benches and lamps keep clear of both. Between them planted
 banks, white-rimmed terrace beds, faceted park trees (tall on the far side, low toward the close-up cameras), benches facing
 the plinth, ice-white lamps and residents. Measurements: docs/handoffs/q05-park-cooling.md `## C-R2b brief`.
 
@@ -35,13 +38,17 @@ BANK_GAP = (146 * D, 184 * D)
 NORTH = (-125 * D, -60 * D)                     # the bank is paved here, sloping onto the seaside promenade paving (y -0.19)
 # Link walks: polylines (x, z) from the ring's outer edge to the city, with the end height they land on. Bearings are Q05-A's.
 LINKS = {
-    'ne': ([(19.3, -19.3), (20.4, -22.6), (21.0, -26.5), (21.2, -31.0)], -.19),   # promenade paving (north-east)
     'nw': ([(-19.3, -19.3), (-20.4, -21.4), (-21.6, -24.2)], -.19),             # promenade paving (north-west)
     'se': ([(17.5, 20.9), (19.2, 23.0), (20.6, 24.8)], .23),                   # avenue (1) outside footway (50 deg: clear of
                                                                                 # the lamp mast at (24, 20))
     'sw': ([(-19.3, 19.3), (-20.8, 23.5), (-22.4, 28.0), (-23.4, 32.4)], .19),   # pod-tower drive's north edge
 }
 LINK_HALF = 1.5
+# C-R3: the promenade boardwalk tails (src/layout.ts `promenadeTails` minus the lot centre (-210, -135); keep both in step,
+# tests/lotRuntime.test.ts reads the layout copy), 7.2 m wide; TAIL_CLEAR is the keep-out half-width round their centre lines.
+TAILS = ([(32.0, -38.0), (28.17, -34.79), (20.77, -25.65), (16.55, -20.44)],
+         [(-49.0, -10.0), (-46.31, -14.22), (-38.6, -13.7), (-30.76, -8.82), (-25.28, -7.25)])
+TAIL_CLEAR = 3.6 + 1.0
 
 ROLES_S = {
     'walk': ((.82, .81, .77, 1), None, .5),                     # pale ceramic paving (the plinths' family, a touch lighter)
@@ -125,13 +132,37 @@ def link_bearings():
     return [math.atan2(p[0][1], p[0][0]) for p, _ in LINKS.values()]
 
 
+def tail_bearings():
+    return [math.atan2(t[-1][1], t[-1][0]) for t in TAILS]
+
+
+TAIL_CUT = 9 * D                                # bank and kerb opening round each tail's bearing (7.2 m at r 27.3 is +-7.6 deg)
+
+
+def tail_gap(x, z):
+    """Plan distance from (x, z) to the nearer boardwalk tail centre line."""
+    best = math.inf
+    for t in TAILS:
+        for (x0, z0), (x1, z1) in zip(t, t[1:]):
+            dx, dz = x1 - x0, z1 - z0
+            u = max(0.0, min(1.0, ((x - x0) * dx + (z - z0) * dz) / (dx * dx + dz * dz)))
+            best = min(best, math.hypot(x - x0 - u * dx, z - z0 - u * dz))
+    return best
+
+
 def ground(ctx):
     """Ring walk with kerbs and seams, the planted (north: paved) bank round it, the four link walks."""
     a = ctx.a
     a0, a1 = GAP[1], GAP[0] + TAU
     n = 260
     arc_solid(a['walk'], [(R_IN, TOP), (R_OUT, TOP), (R_OUT, FOOT), (R_IN, FOOT)], a0, a1, n)
-    arc_solid(a['kerb'], [(R_OUT - .05, TOP + .07), (R_OUT + .22, TOP + .07), (R_OUT + .22, FOOT), (R_OUT - .05, FOOT)], a0, a1, n)
+    kerb = [(R_OUT - .05, TOP + .07), (R_OUT + .22, TOP + .07), (R_OUT + .22, FOOT), (R_OUT - .05, FOOT)]
+    marks = [a0]
+    for b in sorted(((b - a0) % TAU + a0 for b in tail_bearings())):            # open the kerb where a boardwalk tail lands
+        marks += [b - TAIL_CUT, b + TAIL_CUT]
+    marks.append(a1)
+    for m0, m1 in zip(marks[::2], marks[1::2]):
+        arc_solid(a['kerb'], kerb, m0, m1, max(2, int(n * (m1 - m0) / (a1 - a0))))
     for r in (R_IN + .7, R_OUT - .9):                                         # two ice-white seams along the walk
         arc_solid(a['ice'], [(r - .05, TOP + .012), (r + .05, TOP + .012), (r + .05, TOP - .02), (r - .05, TOP - .02)], a0, a1, n)
     for i in range(72):                                                       # radial paving joints
@@ -152,7 +183,8 @@ def ground(ctx):
                          n=24, size=.36, droop=.5, lobes=2)
     # Bank: from the kerb down to the lawn; planted, except the north arc where it is paved onto the promenade. Cut at the links.
     links = link_bearings()
-    cuts = sorted([(b - .075, b + .075) for b in links] + [BANK_GAP], key=lambda c: c[0] % TAU)
+    cuts = sorted([(b - .075, b + .075) for b in links] + [(b - TAIL_CUT, b + TAIL_CUT) for b in tail_bearings()] + [BANK_GAP],
+                  key=lambda c: c[0] % TAU)
     bank = [(R_OUT + .2, TOP + .02), (R_BANK, -.42), (R_BANK, FOOT), (R_OUT + .2, FOOT)]
     edges = []
     lo = BANK_GAP[1]
@@ -186,25 +218,9 @@ def ground(ctx):
             obox(a['kerb'], (x - tx * .6 - tz * o, y + .015, z - tz * .6 + tx * o), (.9, .03, .3), (tx, tz), (-tz, tx))
 
 
-def bed(ctx, ang, r, length, depth, tiers=2):
-    """White-rimmed terrace bed along the ring at bearing `ang`, radius r (its inner edge), two tiers stepping up outward,
-    planted with ground cover and leaf clumps."""
-    a = ctx.a
-    c, s = math.cos(ang), math.sin(ang)
-    for k in range(tiers):
-        rr = r + depth * (k + .5) / tiers
-        h = .55 + .4 * k
-        obox(a['kerb'], (rr * c, h / 2 - .3, rr * s), (depth / tiers, h + .6, length - k * .8), (c, s), (-s, c))
-        obox(a['lawn'], (rr * c, h + .005, rr * s), (depth / tiers - .28, .02, length - k * .8 - .28), (c, s), (-s, c))
-        for q in range(int(length / 1.6)):
-            o = -length / 2 + .9 + q * 1.6 + ctx.rng.uniform(-.3, .3)
-            if abs(o) > (length - k * .8) / 2 - .5:
-                continue
-            M.leaf_clump(ctx, (rr * c - s * o, h + .35, rr * s + c * o), (.75, .5, .75), roles=('leaf_l', 'green'), core='green',
-                         n=22, size=.34, droop=.5, lobes=2)
-
-
 def clear_of_links(x, z, gap):
+    if tail_gap(x, z) < TAIL_CLEAR + gap - 2.0:
+        return False
     for key in LINKS:
         for px, pz, _ in link_path(key, 1.0):
             if math.hypot(x - px, z - pz) < gap:
@@ -238,14 +254,15 @@ def greenery(ctx):
         ang = ang_deg * D
         if not clear_of_links(R_BANK * math.cos(ang), R_BANK * math.sin(ang), 4.0):
             continue
-        bed(ctx, ang, R_BANK + .2, rng.uniform(5.5, 7.0), 2.2)
+        M.terrace_bed(ctx, ang, R_BANK + .2, rng.uniform(5.5, 7.0), 2.2, rim='kerb', ground='lawn')
     # Shrubs along the planted bank.
     links = link_bearings()
     for i in range(110):
         ang = i * TAU / 110
-        if in_arc(ang, BANK_GAP) or in_arc(ang, NORTH) or any(ang_gap(ang, b) < .12 for b in links):
-            continue
         r = (R_OUT + R_BANK) / 2 + .3
+        if in_arc(ang, BANK_GAP) or in_arc(ang, NORTH) or any(ang_gap(ang, b) < .12 for b in links) or \
+                tail_gap(r * math.cos(ang), r * math.sin(ang)) < TAIL_CLEAR:
+            continue
         M.leaf_clump(ctx, polar(r, ang, .05), (.9, .55, .9), roles=('leaf_l', 'green'), core='green', n=20, size=.36, droop=.5,
                      lobes=2)
     return trees
@@ -259,16 +276,17 @@ def furniture(ctx):
     seats = []
     for i in range(18):                                                       # benches
         ang = (i + .5) * TAU / 18
-        if in_arc(ang, (GAP[0] - 4 * D, GAP[1] + 4 * D)) or any(ang_gap(ang, b) < .16 for b in links):
-            continue
         r = R_OUT - .55
         x, z = r * math.cos(ang), r * math.sin(ang)
+        if in_arc(ang, (GAP[0] - 4 * D, GAP[1] + 4 * D)) or any(ang_gap(ang, b) < .16 for b in links) or tail_gap(x, z) < TAIL_CLEAR:
+            continue
         yaw = math.atan2(-x, -z)
         M.kit_prop(ctx, 'bench', x, TOP, z, yaw + math.pi)
         seats.append((x, z, yaw))
     for x, z, yaw in seats[::3]:
         M.seated_person(ctx, x, TOP + .45, z, yaw)
     lamps = [polar(R_OUT - .3, (i + .25) * TAU / 12, TOP) for i in range(12) if not in_arc((i + .25) * TAU / 12, GAP)]
+    lamps = [p for p in lamps if tail_gap(p[0], p[2]) >= TAIL_CLEAR]
     for key in LINKS:
         path = link_path(key, 1.0)
         if len(path) > 8:

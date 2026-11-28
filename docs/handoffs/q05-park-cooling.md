@@ -649,6 +649,72 @@ owner 選擇（原文選項）：「一個共通周邊 (Recommended)」——「
 - 工具盒 `CTX_north_utility_service` 是否另行處理（加綠化包覆或移走），屬地塊外城市背景。
 - 台座上 C 自身的加密綠化（目標中的綠化台階）留待 C-R3。
 
+## C-R2b verdict
+
+«開新 session 做 C-R3, fix the red circle broken road too»（2026-11-28；附 owner 在 hero 總覽上圈出兩處紅圈的截圖，存於 `~/city2127-evidence/q05c/r3/owner-red-circles.webp`）
+
+即本輪處理 C-R3 round prompt 所列 C-R2／C-R2b 未足各項（雲形、日間雪地藍影、台座上 C 自身的綠化），並修補紅圈所指的「斷路」。
+
+## C-R3 brief
+
+量度方法：近鏡讀數取 3200 × 1800 的 `q05:cloud`（`?rotation&jump=Q05:C&hour=12&reviewTime=20`，覆核 `r2b/focal-day.jpg`）；hero 讀數取同一網址的 hero 總覽。紅圈位置以 `heroSettledCamera` 投影核對：海濱步道東段終點 (−178, −173) 投影於 2000 × 1125 畫面 (1099, 989)，西段起點 (−259, −145) 投影於 (1491, 1048)，分別落在 owner 左、右兩個紅圈內。地面以 2.5 m 格網由上而下射線取樣（地塊北面：台座北緣 z −159 外只有約 5–7 m 寬的海濱鋪地 `WATERFRONT_PROMENADE`，其外即海水渠 `WATER_MAIN`（x −250 至 −212、z −163 至 −166）及護岸）。
+
+| # | 要求 | 現況（R2b） | 量度目標 |
+| --- | --- | --- | --- |
+| a | 雲呈「上大下細」蘑菇形；目標的雲較扁闊、環在雲下緣 | 雲底 16.5 m、頂約 31 m；21 m 以下收在半徑 10.6 m 內，其上外鼓至約 14 m。近鏡雲寬約 808 px、高約 547 px（寬高比約 1.48），最闊處（雲帽）在環上約 5 m，比環本身更闊（雲寬約為環寬 0.96） | 目標圖雲寬約為環寬 0.79，寬高比約 2.0，環前管在雲高約三分之一處。雲改為扁圓頂：雲底升至約 17 m，頂降至約 27.5 m；最闊處（半徑約 12 m，不超過環管中線外 0.5 m）在 21.5–23.5 m，即緊貼環上；其上逐層收窄成圓頂。21 m 以下仍收在半徑 10.6 m 內（腰限制及其單元測試不變），雪層頂 20 m 仍藏在雲內；夜間冰白發光不變。近鏡：雲寬高比 ≥ 1.9；雲寬為環寬 0.8–1.0；雲最闊一行在環前管以上 ≤ 3 m（約 ≤ 90 px）。 |
+| b | 日間雪地藍影不足 | 近鏡雪地區 (1408–1792, 1312–1440) 平均 RGB (227, 229, 237)：藍比紅高 10、亮度 231（半量落雪後覆核） | 雪地頂點顏色及基色再加藍、加深（亮處與陰影兩端都調），霜帶不變；同一區域藍比紅高 ≥ 20、亮度 ≤ 225；雪粒仍為近白點，在雪地上可辨。 |
+| c | 台座上 C 自身的綠化加密（目標的綠化台階、花槽、小徑） | 近鏡台座橢圓（雪地除外）綠色像素佔 0.236；近鏡側（CAM ± 1.2 rad）只有三個低花槽及零星矮灌木，其餘為淺色鋪地 | 台座上（渠外 r 15–23.3 m）加兩級白邊台階花槽（後方及兩側，上植 `facet_tree` 及灌木）與近鏡側低矮白邊花槽（高 ≤ 1.2 m，連密灌木），沿兩條入口小徑兩旁加綠邊；入口方位 `GATES`、泵 `PUMP`、跌水口 `SPILL` 及近鏡視線保持開放。同一橢圓綠色像素佔 ≥ 0.35。台階花槽如共用周邊已有同類，提升為庫存模組（`LIBRARY.md` 行及 lineup）。 |
+| d | 紅圈「斷路」：hero 中帶冰藍光線的海濱木棧道在 NE PARK 地塊兩側戛然而止，止於草地 | `promenades` 兩段止於 (−178, −173)（東段）及 (−259, −145)（西段），距環台座步道外緣約 13 m 及 22 m；C-R2b 的東北連接路只接到 (−189, −166) 的鋪地，並未接上木棧道 | 不改步行者路線 `promenades`（改長度會令全條海濱的長椅、停留點、林蔭花槽、`automationBays`、`districtMeters` 重新分佈，且步行者道不可進入地塊 ±21 m 方框）。在 `src/layout.ts` 新增只供繪製的 `promenadeTails`：兩段延伸，由兩端以同樣 7.2 m 木棧道及兩條光線（`skyways.ts` 同一 `deck`／`offsetTube`／`paving`／`trail`）伸至環台座步道外緣，路面由 y 0 漸升至約 0.40，與步道外緣重疊而不共面。東段沿 315°（A 的東北入口方位）進入，取代共用周邊的東北連接路；西段由西面於約 203°（工具盒缺口 150°–180° 與西北連接路 225° 之間）進入。兩段足跡（中線 ± 3.6 m）只落在草地、海濱鋪地或周邊上，不入海水渠、潮間帶或護岸。共用周邊在兩段足跡（± 4.6 m）內不放草坡、樹、花槽、長椅、燈柱，路緣開口；單元測試讀 `layout.ts` 的同一折線核對。hero 中兩個紅圈處木棧道及光線連續接上環台座步道，經步道北半圈相連。預設公園、A、B、C 四個狀態都檢查。 |
+
+另一讀法：第 d 項亦可理解為兩段木棧道在地塊北面直接相連成一條。量度所見北面只有 5–7 m 寬的鋪地，其外為海水渠，7.2 m 棧道必須伸入台座或架橋過渠；本輪取經環台座步道相連的做法，架橋列為 owner 問題。步行者仍在原終點折返（棧道最後約 20 m 只有路面，無步行者），亦列為 owner 問題。
+
 ## C-R3 round prompt（下一輪會話）
 
-place-building round for `q05c-snow-cloud`: worktree `/Users/fatboy/city2127-q05c`, branch `feat/q05c-snow-cloud`, read `docs/handoffs/q05-park-cooling.md` (its `## C-R2 brief`, `## C-R2`, `## C-R2b brief` and `## C-R2b` sections). Open from C-R2: the cloud's mushroom shape, the day snowfield blue short of target; from C-R2b: densify C's own plinth greenery (target's green terraces), B's gates, the utility block. Owner verdict on C-R2 / C-R2b: «…»
+place-building round for `q05c-snow-cloud`: worktree `/Users/fatboy/city2127-q05c`, branch `feat/q05c-snow-cloud`, read `docs/handoffs/q05-park-cooling.md` (its `## C-R2 brief`, `## C-R2`, `## C-R2b brief` and `## C-R2b` sections). Open from C-R2: the cloud's mushroom shape, the day snowfield blue short of target; from C-R2b: densify C's own plinth greenery (target's green terraces), B's gates, the utility block. Owner verdict on C-R2 / C-R2b: «開新 session 做 C-R3, fix the red circle broken road too» (annotated hero screenshot `~/city2127-evidence/q05c/r3/owner-red-circles.webp`)
+
+## C-R3（2026-11-28，Q05-C 雪雲噴泉＋海濱木棧道）
+
+### Git 狀態
+
+- 開始時 worktree `../city2127-q05c` 在 `feat/q05c-snow-cloud`，與遠端同步於 `867e6838`，工作樹乾淨；`git fetch --prune origin` 成功，本分支與遠端沒有分歧；沒有上一輪的伺服器在運行。主工作目錄（B 分支）未有觸碰。
+
+### 改動
+
+- **海濱木棧道延伸段**（第 d 項）：`src/layout.ts` 新增只供繪製的 `promenadeTails`（兩條折線），`src/skyways.ts` 以同一 7.2 m 木棧道及兩條光線繪製；東段由 (−178, −173) 於 309° 進入環台座步道，西段由 (−259, −145) 向東彎入，於 196° 進入；路面由 y 0 漸升至 0.36 m，與步道外緣重疊約 0.75 m。足跡先以射線取樣核對，只落在草地、海濱鋪地及周邊上。步行者路線 `promenades` 不改。
+- **共用周邊** `build_park_surround.py`：刪去東北連接路（由東段延伸取代）；路緣及草坡在兩段延伸的方位各開 ±9°；樹、花槽、坡上灌木、長椅、燈柱避開延伸段中線 4.6 m 內；約 41k tris，GLB 1.8 MB。其兩級白邊台階花槽 `bed` 提升為庫存模組 `terrace_bed`（`modules.py`、`LIBRARY.md` 行、`review_modules.py` 樣本）；提升後周邊 GLB 與提升前逐位元相同。
+- **C 模型** `build_snow_cloud.py`：雲改為扁圓頂（`CLOUD_RX` 12、`CLOUD_H` 10.5、雲底 17 m、頂約 28 m；六層配方，外鼓層中心半徑上限 0.74 rx，最闊約 11.3 m，只比腰寬約 0.7 m；新增一層填補腰與外鼓層之間的台階），腰限制 (21 m, 10.6 m) 不變；雪地頂點顏色兩端加藍（亮處 (0.68, 0.79, 1.0)、陰影 (0.30, 0.44, 0.86)），基色 (0.90, 0.94, 1)；新增 `plinth_green`：近鏡半圈台座邊 r 19.4–23.3 m 鋪草（只在入口、跌水口、泵處斷開），外緣綠籬、內緣斷續矮籬，草地內六個單級白邊花槽（`terrace_bed`，按入口避讓後實得數個），兩條小徑兩旁綠邊及灌木。約 100k tris，GLB 3.4 MB。
+- **測試** `tests/lotRuntime.test.ts`：讀 `layout.ts` 的 `promenadeTails`，核對周邊在延伸段 3.6 m 半寬內沒有高於 0.45 m 的頂點，且兩段終點落在環台座步道上、低於步道頂。
+- **文件**：`PROJECT.md` 加一段；`LIBRARY.md` 更新 C 及周邊兩行、加 `terrace_bed` 行；本交接的 verdict、brief。
+
+### 自評（`~/city2127-evidence/q05c/r3/`，3200 × 1800）
+
+| # | 項目 | 結果 |
+| --- | --- | --- |
+| a | 雲形 | 大致達到：不再是蘑菇形，雲成一團扁圓，環前管在雲下緣，雲寬為環寬約 0.80（R2b 0.96；目標 0.79）（`crop-cloud.jpg`、`r2b-vs-r3.jpg`、`target-vs-r3.jpg`）。未足：近鏡寬高比約 1.74（目標 ≥ 1.9；R2b 1.48）；雲最闊一行在環前管以上約 110–160 px（約 4–5 m），未達 ≤ 90 px；腰與上層之間仍見一道淺橫摺。夜間雲平均 RGB (216, 225, 232)，亮度 224，冷光保留（`focal-night.jpg`）。 |
+| b | 雪地藍影 | 達到：同一區域 (227, 229, 237) → (214, 220, 235)，藍比紅高 21（目標 ≥ 20），亮度 223（目標 ≤ 225）；白色雪粒仍清楚（`crop-snowfield.jpg`）。 |
+| c | 台座綠化 | 大致達到：近鏡半圈加了草地、綠籬、白邊花槽及小徑綠邊（`crop-plinth-green.jpg`）；綠色像素佔 0.236 → 0.348，略低於 0.35。泵左側仍有一片淺色鋪地（泵的避讓範圍）。 |
+| d | 紅圈斷路 | 達到：hero 中兩段帶光線的木棧道都連續接上環台座步道，經步道北半圈相連（`hero-road-owner-vs-r3.jpg`、`hero-road-before-after.jpg`）；預設公園、A、B、C 四個狀態都相同（`four-states-hero.jpg`、`top-three-states.jpg`）。步行者仍在原終點折返，延伸段約 20 m 上沒有步行者。 |
+
+- 雪層循環無跳格（`keyframes.jpg`：t 20.0／20.7／21.4）。
+- 三輪 capture-compare：pass 1 延伸段及兩個 GLB 重建（雲已扁，但雪地藍影、綠化及雲的上下兩層仍未足）→ pass 2 草地按逐項避讓加闊、雲加填補層 → pass 3 雲外鼓層收窄、加內緣矮籬。
+- 讀數方法：`~/city2127-evidence/q05c/r3/analysis/measure.py`（綠色像素橢圓及雪地區域）；紅圈投影核對及地面取樣見 `analysis/`。
+
+### 檢查
+
+- 單元：`tests/lotRuntime.test.ts`、`tests/assetLibrary.test.ts` 通過。根目錄 `npm test` 通過（2026-11-28，EXIT 0，記錄 `~/city2127-evidence/q05c/r3/npm-test.log`；含 `odaiba`、`mobility`、`skyRingClearance`）。`npm run build`、`git diff --check` 通過。survey 未改，未跑。
+- 截圖 sidecar：commit `867e6838`、branch `feat/q05c-snow-cloud`（Vite 5187），工作樹有未提交改動（本輪改動）。
+- FPS：未量度。headless 截圖 data-fps 約 33–36（近鏡）、32–33（overview），只作參考。
+- 模組總覽圖 `artifacts/asset-library/modules-lineup.jpg` 未重生：`review_modules.py` 的鏡頭只框到 `facet_tree`，`cumulus` 及新的 `terrace_bed` 樣本在框外（R1 起已如此），屬另一項工作。
+- 變化總覽（`artifacts/change-review`）未重生：C 未驗收，未改已驗收模型、近鏡或文案。
+
+### 待 owner 決定
+
+- 雲形是否已夠扁；若要再扁（寬高比 ≥ 1.9），可再降雲頂或把腰限制放寬至約 11 m。
+- 紅圈的接法：現經環台座步道北半圈相連；如要兩段木棧道在地塊北面直接相連成一條，須架橋過海水渠 `WATER_MAIN` 或改動海邊佈局。
+- 步行者是否要走上延伸段及環台座步道（須改步行者路線及「步行者不入地塊方框」的測試規則）。
+- 延伸段的光線沿用全城海濱步道的藍色光線（與步道一致）；共用周邊本身的光縫仍為冰白。
+- 仍未處理：B 的入口方位（B 分支）、工具盒 `CTX_north_utility_service`；結果卡文案及 `q05:cloud` 近鏡仍為暫定；C 疊在 B 分支上，B 驗收合併後才可合併。
+
+## C-R4 round prompt（下一輪會話）
+
+place-building round for `q05c-snow-cloud`: worktree `/Users/fatboy/city2127-q05c`, branch `feat/q05c-snow-cloud`, read `docs/handoffs/q05-park-cooling.md` (its `## C-R3 brief` and `## C-R3` sections). Open from C-R3: the cloud's close-up aspect (1.74 against ≥ 1.9) and the faint crease between its waist and upper billows, plinth green share 0.348 against 0.35 (pale paving left of the pumps); owner questions on the promenade join (via the ring walk, or a bridge over `WATER_MAIN`) and walkers on the tails; still open: B's gates, the utility block. Owner verdict on C-R3: «…»

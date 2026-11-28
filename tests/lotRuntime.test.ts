@@ -3,7 +3,7 @@
 import assert from './assert.ts';
 import { readFileSync } from 'node:fs';
 import { Group, Mesh, MeshStandardMaterial, BoxGeometry, Scene } from 'three';
-import { LOTS } from '../src/layout.ts';
+import { LOTS, promenadeTails } from '../src/layout.ts';
 import { FARM_CENTRE, EnergyRuntime } from '../src/energyRuntime.ts';
 import { BAY_FLOWER_SHOWN } from '../src/bayFlower.ts';
 import { LotRuntime, PARK_SURROUND, q02Models, q03Housing, q05Model, q06Tower, q08Vacant } from '../src/lotRuntime.ts';
@@ -336,6 +336,27 @@ assert.deepEqual(q05set.options.map((o: { modelId: string | null }) => o.modelId
   });
   assert.ok(inner >= 24.25, `the surround stays off the plinths (inner ${inner.toFixed(2)} m)`);
   assert.equal(onBlock, 0, 'nothing stands on the utility block');
+  // C-R3: the promenade boardwalk tails (layout copy; the build script keeps its own) land on the ring walk across clear ground:
+  // nothing of the surround rises above the walk top within the boardwalk's 3.6 m half-width, and each tail reaches the walk.
+  const [cx, , cz] = [LOTS['ne-park'].x, 0, LOTS['ne-park'].z];
+  const tailGap = (x: number, z: number) => Math.min(...promenadeTails.flatMap(t => t.slice(1).map((b, k) => {
+    const a = t[k], dx = b[0] - a[0], dz = b[2] - a[2], u = Math.max(0, Math.min(1, ((x - a[0]) * dx + (z - a[2]) * dz) / (dx * dx + dz * dz)));
+    return Math.hypot(x - a[0] - u * dx, z - a[2] - u * dz);
+  })));
+  let onTail = 0;
+  model.traverse(o => {
+    if (!(o instanceof Mesh)) return;
+    const pos = o.geometry.getAttribute('position');
+    for (let i = 0; i < pos.count; i++) {
+      v.fromBufferAttribute(pos, i).applyMatrix4(o.matrixWorld);
+      if (v.y > .45 && tailGap(v.x + cx, v.z + cz) < 3.6) onTail++;
+    }
+  });
+  assert.equal(onTail, 0, 'the surround keeps the promenade boardwalk tails clear');
+  for (const t of promenadeTails) {
+    const [x, y, z] = t[t.length - 1], r = Math.hypot(x - cx, z - cz);
+    assert.ok(r > 24.3 + 1.5 && r < 27.3 && y < .42 && y > .3, `a boardwalk tail lands on the ring walk just under its top (r ${r.toFixed(1)})`);
+  }
 }
 {
   const acScene = new Scene(), ac = new Group(), park = new Group(), parkShared = new MeshStandardMaterial();

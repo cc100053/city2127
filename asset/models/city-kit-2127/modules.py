@@ -1395,6 +1395,26 @@ def leaf_strand(ctx, top, ln, out, role='vine', size=.3, step=.22, flowers=(), f
             ell(A[rng.choice(flowers)], _v(p, out, .06), (.06, 0, 0), (0, .05, 0), (0, 0, .06), 5, 3)
 
 
+def terrace_bed(ctx, ang, r, length, depth, tiers=2, y0=0.0, rim='white', ground='leaf_l', step=.4):
+    """White-rimmed terrace bed lying along a ring at bearing `ang` (three.js atan2(z, x)), its inner edge at radius r: `tiers`
+    rims stepping up outward by `step` (first top y0 + .55), each planted with a ground-cover top and a row of `leaf_clump`
+    shrubs; rims reach 0.6 m below y0 into the ground. length runs along the ring (each tier 0.8 m shorter), depth across it.
+    About 1.1k tris per metre of a two-tier bed. Metres. (Q05 park surround C-R2b; library C-R3)"""
+    a = ctx.a
+    c, s = math.cos(ang), math.sin(ang)
+    for k in range(tiers):
+        rr = r + depth * (k + .5) / tiers
+        h = .55 + step * k
+        obox(a[rim], (rr * c, y0 + h / 2 - .3, rr * s), (depth / tiers, h + .6, length - k * .8), (c, s), (-s, c))
+        obox(a[ground], (rr * c, y0 + h + .005, rr * s), (depth / tiers - .28, .02, length - k * .8 - .28), (c, s), (-s, c))
+        for q in range(int(length / 1.6)):
+            o = -length / 2 + .9 + q * 1.6 + ctx.rng.uniform(-.3, .3)
+            if abs(o) > (length - k * .8) / 2 - .5:
+                continue
+            leaf_clump(ctx, (rr * c - s * o, y0 + h + .35, rr * s + c * o), (.75, .5, .75), roles=('leaf_l', 'green'), core='green',
+                       n=22, size=.34, droop=.5, lobes=2)
+
+
 # Registry checked against LIBRARY.md by tests/assetLibrary.test.ts — add a row there for every new key.
 MODULES = {
     'kit_prop': kit_prop, 'person': person, 'seated_person': seated_person, 'furnish': furnish,
@@ -1404,4 +1424,5 @@ MODULES = {
     'bone_arm': bone_arm, 'ell': ell, 'disc': disc, 'vine_curtain': vine_curtain, 'arch_shell': arch_shell,
     'flower_bed': flower_bed, 'leaf_card': leaf_card, 'leaf_clump': leaf_clump, 'leafy_tree': leafy_tree,
     'leaf_strand': leaf_strand, 'facet_blob': facet_blob, 'facet_tree': facet_tree, 'cumulus': cumulus,
+    'terrace_bed': terrace_bed,
 }

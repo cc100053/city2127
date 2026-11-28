@@ -2,7 +2,7 @@ import * as T from 'three';
 import { arc, bake, box, skyGlass, leaf, leafyCrown, paint, stone, trail } from './cityRig.ts';
 import { megaSeam, megaShell } from './megastructures.ts';
 const trim = megaShell; // r1 (P3): white engineered members, one material family with the megastructures
-import { changeSites, gardenDecks, midDecks } from './layout.ts';
+import { changeSites, gardenDecks, midDecks, promenadeTails } from './layout.ts';
 import { routes } from './mobility.ts';
 import { inMega } from './megaFootprints.ts';
 import layout from './odaiba-layout.json' with { type: 'json' };
@@ -184,8 +184,9 @@ export function skyways() {
   for (const s of SPHERES) sphere(root, s.centre, s.radius, s.deck);
   // Lit blue lines at street level too (target v2): both edges of the seaside promenades, over a 7.2 m paved boardwalk whose top is the
   // walkers' level (the lawn lies 0.2–0.35 m below it, so it reads as a low raised walk rather than people on grass).
-  for (const walk of routes().promenades) {
-    root.add(new T.Mesh(deck(walk, 7.2, .6, 160), paving));
+  const tails = promenadeTails.map(points => new T.CatmullRomCurve3(points.map(p => new T.Vector3(...p)), false, 'centripetal'));
+  for (const walk of [...routes().promenades, ...tails]) {
+    root.add(new T.Mesh(deck(walk, 7.2, .6, walk.getLength() < 60 ? 40 : 160), paving));
     for (const side of [-3.6, 3.6]) root.add(new T.Mesh(offsetTube(walk, side, .25, .3, false), trail));
   }
   shoreTerraces(root);
