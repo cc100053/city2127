@@ -1,0 +1,61 @@
+{
+ "massing": true,
+ "tris_fixed": 105712,
+ "tris_moving": 55172,
+ "unique_mesh_tris": 127840,
+ "objects": 38,
+ "materials": 5,
+ "tris_total": 160884,
+ "layout": {
+  "shell": {
+   "outer_r": 45.0,
+   "inner_r": 40.5,
+   "height": 50.0,
+   "opening_deg": 120.0
+  },
+  "nominal_gap_building_to_inner_skin_m": 3.5,
+  "bogies": 12,
+  "load_wheels": 48,
+  "rail_top_z": 1.48,
+  "axle_z": 2.28,
+  "roof": {
+   "truss_y": [
+    -41.18,
+    42.6
+   ],
+   "truss_z": [
+    45.4,
+    51.8
+   ],
+   "panel_levels": [
+    50.65,
+    49.7,
+    48.75,
+    47.8,
+    46.85,
+    45.9
+   ],
+   "lowest_panel_underside_m": 45.9,
+   "building_top_m": 43.0,
+   "travel_m": 65.0,
+   "state_travel_m": {
+    "0": 0.0,
+    "90": 6.5,
+    "180": 65.0
+   },
+   "panel_on_rail_min_margin_m": 0.4,
+   "stowed_corner_r_m": 39.0
+  },
+  "passages": {
+   "floor_z": -5.2,
+   "clear_h": 3.2,
+   "roof_top_z": -1.6,
+   "transfer_girder_bottom_z": -1.35,
+   "ramp": [
+    58.0,
+    120.4
+   ],
+   "ramp_grade": "1:12"
+  }
+ }
+}

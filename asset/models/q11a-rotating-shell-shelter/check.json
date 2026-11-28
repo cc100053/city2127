@@ -1,0 +1,148 @@
+{
+ "glb": "q11a-rotating-shell-shelter.glb",
+ "glb_bytes": 16244292,
+ "objects": 39,
+ "meshes": 27,
+ "unique_meshes": 16,
+ "triangles": 465612,
+ "materials": 71,
+ "new_materials_on_import": 71,
+ "bounds_min": [
+  -135.0,
+  -135.0,
+  -16.0
+ ],
+ "bounds_max": [
+  135.0,
+  135.0,
+  52.35
+ ],
+ "moving_pivot_rotation_deg": 90.0,
+ "bogies": 12,
+ "roof_panels": 6,
+ "people_nodes": [],
+ "transparent_materials": {
+  "q11a_canopy_glass": {
+   "alpha": 0.3,
+   "method": "BLENDED"
+  },
+  "q11a_facade_glass": {
+   "alpha": 0.28,
+   "method": "BLENDED"
+  },
+  "q11a_floor_glass": {
+   "alpha": 0.14,
+   "method": "BLENDED"
+  },
+  "q11a_guard_glass": {
+   "alpha": 0.25,
+   "method": "BLENDED"
+  },
+  "q11a_well_window": {
+   "alpha": 0.25,
+   "method": "BLENDED"
+  }
+ },
+ "shell_sweep": {
+  "building_to_moving_min_gap_m": 3.0,
+  "at_z_m": 5.0,
+  "moving_to_outer_fixed_min_gap_m": 2.117,
+  "outer_at_z_m": 1.0,
+  "fixed_vertices_in_swept_profile": 0,
+  "examples": []
+ },
+ "roof_over_building": {
+  "roof_lowest_over_building_m": 45.14,
+  "building_highest_m": 43.0,
+  "vertical_gap_m": 2.14,
+  "highest_terrace_planting_m": 39.709
+ },
+ "wheels_on_rails": {
+  "rail_head_top_z": 1.48,
+  "wheels_found": 48,
+  "tread_lowest_minus_rail_top_m": [
+   -0.0,
+   -0.0
+  ],
+  "tread_centre_minus_rail_radius_m": [
+   0.0036,
+   0.0039
+  ]
+ },
+ "passages": {
+  "-104": {
+   "samples": 177,
+   "misses": 0,
+   "floor_at_basement_z": -5.2,
+   "floor_at_plaza_end_z": 0.0,
+   "max_step_m": 0.042,
+   "floor_range": [
+    -5.2,
+    0.0
+   ],
+   "min_clear_height_m": 2.88,
+   "open_to_sky_samples": 123
+  },
+  "-76": {
+   "samples": 177,
+   "misses": 0,
+   "floor_at_basement_z": -5.2,
+   "floor_at_plaza_end_z": 0.0,
+   "max_step_m": 0.042,
+   "floor_range": [
+    -5.2,
+    0.0
+   ],
+   "min_clear_height_m": 2.88,
+   "open_to_sky_samples": 123
+  }
+ },
+ "ground": {
+  "down_rays": 212357,
+  "holes": 0,
+  "first_holes": []
+ },
+ "roof_travel": {
+  "rail_y_range_local": [
+   -39.68,
+   42.6
+  ],
+  "roller_on_rail_min_margin_m": 1.32,
+  "panel_pairs_overlapping_during_travel": 0,
+  "panel_top_under_stowage_roof_min_m": 0.52,
+  "panel_z_ranges": {
+   "0": [
+    50.7,
+    51.38
+   ],
+   "1": [
+    49.75,
+    50.43
+   ],
+   "2": [
+    48.8,
+    49.48
+   ],
+   "3": [
+    47.85,
+    48.53
+   ],
+   "4": [
+    46.9,
+    47.58
+   ],
+   "5": [
+    45.95,
+    46.63
+   ]
+  },
+  "standby_offsets_m": [
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   6.5
+  ]
+ }
+}
