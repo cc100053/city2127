@@ -1,0 +1,198 @@
+{
+ "massing": false,
+ "tris": 108754,
+ "objects": 25,
+ "tris_by_object": {
+  "TIER_1": 11212,
+  "TIER_2": 10646,
+  "TIER_3": 9920,
+  "GYM_EQUIPMENT": 6236,
+  "YOGA_ROOM": 3832,
+  "ROOMS_CORE": 264,
+  "READING": 19108,
+  "GARDENS": 13084,
+  "WING_ROOTS": 1972,
+  "WING_1": 2816,
+  "WING_2": 2816,
+  "WING_3": 2816,
+  "WING_4": 2816,
+  "WING_5": 2816,
+  "WING_6": 2816,
+  "SIGN_GYM": 2,
+  "SIGN_YOGA": 2,
+  "SIGN_SURROUNDS": 108,
+  "SITE_PAVING": 15472
+ },
+ "materials": 73,
+ "bbox_min": [
+  -26.03,
+  -14.0,
+  -0.3
+ ],
+ "bbox_max": [
+  26.03,
+  26.0,
+  17.42
+ ],
+ "building_bbox": [
+  [
+   -15.0,
+   -7.3,
+   0.0
+  ],
+  [
+   16.67,
+   18.1,
+   17.42
+  ]
+ ],
+ "wings": [
+  {
+   "root": [
+    -6.6,
+    8.2,
+    14.7
+   ],
+   "tip": [
+    12.74,
+    5.21,
+    16.99
+   ],
+   "length": 19.7,
+   "bank_deg": 62.0,
+   "backstay_len": 10.89
+  },
+  {
+   "root": [
+    -6.0,
+    7.75,
+    14.4
+   ],
+   "tip": [
+    14.97,
+    2.61,
+    15.96
+   ],
+   "length": 21.64,
+   "bank_deg": 66.0,
+   "backstay_len": 11.7
+  },
+  {
+   "root": [
+    -5.4,
+    7.3,
+    14.1
+   ],
+   "tip": [
+    16.4,
+    -0.2,
+    14.81
+   ],
+   "length": 23.05,
+   "bank_deg": 70.0,
+   "backstay_len": 12.49
+  },
+  {
+   "root": [
+    -4.8,
+    6.85,
+    13.8
+   ],
+   "tip": [
+    16.63,
+    -2.91,
+    13.62
+   ],
+   "length": 23.54,
+   "bank_deg": 74.0,
+   "backstay_len": 13.18
+  },
+  {
+   "root": [
+    -4.2,
+    6.4,
+    13.5
+   ],
+   "tip": [
+    15.66,
+    -5.34,
+    12.3
+   ],
+   "length": 23.09,
+   "bank_deg": 78.0,
+   "backstay_len": 13.74
+  },
+  {
+   "root": [
+    -3.6,
+    6.0,
+    13.2
+   ],
+   "tip": [
+    13.68,
+    -7.26,
+    11.06
+   ],
+   "length": 21.87,
+   "bank_deg": 82.0,
+   "backstay_len": 14.15
+  }
+ ],
+ "wing_tip_max_z": 16.99,
+ "tiers": [
+  {
+   "floor": 0.0,
+   "plan_y": [
+    0.0,
+    18.0
+   ],
+   "size_m": [
+    30.0,
+    18.0
+   ],
+   "roof_top": 4.2
+  },
+  {
+   "floor": 4.2,
+   "plan_y": [
+    3.0,
+    18.0
+   ],
+   "size_m": [
+    30.0,
+    15.0
+   ],
+   "roof_top": 8.0
+  },
+  {
+   "floor": 8.0,
+   "plan_y": [
+    6.0,
+    18.0
+   ],
+   "size_m": [
+    30.0,
+    12.0
+   ],
+   "roof_top": 11.6
+  }
+ ],
+ "rooms": {
+  "gym_m": [
+   12.0,
+   9.0
+  ],
+  "band_m": 3.0,
+  "yoga_m": [
+   10.0,
+   9.0
+  ],
+  "door_clear_m": 1.8
+ },
+ "iridescence_patched": [
+  "q09a_wing_film_cyan",
+  "q09a_wing_film_lilac",
+  "q09a_wing_film_periwinkle"
+ ],
+ "glb_bytes": 5554952
+}

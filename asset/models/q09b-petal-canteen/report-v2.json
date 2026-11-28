@@ -1,0 +1,52 @@
+{
+ "massing": false,
+ "tris": 144440,
+ "objects": 22,
+ "tris_by_object": {
+  "COLUMNS_RING_RIBS": 12808,
+  "PETALS_OUTER": 37344,
+  "PETALS_INNER": 24896,
+  "KITCHEN_HOOD": 8556,
+  "KITCHEN_COUNTER": 16356,
+  "TABLE_1": 4624,
+  "TABLE_2": 4624,
+  "TABLE_3": 4624,
+  "TABLE_4": 4624,
+  "TABLE_5": 6220,
+  "TABLE_6": 4624,
+  "FLOOR_PLAZA": 12532,
+  "BACK_OF_HOUSE": 168,
+  "MENU_RING": 24,
+  "LIGHTBOX": 4,
+  "MENU_LIGHTBOX_FRAMES": 2412
+ },
+ "materials": 66,
+ "bbox_min": [
+  -24.03,
+  -7.0,
+  -0.3
+ ],
+ "bbox_max": [
+  24.03,
+  42.0,
+  15.0
+ ],
+ "petal_tips": {
+  "outer_max_z": 6.88,
+  "outer_max_r": 19.6,
+  "inner_max_z": 13.45,
+  "inner_min_z": 13.2
+ },
+ "outlet_z": 15.0,
+ "hall_d": 32.0,
+ "eave": 5.0,
+ "iridescence_patched": [
+  "q09b_crown_amber",
+  "q09b_crown_teal",
+  "q09b_crown_lilac",
+  "q09b_outer_amber",
+  "q09b_outer_lilac",
+  "q09b_outer_teal"
+ ],
+ "glb_bytes": 5752992
+}
