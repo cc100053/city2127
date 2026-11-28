@@ -46,4 +46,5 @@
 - 補齊 17 個未有模型嘅選項。Q05-A、Q05-B、Q05-C 已驗收，三者放於 NE PARK，見[交接](handoffs/q05-park-cooling.md)。Q04、Q07、Q09 嘅模型同地塊安排仍待決定。
 - 各題起始選項、最少樣本門檻同展覽題目、設施及結果文案待 owner 最終確認。
 - 新模型接入時核對進出場、相機、旅程著陸、固定道路同入口，再更新變化總覽。實機同雙站覆蓋見 [VALIDATION](VALIDATION.md)。
+- 輪換模型須連同結果字幕一併完成（owner 2026-11-28）：大屏幕於投票光點著陸時在結果卡標題、於鏡頭飛入時在浮動標籤顯示來賓所選選項原文（`featuredAnswer`），建成後只顯示一句效果文案。字幕未依此模式寫好、`tests/rotationCaptions.test.ts` 未通過者，該模型不算完成；步驟見 `place-building` 技能「Wire the result caption」。
 - 逐件確認退役能源部件去留。構想地處理無可見變化又無可探訪模型嘅結果，詳見 [展覽規格](EXHIBITION_SPEC.md#抽題輪換唯一現行版本)。

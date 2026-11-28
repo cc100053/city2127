@@ -199,6 +199,18 @@ export function conceptVisit(proposal: ExhibitionProposal) {
   return answer && { questionId: answer.questionId, optionId: answer.optionId, label: answer.optionLabel, shot: 'concept:lot' as ShotId };
 }
 
+/**
+ * The answer the big screen features for a rotation result, in the camera's order (src/main.ts): the visited site's question, else the
+ * concept lot's, else the outcome's. `label` is the guest's own option text without its closing 。/. Undefined without a rotation outcome.
+ */
+export function featuredAnswer(proposal: ExhibitionProposal) {
+  const outcome = proposal.rotation?.outcome;
+  if (!outcome) return undefined;
+  const questionId = rotationVisit(proposal)?.questionId ?? conceptVisit(proposal)?.questionId ?? outcome.questionId;
+  const label = proposal.answers.find(answer => answer.questionId === questionId)?.optionLabel.trim().replace(/[。.]$/, '');
+  return label ? { questionId, label } : undefined;
+}
+
 /** A rotation proposal that changed nothing visible but visits a site already showing the guest's answer: question, option, shot and place. */
 export function rotationVisit(proposal: ExhibitionProposal) {
   const questionId = proposal.rotation?.visit;

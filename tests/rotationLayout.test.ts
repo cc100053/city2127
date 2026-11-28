@@ -2,7 +2,7 @@
 // version4 views pass through untouched, and a Q01 swap reads the NW focal copy.
 import assert from './assert.ts';
 import { ladderLayout } from '../survey/src/shared/cityView.ts';
-import { conceptVisit, q01Swap, q02Swap, rotationLayout, rotationVisit, withQ01, Q01_NW_TIERS, ROTATION_VISITS } from '../src/rotationLayout.ts';
+import { conceptVisit, featuredAnswer, q01Swap, q02Swap, rotationLayout, rotationVisit, withQ01, Q01_NW_TIERS, ROTATION_VISITS } from '../src/rotationLayout.ts';
 import { loadRotationSetFile } from '../survey/src/survey/questionLoader.ts';
 import { journeyOutcome } from '../src/voteJourney.ts';
 import { CONCEPT_JOINED, CONCEPT_PLACE, residentCards, residentResult } from '../src/surveyAtmosphere.ts';
@@ -125,6 +125,17 @@ for (const visible of [{ kind: 'swap', questionId: 'Q03', from: 'A', to: 'B' }, 
 assert.equal(conceptVisit(proposal({ kind: 'swap', questionId: 'Q01', from: 'B', to: 'C' }, 'C')), undefined, 'a Q01 swap');
 assert.equal(conceptVisit(unbuilt({ kind: 'swap', questionId: 'Q04', from: 'A', to: 'B' }, 'B', 'Q01')), undefined, 'a visit wins');
 assert.equal(conceptVisit({ ...proposal({ kind: 'fallback', questionId: 'Q01' }, 'C'), rotation: undefined }), undefined, 'version4 proposals');
+// The big screen names the guest's own option for the answer the camera features: the visit, else the concept lot, else the swap.
+const labelled = (outcome: NonNullable<ExhibitionProposal['rotation']>['outcome'], visit?: string): ExhibitionProposal => ({
+  ...proposal(outcome, 'C'),
+  answers: [{ questionId: 'Q06', optionId: 'B', questionText: '', optionLabel: ' 小さな個室で静かに過ごす。 ' }, { questionId: 'Q04', optionId: 'B', questionText: '', optionLabel: '同じ建物の住民と共有する.' },
+    { questionId: 'Q01', optionId: 'C', questionText: '', optionLabel: 'いつでも自分で使える' }],
+  rotation: { outcome, shares: [], ...(visit ? { visit } : {}) },
+});
+assert.deepEqual(featuredAnswer(labelled({ kind: 'swap', questionId: 'Q06', from: 'A', to: 'B' })), { questionId: 'Q06', label: '小さな個室で静かに過ごす' }, 'a swap');
+assert.deepEqual(featuredAnswer(labelled({ kind: 'swap', questionId: 'Q06', from: 'A', to: 'B' }, 'Q01')), { questionId: 'Q01', label: 'いつでも自分で使える' }, 'a visit wins over the swap');
+assert.deepEqual(featuredAnswer(labelled({ kind: 'swap', questionId: 'Q04', from: 'A', to: 'B' })), { questionId: 'Q04', label: '同じ建物の住民と共有する' }, 'the concept lot');
+assert.equal(featuredAnswer({ ...labelled({ kind: 'fallback', questionId: 'Q01' }), rotation: undefined }), undefined, 'version4 proposals');
 const ideaCard = residentResult(unbuilt({ kind: 'swap', questionId: 'Q04', from: 'A', to: 'B' }, 'B'), []);
 assert.deepEqual([ideaCard.kind, ideaCard.preference, ideaCard.effect, ideaCard.place], ['concept', 'あなたは「同じ建物の住民と共有する」という暮らしを選びました。', CONCEPT_JOINED, CONCEPT_PLACE]);
 assert.match(residentResult(unbuilt({ kind: 'swap', questionId: 'Q03', from: 'B', to: 'C' }, 'C'), []).preference, /地域の共有サービス/, 'a known option keeps its preference line');

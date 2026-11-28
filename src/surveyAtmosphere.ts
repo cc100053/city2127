@@ -1,6 +1,6 @@
 import type { EnergyConfiguration } from '../survey/src/shared/energy.ts';
 import { DISPLAY_MS } from '../survey/src/shared/displayTiming.ts';
-import { reasonDelayMs } from './resultTimeline.ts';
+import { reasonDelayMs, shotTimeline } from './resultTimeline.ts';
 import { SITE_TRANSITION_SECONDS } from './siteBuilders/siteRuntime.ts';
 import { headlineTransitionSeconds, SHELF_TRANSITION_SECONDS } from './siteBuilders/shelfTimeline.ts';
 import { addHudChrome } from './hudFrame.ts';
@@ -8,7 +8,7 @@ import type { CarrierChange } from './cityChangeManager.ts';
 import type { DisplayMode } from './dayCycle.ts';
 import { presets, type WorldState } from './presets.ts';
 import { changeSites } from './layout.ts';
-import { conceptVisit, q01Swap, q02Swap, q03Result, q03Swap, q05Result, q05Swap, q06Result, q06Swap, q08Result, q08Swap, Q02_RESULTS, Q03_RESULTS, Q05_RESULTS, Q06_RESULTS, Q08_RESULTS, rotationLayout, rotationVisit } from './rotationLayout.ts';
+import { conceptVisit, featuredAnswer, q01Swap, q02Swap, q03Result, q03Swap, q05Result, q05Swap, q06Result, q06Swap, q08Result, q08Swap, Q02_RESULTS, Q03_RESULTS, Q05_RESULTS, Q06_RESULTS, Q08_RESULTS, rotationLayout, rotationVisit } from './rotationLayout.ts';
 import { ALREADY_HERE, crowdShareText, FACILITY_TO_COME } from '../survey/src/shared/rotation.ts';
 import { AXES, connectSurvey, isExhibitionView, supersedes, type CityView, type Decision, type ExhibitionProposal, type ExhibitionView, type SurveyEventKind, type SurveyView, type ExploreLook } from './surveyView.ts';
 
@@ -328,6 +328,7 @@ export function startSurveyAtmosphere(
   let cardIndex = 0;
   let storyTimer = 0;
   let reasonTimer = 0;
+  let choiceTimer = 0;
   const showAmbient = () => {
     if (!current || !isExhibitionView(current)) return;
     const cards = residentCards(current), card = cards[cardIndex++ % cards.length];
@@ -344,6 +345,7 @@ export function startSurveyAtmosphere(
     current = view;
     const changes = apply(kind, view, displayMs);
     clearTimeout(reasonTimer);
+    clearTimeout(choiceTimer);
     if (isExhibitionView(view)) {
       panel.classList.add('resident-panel');
       panel.dataset.guestCount = String(view.guestCount);
@@ -358,17 +360,28 @@ export function startSurveyAtmosphere(
           ? changes || undefined : undefined;
         const result = residentResult(proposal, evidence);
         panel.dataset.resultKind = result.kind;
-        latest.replaceChildren(el('p', 'causal-context', residentIdentity(proposal)),
-          el('h3', 'resident-card-title', '思いが重なり、街が応える。'),
-          el('p', 'resident-card-copy', '街の画面をご覧ください。'),
-          el('p', 'resident-place', `街の画面：${result.place}`));
+        const context = el('p', 'causal-context', residentIdentity(proposal)), cardTitle = el('h3', 'resident-card-title', '思いが重なり、街が応える。');
+        const copy = el('p', 'resident-card-copy', '街の画面をご覧ください。');
+        latest.replaceChildren(context, cardTitle, copy, el('p', 'resident-place', `街の画面：${result.place}`));
+        // Rotation results name the guest's own option once the orbs land, so the iPad choice reads as the cause of the change;
+        // the reason then keeps only the effect, since the title already states the choice.
+        const featured = featuredAnswer(proposal);
+        const showChoice = () => {
+          if (!featured) return;
+          context.textContent = `${residentIdentity(proposal)} · ${featured.questionId}`;
+          cardTitle.textContent = `「${featured.label}」`;
+          cardTitle.lang = 'ja'; // the page is lang=en; auto-phrase only breaks Japanese at phrase boundaries under ja
+        };
         const showReason = () => {
-          latest.querySelector('.resident-card-copy')!.textContent = `${result.preference}${result.effect}`;
+          copy.textContent = featured ? result.effect : `${result.preference}${result.effect}`;
           // The crowd share stays off the big screen (owner 2026-11-23): only the hovered card on the guest's iPad shows it.
         };
         const transitionMs = reasonDelayMs(displayMs, globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false, q08Swap(proposal)?.shelf ? SHELF_TRANSITION_SECONDS : headlineTransitionSeconds(evidence?.[0], SITE_TRANSITION_SECONDS));
-        if (transitionMs === 0) showReason();
-        else reasonTimer = window.setTimeout(showReason, transitionMs);
+        if (transitionMs === 0) { showChoice(); showReason(); }
+        else {
+          choiceTimer = window.setTimeout(showChoice, shotTimeline(displayMs).flyIn * 1000);
+          reasonTimer = window.setTimeout(showReason, transitionMs);
+        }
         storyTimer = window.setTimeout(showAmbient, displayMs);
       } else {
         cardIndex = 0;

@@ -58,7 +58,7 @@ The owner pastes this prompt into a new session:
 
 1. **Start.** Run the AGENTS.md preflight in the worktree. Check that R(N−1) is committed and pushed, the tree is clean, and none of the earlier rounds' dev servers or `playwright-cli` sessions are still running (stop any you find).
 2. **Brief.** Copy the verdict word for word under `## R(N−1) verdict`. Then turn each of the owner's words into a measured row of `## RN brief`: metres, counts, or on-screen pixels at 3200 × 1800. When a word reads two ways ("more space between the frame"), build the likelier reading and name the other one in the report.
-3. **Build.** Follow the closeup-polish **Blender route**, with the library first. Allow at most three capture-compare passes. Rerun the building's own unit test while iterating, and the full suite once, at the end.
+3. **Build.** Follow the closeup-polish **Blender route**, with the library first. Allow at most three capture-compare passes. Rerun the building's own unit test while iterating, and the full suite once, at the end. In the round that first puts a rotation model on its lot, also do **Wire the result caption** below.
 4. **Capture** into `$CITY2127_EVIDENCE_ROOT/<task>/rN/` with one `npm run capture -- --size=3200x1800 <url> <task>/rN/<name> ...` batch (the closeup-polish **Capture** note):
    - `focal-day` and `focal-night`;
    - `overview`;
@@ -75,6 +75,20 @@ The owner pastes this prompt into a new session:
    - Send the owner the captures with SendUserFile.
 
    Done when the branch is clean and pushed, nothing runs in the background, and the owner has the images. Merge only after the owner accepts. Then follow polish-ladder **Record** and regenerate the change sheet, and update any copy that still names the replaced building.
+
+## Wire the result caption
+
+Required for every rotation model (owner 2026-11-28), written in the same round as the model is placed. The big screen names the guest's own option in the result-card title from the moment the vote orbs land and in the floating tag from the camera fly-in, then shows only the effect line after the build. A model is not done until its caption follows this pattern.
+
+1. **Result row.** Add or confirm `QXX_RESULTS[option] = [place, preference]` in `src/rotationLayout.ts`, marked as provisional owner copy (plan 5.2) like the existing rows.
+2. **Effect copy.** Write the effect for the model entering, leaving, and the lot staying vacant, following `q03Result`/`q05Result`/`q06Result`/`q08Result`, and route the swap through `residentResult`, `visitPreference` (`src/surveyAtmosphere.ts`) and `conceptVisit`. Keep each effect line to about one sentence.
+3. **Visit and shot.** Add the `ROTATION_VISITS` entry and its headline shot (`src/headlineCamera.ts`).
+4. **Exact option.** Confirm `featuredAnswer` returns the guest's exact option label, without the closing 。, for swap, visit and concept results.
+5. **Guard.** Run `node --experimental-strip-types tests/rotationCaptions.test.ts`. It fails for a `ROTATION_VISITS` entry without its copy.
+6. **Change sheet.** Regenerate it with `node --experimental-strip-types scripts/changeSheet.ts` and commit it.
+7. **Captures.** On the real vote pipeline (`survey` `npm run dev:auto`), capture the result at 3.5 s (option in the title and tag) and at 10.5 s (effect line after the build) for owner review.
+
+Done when the guard passes and the owner has the two captures.
 
 ## Time sinks seen
 
