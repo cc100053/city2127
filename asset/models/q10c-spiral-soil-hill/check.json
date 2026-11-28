@@ -1,0 +1,103 @@
+{
+ "glb": "q10c-spiral-soil-hill.glb",
+ "glb_bytes": 13731420,
+ "objects": 87,
+ "meshes": 78,
+ "unique_meshes": 23,
+ "triangles": 425502,
+ "materials": 55,
+ "new_materials_on_import": 55,
+ "bounds_min": [
+  -84.0,
+  -84.43,
+  -1.3
+ ],
+ "bounds_max": [
+  84.94,
+  86.0,
+  53.31
+ ],
+ "groups": [
+  "CHANNEL",
+  "FEED",
+  "HILL",
+  "LIFT",
+  "PIER_LINK",
+  "PIER_LINK_Q11B",
+  "Q10C_SpiralSoilHill",
+  "SUMMIT",
+  "WALK"
+ ],
+ "stage_objects": [
+  "CHANNEL_MIST",
+  "CHANNEL_MOUTH",
+  "CHANNEL_S1_OBJECTS",
+  "CHANNEL_S2_COCOONS",
+  "CHANNEL_S3_CRUMBLE",
+  "CHANNEL_S4_SOIL",
+  "CHANNEL_S4_SPROUTS",
+  "CHANNEL_STRUCTURE"
+ ],
+ "people_nodes": [],
+ "bank_vertex_colours": [
+  "Color"
+ ],
+ "transparent_materials": {
+  "q10c_bin_glass": {
+   "alpha": 0.3,
+   "method": "BLENDED"
+  },
+  "q10c_lift_glass": {
+   "alpha": 0.24,
+   "method": "BLENDED"
+  },
+  "q10c_mist": {
+   "alpha": 0.07,
+   "method": "BLENDED"
+  },
+  "q10c_mycelium_veil": {
+   "alpha": 0.5,
+   "method": "BLENDED"
+  },
+  "q10c_tube_glass": {
+   "alpha": 0.18,
+   "method": "BLENDED"
+  }
+ },
+ "entrance_view": {
+  "rays_on_old_wood": 82,
+  "of_which_through_tube_glass": 46
+ },
+ "main_view": {
+  "rays_on_old_wood": 103,
+  "of_which_through_tube_glass": 9
+ },
+ "seams": {
+  "holes": {
+   "down_rays": 48301,
+   "holes": 0,
+   "edge_grazing_rays": 1,
+   "first_holes": []
+  },
+  "bank_edges": {
+   "wall_top_edge": {
+    "points": 1081,
+    "bank_vertex_max_dist_m": 0.0,
+    "bench_surface_max_dist_m": 0.0014
+   },
+   "curb_foot_edge": {
+    "points": 1081,
+    "bank_vertex_max_dist_m": 0.0,
+    "bench_surface_max_dist_m": 0.0012
+   }
+  }
+ },
+ "planting": {
+  "objects_checked": 61,
+  "verts_checked": 284356,
+  "verts_in_channel_or_path": 0,
+  "offenders": [],
+  "sprout_verts": 19056,
+  "sprout_verts_on_rim_or_path": 0
+ }
+}

@@ -1,0 +1,92 @@
+{
+ "massing": false,
+ "tris_by_group": {
+  "HILL": 133780,
+  "CHANNEL": 181192,
+  "WALK": 46848,
+  "FEED": 8248,
+  "SUMMIT": 55218,
+  "LIFT": 216,
+  "PIER_LINK": 0
+ },
+ "tris_total": 425502,
+ "unique_mesh_tris": 342012,
+ "objects": 87,
+ "materials": 55,
+ "glb_bytes": 13731420,
+ "layout": {
+  "pitch_m": 13.07,
+  "plateau_radius_min_m": 13.35,
+  "plateau_radius_at_exit_m": 21.3,
+  "hill_outer_radius_m": 61.0,
+  "turns": [
+   {
+    "length_m": 306.3,
+    "z": [
+     0.0,
+     12.5
+    ],
+    "grade_pct": 4.08,
+    "channel_width_m": [
+     5.6,
+     5.27
+    ],
+    "bank_above_width_min_m": 4.28,
+    "bank_above_rise_max_m": 12.5,
+    "bank_above_slope_max_deg": 71.1
+   },
+   {
+    "length_m": 224.4,
+    "z": [
+     12.5,
+     25.0
+    ],
+    "grade_pct": 5.57,
+    "channel_width_m": [
+     5.27,
+     4.93
+    ],
+    "bank_above_width_min_m": 4.62,
+    "bank_above_rise_max_m": 11.4,
+    "bank_above_slope_max_deg": 67.0
+   },
+   {
+    "length_m": 142.8,
+    "z": [
+     25.0,
+     38.0
+    ],
+    "grade_pct": 9.1,
+    "channel_width_m": [
+     4.93,
+     4.6
+    ],
+    "bank_above_width_min_m": 0.0,
+    "bank_above_rise_max_m": 11.4,
+    "bank_above_slope_max_deg": 66.5
+   }
+  ],
+  "path_centre_max_step_m": 0.26,
+  "turn_1_to_2_gap_m": 0.0001,
+  "turn_2_to_3_gap_m": 0.0001,
+  "exit": {
+   "path_z": 38.0,
+   "plateau_z": 38.0,
+   "wall_h_at_end": 0.0,
+   "exit_path_r": [
+    18.65,
+    21.05
+   ],
+   "plateau_edge_r_at_exit": 21.3
+  },
+  "tube": {
+   "outlet_lip_over_floor_m": 0.12,
+   "outlet_offset_from_channel_centre_m": -0.1,
+   "outlet_clear_of_channel_sides_m": 1.25,
+   "axis_down_deg": 19.9,
+   "axis_off_channel_direction_deg": 0.0,
+   "outlet_along_m": 3.3,
+   "hero_chair_along_m": 6.32
+  }
+ }
+}
