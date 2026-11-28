@@ -30,7 +30,7 @@ import { build2127 } from './odaiba2127';
 import { bayWater, waterLights } from './bayWater';
 import { residentIdentity, scoresToWorldState, startSurveyAtmosphere } from './surveyAtmosphere';
 import { isExhibitionView } from './surveyView';
-import { conceptVisit, q02Swap, q03Shot, q03Swap, q05Shot, q05Swap, q06Shot, q06Swap, q08Shot, q08Swap, Q02_SHOTS, rotationLayout, rotationVisit } from './rotationLayout';
+import { conceptVisit, featuredAnswer, q02Swap, q03Shot, q03Swap, q05Shot, q05Swap, q06Shot, q06Swap, q08Shot, q08Swap, Q02_SHOTS, rotationLayout, rotationVisit } from './rotationLayout';
 import { LotRuntime } from './lotRuntime';
 import { ConceptHologram } from './conceptHologram';
 import { bayFlowerShown } from './bayFlower';
@@ -402,7 +402,8 @@ try {
         if(idea&&headlineCamera)concept?.show(idea.label,changeAt,now+displayMs/1000);else concept?.hide();
         const shot=(seen?headlineCamera?.playShot(seen.shot,now,displayMs):idea?headlineCamera?.playShot(idea.shot,now,displayMs):q02?headlineCamera?.playShot(Q02_SHOTS[q02.to],now,displayMs):q03?headlineCamera?.playShot(q03Shot(q03),now,displayMs):q05?headlineCamera?.playShot(q05Shot(q05),now,displayMs):q06?headlineCamera?.playShot(q06Shot(q06),now,displayMs):q08?headlineCamera?.playShot(q08Shot(q08),now,displayMs):headlineCamera?.play(changes,now,visit?(shotTimeline(displayMs).changeEnd+BEAT_SECONDS)*1000:displayMs))??null;
         narration?.play(shot,changes[0],now,displayMs);
-        if(shot&&voiceLabel){const t=shotTimeline(displayMs);voiceLabel.show(residentIdentity(latest),SHOTS[shot].target,now+t.hold,now+(visit?t.changeEnd:t.flyOut));}
+        // A rotation result's tag carries the guest's option from the fly-in on, so the choice is named before the change plays.
+        if(shot&&voiceLabel){const t=shotTimeline(displayMs),pick=featuredAnswer(latest);voiceLabel.show(pick?`${residentIdentity(latest)} ｜ ${pick.label}`:residentIdentity(latest),SHOTS[shot].target,now+(pick?t.flyIn:t.hold),now+(visit?t.changeEnd:t.flyOut));}
         if(visit&&(shot==='nw:focal'||shot==='nw:focal-low'))residentDemo!.start(now+shotTimeline(displayMs).changeEnd,layout.bands.nw,prevNw);
         return changes;
       }

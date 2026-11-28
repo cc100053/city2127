@@ -21,6 +21,10 @@ export function labelOpacity(now: number, from: number, until: number) {
   return Math.min(1, (now - from) / LABEL_FADE, (until - now) / LABEL_FADE);
 }
 
+/** Centre x that keeps a tag `tagWidth` wide at least 16 px inside a `width`-wide frame (a long tag shows while the camera still flies in). */
+export const clampLabelX = (x: number, tagWidth: number, width: number, edge = 16) =>
+  Math.min(Math.max(x, tagWidth / 2 + edge), width - tagWidth / 2 - edge);
+
 export class VoiceLabel {
   private readonly element = document.createElement('div');
   private readonly point = new T.Vector3();
@@ -31,6 +35,7 @@ export class VoiceLabel {
 
   constructor(parent: HTMLElement = document.body) {
     this.element.className = 'voice-label';
+    this.element.lang = 'ja';
     // The resident card already announces the same identity to assistive tech.
     this.element.setAttribute('aria-hidden', 'true');
     this.element.hidden = true;
@@ -56,6 +61,7 @@ export class VoiceLabel {
     this.element.hidden = opacity <= 0 || !visible;
     if (this.element.hidden) return;
     this.element.style.opacity = opacity.toFixed(3);
-    this.element.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) translate(-50%, -100%)`;
+    const left = clampLabelX(x, this.element.offsetWidth, width);
+    this.element.style.transform = `translate(${left.toFixed(1)}px, ${y.toFixed(1)}px) translate(-50%, -100%)`;
   }
 }
