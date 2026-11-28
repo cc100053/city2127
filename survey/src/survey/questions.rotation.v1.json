@@ -129,7 +129,7 @@
         {
           "id": "C",
           "label": "公園の上に冷たい雲をつくる。",
-          "modelId": null,
+          "modelId": "q05c-snow-cloud-2127",
           "lotId": "ne-park"
         }
       ]

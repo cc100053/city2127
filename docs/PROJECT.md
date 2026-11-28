@@ -198,9 +198,15 @@ Q03-A「車が引き出しになる住宅」在フジテレビ西南側 A 位，
 
 Q06-B 蛋艙塔（2026-11-19，owner）：住宅 U 自城市背景撤走（`background.parts.mobile.visible=false`；DEV `?housing` 研究照舊），`pod-frame-tower-2127` GLB 以固定形態載入其地塊 `POD_TOWER` (−258, −75)，正面朝北，不透明網格合批。獨立預覽顯示固定模型；展覽由 Q06 驅動（B 顯示，A／C 淡出留草地，`LotRuntime.setQ06`）。`streetKit.podTowerAccess` 由道路 ③ 外側接入陶板支路，並以連續步道接北面兩個入口和東側入口。道路、入口平台及夜間導光屬固定街道層，塔淡出後保留。[交接](handoffs/archive/pod-frame-tower.md)
 
-Q05-A 逆向冷氣機（R2，2026-11-27 owner 驗收）：`q05a-reverse-ac-2127` GLB 隱藏載入 NE PARK 地塊 `LOTS['ne-park']` (−210, −135)，連同自身半徑 24 m 的冷卻草地（地塊 48 m）。不透明網格合批，玻璃芯及四個活動件分件；[reverseAc.ts](../src/reverseAc.ts) 令火舌以一般透明、熱浪及草地冷氣流線以加法混合繪製，並轉動螺旋熱流、火舌、熱浪及冷氣流線（流線向塔底捲入）。展覽由 Q05 驅動（`LotRuntime.setQ05`）：A 時塔淡入，NE 公園（凍結的 tier 0 Meter 站點 `survey-site-ne`）及其下的共享庭園 1（`SharingDistrict.setCourtKeep`）同步淡出；B 時呼吸巨葉取而代之；C 未有模型，公園及庭園回復。version4 run 不接手，維持公園。[交接](handoffs/q05-park-cooling.md)
+Q05-A 逆向冷氣機（R2，2026-11-27 owner 驗收）：`q05a-reverse-ac-2127` GLB 隱藏載入 NE PARK 地塊 `LOTS['ne-park']` (−210, −135)，連同自身半徑 24 m 的冷卻草地（地塊 48 m）。不透明網格合批，玻璃芯及四個活動件分件；[reverseAc.ts](../src/reverseAc.ts) 令火舌以一般透明、熱浪及草地冷氣流線以加法混合繪製，並轉動螺旋熱流、火舌、熱浪及冷氣流線（流線向塔底捲入）。展覽由 Q05 驅動（`LotRuntime.setQ05`）：A 時塔淡入，NE 公園（凍結的 tier 0 Meter 站點 `survey-site-ne`）及其下的共享庭園 1（`SharingDistrict.setCourtKeep`）同步淡出；B 時呼吸巨葉、C 時雪雲噴泉取而代之。version4 run 不接手，維持公園。[交接](handoffs/q05-park-cooling.md)
 
-Q05-B 呼吸巨葉（R2，2026-11-27，待 owner 評審）：`q05b-breathing-leaf-2127` GLB 同樣隱藏載入 NE PARK 地塊，台座半徑 24 m。五片心形巨葉（長 13–15 m，兩層向近鏡左右伸出，頂約 22 m）、半透明玻璃綠莖、白色根環、水管、彎曲長椅牆、近鏡左前方的小溪及 `facet_tree` 樹林；不透明網格合批，葉脈、莖上水滴三相、半透明莖及兩組葉邊霧簾分件。葉面及樹冠在載入時調低天光反射（`BREATHING_LEAF_MATTE`），令日間保持深綠。[breathingLeaf.ts](../src/breathingLeaf.ts) 只改發光強度：水滴三相輪流亮起（水沿莖上升），葉脈及兩組霧簾以 5 秒週期呼吸（霧簾反相）；不透明度留給地塊淡入淡出。巨葉出入時飛 `q05:leaf` 近鏡。DEV `?rotation&jump=Q05:B` 於載入時即時設定選項，供截圖。
+Q05-B 呼吸巨葉（B-R6，2026-11-28 owner 驗收）：`q05b-breathing-leaf-2127` GLB 同樣隱藏載入 NE PARK 地塊，台座半徑 24 m。五片心形巨葉（長 13–15 m，兩層向近鏡左右伸出，頂約 22 m）、半透明玻璃綠莖、白色根環、水管、彎曲長椅牆、近鏡左前方的小溪及 `facet_tree` 樹林；不透明網格合批，葉脈、莖上水滴三相、半透明莖及兩組葉邊霧簾分件。葉面及樹冠在載入時調低天光反射（`BREATHING_LEAF_MATTE`），令日間保持深綠。[breathingLeaf.ts](../src/breathingLeaf.ts) 只改發光強度：水滴三相輪流亮起（水沿莖上升），葉脈及兩組霧簾以 5 秒週期呼吸（霧簾反相）；不透明度留給地塊淡入淡出。巨葉出入時飛 `q05:leaf` 近鏡。DEV `?rotation&jump=Q05:B` 於載入時即時設定選項，供截圖。
+
+Q05-C 雪雲噴泉（C-R3，2026-11-28 owner 驗收）：`q05c-snow-cloud-2127` GLB 同樣隱藏載入 NE PARK 地塊，台座半徑 24 m。扁圓積雲（底約 17 m、頂約 28 m，21 m 以下收在環內，頂白底藍灰頂點顏色，夜間冰白自發光）連半透明薄霧殼、離地 19.5 m 的白色發射環（16 個冰白噴嘴、電弧）、近鏡左方兩台抽水泵及升至環的總管、三組落雪、雪地及藍灰霜帶、地面冷霧、環形融水渠及流向台座邊跌水口的支渠、後半圈 `facet_tree` 樹林、近鏡半圈草地、綠籬及白邊花槽。不透明網格合批，雲、薄霧、雪、噴嘴、電弧、水光及冷霧分件。[snowCloud.ts](../src/snowCloud.ts) 令雲慢轉浮動；每組雪為周期重複的雪層，按（速度 × 時間）除以周期的餘數下移，頂端藏於雲內、底端藏於台座下，故循環無跳格；噴嘴兩組交替亮、電弧閃爍、水光三相流向跌水口、冷霧呼吸；不透明度留給地塊淡入淡出。雪雲出入時飛 `q05:cloud` 近鏡。
+
+Q05 共用公園周邊（C-R2b，2026-11-28，owner「一個共通周邊」「常駐」）：`q05-park-surround-2127` GLB 以 `PARK_SURROUND` 之名常駐載入 NE PARK 地塊中心，不屬 `LotRuntime` 任何淡變，故預設公園及 Q05-A／B／C 四個狀態都顯示。內容：台座外半徑 24.3–27.3 m 的環台座步道（工具盒處斷開）、斜草坡，以及四條按 Q05-A 斜角徑方位的連接路，分別接海濱步道鋪地（東北、西北）、① 外側行人路（東南）及 pod tower 車道（西南）；另有花槽、`facet_tree` 樹叢、長椅、冰白頂燈及居民。不透明網格全部合批。步行者路線 `promenades` 不變。Q05-C 的兩條入雪地小徑已對準西北及東南連接路；B 的入口未改（B 分支待驗收）。
+
+海濱木棧道延伸段（C-R3，2026-11-28，owner「fix the red circle broken road」）：`src/layout.ts` 的 `promenadeTails` 只供繪製，由 `src/skyways.ts` 以同一 7.2 m 木棧道及兩條光線，把兩段 `promenades` 由其終點延伸至共用周邊環台座步道外緣（東段於 309° 進入，取代原東北連接路；西段於 196° 進入），路面漸升至 0.36 m，與步道（頂 0.42 m）重疊；海濱步道經環台座步道北半圈連續。步行者仍沿 `promenades` 在原終點折返（步行者道不可進入地塊 ±21 m 方框）。共用周邊在兩段足跡內不放任何高於步道的物件，`tests/lotRuntime.test.ts` 讀同一折線核對。
 
 Q08-C 南岸活動模組棚的固定支路沿道路 ④ 現有導光過街位接入，平台銜接兩條地軌，中央步道穿過前庭綠籬接到大堂基座。支路、平台、步道及導光屬街道層，模組棚收起後保留。相鄰的共享庭園 3 東移至 (−90, 230)，避開地軌及平台，並清出與新庭園重疊的樹叢。獨立預覽亦使用同一組街道鋪面。[交接](handoffs/question-rotation.md)
 

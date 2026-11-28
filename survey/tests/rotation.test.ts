@@ -7,13 +7,13 @@ import {
   type RotationSet, type RotationSubmission,
 } from '../src/shared/rotation.ts';
 
-// 1.1 — the shipped draft set: nine SURVEY_V2 questions, all drawn (owner 2026-11-18) though only Q01 and Q02 have three models (Q02's flower receiver is unsited).
+// 1.1 — the shipped draft set: nine SURVEY_V2 questions, all drawn (owner 2026-11-18) though only Q01, Q02 and Q05 have three models (Q02's flower receiver is unsited).
 const ROTATION_PATH = new URL('../src/survey/questions.rotation.v1.json', import.meta.url).pathname;
 const shipped = loadRotationSetFile(ROTATION_PATH);
 assert.equal(shipped.questions.length, 9);
 assert.equal(shipped.draft, true);
 assert.ok(shipped.questions.every(q => q.online));
-assert.deepEqual(shipped.questions.filter(q => q.options.every(o => o.modelId)).map(q => q.id), ['Q01', 'Q02']);
+assert.deepEqual(shipped.questions.filter(q => q.options.every(o => o.modelId)).map(q => q.id), ['Q01', 'Q02', 'Q05']);
 assert.ok(shipped.questions.every(q => q.options.length === 3));
 assert.deepEqual(drawQuestions(shipped, initialRotation(shipped)), ['Q01', 'Q02', 'Q03', 'Q04']);
 
@@ -111,40 +111,41 @@ assert.deepEqual(crowdShare(emptyTallies(set), 'q1', 'A', 0), { questionId: 'q1'
 
 // 3.4 — nothing visible changed: the fallback and the visit go to a drawn site already showing the guest's answer with a model.
 const home = initialRotation(shipped); // Q01 B, Q02 A, Q03 A, Q04 A, Q05 A, Q06 B, Q07 A, Q08 C, Q09 A
-// Q05 is parked on C (no model yet) wherever these cases need a question whose shown option has no model; its A (2026-11-26) and B
-// (2026-11-27) have one.
-const parked = { ...home.shown, Q05: 'C' };
+// Q06 is parked on A (no model yet) wherever these cases need a question whose shown option has no model (Q05 used to be, until its
+// C got a model, 2026-11-28).
+const parked = { ...home.shown, Q06: 'A' };
 const stale = { shown: parked, changedAt: { ...home.changedAt, Q01: 9, Q03: 4 } };
 assert.equal(hasModel(shipped, 'Q01', 'B'), true);
 assert.equal(hasModel(shipped, 'Q08', 'A'), false);
 assert.equal(hasModel(shipped, 'Q04', 'A'), false);
-const quiet = ['Q01', 'Q04', 'Q05', 'Q07'];
-assert.equal(hasModel(shipped, 'Q05', 'A'), true); assert.equal(hasModel(shipped, 'Q05', 'B'), true); assert.equal(hasModel(shipped, 'Q05', 'C'), false);
+const quiet = ['Q01', 'Q04', 'Q06', 'Q07'];
+assert.equal(hasModel(shipped, 'Q05', 'A'), true); assert.equal(hasModel(shipped, 'Q05', 'B'), true); assert.equal(hasModel(shipped, 'Q05', 'C'), true);
+assert.equal(hasModel(shipped, 'Q06', 'A'), false);
 // Every drawn site already shows the guest's answer: the stalest with a model (Q01), not the stalest overall (Q04, no model).
 const held = rotationStep(shipped, stale, { stamp: 10, drawn: quiet, answers: answer(quiet, id => parked[id]) });
 assert.deepEqual(held.outcome, { kind: 'fallback', questionId: 'Q01' });
 assert.equal(rotationVisit(shipped, held.state, { stamp: 10, drawn: quiet, answers: answer(quiet, id => parked[id]) }, held.outcome), 'Q01');
 // A fallback with no model anywhere keeps the stalest question and visits nothing.
-const bare = ['Q04', 'Q05', 'Q07', 'Q09'];
+const bare = ['Q04', 'Q06', 'Q07', 'Q09'];
 const bareState = { shown: parked, changedAt: home.changedAt }, bareAnswers = answer(bare, id => parked[id]);
 const empty = rotationStep(shipped, bareState, { stamp: 1, drawn: bare, answers: bareAnswers });
 assert.deepEqual(empty.outcome, { kind: 'fallback', questionId: 'Q04' });
 assert.equal(rotationVisit(shipped, empty.state, { stamp: 1, drawn: bare, answers: bareAnswers }, empty.outcome), undefined);
 // A swap on a question without models changes nothing visible: the camera visits Q01, whose AUTO HUB already shows the answer.
-const unseen = { stamp: 10, drawn: quiet, answers: { Q01: 'B', Q04: 'B', Q05: 'C', Q07: 'A' } };
+const unseen = { stamp: 10, drawn: quiet, answers: { Q01: 'B', Q04: 'B', Q06: 'A', Q07: 'A' } };
 const q04 = rotationStep(shipped, stale, unseen);
 assert.deepEqual(q04.outcome, { kind: 'swap', questionId: 'Q04', from: 'A', to: 'B' });
 assert.equal(swapVisible(shipped, q04.outcome), false);
 assert.equal(rotationVisit(shipped, q04.state, unseen, q04.outcome), 'Q01');
 // Vacant↔vacant (Q08 A↔B) is invisible too; with no other drawn model matching, nothing is visited.
-const vacant = ['Q08', 'Q04', 'Q05', 'Q07'];
+const vacant = ['Q08', 'Q04', 'Q06', 'Q07'];
 const lot = { shown: { ...parked, Q08: 'A' }, changedAt: home.changedAt };
-const ab = { stamp: 2, drawn: vacant, answers: { Q08: 'B', Q04: 'B', Q05: 'C', Q07: 'B' } };
+const ab = { stamp: 2, drawn: vacant, answers: { Q08: 'B', Q04: 'B', Q06: 'A', Q07: 'B' } };
 const q08 = rotationStep(shipped, lot, ab);
 assert.deepEqual(q08.outcome, { kind: 'swap', questionId: 'Q04', from: 'A', to: 'B' });
 assert.equal(rotationVisit(shipped, q08.state, ab, q08.outcome), undefined);
 // A model entering or leaving is a visible swap: no visit.
-const shelf = { stamp: 2, drawn: vacant, answers: { Q08: 'A', Q04: 'A', Q05: 'A', Q07: 'A' } };
+const shelf = { stamp: 2, drawn: vacant, answers: { Q08: 'A', Q04: 'A', Q06: 'B', Q07: 'A' } };
 const gone = rotationStep(shipped, home, shelf);
 assert.deepEqual(gone.outcome, { kind: 'swap', questionId: 'Q08', from: 'C', to: 'A' });
 assert.equal(swapVisible(shipped, gone.outcome), true);

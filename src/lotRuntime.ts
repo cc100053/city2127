@@ -4,8 +4,8 @@
 // share the drawer housing lot: A is the drawer housing, B and C have no model yet (owner 2026-11-19), so the housing fades and its
 // loop road stays. Q06's share the pod-frame tower lot (the retired housing U site): B is the tower, A and C have no model yet (owner
 // 2026-11-19), so the tower fades to lawn. Q05's share the NE PARK lot: A is the reverse air conditioner on its own cooled lawn and B
-// the breathing giant leaf on its own shaded lawn, each standing in place of the NE park; C has no model yet, so the NE park comes
-// back for it. Version4 runs never engage it, so
+// the breathing giant leaf on its own shaded lawn and C the snow-cloud fountain over its own snowfield, each standing in place of
+// the NE park. Version4 runs never engage it, so
 // their city stays as built: the hydro terrace, drawer housing and pod tower as fixed background, the bay flower vacant, the farm on
 // the energy vote, SW on its Meter band, the NE park.
 import type { Object3D, Scene } from 'three';
@@ -39,6 +39,10 @@ export const q03Housing = (option: string | undefined) => option !== 'B' && opti
 export const q06Tower = (option: string | undefined) => option !== 'A' && option !== 'C';
 
 export { q05Model };
+
+/** The Q05 shared park surround (C-R2b): ring walk, link walks and planting round the NE PARK plinth, loaded by main.ts under this
+ *  name. It is the same for the NE park and all three Q05 models, so LotRuntime never fades it. */
+export const PARK_SURROUND = 'q05-park-surround-2127';
 
 /** One lot's model fading over the shared 3-second site transition. It touches the scene only once set, and gives its meshes their
  *  own materials (ownFinishes) only once the model has loaded, so a version4 run keeps the shared materials. */
@@ -80,6 +84,7 @@ export class LotRuntime {
   private readonly tower: LotFade;
   private readonly reverseAc: LotFade;
   private readonly breathingLeaf: LotFade;
+  private readonly snowCloud: LotFade;
   private readonly nePark: LotFade;
   private engaged = false;
   private q03Engaged = false;
@@ -97,7 +102,7 @@ export class LotRuntime {
     this.energy = energy; this.flowerDefault = flowerDefault; this.commons = commons; this.sharing = sharing;
     // Looked up until each GLB has loaded (the roots once, then only their own subtrees).
     let hydro: Object3D | undefined, flower: Object3D | undefined, housing: Object3D | undefined, tower: Object3D | undefined;
-    let reverseAc: Object3D | undefined, breathingLeaf: Object3D | undefined, nePark: Object3D | undefined;
+    let reverseAc: Object3D | undefined, breathingLeaf: Object3D | undefined, snowCloud: Object3D | undefined, nePark: Object3D | undefined;
     this.hydro = new LotFade(() => {
       hydro ??= scene.getObjectByName('q02a-hydro-terrace');
       return hydro && { targets: [hydro], loaded: !!hydro.getObjectByName('q02a-hydro-terrace-glb') };
@@ -126,6 +131,11 @@ export class LotRuntime {
     this.breathingLeaf = new LotFade(() => {
       breathingLeaf ??= scene.getObjectByName('q05b-breathing-leaf-2127');
       return breathingLeaf && { targets: [breathingLeaf], loaded: true };
+    }, 0);
+    // And the snow-cloud fountain, hidden until a rotation run shows Q05-C.
+    this.snowCloud = new LotFade(() => {
+      snowCloud ??= scene.getObjectByName('q05c-snow-cloud-2127');
+      return snowCloud && { targets: [snowCloud], loaded: true };
     }, 0);
     // The NE park they replace (the frozen tier-0 Meter site); its own finishes once the park's tree GLB is in, so the trees fade too.
     this.nePark = new LotFade(() => {
@@ -164,8 +174,8 @@ export class LotRuntime {
     this.q06Engaged = true;
     this.tower.set(q06Tower(option) ? 1 : 0, now, immediate);
   }
-  /** Shows Q05 `option`'s model in place of the NE park (A the reverse air conditioner, B the breathing giant leaf), or brings the
-   *  park back (C), over the shared transition from `now` unless `immediate`. Undefined after a rotation run restores the park, and
+  /** Shows Q05 `option`'s model in place of the NE park (A the reverse air conditioner, B the breathing giant leaf, C the snow-cloud
+   *  fountain) over the shared transition from `now` unless `immediate`. Undefined after a rotation run restores the park, and
    *  before one leaves it untouched. */
   setQ05(option: string | undefined, now: number, immediate: boolean) {
     if (option === undefined && !this.q05Engaged) return;
@@ -173,11 +183,12 @@ export class LotRuntime {
     const shown = q05Model(option);
     this.reverseAc.set(shown === 'tower' ? 1 : 0, now, immediate);
     this.breathingLeaf.set(shown === 'leaf' ? 1 : 0, now, immediate);
+    this.snowCloud.set(shown === 'cloud' ? 1 : 0, now, immediate);
     this.nePark.set(shown ? 0 : 1, now, immediate);
   }
   getDiagnostics() {
     return { hydro: this.hydro.shown, flower: this.flower.shown, housing: this.housing.shown, tower: this.tower.shown, reverseAc: this.reverseAc.shown,
-      breathingLeaf: this.breathingLeaf.shown };
+      breathingLeaf: this.breathingLeaf.shown, snowCloud: this.snowCloud.shown };
   }
   update(now: number, reducedMotion: boolean) {
     this.hydro.update(now, reducedMotion);
@@ -186,6 +197,7 @@ export class LotRuntime {
     this.tower.update(now, reducedMotion);
     this.reverseAc.update(now, reducedMotion);
     this.breathingLeaf.update(now, reducedMotion);
+    this.snowCloud.update(now, reducedMotion);
     this.nePark.update(now, reducedMotion);
     if (this.q05Engaged) this.sharing?.setCourtKeep(this.sharing.courtAt(LOTS['ne-park'].x, LOTS['ne-park'].z), this.nePark.level);
   }

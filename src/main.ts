@@ -18,6 +18,7 @@ import { heroCamera, HERO_TARGET } from './heroCamera';
 import { DRAWER_HOUSING, DISTRICT, LOTS, POD_TOWER } from './layout';
 import { prepareReverseAc, REVERSE_AC, reverseAcBakes } from './reverseAc';
 import { BREATHING_LEAF, breathingLeafBakes, prepareBreathingLeaf } from './breathingLeaf';
+import { SNOW_CLOUD, snowCloudBakes, prepareSnowCloud } from './snowCloud';
 import { createWorldState } from './worldState';
 import { displayHour, type DisplayMode, sunHeight, daylight, moodAt, withNight, nightLighting } from './dayCycle';
 import { overlay } from './overlay';
@@ -31,7 +32,7 @@ import { bayWater, waterLights } from './bayWater';
 import { residentIdentity, scoresToWorldState, startSurveyAtmosphere } from './surveyAtmosphere';
 import { isExhibitionView } from './surveyView';
 import { conceptVisit, q02Swap, q03Shot, q03Swap, q05Shot, q05Swap, q06Shot, q06Swap, q08Shot, q08Swap, Q02_SHOTS, rotationLayout, rotationVisit } from './rotationLayout';
-import { LotRuntime } from './lotRuntime';
+import { LotRuntime, PARK_SURROUND } from './lotRuntime';
 import { ConceptHologram } from './conceptHologram';
 import { bayFlowerShown } from './bayFlower';
 import { createCityChangeManager } from './createCityChangeManager';
@@ -199,7 +200,7 @@ try {
   const housing=import.meta.env.DEV&&!surveyUrl&&metersParam===null&&!scaleLab&&!params.has('energy')&&params.has('housing');
   const energyReview=import.meta.env.DEV&&!surveyUrl&&metersParam===null&&!scaleLab&&params.has('energy');
   const shotPreview=import.meta.env.DEV&&!surveyUrl&&metersParam===null&&!scaleLab&&!housing&&!energyReview&&!civicReview&&!streetReview&&params.has('shot');
-  let reverseAcMotion:((now:number)=>void)|undefined,breathingLeafMotion:((now:number)=>void)|undefined;
+  let reverseAcMotion:((now:number)=>void)|undefined,breathingLeafMotion:((now:number)=>void)|undefined,snowCloudMotion:((now:number,dark:number)=>void)|undefined;
   if(!housing&&!energyReview){
     // Fixed city background: votes and recovery never retarget the dwellings; the update cycle stays in DEV.
     const background=housingPrototype();background.select('mixed');background.root.name='housing-background';scene.add(background.root);
@@ -227,6 +228,16 @@ try {
       foundation.receiveShadow = true;
       model.add(foundation);
     }).catch(error => console.error('Drawer housing could not load', error));
+    // Q05 shared park surround (owner 2026-11-28, C-R2b): the ring walk, link walks and planting round the NE PARK plinth, the same for
+    // the NE park and all three Q05 models, so it stays shown (never one of lotRuntime's fades).
+    const parkSurroundUrl = new URL('../asset/models/q05-park-surround-2127/q05-park-surround-2127.glb', import.meta.url).href;
+    void odaibaReady.then(async ready => {
+      if (!ready) return;
+      const lot = LOTS['ne-park'];
+      const model = await addCityModel(scene, parkSurroundUrl, [lot.x, 0, lot.z]);
+      model.add(...bake(model, mesh => !Array.isArray(mesh.material) && !mesh.material.transparent));
+      model.name = PARK_SURROUND;
+    }).catch(error => console.error('Q05 park surround could not load', error));
     // Q05-A reverse air conditioner on the NE PARK lot: loaded hidden; lotRuntime shows it in place of the NE park in rotation runs.
     const reverseAcUrl = new URL('../asset/models/q05a-reverse-ac-2127/q05a-reverse-ac-2127.glb', import.meta.url).href;
     void odaibaReady.then(async ready => {
@@ -249,6 +260,17 @@ try {
       model.add(...bake(model, breathingLeafBakes));
       model.name = BREATHING_LEAF;
     }).catch(error => console.error('Breathing giant leaf could not load', error));
+    // Q05-C snow-cloud fountain on the same lot, likewise loaded hidden for rotation runs.
+    const snowCloudUrl = new URL('../asset/models/q05c-snow-cloud-2127/q05c-snow-cloud-2127.glb', import.meta.url).href;
+    void odaibaReady.then(async ready => {
+      if (!ready) return;
+      const lot = LOTS['ne-park'];
+      const model = await addCityModel(scene, snowCloudUrl, [lot.x, 0, lot.z]);
+      snowCloudMotion = prepareSnowCloud(model);
+      // Keep the cloud, snow, haze, fog and glowing parts separate and batch the static opaque parts; named once complete.
+      model.add(...bake(model, snowCloudBakes));
+      model.name = SNOW_CLOUD;
+    }).catch(error => console.error('Snow-cloud fountain could not load', error));
   }
   // DEV `?showcase`: the unplaced Q10-A and Q11-C drafts on the west bay (src/devShowcase.ts), outside the rotation.
   let showcaseFrame:((now:number)=>void)|undefined,showcaseFly:(()=>boolean)|undefined;
@@ -458,7 +480,7 @@ try {
     attract?.update(now,!!headlineCamera?.active||!!explore?.active||devShot!==null,cameraMotion.matches,voices);
     if(headlineCamera?.active)voiceLabel?.update(camera,now);else voiceLabel?.hide();
     if(import.meta.env.DEV&&devShot){camera.position.set(...devShot.position);controls.target.set(...devShot.target);camera.lookAt(controls.target);}
-    cityChanges?.update(now,dark);lots?.update(now,cameraMotion.matches);if(!cameraMotion.matches){reverseAcMotion?.(now);breathingLeafMotion?.(now);showcaseFrame?.(now);}concept?.update(now);journey?.update(now,dark);devFrame?.(now,dark);elevatorNear.update(now,dark);ring.update(dark);holo.update(now,dark);rig.update(s,now,dark,cityChanges?.automationLevel,hour);updateOdaiba(dark);updateFloaters(now,dark);updateHoverBeds(now);updateOverlay(hour,dark>.5);renderer.info.reset();
+    cityChanges?.update(now,dark);lots?.update(now,cameraMotion.matches);if(!cameraMotion.matches){reverseAcMotion?.(now);breathingLeafMotion?.(now);snowCloudMotion?.(now,dark);showcaseFrame?.(now);}concept?.update(now);journey?.update(now,dark);devFrame?.(now,dark);elevatorNear.update(now,dark);ring.update(dark);holo.update(now,dark);rig.update(s,now,dark,cityChanges?.automationLevel,hour);updateOdaiba(dark);updateFloaters(now,dark);updateHoverBeds(now);updateOverlay(hour,dark>.5);renderer.info.reset();
     // Wall-clock rate, so held review times still redraw shadows as models load and Meter sites change.
     if(performance.now()-shadowDrawn>=1000/quality.shadowHz){renderer.shadowMap.needsUpdate=true;shadowDrawn=performance.now();}
     composer.render();
