@@ -1,0 +1,314 @@
+{
+ "glb": "C:\\Users\\User\\OneDrive\\\u6587\u4ef6\\GitHub\\city2127-q09b\\asset\\models\\q09b-petal-canteen\\q09b-petal-canteen-v2.glb",
+ "glb_bytes": 5752992,
+ "objects": 22,
+ "meshes": 16,
+ "roots": [
+  "Q09B_PetalCanteen"
+ ],
+ "root_location": [
+  0.0,
+  0.0,
+  0.0
+ ],
+ "preview_or_figure_nodes": [],
+ "bbox_min_m": [
+  -24.03,
+  -7.0,
+  -0.3
+ ],
+ "bbox_max_m": [
+  24.03,
+  42.0,
+  15.0
+ ],
+ "triangles": 144440,
+ "triangles_by_object": {
+  "TABLE_1": 4624,
+  "TABLE_2": 4624,
+  "TABLE_3": 4624,
+  "TABLE_4": 4624,
+  "TABLE_5": 6220,
+  "TABLE_6": 4624,
+  "KITCHEN_COUNTER": 16356,
+  "KITCHEN_HOOD": 8556,
+  "LIGHTBOX": 4,
+  "MENU_LIGHTBOX_FRAMES": 2412,
+  "MENU_RING": 24,
+  "PETALS_INNER": 24896,
+  "PETALS_OUTER": 37344,
+  "BACK_OF_HOUSE": 168,
+  "FLOOR_PLAZA": 12532,
+  "COLUMNS_RING_RIBS": 12808
+ },
+ "materials": 66,
+ "empty_slots": 0,
+ "see_through": {
+  "q09b_crown_amber": {
+   "alpha": 0.48,
+   "base": "#F29A2E",
+   "thin_film_nm": 400.0
+  },
+  "q09b_crown_lilac": {
+   "alpha": 0.48,
+   "base": "#B486EC",
+   "thin_film_nm": 400.0
+  },
+  "q09b_crown_teal": {
+   "alpha": 0.48,
+   "base": "#3FCDB8",
+   "thin_film_nm": 400.0
+  },
+  "q09b_cup_glass": {
+   "alpha": 0.35,
+   "base": "#F2EAD0",
+   "thin_film_nm": 0.0
+  },
+  "q09b_outer_amber": {
+   "alpha": 0.3,
+   "base": "#F29A2E",
+   "thin_film_nm": 400.0
+  },
+  "q09b_outer_lilac": {
+   "alpha": 0.3,
+   "base": "#B486EC",
+   "thin_film_nm": 400.0
+  },
+  "q09b_outer_teal": {
+   "alpha": 0.3,
+   "base": "#3FCDB8",
+   "thin_film_nm": 400.0
+  },
+  "q09b_shelf_glass": {
+   "alpha": 0.35,
+   "base": "#E3F2F2",
+   "thin_film_nm": 0.0
+  }
+ },
+ "PETALS_OUTER_top_z": 6.93,
+ "PETALS_OUTER_max_r": 19.65,
+ "PETALS_INNER_top_z": 13.5,
+ "PETALS_INNER_max_r": 7.1,
+ "KITCHEN_HOOD_top_z": 15.0,
+ "KITCHEN_HOOD_max_r": 3.77,
+ "hood_is_own_object": true,
+ "petal_layers_under_roof": {
+  "probes": 740,
+  "covered_share": 0.751,
+  "two_or_more_layers_share": 0.065,
+  "max_layers": 3
+ },
+ "tables": {
+  "TABLE_1": {
+   "present": true,
+   "table_top": true,
+   "chairs": true,
+   "tableware": true,
+   "lamps": true
+  },
+  "TABLE_2": {
+   "present": true,
+   "table_top": true,
+   "chairs": true,
+   "tableware": true,
+   "lamps": true
+  },
+  "TABLE_3": {
+   "present": true,
+   "table_top": true,
+   "chairs": true,
+   "tableware": true,
+   "lamps": true
+  },
+  "TABLE_4": {
+   "present": true,
+   "table_top": true,
+   "chairs": true,
+   "tableware": true,
+   "lamps": true
+  },
+  "TABLE_5": {
+   "present": true,
+   "table_top": true,
+   "chairs": true,
+   "tableware": true,
+   "lamps": true
+  },
+  "TABLE_6": {
+   "present": true,
+   "table_top": true,
+   "chairs": true,
+   "tableware": true,
+   "lamps": true
+  }
+ },
+ "serving_ring_clear": {
+  "probes": 216,
+  "blocked": [],
+  "clear": true
+ },
+ "table_passages": [
+  {
+   "bearing": 30.0,
+   "width_tested_m": 1.8,
+   "clear": true,
+   "hits": []
+  },
+  {
+   "bearing": 90.0,
+   "width_tested_m": 1.8,
+   "clear": true,
+   "hits": []
+  },
+  {
+   "bearing": 150.0,
+   "width_tested_m": 1.8,
+   "clear": true,
+   "hits": []
+  },
+  {
+   "bearing": 210.0,
+   "width_tested_m": 1.8,
+   "clear": true,
+   "hits": []
+  },
+  {
+   "bearing": 270.0,
+   "width_tested_m": 1.8,
+   "clear": true,
+   "hits": []
+  },
+  {
+   "bearing": 330.0,
+   "width_tested_m": 1.8,
+   "clear": true,
+   "hits": []
+  }
+ ],
+ "service_route": {
+  "from_y": 20.3,
+  "to_y": 32.85,
+  "width_tested_m": 1.8,
+  "blocked": [],
+  "clear": true
+ },
+ "table_end_clearance": [
+  {
+   "bearing": 0.0,
+   "clear_m": 2.25,
+   "to": "FLOOR_PLAZA"
+  },
+  {
+   "bearing": 60.0,
+   "clear_m": 2.25,
+   "to": "FLOOR_PLAZA"
+  },
+  {
+   "bearing": 120.0,
+   "clear_m": 2.25,
+   "to": "FLOOR_PLAZA"
+  },
+  {
+   "bearing": 180.0,
+   "clear_m": 2.25,
+   "to": "FLOOR_PLAZA"
+  },
+  {
+   "bearing": 240.0,
+   "clear_m": 2.25,
+   "to": "FLOOR_PLAZA"
+  },
+  {
+   "bearing": 300.0,
+   "clear_m": 2.25,
+   "to": "FLOOR_PLAZA"
+  }
+ ],
+ "petal_tip_max_z": 13.5,
+ "signs": {
+  "MENU_RING": {
+   "present": true,
+   "faces": 24,
+   "images": [
+    {
+     "material": "q09b_menu_0",
+     "image": "q09b-menu-0",
+     "px": [
+      1024,
+      312
+     ]
+    },
+    {
+     "material": "q09b_menu_0",
+     "image": "q09b-menu-0",
+     "px": [
+      1024,
+      312
+     ]
+    },
+    {
+     "material": "q09b_menu_1",
+     "image": "q09b-menu-1",
+     "px": [
+      1024,
+      312
+     ]
+    },
+    {
+     "material": "q09b_menu_1",
+     "image": "q09b-menu-1",
+     "px": [
+      1024,
+      312
+     ]
+    },
+    {
+     "material": "q09b_menu_2",
+     "image": "q09b-menu-2",
+     "px": [
+      1024,
+      312
+     ]
+    },
+    {
+     "material": "q09b_menu_2",
+     "image": "q09b-menu-2",
+     "px": [
+      1024,
+      312
+     ]
+    }
+   ]
+  },
+  "LIGHTBOX": {
+   "present": true,
+   "faces": 4,
+   "images": [
+    {
+     "material": "q09b_lightbox",
+     "image": "q09b-lightbox",
+     "px": [
+      300,
+      1300
+     ]
+    },
+    {
+     "material": "q09b_lightbox",
+     "image": "q09b-lightbox",
+     "px": [
+      300,
+      1300
+     ]
+    }
+   ]
+  }
+ },
+ "visibility_v2": {
+  "menu_from_main": "13 / 18",
+  "served_table_from_main": "494 / 532",
+  "hood_from_main": "6 / 8",
+  "menu_from_table": "11 / 18",
+  "served_table_from_table": "495 / 532",
+  "hood_from_table": "6 / 8"
+ }
+}

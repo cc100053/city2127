@@ -1,0 +1,64 @@
+{
+ "massing": true,
+ "tris": 15060,
+ "objects": 13,
+ "tris_by_object": {
+  "PAVING": 1484,
+  "SHOPS": 1560,
+  "CANOPIES": 544,
+  "COURTYARD_GROUND": 472,
+  "STAIR_LANDING": 472,
+  "SKYWALK_L": 3724,
+  "SKYWALK_R": 3724,
+  "CANOPY_COURTYARD": 2936,
+  "LIFT": 144
+ },
+ "materials": 3,
+ "bbox_min": [
+  -27.0,
+  0.0,
+  -0.3
+ ],
+ "bbox_max": [
+  27.0,
+  36.0,
+  8.3
+ ],
+ "levels": {
+  "stair_top": 2.5,
+  "landing": 2.5,
+  "deck": 5.0,
+  "skywalks": {
+   "L": {
+    "start": [
+     -1.48,
+     15.9,
+     2.7338435374149657
+    ],
+    "end": [
+     -6.95,
+     22.8,
+     5.0
+    ]
+   },
+   "R": {
+    "start": [
+     1.48,
+     15.9,
+     2.7338435374149657
+    ],
+    "end": [
+     6.95,
+     22.8,
+     5.0
+    ]
+   }
+  }
+ },
+ "block": [
+  -27.0,
+  27.0,
+  0.0,
+  36.0
+ ]
+}

@@ -1,0 +1,114 @@
+{
+ "glb": "C:\\Users\\User\\OneDrive\\\u6587\u4ef6\\GitHub\\city2127-q09c\\asset\\models\\q09c-skywalk-market\\q09c-skywalk-market.glb",
+ "glb_bytes": 2053788,
+ "objects": 13,
+ "meshes": 9,
+ "roots": [
+  "Q09C_SkywalkMarket"
+ ],
+ "root_location": [
+  0.0,
+  0.0,
+  0.0
+ ],
+ "preview_or_figure_nodes": [],
+ "bbox_min_m": [
+  -27.0,
+  0.0,
+  -0.3
+ ],
+ "bbox_max_m": [
+  27.0,
+  36.06,
+  11.784
+ ],
+ "inside_block_plan": true,
+ "triangles": 53974,
+ "triangles_by_object": {
+  "CANOPIES": 5196,
+  "COURTYARD_GROUND": 3736,
+  "SHOPS": 11780,
+  "PAVING": 5960,
+  "CANOPY_COURTYARD": 9306,
+  "LIFT": 156,
+  "SKYWALK_L": 8548,
+  "SKYWALK_R": 8548,
+  "STAIR_LANDING": 744
+ },
+ "materials": 50,
+ "empty_slots": 0,
+ "glass_and_pearl": {
+  "q09c_glass_rail": {
+   "alpha": 0.22,
+   "thin_film_nm": 0.0
+  },
+  "q09c_lift_glass": {
+   "alpha": 0.2,
+   "thin_film_nm": 0.0
+  },
+  "q09c_pearl_cladding": {
+   "alpha": 1.0,
+   "thin_film_nm": 400.0
+  },
+  "q09c_pearl_roof": {
+   "alpha": 1.0,
+   "thin_film_nm": 400.0
+  },
+  "q09c_shop_glass": {
+   "alpha": 0.14,
+   "thin_film_nm": 0.0
+  }
+ },
+ "levels": {
+  "stair_top_tread_z": 2.321,
+  "landing_z": 2.5,
+  "stair_to_landing_step_m": 0.179,
+  "skywalks": {
+   "L": {
+    "first_tread_z": 2.679,
+    "riser_from_landing_m": 0.179,
+    "design_riser_m": 0.179,
+    "tread_depth_m": 0.489,
+    "level_deck_z": 5.0,
+    "end_deck_z": 5.0,
+    "courtyard_deck_z": 5.0,
+    "end_to_courtyard_step_m": 0.0,
+    "min_clear_under_over_lane_m": null,
+    "min_clear_under_over_planting_m": 3.65
+   },
+   "R": {
+    "first_tread_z": 2.679,
+    "riser_from_landing_m": 0.179,
+    "design_riser_m": 0.179,
+    "tread_depth_m": 0.489,
+    "level_deck_z": 5.0,
+    "end_deck_z": 5.0,
+    "courtyard_deck_z": 5.0,
+    "end_to_courtyard_step_m": 0.0,
+    "min_clear_under_over_lane_m": null,
+    "min_clear_under_over_planting_m": 3.65
+   }
+  },
+  "lift_car_floor_z": 5.0,
+  "courtyard_deck_z": 5.0,
+  "stair_note": "the top tread is one riser below the landing (14 risers, 13 treads + landing)"
+ },
+ "ground_passage": {
+  "entrance_street": {
+   "clear": true,
+   "hits": []
+  },
+  "exit_street": {
+   "clear": true,
+   "hits": []
+  },
+  "left_lane": {
+   "clear": true,
+   "hits": []
+  },
+  "right_lane": {
+   "clear": true,
+   "hits": []
+  }
+ }
+}

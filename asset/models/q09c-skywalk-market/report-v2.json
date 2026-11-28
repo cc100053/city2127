@@ -1,0 +1,71 @@
+{
+ "massing": false,
+ "tris": 59090,
+ "objects": 15,
+ "tris_by_object": {
+  "PAVING": 5960,
+  "SHOPS": 11780,
+  "CANOPIES": 5196,
+  "COURTYARD_GROUND": 3736,
+  "STAIR_LANDING": 792,
+  "SKYWALK_L": 10960,
+  "SKYWALK_R": 10960,
+  "CANOPY_COURTYARD": 9306,
+  "LIFT": 156,
+  "SIGNS": 12,
+  "SIGN_FRAMES": 232
+ },
+ "materials": 57,
+ "bbox_min": [
+  -27.0,
+  0.0,
+  -0.3
+ ],
+ "bbox_max": [
+  27.0,
+  36.06,
+  11.78
+ ],
+ "levels": {
+  "stair_top": 2.5,
+  "landing": 2.5,
+  "deck": 5.0,
+  "skywalks": {
+   "L": {
+    "start": [
+     -1.48,
+     15.9,
+     2.7338435374149657
+    ],
+    "end": [
+     -6.95,
+     22.8,
+     5.0
+    ]
+   },
+   "R": {
+    "start": [
+     1.48,
+     15.9,
+     2.7338435374149657
+    ],
+    "end": [
+     6.95,
+     22.8,
+     5.0
+    ]
+   }
+  }
+ },
+ "block": [
+  -27.0,
+  27.0,
+  0.0,
+  36.0
+ ],
+ "iridescence_patched": [
+  "q09c_pearl_roof",
+  "q09c_pearl_cladding"
+ ],
+ "glb_bytes": 3994168
+}
