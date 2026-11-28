@@ -14,6 +14,7 @@ const MODEL_NAMES: Record<string, string> = {
   'drawer-housing-2127': '車抽屜住宅', 'pod-frame-tower-2127': '蛋艙塔', 'event-shelf-2127': '活動モジュール棚',
   'q05a-reverse-ac-2127': '逆向き冷房塔',
   'q05b-breathing-leaf-2127': '呼吸する巨葉',
+  'q05c-snow-cloud-2127': '雪雲噴水',
 };
 
 type Emit = (kind: SurveyEventKind, view: CityView, displayMs?: number) => void;

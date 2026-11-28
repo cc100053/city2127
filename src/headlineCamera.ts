@@ -8,7 +8,7 @@ import { STAGE_SLOTS } from './stages.ts';
 export { FLY_IN, FLY_OUT, shotTimeline } from './resultTimeline.ts';
 
 type Site = CarrierChange['socketId'];
-export type ShotId = `${Site}:${'focal' | 'district'}` | `${'nw' | 'sw' | 'se'}:${string}` | `energy:${'garden' | 'garden2' | 'ring' | 'wing' | 'farm' | 'island'}` | `q02:${'hydro' | 'flower' | 'farm'}` | 'q03:housing' | 'q05:tower' | 'q05:leaf' | 'q06:tower' | 'concept:lot';
+export type ShotId = `${Site}:${'focal' | 'district'}` | `${'nw' | 'sw' | 'se'}:${string}` | `energy:${'garden' | 'garden2' | 'ring' | 'wing' | 'farm' | 'island'}` | `q02:${'hydro' | 'flower' | 'farm'}` | 'q03:housing' | 'q05:tower' | 'q05:leaf' | 'q05:cloud' | 'q06:tower' | 'concept:lot';
 type Pose = { position: [number, number, number]; target: [number, number, number] };
 export const SHOTS: Record<ShotId, Pose> = {
   'nw:focal': { position: [212, 64, -342], target: [40, 62, -300] },
@@ -57,6 +57,7 @@ export const SHOTS: Record<ShotId, Pose> = {
   // Q05-B (2026-11-27): the breathing giant leaf from the same side, lower and closer, so the five leaves, the mist on their rims
   // and the root ring with the residents under them fill the frame; used when the leaf enters or leaves.
   'q05:leaf': { position: [-252, 40, -192], target: [-210, 9, -135] },
+  'q05:cloud': { position: [-256, 36, -196], target: [-210, 17, -135] },
   // Question rotation Q06 (2026-11-19): the pod-frame tower on the retired housing U lot, from the north-east over the open lawn
   // (owner accepted the placement close-up); used when the tower enters or leaves.
   'q06:tower': { position: [-208, 50, -158], target: [-258, 16, -75] },

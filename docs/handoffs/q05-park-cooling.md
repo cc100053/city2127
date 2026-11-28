@@ -1,7 +1,7 @@
 # q05-park-cooling — Q05 公園降溫三態：目標圖與建築故事
 
 - Owner: repository owner
-- Status: Q05-A DONE（R2 owner 驗收，2026-11-27，已合併入 main）；Q05-B R5 已建，待 owner 評審（分支 `feat/q05b-breathing-leaf`）；C 未建模。
+- Status: Q05-A DONE（R2 owner 驗收，2026-11-27，已合併入 main）；Q05-B DONE（B-R6 owner 驗收，2026-11-28，已合併入 main）；Q05-C DONE（C-R3 owner 驗收，2026-11-28，「accept, merge main」，已合併入 main；含共用公園周邊及海濱木棧道延伸段）。
 - Branch: `feat/q05a-reverse-ac`（worktree `../city2127-q05a`），自 `origin/main` `bbec76c2`；目標圖記錄見舊分支 `docs/q05-targets`（已合併）。
 - Base commit: `bbec76c26a833a2a5ba24dfc42f3cee3f9a03c0c`
 - Last verified commit: `00f0cd75`（A R2）；B-R4 見分支 `feat/q05b-breathing-leaf` 最新提交（檢查見 B-R4 一節）。
@@ -531,3 +531,281 @@ owner 指示：「do b modeling」。地塊、近鏡方位及台座沿用 A 的�
 ## B-R7 round prompt（下一輪會話）
 
 place-building round for `q05b-breathing-leaf`: main checkout `/Users/fatboy/city2127`, branch `feat/q05b-breathing-leaf`, read `docs/handoffs/q05-park-cooling.md` (its `## B-R6 brief` and `## B-R6` sections). Owner verdict on B-R6: «…»
+
+## C-R1 brief（2026-11-28，Q05-C 雪雲噴泉）
+
+owner 指示：「做 Q5 嘅 C model」。地塊、近鏡方位及台座沿用 A／B（NE PARK 48 × 48 m，圓台座半徑 24 m，近鏡由西南望，方位 `CAM` −2.22）。尺寸按目標圖中 1.8 m 居民量度（目標圖寬 2400 px 中，雪地上的大人約 60 px，即約 33 px/m）。
+
+**分支：** C 需要 B 的 Q05 接線（`q05Model`、`?jump=`），故 `feat/q05c-snow-cloud` 由 `feat/q05b-breathing-leaf` 的 `3f13a1c5` 開出（worktree `../city2127-q05c`），不是由 `origin/main`。B 未驗收前 C 不能合併；B 若再改，C 須重新疊上（rebase）。
+
+**對目標的調整：** 目標中抽水泵在海邊、廣場為方形；NE PARK 地塊在內陸，故保留 A／B 的圓形台座，海水總管及融水渠都在台座邊的維修口終止（同 B 的水管做法），表示經地下通往東京灣。發射環由抽水立管撐起，另加兩支幼補給管；只有雲是浮空的。所有發光避開概念地塊 `#5fdcff`，噴嘴及電弧用冰白色。
+
+| # | 目標圖 | 量度目標 |
+| --- | --- | --- |
+| 1 | 懸浮冷雲（主角） | 約 45 個平滑團塊組成的積雲，底約 16 m、頂約 31 m，直徑約 26 m；頂部純白，底部漸變為藍灰（頂點顏色），令雲在淺色城市背景前有立體感；外層半透明薄霧殼令邊緣柔和。執行時慢轉並輕微上下浮動。 |
+| 2 | 發射環 | 半徑 12 m、離地約 19.5 m 的白色水平環管（管半徑 0.55 m），16 個發光冰白噴嘴（兩組交替亮起，似在發射）；環外一圈閃爍的冰白電弧。 |
+| 3 | 抽水泵及管道 | 近鏡左方台座邊的兩台白色抽水泵（主泵馬達直徑約 2.4 m，前面發光圓眼），半徑 0.8 m 的白色總管由台座邊維修口經泵升至約 19 m，再彎入發射環；管上冰白色光帶。另兩支 0.3 m 幼補給管支撐環的另一側。 |
+| 4 | 落雪 | 雪柱半徑約 7–9 m，由雲底落到地面；三組不同周期及速度的雪粒（每粒約 0.18 m，近鏡約 5 px），發光白色，執行時不斷下落並微微旋轉。 |
+| 5 | 雪地及冷霧 | 中心半徑約 9.5 m 的白色雪地（雪堆團塊），外圈藍灰霜帶作陰影對比；地面一層半透明冷霧。小孩在雪下（約 1.2 m 高），大人圍觀，長椅。 |
+| 6 | 融水渠流回海 | 半徑約 13.5 m 的環形水渠（闊約 1.4 m，白色渠邊），一條支渠在近鏡左前方流到台座邊的跌水口；渠中三相水光（執行時輪流亮起，表示水流向海）。 |
+| 7 | 綠化 | 後半圈濃密 `facet_tree` 樹林及白邊花槽（深色背景襯托落雪），近鏡一側只放低矮灌木，不擋雪地。 |
+| 8 | 近鏡 | 新近鏡 `q05:cloud`，由西南略高處望向雲底及雪地，畫面包括雲頂、發射環、泵及雪地。 |
+
+## C-R1（2026-11-28，Q05-C 雪雲噴泉）
+
+### Git 狀態
+
+- 開始時主工作目錄在 `feat/q05b-breathing-leaf`（與遠端同步於 `3f13a1c5`，工作樹乾淨）；`git fetch --prune origin` 成功，`origin/main` 為 `bf359692`，B 分支比它落後 11、超前 4（B 未合併）。主工作目錄留給 B-R5，C 在 worktree `../city2127-q05c` 的 `feat/q05c-snow-cloud`（由 `3f13a1c5` 開出，見 C-R1 brief「分支」）。
+
+### 改動
+
+- **模型** `asset/models/q05c-snow-cloud-2127/`：`build_snow_cloud.py`（Blender 5.2 headless）、`.blend`、`.glb`（約 94k tris，3.7 MB）、`review_snow_cloud.py`。內容見 C-R1 brief；新庫存模組 `cumulus`（`modules.py`，`LIBRARY.md` 加行，lineup 加樣本）。
+- **執行時** `src/snowCloud.ts`：雲慢轉及上下浮動、薄霧殼反轉；三組雪（周期 3.1／3.7／4.3 m，速度 1.6／1.25／1.9 m/s）按餘數下移並微轉；噴嘴兩組交替亮、電弧閃爍、融水光三相流向跌水口、冷霧呼吸；只改位置及發光強度。
+- **輪換**：`q05Model` 加 `'cloud'`；`setQ05` C 時雪雲淡入，公園及庭園 1 淡出；`q05Shot` 改為三選；新近鏡 `q05:cloud` (−256, 36, −196) 望 (−210, 17, −135)；`ROTATION_VISITS.Q05.C`；結果卡暫定文案（地點「お台場海浜公園の雪雲噴水」，出現「…海の水からつくった冷たい雲が浮かび、真夏の広場に雪が降るようになりました。」，離開「…雪雲噴水が外れ、新しい涼しさを待つ公園に戻りました。」）；`questions.rotation.v1.json` Q05-C `modelId`；DEV 面板名「雪雲噴水」。
+- **測試**：`tests/lotRuntime.test.ts`（`q05Model`、C 的 GLB：台座、範圍、雲高、雪層頂藏於雲內、活動件不合批、薄霧及冷霧透明、雪循環、噴嘴交替、水光次序；B→C 交叉淡變、run 後回復公園；`q05Shot`／`q05Result`）、`tests/headlineCamera.test.ts`（近鏡數 33）、`survey/tests/rotation.test.ts`（「無模型」例子由 Q05-C 改用 Q06-A；三態齊全題加 Q05）。
+- **文件**：`PROJECT.md`、`QUESTION_ROTATION_PLAN.md`、`LIBRARY.md`；變化總覽已重生（Q05 未有近鏡畫格）。
+
+### 自評（`~/city2127-evidence/q05c/r1/`，3200 × 1800，`q05:cloud`）
+
+| # | 項目 | 結果 |
+| --- | --- | --- |
+| 1 | 懸浮冷雲 | 大致達到：雲大而立體，頂白、底部略灰，hero 總覽中亦一眼看到（`overview.jpg`）。未足：團塊仍似一個個圓球，未及目標的蓬鬆細碎邊緣；底部藍灰在日間不明顯；夜間雲呈灰色，沒有發光。 |
+| 2 | 發射環 | 大致達到：白色環、發光噴嘴及電弧可見（`row1-cloud-ring.jpg`）。未足：雲底向外鼓出，遮去環的前半部，近鏡只見約四個噴嘴；目標中環在雲外清楚圍住雲腰。 |
+| 3 | 抽水泵及管道 | 達到：近鏡左下兩台白色泵連發光圓眼，總管升至環頂再彎入（`row3-pumps-snowfield.jpg`）。 |
+| 4 | 落雪 | 大致達到：在後方深綠樹林前清楚，夜間閃亮明顯（`focal-night.jpg`）；在白色雪地前幾乎看不到。雪層循環無跳格（`keyframes.jpg`）。 |
+| 5 | 雪地及冷霧 | 大致達到：pass 3 縮細冷霧後，雪地、藍灰霜帶及水渠分得開；居民及小孩在雪地上。未足：雪地與台座仍同屬白色系，對比不及目標的藍影。 |
+| 6 | 融水渠 | 大致達到：深藍環形水渠清楚；支渠在近鏡前方，水光細小，縮細後較難看出。 |
+| 7 | 綠化 | 達到：後方及左右兩側濃密 `facet_tree`，近鏡前方三個低花槽。 |
+| 8 | 近鏡 | 達到：畫面包括雲頂、環、泵及雪地。 |
+
+### 檢查
+
+- 單元：`tests/lotRuntime.test.ts`、`tests/headlineCamera.test.ts`、`tests/assetLibrary.test.ts` 通過；`survey` `npm test` EXIT 0、`npm run build` 通過；根目錄 `npm run build`、`git diff --check` 通過。
+- 根目錄 `npm test` 通過（2026-11-28，EXIT 0，記錄 `~/city2127-evidence/q05c/r1/npm-test.log`）。
+- 瀏覽器（Vite 5187，`?rotation&jump=Q05:C&shot=q05:cloud`）：三輪 capture-compare（pass1 雲太白、薄霧殼似玻璃泡、水渠太淡 → pass2 調暗雲、台座及水渠，加前方花槽 → pass3 冷霧縮至雪地，雲團加至 72 個）。
+- FPS：未量度（`fps.sh` 只跑 `?meters`）。headless 截圖 data-fps 約 22（近鏡）、30（overview），只作參考；B-R4 為 31–33／27。
+
+### 待 owner 決定
+
+- 雲是否要更蓬鬆（較多較細的團塊、柔和邊緣），以及雲底是否應收在環內，令整個發射環露出。
+- 夜間雲是否要從內部發出冷光。
+- 雪地是否要加藍色陰影，令白雪在白台座上更突出。
+- 結果卡文案及 `q05:cloud` 近鏡角度（皆為暫定）。
+- C 疊在 B 分支上：B 驗收合併後，C 才可合併。
+
+## C-R1 verdict
+
+«跟你嘅建議，開新 session 做 R2»（2026-11-28）
+
+即 owner 採納 C-R1 自評中「未足」各項及「待 owner 決定」的建議作為本輪要求：雲更蓬鬆、雲底收在環內、夜間雲內發冷光、雪地加藍影。結果卡文案及 `q05:cloud` 近鏡仍屬暫定，除非第 2 項需要，否則不改。
+
+## C-R2 brief
+
+像素以 3200 × 1800 的 `q05:cloud` 近鏡量度；R1 該畫面雲寬約 880 px（約 29 m），即雲中心約 30 px/m（與 C-R1 brief「0.18 m 雪粒約 5 px」一致）。R1 讀數取自 `~/city2127-evidence/q05c/r1/focal-day.png`／`focal-night.png`。
+
+| # | 要求 | R1 現況 | 量度目標 |
+| --- | --- | --- | --- |
+| 1 | 雲似一個個圓球，要更蓬鬆、細碎柔邊（近目標） | 72 個平滑團塊，半徑 3.2–5.2 m（近鏡約 100–160 px），表面完全圓滑 | 擴充庫存模組 `cumulus`：團塊約 200 個，半徑 1.4–3.4 m（近鏡不大於約 100 px）；每個團塊頂點加約 ±12% 的低頻隆起，不再是完美球面；輪廓外加約 40 個 0.5–1.2 m 的細碎小團（碎邊）；薄霧殼改由同一配方的較少、較細團塊組成，同受第 2 項的腰限制。雲的整體大小不變（頂約 31 m，最闊直徑約 28 m）；雲約 ≤ 35k tris。`LIBRARY.md` 一行同步。 |
+| 2 | 雲底鼓出，遮去環的前半，只見約四個噴嘴 | 中層團塊（中心高 20–24 m）伸出至半徑約 15.7 m，低至約 15 m，正好擋在環（半徑 12 m、高 19.5 m）前面 | `cumulus` 加「腰」限制：凡團塊底部低於環高 + 1.5 m（21 m），其外緣須在半徑 10.6 m 以內（環管內緣 11.45 m 再留約 0.8 m）；只有底部高於 21 m 的團塊可向外鼓至約 14 m。雲底約 15.5 m，在環內垂下；雲底在半徑約 9 m 內保持實心，令雪層頂（20 m）仍藏在雲內。單元測試：雲及薄霧所有低於 21 m 的頂點都在半徑 10.6 m 以內。近鏡中環前半由左至右連續可見，前方至少 8 個噴嘴完整露出；環後半在雲腰之後，如目標般被雲遮去。近鏡不變。 |
+| 3 | 夜間雲呈灰色 | 夜間近鏡雲平均 RGB 約 (143, 156, 172)；發光 0.10 白 | 雲材質發光色改為冰白 (0.86, 0.93, 1.0)（不用 `#5fdcff`）；執行時按夜色 `dark`（0–1）把發光強度由日間 0.10 升至夜間約 0.9，並以約 8 s 周期 ±10% 緩慢呼吸；只改發光強度，不改不透明度（屬地塊淡變）。夜間近鏡雲平均亮度 ≥ 190，且藍值高於紅值（冷色）。日間不變。 |
+| 4 | 白雪在白雪地上看不見；雪地與台座同屬白色 | 日間近鏡雪地平均 RGB 約 (251, 252, 238)，偏暖白；霜帶基色 (0.50, 0.60, 0.74) 只呈 (226, 233, 236)，台座 (232, 232, 222)：天光環境反射把三者都洗成白色 | 雪地及霜帶執行時 `envMapIntensity` 降至約 0.35（同 B-R2 葉面做法），雪地自發光 0.18 → 0.04；雪地基色改為淡藍白，頂點顏色加藍影（雪堆背光面及雲下陰影區較深較藍），霜帶加深加藍；確實數值按瀏覽器讀數調校。雪粒 0.11–0.17 → 0.16–0.24 m（近鏡約 5–7 px）。日間近鏡雪地平均藍值比紅值高 ≥ 20、平均亮度 ≤ 225，雪粒仍為近 255 的白點，在雪地上可辨。 |
+
+另一讀法：第 2 項「整個環同 16 個噴嘴」若指 16 個全部可見，須把雲腰收至環後半亦露出，雲下部變成細柱，與目標的雲形不符；本輪按目標圖理解（環前半完整、後半被雲腰遮去）。
+
+## C-R2（2026-11-28，Q05-C 雪雲噴泉）
+
+### Git 狀態
+
+- 開始時 worktree `../city2127-q05c` 在 `feat/q05c-snow-cloud`，與遠端同步於 `b0e1f304`，工作樹乾淨；`git fetch --prune origin` 成功（EXIT 0），本分支與遠端沒有分歧。沒有上一輪的伺服器在運行。主工作目錄（B 分支）未有觸碰。
+
+### 改動
+
+- **庫存模組 `cumulus`**（`modules.py`，`LIBRARY.md` 行同步）：新增可選參數 `layers`（配方表，預設值即 R1 的 `CUMULUS_LAYERS`）、`lumps`（每個團塊以三個隨機方向的低頻餘弦隆起變形）、`wisps`（上層團塊外表加細小碎團）、`waist=(y, r)`（團塊底部低於 y 者，外緣收在半徑 r 內）。預設參數下輸出與 R1 相同，lineup 樣本不變。
+- **模型** `build_snow_cloud.py`：雲改為 240 個團塊（半徑 1.4–3.5 m，`lumps` 0.2，`n` 12、`m` 6）加 60 個碎團，五層配方（扁平雲底、雲腰帶、實心核心、環上外鼓層、雲頂）；`waist` = (21 m, 10.6 m)，雲及薄霧殼在 21 m 以下都收在環內；雲底 16.5 m，頂約 31 m；薄霧殼 60 團、不透明度 0.14 → 0.05。雲發光色改為冰白 (0.86, 0.93, 1.0)。雪地加頂點顏色（雪堆頂淺藍白 (0.80, 0.87, 1.0)，平地、邊緣及五塊雲影較深藍 (0.34, 0.48, 0.84)），自發光 0.18 → 0.04；霜帶 (0.50, 0.60, 0.74) → (0.30, 0.44, 0.68)；冷霧不透明度 0.16 → 0.07（pass 1 發現冷霧把雪地洗白）；雪粒 0.11–0.17 → 0.16–0.24 m。約 104k tris（雲 36k），GLB 4.0 MB。
+- **執行時** `src/snowCloud.ts`：動作函數改為 `(now, dark)`（`main.ts` 傳入夜色）；雲加入發光表，夜間發光為日間的 6 倍，並以 8 s 周期 ±10% 呼吸，只改發光強度；雪地及霜帶 `envMapIntensity` 0.35。
+- **測試** `tests/lotRuntime.test.ts`：雲及薄霧所有低於 21 m 的頂點在半徑 10.6 m 內；雪地及霜帶天光反射 < 0.5；雪地保留 `color` 屬性；雲只在夜間發光，且不改不透明度。
+
+### 自評（`~/city2127-evidence/q05c/r2/`，3200 × 1800，`q05:cloud`）
+
+讀數取同一區域：雪地 (1408–1792, 1312–1440)，雲 (1312–1888, 608–768)。
+
+| # | 項目 | 結果 |
+| --- | --- | --- |
+| 1 | 雲更蓬鬆、細碎柔邊 | 大致達到：團塊明顯變細變多，表面有隆起，輪廓較碎（`row1-cloud.jpg`、`r1-vs-r2.jpg`）；最大團塊近鏡約 100 px。未足：雲上半部仍可辨認個別圓團，未及目標的棉絮質感；雲在環上外鼓、環下收窄，整體像「上大下細」的兩層（蘑菇形），目標的雲較扁闊、環在雲下緣。 |
+| 2 | 雲底收在環內，環圍住雲腰 | 達到：環前半由左至右連續可見，環後半在雲腰後，電弧清楚（`row2-ring.jpg`）。近鏡可見 7 個前方噴嘴（5 個正面、2 個在環兩端側面），比量度目標的 8 個少一個；R1 只見約 4 個。 |
+| 3 | 夜間雲內發冷光 | 達到：夜間雲平均 RGB (143, 156, 172) → (217, 226, 233)，亮度 226（目標 ≥ 190），藍值高於紅值（`row3-night-cloud.jpg`、`r1-vs-r2-night.jpg`）。雲團之間仍見明暗，未變成一片平白。日間不變。 |
+| 4 | 雪地加藍影，令落雪看得見 | 大致達到：霜帶及雪堆之間的平地呈淺藍，白色雪粒在藍色地面上可辨（`row4-snowfield.jpg`）。未足：日間雪地平均 RGB (251, 252, 238) → (226, 229, 236)，藍比紅高 10、亮度 230，未達藍比紅高 ≥ 20、亮度 ≤ 225；雪堆頂仍近白，與台座分別不大。夜間 (180, 195, 218) 明顯偏藍。 |
+
+- 雪層循環無跳格（`keyframes.jpg`：t 20.0／20.7／21.4 及夜間 t 24）；雪層頂仍藏在雲內。
+- Blender 檢視圖：`~/city2127-evidence/q05c/r2/blender/`。
+- 三輪 capture-compare：pass 1 環已露出，但冷霧把雪地洗白、薄霧殼呈泡狀 → pass 2 冷霧及薄霧變淡、雪地藍影加深、團塊加至 240 並加大隆起 → pass 3 雲底升至 16.5 m、外鼓層下移貼近環、雪地再加深。
+
+### 檢查
+
+- 單元：`tests/lotRuntime.test.ts`、`tests/assetLibrary.test.ts` 通過。
+- 根目錄 `npm test` 通過（2026-11-28，EXIT 0，記錄 `~/city2127-evidence/q05c/r2/npm-test.log`）。`npm run build` 通過；`git diff --check` 通過。survey 未改，未跑。
+- 截圖 sidecar：commit `b0e1f304`、branch `feat/q05c-snow-cloud`（即本 worktree 的 Vite 5187），工作樹有未提交改動（本輪改動）。
+- FPS：未量度（`fps.sh` 只跑 `?meters`）。headless 截圖 data-fps 約 34–36（近鏡）、30（overview），只作參考；R1 為 22／30。
+
+### 待 owner 決定
+
+- 雲形：是否要把雲壓扁加闊（雲底貼環、最闊處在環上不遠），去掉「上大下細」的蘑菇感；以及雲面是否要更似棉絮（例如更多更細的團塊或加一層柔邊卡片）。
+- 雪地：藍影是否足夠，或要更深的藍、甚至在雲正下方加一塊明顯的雲影。
+- 結果卡文案及 `q05:cloud` 近鏡仍為暫定。
+- C 疊在 B 分支上：B 驗收合併後，C 才可合併（須 rebase）。
+
+### R2 補充（owner 2026-11-28：「落雪量減一半。」）
+
+- 雪粒 1,618 → 823：每組雪層取同一批隨機抽樣的一半，其餘部分（樹林等）佈局不變；約 98k tris，GLB 3.5 MB。截圖 `~/city2127-evidence/q05c/r2/half-snow-day.jpg`。`tests/lotRuntime.test.ts`、`tests/assetLibrary.test.ts`、`npm run build`、`git diff --check` 通過；只改 GLB 及文件，未再跑全套 `npm test`。
+- owner 同時指示另開新 session 處理地塊周邊（見下）。
+
+## C-R2b owner 決定（2026-11-28，地塊周邊）
+
+owner 指示（原文）：「落雪量減一半。 then new session do the surrounding.」
+
+本輪先問「周邊」指台座上模型自身的周邊，抑或地塊外的城市背景。owner 回覆（原文）：「你分析一下 A、B、C 三個模型，佢哋嘅周邊會唔會都係一樣？最緊要係相連嘅道路。如果係一樣，就可以整一個共通；如果唔一樣，就要分開每個整一個專屬嘅周邊。」
+
+分析（俯視圖 `~/city2127-evidence/q05c/r2b/analysis/links-map.jpg`，上方為北，即 −Z）：A、B、C 同在 NE PARK 地塊（中心 −210, −135），同用半徑 24 m 圓台座，台座外的城市環境完全相同；附近有四條可連接的路：海濱步道東段終點（−178, −173，東北，離台座邊約 26 m）、海濱步道西段起點（−259, −145，西，約 26 m；兩段步道正好在本地塊前斷開）、① 車道（最近中心線 −182.6, −102.6，東南，約 18 m）、往 pod tower 的小路（西南）。三個模型現時都沒有接上任何一條路；台座邊入口方位各異：A 四條斜角徑（±π/4、±3π/4），B 兩條（−2.57、0.57），C 兩條（−2.77、0.37）另加北面的泵及跌水口。
+
+owner 選擇（原文選項）：「一個共通周邊 (Recommended)」——「整一套共用周邊模型（台座外：四條連接路接返海濱步道兩端、① 車道行人路、pod tower 小路，加綠化同居民）；再微調 B、C（同 A 一條）嘅台座入口，對準同一組四個入口方位。做一次，三個模型都用。」；以及「常駐，四個狀態都見 (Recommended)」——「連接路當城市基建常駐，海濱步道唔再喺地塊前斷開；原本 NE 公園都接得上。」
+
+## C-R2b brief（地塊周邊，共用）
+
+量度方法：在 Vite 5187 的場景中，以 1.5 m 格網由上而下射線取樣地塊中心半徑 48 m 內的地面（排除 Q05 模型及 `survey-site-ne`），方位以世界座標 `atan2(dz, dx)` 計（0° 為 +X 東，90° 為 +Z 南，270° 為北海邊；與模型內 `CAM` −2.22 rad＝233° 同一座標系）。
+
+| 項目 | 量度 |
+| --- | --- |
+| 地面 | 草地 `TERRAIN_LOW_DENSITY` y −0.15 至 −0.35；三個模型的台座頂約 y 0.48–0.62，台座邊比草地高約 0.8 m。 |
+| 北（235°–300°） | 海濱步道鋪地 `WATERFRONT_PROMENADE`（y −0.19）已貼住台座邊，向西連西段、向東北連東段；鋪地本身連續，只是步行者路線 `promenades` 的兩段在 (−178, −173) 及 (−259, −145) 折返。 |
+| 東北（300°–350°） | 台座邊至步道鋪地約 8–10 m 草地。 |
+| 東南（40°–60°） | ① 外側行人路由半徑約 31 m 起；(−186, −115)（39.6°，半徑 31.2 m）有一支高約 26 m 的燈柱。 |
+| 南（60°–125°） | 草地至半徑 44 m 以上；15°、半徑 34–38 m 有沿街樹。 |
+| 西南（125°–150°） | pod tower 車道 `pod-tower-drive` 北緣約在 dz +31（距台座邊約 12–15 m）。 |
+| 西（150°–175°） | 工具盒 `CTX_north_utility_service` 佔 dx −36 至 −25、dz +6 至 +15，最近角在半徑約 26 m（約 167°）。 |
+
+| # | 要求 | 量度目標 |
+| --- | --- | --- |
+| 1 | 共用周邊模型（新目錄 `asset/models/q05-park-surround-2127/`，Blender 5.2 headless，用 city-kit 模組） | 常駐背景，不屬任何 `LotFade`；預設公園、A、B、C 四個狀態都顯示。所有幾何在半徑 24.3 m 以外，不入台座。≤ 約 45k tris。 |
+| 2 | 環台座步道 | 半徑 24.3–27.3 m（闊 3 m）淺色鋪地，頂 y 0.42（與台座邊只差一級），外緣白色路緣及兩條冰白細光縫；外側 27.3–29 m 為斜草坡落回草地，北面與海濱步道相接一段改為鋪地斜坡。工具盒處（155°–178°）斷開，以花槽收口。 |
+| 3 | 四條連接路（闊 3 m，同鋪地及光縫，由 y 0.42 斜落至目的地高度） | 東北 315°：接海濱步道東段鋪地（約 10 m）；西北 225°：接北面步道鋪地（約 3 m）；東南 50°：接 ① 外側行人路（約 5 m，避開 39.6° 燈柱，間距 ≥ 4 m）；西南 135°：接 pod tower 車道北緣（約 12 m），盡頭白色斑馬線。方位與 A 的四條斜角徑相同（A 已驗收，不改）。 |
+| 4 | 綠化及居民 | 連接路之間的草地上：白邊階梯花槽（兩級）、`facet_tree`／`tree_round_*` 樹叢（遠側 0°–125° 可高至約 9 m，作雪的深色背景；近鏡側 200°–270° 只放低矮灌木及長椅，不擋模型）、沿步道外緣長椅面向台座、冰白頂燈的燈柱、步行及坐着的居民。避開步道鋪地、行人路、沿街樹、燈柱、工具盒及 pod tower 車道。 |
+| 5 | C 的台座入口 | `build_snow_cloud.py` `PATHS` 由 CAM−0.55／+π 改為 225°／45°（−3π/4、π/4），對準共用的西北及東南連接路；樹林另避開 135° 及 315°，令四條連接路都落在 C 的開放鋪地上。 |
+
+步行者路線 `promenades` 不改：它同時生成 7.2 m 木棧道及兩邊光線（`skyways.ts`）和草地帶（`odaibaScene.ts`），若在北面把兩段連起來，棧道須離中心 ≥ 28 m，但該處 dx −40 至 −15、dz −30 至 −28 是海水渠 `WATER_MAIN`，放不下；海濱鋪地本身已連續，人可經環台座步道及北面鋪地通過。
+
+不在本輪：B 的入口（B 分支待驗收，本 worktree 的 B 仍是 R4，重建 B 會與 B-R5／R6 衝突；環台座步道令 B 現有入口 213°、33° 亦可接上）；A 不改；台座上 C 自身的加密綠化留待 C-R3。
+
+## C-R2b（2026-11-28，Q05 共用公園周邊）
+
+### Git 狀態
+
+- 開始時 worktree `../city2127-q05c` 在 `feat/q05c-snow-cloud`，與遠端同步於 `8cd6ab43`，工作樹乾淨；`git fetch --prune origin` 成功，本分支與遠端沒有分歧。主工作目錄（B 分支）未有觸碰。
+
+### 改動
+
+- **新模型** `asset/models/q05-park-surround-2127/`：`build_park_surround.py`（Blender 5.2 headless）、`.blend`、`.glb`（約 45k tris，2.1 MB）。內容見 `## C-R2b brief`：環台座步道（半徑 24.3–27.3 m，頂 y 0.42，白路緣、兩條冰白光縫、徑向縫，工具盒處 150°–180° 斷開並以花槽收口）、斜草坡（北面一段為鋪地斜坡接海濱步道）、四條連接路（東北、西北接海濱步道鋪地，東南 50° 接 ① 外側行人路，西南接 pod tower 車道北緣，盡頭白色斑馬線）、兩級白邊花槽、30 棵 `facet_tree`（遠側高、近鏡側矮）、坡上灌木、18 張長椅位置中的長椅、13 支冰白頂燈、居民。`LIBRARY.md` 加行。
+- **接線** `src/main.ts`：以 `PARK_SURROUND`（`src/lotRuntime.ts` 匯出）之名常駐載入地塊中心，不透明網格全部合批；不屬任何 `LotFade`。
+- **C 模型** `build_snow_cloud.py`：`PATHS` 改為 225°／45°（對準西北、東南連接路），樹林避開四個入口方位（`GATES`）；雲、雪不變（隨機次序在其後），樹林、長椅及居民位置因此重排；約 91k tris，GLB 3.1 MB。
+- **測試** `tests/lotRuntime.test.ts`：周邊 GLB 所有頂點在半徑 24.25 m 以外、工具盒平面上沒有地面以上的幾何、沒有 `#5fdcff` 發光；`setQ05` 經 A→B→C→無 之後周邊仍顯示、不透明度 1。
+- **文件**：`PROJECT.md` 加一段；本交接的 owner 決定及 brief。
+
+### 自評（`~/city2127-evidence/q05c/r2b/`，3200 × 1800）
+
+| # | 項目 | 結果 |
+| --- | --- | --- |
+| 1 | 共用、常駐 | 達到：預設公園、A、B、C 四個近鏡都見同一圈步道、連接路及樹叢（`four-states.jpg`）；預設公園的方形地台角位與步道相疊，未見破面。 |
+| 2 | 環台座步道 | 達到：近鏡前景一圈淺色步道、長椅、燈柱及居民，取代 R2 光禿的白色地面邊（`before-vs-after.jpg`、`crop-near-left.jpg`）；夜間兩條冰白光縫清楚勾出圓環（`focal-night.jpg`、`crop-night-ring.jpg`）。 |
+| 3 | 連接路 | 達到：俯視可見四條路由步道伸出並接上海濱步道、① 行人路及 pod tower 車道（`top-before-after.jpg`）；近鏡左方東北連接路及其光縫可見。 |
+| 4 | 綠化 | 大致達到：近鏡左右原本空白的淺色草地加了樹叢及花槽（`crop-near-right.jpg`），hero 總覽中地塊讀成一片公園（`overview.jpg`）。未足：工具盒 `CTX_north_utility_service` 仍是一個白色方盒，只被右側樹叢遮去一角；海邊北面一段仍是淺色鋪地。 |
+| 5 | C 入口 | 達到：近鏡下方的入雪地小徑直對鏡頭方向的西北連接路。 |
+
+- 兩輪 capture-compare：pass 1 周邊加入後四個狀態檢查（`pass1-grid.jpg`）→ pass 2 C 入口改向後日夜近鏡及俯視。
+- 目標對照：`target-vs-r2b.jpg`；分析圖：`analysis/links-map.jpg`。
+
+### 檢查
+
+- 單元：`tests/lotRuntime.test.ts` 通過。根目錄 `npm test` 通過（2026-11-28，EXIT 0，記錄 `~/city2127-evidence/q05c/r2b/npm-test.log`）。`npm run build`、`git diff --check` 通過。survey 未改，未跑。
+- 截圖 sidecar：commit `8cd6ab43`、branch `feat/q05c-snow-cloud`，工作樹有未提交改動（本輪改動）。
+- FPS：未量度。headless 截圖 data-fps 約 19–21（近鏡）、19（overview），只作參考；R2 為 34–36／30（同機不同負載，不可直接比較）。
+- 變化總覽（`artifacts/change-review`）未重生：本輪未改任何已驗收模型、近鏡或文案，只加共用背景。
+
+### 待 owner 決定
+
+- 周邊是否接受作為 Q05 三個模型共用的常駐背景（含預設公園）。
+- B 的入口（213°、33°）是否要在 B 分支改向 225°／45°，與 A、C 一致；現時靠環台座步道接上。
+- 工具盒 `CTX_north_utility_service` 是否另行處理（加綠化包覆或移走），屬地塊外城市背景。
+- 台座上 C 自身的加密綠化（目標中的綠化台階）留待 C-R3。
+
+## C-R2b verdict
+
+«開新 session 做 C-R3, fix the red circle broken road too»（2026-11-28；附 owner 在 hero 總覽上圈出兩處紅圈的截圖，存於 `~/city2127-evidence/q05c/r3/owner-red-circles.webp`）
+
+即本輪處理 C-R3 round prompt 所列 C-R2／C-R2b 未足各項（雲形、日間雪地藍影、台座上 C 自身的綠化），並修補紅圈所指的「斷路」。
+
+## C-R3 brief
+
+量度方法：近鏡讀數取 3200 × 1800 的 `q05:cloud`（`?rotation&jump=Q05:C&hour=12&reviewTime=20`，覆核 `r2b/focal-day.jpg`）；hero 讀數取同一網址的 hero 總覽。紅圈位置以 `heroSettledCamera` 投影核對：海濱步道東段終點 (−178, −173) 投影於 2000 × 1125 畫面 (1099, 989)，西段起點 (−259, −145) 投影於 (1491, 1048)，分別落在 owner 左、右兩個紅圈內。地面以 2.5 m 格網由上而下射線取樣（地塊北面：台座北緣 z −159 外只有約 5–7 m 寬的海濱鋪地 `WATERFRONT_PROMENADE`，其外即海水渠 `WATER_MAIN`（x −250 至 −212、z −163 至 −166）及護岸）。
+
+| # | 要求 | 現況（R2b） | 量度目標 |
+| --- | --- | --- | --- |
+| a | 雲呈「上大下細」蘑菇形；目標的雲較扁闊、環在雲下緣 | 雲底 16.5 m、頂約 31 m；21 m 以下收在半徑 10.6 m 內，其上外鼓至約 14 m。近鏡雲寬約 808 px、高約 547 px（寬高比約 1.48），最闊處（雲帽）在環上約 5 m，比環本身更闊（雲寬約為環寬 0.96） | 目標圖雲寬約為環寬 0.79，寬高比約 2.0，環前管在雲高約三分之一處。雲改為扁圓頂：雲底升至約 17 m，頂降至約 27.5 m；最闊處（半徑約 12 m，不超過環管中線外 0.5 m）在 21.5–23.5 m，即緊貼環上；其上逐層收窄成圓頂。21 m 以下仍收在半徑 10.6 m 內（腰限制及其單元測試不變），雪層頂 20 m 仍藏在雲內；夜間冰白發光不變。近鏡：雲寬高比 ≥ 1.9；雲寬為環寬 0.8–1.0；雲最闊一行在環前管以上 ≤ 3 m（約 ≤ 90 px）。 |
+| b | 日間雪地藍影不足 | 近鏡雪地區 (1408–1792, 1312–1440) 平均 RGB (227, 229, 237)：藍比紅高 10、亮度 231（半量落雪後覆核） | 雪地頂點顏色及基色再加藍、加深（亮處與陰影兩端都調），霜帶不變；同一區域藍比紅高 ≥ 20、亮度 ≤ 225；雪粒仍為近白點，在雪地上可辨。 |
+| c | 台座上 C 自身的綠化加密（目標的綠化台階、花槽、小徑） | 近鏡台座橢圓（雪地除外）綠色像素佔 0.236；近鏡側（CAM ± 1.2 rad）只有三個低花槽及零星矮灌木，其餘為淺色鋪地 | 台座上（渠外 r 15–23.3 m）加兩級白邊台階花槽（後方及兩側，上植 `facet_tree` 及灌木）與近鏡側低矮白邊花槽（高 ≤ 1.2 m，連密灌木），沿兩條入口小徑兩旁加綠邊；入口方位 `GATES`、泵 `PUMP`、跌水口 `SPILL` 及近鏡視線保持開放。同一橢圓綠色像素佔 ≥ 0.35。台階花槽如共用周邊已有同類，提升為庫存模組（`LIBRARY.md` 行及 lineup）。 |
+| d | 紅圈「斷路」：hero 中帶冰藍光線的海濱木棧道在 NE PARK 地塊兩側戛然而止，止於草地 | `promenades` 兩段止於 (−178, −173)（東段）及 (−259, −145)（西段），距環台座步道外緣約 13 m 及 22 m；C-R2b 的東北連接路只接到 (−189, −166) 的鋪地，並未接上木棧道 | 不改步行者路線 `promenades`（改長度會令全條海濱的長椅、停留點、林蔭花槽、`automationBays`、`districtMeters` 重新分佈，且步行者道不可進入地塊 ±21 m 方框）。在 `src/layout.ts` 新增只供繪製的 `promenadeTails`：兩段延伸，由兩端以同樣 7.2 m 木棧道及兩條光線（`skyways.ts` 同一 `deck`／`offsetTube`／`paving`／`trail`）伸至環台座步道外緣，路面由 y 0 漸升至約 0.40，與步道外緣重疊而不共面。東段沿 315°（A 的東北入口方位）進入，取代共用周邊的東北連接路；西段由西面於約 203°（工具盒缺口 150°–180° 與西北連接路 225° 之間）進入。兩段足跡（中線 ± 3.6 m）只落在草地、海濱鋪地或周邊上，不入海水渠、潮間帶或護岸。共用周邊在兩段足跡（± 4.6 m）內不放草坡、樹、花槽、長椅、燈柱，路緣開口；單元測試讀 `layout.ts` 的同一折線核對。hero 中兩個紅圈處木棧道及光線連續接上環台座步道，經步道北半圈相連。預設公園、A、B、C 四個狀態都檢查。 |
+
+另一讀法：第 d 項亦可理解為兩段木棧道在地塊北面直接相連成一條。量度所見北面只有 5–7 m 寬的鋪地，其外為海水渠，7.2 m 棧道必須伸入台座或架橋過渠；本輪取經環台座步道相連的做法，架橋列為 owner 問題。步行者仍在原終點折返（棧道最後約 20 m 只有路面，無步行者），亦列為 owner 問題。
+
+## C-R3 round prompt（下一輪會話）
+
+place-building round for `q05c-snow-cloud`: worktree `/Users/fatboy/city2127-q05c`, branch `feat/q05c-snow-cloud`, read `docs/handoffs/q05-park-cooling.md` (its `## C-R2 brief`, `## C-R2`, `## C-R2b brief` and `## C-R2b` sections). Open from C-R2: the cloud's mushroom shape, the day snowfield blue short of target; from C-R2b: densify C's own plinth greenery (target's green terraces), B's gates, the utility block. Owner verdict on C-R2 / C-R2b: «開新 session 做 C-R3, fix the red circle broken road too» (annotated hero screenshot `~/city2127-evidence/q05c/r3/owner-red-circles.webp`)
+
+## C-R3（2026-11-28，Q05-C 雪雲噴泉＋海濱木棧道）
+
+### Git 狀態
+
+- 開始時 worktree `../city2127-q05c` 在 `feat/q05c-snow-cloud`，與遠端同步於 `867e6838`，工作樹乾淨；`git fetch --prune origin` 成功，本分支與遠端沒有分歧；沒有上一輪的伺服器在運行。主工作目錄（B 分支）未有觸碰。
+
+### 改動
+
+- **海濱木棧道延伸段**（第 d 項）：`src/layout.ts` 新增只供繪製的 `promenadeTails`（兩條折線），`src/skyways.ts` 以同一 7.2 m 木棧道及兩條光線繪製；東段由 (−178, −173) 於 309° 進入環台座步道，西段由 (−259, −145) 向東彎入，於 196° 進入；路面由 y 0 漸升至 0.36 m，與步道外緣重疊約 0.75 m。足跡先以射線取樣核對，只落在草地、海濱鋪地及周邊上。步行者路線 `promenades` 不改。
+- **共用周邊** `build_park_surround.py`：刪去東北連接路（由東段延伸取代）；路緣及草坡在兩段延伸的方位各開 ±9°；樹、花槽、坡上灌木、長椅、燈柱避開延伸段中線 4.6 m 內；約 41k tris，GLB 1.8 MB。其兩級白邊台階花槽 `bed` 提升為庫存模組 `terrace_bed`（`modules.py`、`LIBRARY.md` 行、`review_modules.py` 樣本）；提升後周邊 GLB 與提升前逐位元相同。
+- **C 模型** `build_snow_cloud.py`：雲改為扁圓頂（`CLOUD_RX` 12、`CLOUD_H` 10.5、雲底 17 m、頂約 28 m；六層配方，外鼓層中心半徑上限 0.74 rx，最闊約 11.3 m，只比腰寬約 0.7 m；新增一層填補腰與外鼓層之間的台階），腰限制 (21 m, 10.6 m) 不變；雪地頂點顏色兩端加藍（亮處 (0.68, 0.79, 1.0)、陰影 (0.30, 0.44, 0.86)），基色 (0.90, 0.94, 1)；新增 `plinth_green`：近鏡半圈台座邊 r 19.4–23.3 m 鋪草（只在入口、跌水口、泵處斷開），外緣綠籬、內緣斷續矮籬，草地內六個單級白邊花槽（`terrace_bed`，按入口避讓後實得數個），兩條小徑兩旁綠邊及灌木。約 100k tris，GLB 3.4 MB。
+- **測試** `tests/lotRuntime.test.ts`：讀 `layout.ts` 的 `promenadeTails`，核對周邊在延伸段 3.6 m 半寬內沒有高於 0.45 m 的頂點，且兩段終點落在環台座步道上、低於步道頂。
+- **文件**：`PROJECT.md` 加一段；`LIBRARY.md` 更新 C 及周邊兩行、加 `terrace_bed` 行；本交接的 verdict、brief。
+
+### 自評（`~/city2127-evidence/q05c/r3/`，3200 × 1800）
+
+| # | 項目 | 結果 |
+| --- | --- | --- |
+| a | 雲形 | 大致達到：不再是蘑菇形，雲成一團扁圓，環前管在雲下緣，雲寬為環寬約 0.80（R2b 0.96；目標 0.79）（`crop-cloud.jpg`、`r2b-vs-r3.jpg`、`target-vs-r3.jpg`）。未足：近鏡寬高比約 1.74（目標 ≥ 1.9；R2b 1.48）；雲最闊一行在環前管以上約 110–160 px（約 4–5 m），未達 ≤ 90 px；腰與上層之間仍見一道淺橫摺。夜間雲平均 RGB (216, 225, 232)，亮度 224，冷光保留（`focal-night.jpg`）。 |
+| b | 雪地藍影 | 達到：同一區域 (227, 229, 237) → (214, 220, 235)，藍比紅高 21（目標 ≥ 20），亮度 223（目標 ≤ 225）；白色雪粒仍清楚（`crop-snowfield.jpg`）。 |
+| c | 台座綠化 | 大致達到：近鏡半圈加了草地、綠籬、白邊花槽及小徑綠邊（`crop-plinth-green.jpg`）；綠色像素佔 0.236 → 0.348，略低於 0.35。泵左側仍有一片淺色鋪地（泵的避讓範圍）。 |
+| d | 紅圈斷路 | 達到：hero 中兩段帶光線的木棧道都連續接上環台座步道，經步道北半圈相連（`hero-road-owner-vs-r3.jpg`、`hero-road-before-after.jpg`）；預設公園、A、B、C 四個狀態都相同（`four-states-hero.jpg`、`top-three-states.jpg`）。步行者仍在原終點折返，延伸段約 20 m 上沒有步行者。 |
+
+- 雪層循環無跳格（`keyframes.jpg`：t 20.0／20.7／21.4）。
+- 三輪 capture-compare：pass 1 延伸段及兩個 GLB 重建（雲已扁，但雪地藍影、綠化及雲的上下兩層仍未足）→ pass 2 草地按逐項避讓加闊、雲加填補層 → pass 3 雲外鼓層收窄、加內緣矮籬。
+- 讀數方法：`~/city2127-evidence/q05c/r3/analysis/measure.py`（綠色像素橢圓及雪地區域）；紅圈投影核對及地面取樣見 `analysis/`。
+
+### 檢查
+
+- 單元：`tests/lotRuntime.test.ts`、`tests/assetLibrary.test.ts` 通過。根目錄 `npm test` 通過（2026-11-28，EXIT 0，記錄 `~/city2127-evidence/q05c/r3/npm-test.log`；含 `odaiba`、`mobility`、`skyRingClearance`）。`npm run build`、`git diff --check` 通過。survey 未改，未跑。
+- 截圖 sidecar：commit `867e6838`、branch `feat/q05c-snow-cloud`（Vite 5187），工作樹有未提交改動（本輪改動）。
+- FPS：未量度。headless 截圖 data-fps 約 33–36（近鏡）、32–33（overview），只作參考。
+- 模組總覽圖 `artifacts/asset-library/modules-lineup.jpg` 未重生：`review_modules.py` 的鏡頭只框到 `facet_tree`，`cumulus` 及新的 `terrace_bed` 樣本在框外（R1 起已如此），屬另一項工作。
+- 變化總覽（`artifacts/change-review`）未重生：C 未驗收，未改已驗收模型、近鏡或文案。
+
+### 待 owner 決定
+
+- 雲形是否已夠扁；若要再扁（寬高比 ≥ 1.9），可再降雲頂或把腰限制放寬至約 11 m。
+- 紅圈的接法：現經環台座步道北半圈相連；如要兩段木棧道在地塊北面直接相連成一條，須架橋過海水渠 `WATER_MAIN` 或改動海邊佈局。
+- 步行者是否要走上延伸段及環台座步道（須改步行者路線及「步行者不入地塊方框」的測試規則）。
+- 延伸段的光線沿用全城海濱步道的藍色光線（與步道一致）；共用周邊本身的光縫仍為冰白。
+- 仍未處理：B 的入口方位（B 分支）、工具盒 `CTX_north_utility_service`；結果卡文案及 `q05:cloud` 近鏡仍為暫定；C 疊在 B 分支上，B 驗收合併後才可合併。
+
+## C-R4 round prompt（下一輪會話）
+
+place-building round for `q05c-snow-cloud`: worktree `/Users/fatboy/city2127-q05c`, branch `feat/q05c-snow-cloud`, read `docs/handoffs/q05-park-cooling.md` (its `## C-R3 brief` and `## C-R3` sections). Open from C-R3: the cloud's close-up aspect (1.74 against ≥ 1.9) and the faint crease between its waist and upper billows, plinth green share 0.348 against 0.35 (pale paving left of the pumps); owner questions on the promenade join (via the ring walk, or a bridge over `WATER_MAIN`) and walkers on the tails; still open: B's gates, the utility block. Owner verdict on C-R3: «…»
+
+## C-R3 verdict
+
+«accept, merge main»（2026-11-28）：owner 驗收 C-R3，合併入 `main`（`feat/q05c-snow-cloud` 先合併已含 B-R6 的 `origin/main`）。C-R3 自評中未足各項（雲近鏡寬高比 1.74、台座綠色像素 0.348）及待 owner 決定各項未有另行要求，留待日後打磨；`## C-R4 round prompt` 保留供日後使用。

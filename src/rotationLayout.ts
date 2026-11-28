@@ -132,37 +132,39 @@ export function q06Result(swap: { from: string; to: string }) {
 export const q06Shot = (swap: { tower: boolean }): ShotId | null => swap.tower ? 'q06:tower' : null;
 
 /** Q05 (question rotation, park cooling, owner 2026-11-26): its three options share the NE PARK lot. A is the reverse air conditioner
- *  on its own cooled lawn and B the breathing giant leaf on its own shaded lawn, each standing in place of the NE park; C (snow-cloud
- *  fountain) has no model yet, so the NE park stays for it. Provisional result copy from the building stories
+ *  on its own cooled lawn, B the breathing giant leaf on its own shaded lawn and C the snow-cloud fountain over its own snowfield, each
+ *  standing in place of the NE park. Provisional result copy from the building stories
  *  (docs/handoffs/q05-park-cooling.md; owner copy pending, plan 5.2): option → [place, preference]; the effect depends on which model
  *  arrived or left (q05Result). */
 export const Q05_RESULTS: Readonly<Record<string, readonly [string, string]>> = {
   A: ['お台場海浜公園の逆向き冷房塔', 'あなたは、機械で熱を空へ運び出す涼しさを選びました。'],
   B: ['お台場海浜公園の呼吸する巨葉', 'あなたは、植物の呼吸がつくる涼しさを選びました。'],
-  C: ['お台場海浜公園', 'あなたは、街が天気をつくる涼しさを選びました。'],
+  C: ['お台場海浜公園の雪雲噴水', 'あなたは、街が天気をつくる涼しさを選びました。'],
 };
 
 /** Q05 option → which model stands on the NE PARK lot in place of the NE park: A the reverse air conditioner, B the breathing giant
- *  leaf; C (not built yet) and no or an unknown option keep the version4 park. */
-export const q05Model = (option: string | undefined): 'tower' | 'leaf' | undefined =>
-  option === 'A' ? 'tower' : option === 'B' ? 'leaf' : undefined;
+ *  leaf, C the snow-cloud fountain; no or an unknown option keeps the version4 park. */
+export const q05Model = (option: string | undefined): 'tower' | 'leaf' | 'cloud' | undefined =>
+  option === 'A' ? 'tower' : option === 'B' ? 'leaf' : option === 'C' ? 'cloud' : undefined;
 
-/** A rotation proposal's Q05 swap, or undefined. `changes` is whether the lot shows something new (A↔B, A↔C, B↔C all do while C
- *  keeps the park). */
+/** A rotation proposal's Q05 swap, or undefined. `changes` is whether the lot shows something new (every swap between A, B and C
+ *  does, each option having its own model). */
 export function q05Swap(proposal: ExhibitionProposal) {
   const outcome = proposal.rotation?.outcome;
   if (outcome?.kind !== 'swap' || outcome.questionId !== 'Q05' || !Q05_RESULTS[outcome.to] || !Q05_RESULTS[outcome.from]) return undefined;
   return { from: outcome.from, to: outcome.to, changes: q05Model(outcome.from) !== q05Model(outcome.to) };
 }
 
-/** The result card for a Q05 swap: the tower or the leaf arriving, or one leaving for the park still waiting for its facility. */
+/** The result card for a Q05 swap: the model that arrives (tower, leaf or cloud), or one leaving for the park. */
 export function q05Result(swap: { from: string; to: string }) {
   const [place, preference] = Q05_RESULTS[swap.to];
   const to = q05Model(swap.to), from = q05Model(swap.from);
   const effect = to === 'tower' ? 'お台場海浜公園に、地面の熱を吸い込んで空へ噴き上げる塔が立ち、塔の下の芝生が涼しくなりました。'
     : to === 'leaf' ? 'お台場海浜公園に、屋根より大きな葉をひろげる植物が育ち、葉のふちから落ちる霧で木陰が涼しくなりました。'
+    : to === 'cloud' ? 'お台場海浜公園の上に、海の水からつくった冷たい雲が浮かび、真夏の広場に雪が降るようになりました。'
     : from === 'tower' ? 'お台場海浜公園から逆向き冷房塔が外れ、新しい涼しさを待つ公園に戻りました。'
     : from === 'leaf' ? 'お台場海浜公園から巨葉の植物が外れ、新しい涼しさを待つ公園に戻りました。'
+    : from === 'cloud' ? 'お台場海浜公園から雪雲噴水が外れ、新しい涼しさを待つ公園に戻りました。'
     : 'お台場海浜公園は、新しい涼しさの仕組みを待っています。';
   return { place, effect, preference };
 }
@@ -170,7 +172,8 @@ export function q05Result(swap: { from: string; to: string }) {
 /** The Q05 headline shot: the close-up of the model that arrives, or of the one that leaves for the park; none when nothing changes. */
 export function q05Shot(swap: { from: string; to: string; changes: boolean }): ShotId | null {
   if (!swap.changes) return null;
-  return (q05Model(swap.to) ?? q05Model(swap.from)) === 'leaf' ? 'q05:leaf' : 'q05:tower';
+  const model = q05Model(swap.to) ?? q05Model(swap.from);
+  return model === 'leaf' ? 'q05:leaf' : model === 'cloud' ? 'q05:cloud' : 'q05:tower';
 }
 
 /** Plan 3.4: what the guest's answer already shows at a visited site (a model that stands there): its headline shot and card place. */
@@ -178,7 +181,8 @@ export const ROTATION_VISITS: Readonly<Record<string, Readonly<Record<string, { 
   Q01: { A: { shot: 'nw:focal-low', place: 'デックス西 AUTO HUB' }, B: { shot: 'nw:focal', place: 'デックス西 AUTO HUB' }, C: { shot: 'nw:focal', place: 'デックス西 AUTO HUB' } },
   Q02: Object.fromEntries(Object.entries(Q02_RESULTS).map(([option, [place]]) => [option, { shot: Q02_SHOTS[option], place }])),
   Q03: { A: { shot: 'q03:housing', place: Q03_RESULTS.A[0] } },
-  Q05: { A: { shot: 'q05:tower', place: Q05_RESULTS.A[0] }, B: { shot: 'q05:leaf', place: Q05_RESULTS.B[0] } },
+  Q05: { A: { shot: 'q05:tower', place: Q05_RESULTS.A[0] }, B: { shot: 'q05:leaf', place: Q05_RESULTS.B[0] },
+    C: { shot: 'q05:cloud', place: Q05_RESULTS.C[0] } },
   Q06: { B: { shot: 'q06:tower', place: Q06_RESULTS.B[0] } },
   Q08: { C: { shot: 'sw:focal', place: Q08_RESULTS.C[0] } },
 };

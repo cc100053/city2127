@@ -9,7 +9,7 @@ p.intro{background:#f4f3ee;border-radius:6px;padding:8px 12px;margin:10px 0}figu
 <h1>變化總覽：9 題 × 3 選項＝27 個建築版本</h1>
 <p>生成：2026-11-28，<code>scripts/changeSheet.ts</code>。題目、選項、模型及地塊來自輪換題組 <code>questions.rotation.v1.json</code>（version 1，草稿：題目文字仍為 SURVEY_V2 暫定稿）；狀態來自 QUESTION_ROTATION_PLAN 第 2 節總表；居民來自 RESIDENT_SCENE_PLAN；日文結果卡及設施卡文案由程式生成。Q01 截圖取自 <code>scripts/closeupSheet.mjs</code>，其餘為輪換實時測試的畫面（含 guest 所見的結果卡）。</p>
 <p class="intro"><b>抽題輪換。</b>每位觀眾從 9 題中回答 4 題，優先抽取最久未變的題目。四個答案均按題目分別計入，大屏幕聚焦其中一個選擇，最多切換一個模型。沒有可見變化時，鏡頭探訪已顯示觀眾所選模型的地塊，或前往構想地展示「構想中」。iPad 交接頁可逐張揭示同題同選項的比例（含本人）；每題未滿 10 票時顯示收集進度。</p>
-<p>現況：27 個版本中，11 個有模型，7 個為空置地塊，9 個未有模型及地塊。</p>
+<p>現況：27 個版本中，12 個有模型，6 個為空置地塊，9 個未有模型及地塊。</p>
 <table><tr><th>題</th><th>選項</th><th>建築版本（計劃總表）</th><th>類別</th></tr>
 <tr><td rowspan="3"><a href="#Q01">Q01</a><br><small>荷物の受け取り予定が急に変わったら、どうする？</small></td><td><a href="#Q01-A">A</a>「配達スタッフに相談する。」</td><td>AUTO HUB −1 人手窗口（驗收）</td><td>有模型</td></tr>
 <tr><td><a href="#Q01-B">B</a>「AIの提案から、自分で選ぶ。」</td><td>AUTO HUB 0 人機協作（驗收）</td><td>有模型</td></tr>
@@ -25,7 +25,7 @@ p.intro{background:#f4f3ee;border-radius:6px;padding:8px 12px;margin:10px 0}figu
 <tr><td><a href="#Q04-C">C</a>「覚えて、便利な案内に役立ててほしい。」</td><td>個人案內閘門（無）</td><td>未有模型及地塊</td></tr>
 <tr><td rowspan="3"><a href="#Q05">Q05</a><br><small>真夏のお台場の公園、どうやって涼しくしたい？</small></td><td><a href="#Q05-A">A</a>「熱を空へ捨てる。」</td><td>逆向冷氣機 <code>q05a-reverse-ac-2127</code>（R2 2026-11-27 owner 驗收，放於 NE PARK）</td><td>有模型</td></tr>
 <tr><td><a href="#Q05-B">B</a>「植物に涼しさをつくってもらう。」</td><td>呼吸巨葉 <code>q05b-breathing-leaf-2127</code>（B-R6 2026-11-28 owner 驗收，放於 NE PARK）</td><td>有模型</td></tr>
-<tr><td><a href="#Q05-C">C</a>「公園の上に冷たい雲をつくる。」</td><td>雪雲噴泉：抽海水造雲下雪（無；目標圖已定）</td><td>空置（地塊已定）</td></tr>
+<tr><td><a href="#Q05-C">C</a>「公園の上に冷たい雲をつくる。」</td><td>雪雲噴泉 <code>q05c-snow-cloud-2127</code>（C-R3 2026-11-28 owner 驗收，放於 NE PARK）</td><td>有模型</td></tr>
 <tr><td rowspan="3"><a href="#Q06">Q06</a><br><small>長く使った家具が古くなった。どうする？</small></td><td><a href="#Q06-A">A</a>「新しい家具に買い替える。」</td><td>新素材建築（住宅 M 輕材可參考）</td><td>空置（地塊已定）</td></tr>
 <tr><td><a href="#Q06-B">B</a>「修理して使い続ける。」</td><td>蛋艙塔 <code>pod-frame-tower-2127</code>（驗收 R4，2026-11-19 放於住宅 U 舊址）</td><td>有模型</td></tr>
 <tr><td><a href="#Q06-C">C</a>「今の家具を誰かに譲り、別の中古品を使う。」</td><td>模組回收＋重組據點（住宅 U 交換骨架可參考）</td><td>空置（地塊已定）</td></tr>
@@ -183,7 +183,7 @@ p.intro{background:#f4f3ee;border-radius:6px;padding:8px 12px;margin:10px 0}figu
 </dl><div class="frames"><p><small>未有實時截圖。</small></p></div></div>
 </section></article>
 <article id="Q05"><h2>Q05 真夏のお台場の公園、どうやって涼しくしたい？ <small>環境調整志向</small></h2>
-<table class="status"><tr><th>地塊方式與位置</th><th>城市接線／三態</th></tr><tr><td>同地輪換，NE PARK <code>changeSites.ne</code> (−210, −135)，以其為中心的 48 × 48 m（<code>LOTS['ne-park']</code>；2026-11-26 在 owner 授權下選定，R2 按 owner「playground expand a little」由 40 m 擴大）</td><td>城市已接 A（<code>lotRuntime</code> <code>setQ05</code>，2026-11-26）及 B（2026-11-27）：A、B 各自取代 NE 公園及其下共享庭園 1；C 未有模型，暫回復 NE 公園；塔出入飛 <code>q05:tower</code>、巨葉出入飛 <code>q05:leaf</code> 近鏡（A↔B 飛向新出現者）；題目及選項文案按交接建議改寫</td></tr></table>
+<table class="status"><tr><th>地塊方式與位置</th><th>城市接線／三態</th></tr><tr><td>同地輪換，NE PARK <code>changeSites.ne</code> (−210, −135)，以其為中心的 48 × 48 m（<code>LOTS['ne-park']</code>；2026-11-26 在 owner 授權下選定，R2 按 owner「playground expand a little」由 40 m 擴大）</td><td>城市已接 A（<code>lotRuntime</code> <code>setQ05</code>，2026-11-26）、B（2026-11-27）及 C（2026-11-28）：三者各自取代 NE 公園及其下共享庭園 1，四態共用常駐公園周邊 <code>q05-park-surround-2127</code>；塔出入飛 <code>q05:tower</code>、巨葉出入飛 <code>q05:leaf</code>、雪雲出入飛 <code>q05:cloud</code> 近鏡（互換時飛向新出現者）；題目及選項文案按交接建議改寫</td></tr></table>
 
 <section class="change" id="Q05-A"><h3>Q05-A <small>有模型，起始版本（暫定）</small></h3>
 <div class="cols"><dl>
@@ -201,11 +201,11 @@ p.intro{background:#f4f3ee;border-radius:6px;padding:8px 12px;margin:10px 0}figu
 <dt>設施卡</dt><dd><small>此選項尚未有專用設施卡。</small></dd>
 </dl><div class="frames"><p><small>未有實時截圖。</small></p></div></div>
 </section>
-<section class="change" id="Q05-C"><h3>Q05-C <small>空置（地塊已定）</small></h3>
+<section class="change" id="Q05-C"><h3>Q05-C <small>有模型</small></h3>
 <div class="cols"><dl>
 <dt>選項</dt><dd><b>「公園の上に冷たい雲をつくる。」</b></dd>
-<dt>建築版本（計劃總表）</dt><dd>雪雲噴泉：抽海水造雲下雪（無；目標圖已定）<br><small>模型 ID：無；地塊：<code>ne-park</code></small></dd>
-<dt>由 A 換入：結果卡</dt><dd>あなたは、街が天気をつくる涼しさを選びました。<br>お台場海浜公園から逆向き冷房塔が外れ、新しい涼しさを待つ公園に戻りました。<br><small>地點標示：お台場海浜公園</small></dd><dt>由 B 換入：結果卡</dt><dd>あなたは、街が天気をつくる涼しさを選びました。<br>お台場海浜公園から巨葉の植物が外れ、新しい涼しさを待つ公園に戻りました。<br><small>地點標示：お台場海浜公園</small></dd>
+<dt>建築版本（計劃總表）</dt><dd>雪雲噴泉 <code>q05c-snow-cloud-2127</code>（C-R3 2026-11-28 owner 驗收，放於 NE PARK）<br><small>模型 ID：<code>q05c-snow-cloud-2127</code>；地塊：<code>ne-park</code></small></dd>
+<dt>由 A 換入：結果卡</dt><dd>あなたは、街が天気をつくる涼しさを選びました。<br>お台場海浜公園の上に、海の水からつくった冷たい雲が浮かび、真夏の広場に雪が降るようになりました。<br><small>地點標示：お台場海浜公園の雪雲噴水</small></dd><dt>由 B 換入：結果卡</dt><dd>あなたは、街が天気をつくる涼しさを選びました。<br>お台場海浜公園の上に、海の水からつくった冷たい雲が浮かび、真夏の広場に雪が降るようになりました。<br><small>地點標示：お台場海浜公園の雪雲噴水</small></dd>
 <dt>設施卡</dt><dd><small>此選項尚未有專用設施卡。</small></dd>
 </dl><div class="frames"><p><small>未有實時截圖。</small></p></div></div>
 </section></article>
