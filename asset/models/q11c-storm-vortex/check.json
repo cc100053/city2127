@@ -1,0 +1,98 @@
+{
+ "glb": "q11c-storm-vortex.glb",
+ "glb_bytes": 5628504,
+ "objects": 90,
+ "meshes": 83,
+ "unique_meshes": 17,
+ "triangles": 284006,
+ "materials": 41,
+ "new_materials_on_import": 41,
+ "bounds_min": [
+  -130.0,
+  -130.0,
+  -0.3
+ ],
+ "bounds_max": [
+  130.99,
+  130.0,
+  125.7
+ ],
+ "roots": [
+  "Q11C_StormVortex"
+ ],
+ "nodes": {
+  "VORTEX_FUNNEL": true,
+  "VORTEX_STREAKS": true,
+  "VORTEX_CAP": true,
+  "RING_LOW": true,
+  "RING_MID": true,
+  "RING_HIGH": true,
+  "TURBINE_HOUSINGS": true,
+  "STRUCTURE_VANES": true,
+  "STRUCTURE_ROOF": true,
+  "DECK_WALKWAYS": true,
+  "PLAZA_GROUND": true
+ },
+ "rotors": {
+  "count": 30,
+  "worst_offset_m": 0.0,
+  "worst_axis_error": 0.0
+ },
+ "centred_nodes": {
+  "RING_LOW": [
+   0.0,
+   0.0,
+   47.0
+  ],
+  "RING_MID": [
+   0.0,
+   0.0,
+   78.0
+  ],
+  "RING_HIGH": [
+   0.0,
+   0.0,
+   110.0
+  ],
+  "VORTEX_STREAKS": [
+   0.0,
+   0.0,
+   0.0
+  ]
+ },
+ "people_nodes": [],
+ "transparent_materials": {
+  "q11c_cap_cloud.001": {
+   "alpha": 0.85,
+   "method": "BLENDED"
+  },
+  "q11c_rail_glass.001": {
+   "alpha": 0.25,
+   "method": "BLENDED"
+  },
+  "q11c_vortex_core.001": {
+   "alpha": 0.78,
+   "method": "BLENDED"
+  },
+  "q11c_vortex_shell.001": {
+   "alpha": 0.18,
+   "method": "BLENDED"
+  },
+  "q11c_vortex_streak.001": {
+   "alpha": 0.62,
+   "method": "BLENDED"
+  },
+  "q11c_vortex_streak_shade.001": {
+   "alpha": 0.7,
+   "method": "BLENDED"
+  },
+  "q11c_vortex_streak_soft.001": {
+   "alpha": 0.4,
+   "method": "BLENDED"
+  }
+ },
+ "main_view": {
+  "vortex_share": 0.11,
+  "turbine_share": 0.0019
+ }
+}

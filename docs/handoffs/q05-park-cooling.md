@@ -1,7 +1,7 @@
 # q05-park-cooling — Q05 公園降溫三態：目標圖與建築故事
 
 - Owner: repository owner
-- Status: Q05-A DONE（R2 owner 驗收，2026-11-27，已合併入 main）；Q05-B R4 已建，待 owner 評審（分支 `feat/q05b-breathing-leaf`）；Q05-C R2 已建，待 owner 評審（分支 `feat/q05c-snow-cloud`，疊在 B 分支之上，見文末 C-R2）。
+- Status: Q05-A DONE（R2 owner 驗收，2026-11-27，已合併入 main）；Q05-B DONE（B-R6 owner 驗收，2026-11-28，已合併入 main）；Q05-C DONE（C-R3 owner 驗收，2026-11-28，「accept, merge main」，已合併入 main；含共用公園周邊及海濱木棧道延伸段）。
 - Branch: `feat/q05a-reverse-ac`（worktree `../city2127-q05a`），自 `origin/main` `bbec76c2`；目標圖記錄見舊分支 `docs/q05-targets`（已合併）。
 - Base commit: `bbec76c26a833a2a5ba24dfc42f3cee3f9a03c0c`
 - Last verified commit: `00f0cd75`（A R2）；B-R4 見分支 `feat/q05b-breathing-leaf` 最新提交（檢查見 B-R4 一節）。
@@ -441,9 +441,96 @@ owner 指示：「do b modeling」。地塊、近鏡方位及台座沿用 A 的�
 - 莖是否再加粗、改為較實的綠色，並把水滴虛線改為目標中沿莖外側的一條水色光帶。
 - 葉面是否要加回少量光澤。
 
-## B-R5 round prompt（下一輪會話）
+## B-R4 verdict
 
-place-building round for `q05b-breathing-leaf`: main checkout `/Users/fatboy/city2127`, branch `feat/q05b-breathing-leaf`, read `docs/handoffs/q05-park-cooling.md` (its `## B-R4 brief` and `## B-R4` sections). Owner verdict on B-R4: «…»
+«做霧嘅效果，依家睇落似一條條光，唔似霧水»
+
+## B-R5 brief
+
+| # | owner 原話 | 現況（B-R4） | 本輪做法（3200 × 1800，`q05:leaf`） |
+| --- | --- | --- | --- |
+| 1 | 霧似一條條光，唔似霧水 | 210 條 0.9–1.5 m 闊實邊白帶，只垂至葉高約三至六成，近鏡每條約 30–45 px 闊、邊緣硬直 | 改為 132 幅 2.2–3.4 m 闊、互相重疊的霧簾（每約 1.1 m 葉緣一幅），沿葉緣走向、略向外拱，垂至距草地約 1.2 m 的五成半至八成半；霧簾帶 UV，執行時套程序生成的柔邊 alpha 貼圖：細絲長短濃淡不一，兩側及向地面漸淡，令其讀作水霧而非光帶。 |
+
+## B-R5（2026-11-28，Q05-B 呼吸巨葉）
+
+### Git 狀態
+
+- 與 B-R4 同一會話。開始時 `feat/q05b-breathing-leaf` 與遠端同步於 `3f13a1c5`，工作樹乾淨。
+
+### 改動
+
+- `build_breathing_leaf.py` `mist()`：霧簾重做（見 brief 1），每幅 4 × 7 頂點並寫入 UV（u 橫向 0→1、隨機鏡像；v 由葉緣向下 0→1）；`main()` 為有 `acc.uv` 的角色建立 UV 層。霧物料 alpha 0.34 → 0.45。
+- `src/breathingLeaf.ts`：新增 `breathingLeafMistAlpha()`（256 × 128 `DataTexture`，固定亂數，Node 亦可執行），`prepareBreathingLeaf` 把它設為兩組霧的 `alphaMap`；呼吸仍只改 emissive。
+- `tests/lotRuntime.test.ts`：霧網格須有 UV 及 alpha 貼圖。
+- 模型約 105k tris，GLB 3.3 MB。
+
+### 自評（`~/city2127-evidence/q05b/r5/`）
+
+| # | 項目 | 結果 |
+| --- | --- | --- |
+| 1 | 霧要似霧水 | 大致達到：前左方霧簾已成柔和的細絲水霧，向下漸淡，透出後面樹木（`row1-mist.jpg`、`r4-vs-r5.jpg`）。未足：後方兩塊高葉的霧簾在亮背景前仍隱約見圓筒狀輪廓與側邊直線（霧簾側面對鏡頭時疊加）；整體比目標淡，目標的霧簾更白、更密。 |
+
+### 檢查
+
+- 單元：`tests/lotRuntime.test.ts` 通過。根目錄 `npm test`、`npm run build`、`git diff --check` 見提交前記錄（`~/city2127-evidence/q05b/r5/npm-test.log`）。
+- 瀏覽器（Vite 5186）：三輪 capture-compare（pass1 太淡 → pass2 加濃、霧簾下半才淡出 → pass3 加強兩側淡出及細絲對比）。
+- FPS：未量度；headless data-fps 約 34（日）、25（夜），只作參考。
+
+### 待 owner 決定
+
+- 霧是否要更白更密（如目標），以及後方高葉的霧簾是否減少以免出現圓筒輪廓。
+
+## B-R5 verdict
+
+«好，加飄落效果，霧再白啲密啲»
+
+## B-R6 brief
+
+| # | owner 原話 | 現況（B-R5） | 本輪做法（3200 × 1800，`q05:leaf`，日 12 時及夜 21 時） |
+| --- | --- | --- | --- |
+| 1 | 加飄落效果 | 霧簾靜止；只有 emissive 呼吸，細絲 alpha 貼圖固定 | 把霧拆成兩層：靜態包絡（葉緣柔和、兩側及近地面淡出）改為頂點 alpha，由第一套 UV 於執行時計算；細絲貼圖改為上下左右皆可平鋪，經第二套以米計的 UV（每 6 m 重複一次）讀取，於既有 motion 閉包內每幀把貼圖 offset 向下捲動 1.5 m/s（霧而非瀑布）。呼吸仍只改 emissive，不動 opacity。 |
+| 2 | 霧再白啲密啲 | 132 幅霧簾、約每 1.1 m 一幅；alpha 0.45、emissive 0.25，比目標淡 | 前方葉緣約每 0.75 m 一幅；alpha 0.48（仍 < 0.5）、emissive 0.55 並偏白；細絲貼圖增益及對比提高，強度主要來自貼圖。 |
+| 3 | （B-R5 未足） | 後方兩塊高葉的霧簾在亮背景前隱約見圓筒輪廓及側邊直線 | 後方兩葉霧簾減為約每 1.3 m 一幅、長度六成；包絡另按霧簾法線與近鏡方向 `CAM` 的夾角淡出側面向鏡頭的霧簾。 |
+
+## B-R6（2026-11-28，Q05-B 呼吸巨葉）
+
+### Git 狀態
+
+- 開始時 `feat/q05b-breathing-leaf` 與遠端同步於 `4925eafd`，工作樹乾淨，`git fetch` 成功。
+
+### 改動
+
+- `build_breathing_leaf.py` `mist()`：霧簾共 153 幅（前方葉緣約每 0.75 m 一幅，後方兩高葉約每 1.3 m 一幅、垂長六成）；每幅 7 × 7 頂點；第一套 UV（`UVMap`）為 0→1 的 (橫, 縱)，第二套 UV（`UVThreads`，glTF `TEXCOORD_1`）橫向隨機鏡像、縱向以 `MIST_TILE` = 6 m 為一次重複並帶每幅不同的起始相位。霧物料 alpha 0.45 → 0.48、emissive 0.25 → 0.55、顏色更白。
+- `src/breathingLeaf.ts`：`breathingLeafMistAlpha()` 改為 256 × 256、雙向平鋪的細絲短段貼圖（`RepeatWrapping`，`channel = 1`）；新增 `breathingLeafMistEnvelope()`（兩側、葉緣、近地面及側向鏡頭淡出）寫入霧網格的 `color`（vec4，白色 rgb，`vertexColors`）；新增 `breathingLeafMistFall()`，motion 閉包每幀設定共用貼圖的 `offset.y`，令兩組霧同速向下飄落。lot fade 複製物料時共用同一貼圖，故捲動不受影響。
+- `tests/lotRuntime.test.ts`：霧網格須有 vec4 頂點 alpha、`uv1` 及 `channel = 1` 的貼圖；包絡於兩側、地面及側向鏡頭時為 0；motion 推進時貼圖 offset 向下，而 opacity 不變。
+- 模型約 112k tris，GLB 3.6 MB。
+
+### 自評（`~/city2127-evidence/q05b/r6/`）
+
+| # | 項目 | 結果 |
+| --- | --- | --- |
+| 1 | 加飄落效果 | 達到（機制）：細絲沿霧簾向下捲動，淡出包絡保持不動（`fall-keyframes.jpg`，reviewTime 20.0 / 20.6 / 21.2 / 21.8）。未足：靜態截圖中細絲移動只見紋理位移，方向須在實機動態中由 owner 確認。 |
+| 2 | 霧再白啲密啲 | 大致達到：左前方霧簾明顯更白更密，仍透出後面樹木，細絲可見（`r5-vs-r6.jpg`、`mist-closeup.jpg`）。第二輪曾把增益及 emissive 推得太高，霧變成發光霧團，第三輪已回調。未足：目標中霧簾環繞所有葉緣，本模型右方兩葉下霧簾仍少（多被樹冠遮擋或因側向鏡頭而淡出），整體覆蓋仍比目標少（`target-vs-r6.jpg`）。 |
+| 3 | 後葉圓筒輪廓 | 達到：後方兩葉不再見圓筒輪廓及側邊直線，只餘淡淡細絲（`focal-day.jpg`、`focal-night.jpg`）。 |
+
+### 檢查
+
+- 單元：`tests/lotRuntime.test.ts` 通過。根目錄 `npm test`、`npm run build`、`git diff --check` 見 `~/city2127-evidence/q05b/r6/npm-test.log` 及提交前記錄。
+- 瀏覽器（Vite 5186）：三輪 capture-compare（pass1 機制確認：包絡生效、後葉輪廓消失，但霧仍淡 → pass2 增益及 emissive 過高成發光霧團 → pass3 回調至白而有細絲）。
+- FPS：未量度；headless data-fps 約 36–38（日夜），只作參考。
+
+### 待 owner 決定
+
+- 飄落速度（現為 1.5 m/s）是否合適。
+- 右方兩葉下是否要加霧簾，令覆蓋更接近目標。
+
+## B-R6 verdict
+
+«Q05-B 呼吸巨葉 merge main too»（2026-11-28）：owner 驗收 B-R6，合併入 `main`。飄落速度及右方兩葉的霧簾覆蓋未有另行要求，留待日後打磨。
+
+## B-R7 round prompt（下一輪會話）
+
+place-building round for `q05b-breathing-leaf`: main checkout `/Users/fatboy/city2127`, branch `feat/q05b-breathing-leaf`, read `docs/handoffs/q05-park-cooling.md` (its `## B-R6 brief` and `## B-R6` sections). Owner verdict on B-R6: «…»
 
 ## C-R1 brief（2026-11-28，Q05-C 雪雲噴泉）
 
@@ -718,3 +805,7 @@ place-building round for `q05c-snow-cloud`: worktree `/Users/fatboy/city2127-q05
 ## C-R4 round prompt（下一輪會話）
 
 place-building round for `q05c-snow-cloud`: worktree `/Users/fatboy/city2127-q05c`, branch `feat/q05c-snow-cloud`, read `docs/handoffs/q05-park-cooling.md` (its `## C-R3 brief` and `## C-R3` sections). Open from C-R3: the cloud's close-up aspect (1.74 against ≥ 1.9) and the faint crease between its waist and upper billows, plinth green share 0.348 against 0.35 (pale paving left of the pumps); owner questions on the promenade join (via the ring walk, or a bridge over `WATER_MAIN`) and walkers on the tails; still open: B's gates, the utility block. Owner verdict on C-R3: «…»
+
+## C-R3 verdict
+
+«accept, merge main»（2026-11-28）：owner 驗收 C-R3，合併入 `main`（`feat/q05c-snow-cloud` 先合併已含 B-R6 的 `origin/main`）。C-R3 自評中未足各項（雲近鏡寬高比 1.74、台座綠色像素 0.348）及待 owner 決定各項未有另行要求，留待日後打磨；`## C-R4 round prompt` 保留供日後使用。

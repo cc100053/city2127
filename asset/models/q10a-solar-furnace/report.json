@@ -1,0 +1,15 @@
+{
+ "tris_by_group": {
+  "STRUCTURE": 65472,
+  "FURNACE": 43004,
+  "FEED": 46360,
+  "POWER": 6128,
+  "POOL": 32224,
+  "PLAZA": 89264
+ },
+ "tris_total": 282452,
+ "unique_mesh_tris": 214682,
+ "objects": 87,
+ "materials": 39,
+ "glb_bytes": 7083480
+}

@@ -74,6 +74,8 @@ npm run dev -- --port 5173
 
 Terminal 1 在 `survey/` 執行 `npm run build`，再執行 `SURVEY_QUESTIONS=src/survey/questions.rotation.v1.json npm run server`；Terminal 2 與上文相同。然後在同一部電腦開啟 `http://127.0.0.1:8787/guest` 答題，並開啟 `http://127.0.0.1:5173/?survey` 觀看城市。只開啟 `http://127.0.0.1:5173/` 則為不接收提案的城市原型。
 
+**模型預覽（DEV，毋須伺服器）：** 開啟 `http://127.0.0.1:5173/?rotation`，左上角「モデルシーン · DEV」面板可逐一播放九題各選項的結果。鏡頭可用鍵盤飛行：W／S 沿視線前後、A／D 左右平移、E 或 Space 上升、Q 或 C 下降，按住 Shift 加速至四倍；滑鼠拖曳仍可環繞前方。近景被固定時，第一次按鍵即解除固定，鏡頭從原位繼續移動。
+
 ## 延伸文件
 
 - [展覽規格](docs/EXHIBITION_SPEC.md) · [驗收指引](docs/VALIDATION.md)（展覽機、雙 iPad、長時間運作）· [LAN 雙站設定](docs/handoffs/lan-guest-stations.md)

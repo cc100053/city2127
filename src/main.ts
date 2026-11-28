@@ -79,6 +79,10 @@ try {
   const triple=(key:string,fallback:[number,number,number])=>{const v=reviewParams.get(key)?.split(',').map(Number);return v?.length===3&&v.every(Number.isFinite)?v as [number,number,number]:fallback;};
   const reviewAim=triple('at',[-24,0,-268]);
   if(streetReview){camera.position.set(...triple('cam',[-40,20,-245]));camera.lookAt(...reviewAim);}
+  // DEV `?showcase` (src/devShowcase.ts): free camera, opening on the two west-bay drafts; `&cam=`/`&at=` override the pose.
+  const showcaseCamera=import.meta.env.DEV&&!civicReview&&!streetReview&&reviewParams.has('showcase');
+  const showcaseAim=triple('at',[-860,50,300]);
+  if(showcaseCamera){camera.position.set(...triple('cam',[-560,200,-330]));camera.lookAt(...showcaseAim);}
   // Review captures reach the live scene here, e.g. to follow one car (artifacts/car-closeup-polish).
   if(streetReview)(window as unknown as {cityReview:object}).cityReview={scene,camera};
   const reviewTime=import.meta.env.DEV && reviewParams.has('reviewTime') ? Number(reviewParams.get('reviewTime')) : NaN;
@@ -137,9 +141,13 @@ try {
   controls.target.set(...HERO_TARGET);controls.enableDamping=true;controls.dampingFactor=.06;controls.rotateSpeed=.45;controls.zoomSpeed=.6;controls.panSpeed=.8;
   if(civicReview)controls.target.set(-10,78,20);
   if(streetReview)controls.target.set(...reviewAim);
+  if(showcaseCamera)controls.target.set(...showcaseAim);
   // Orbit and pan stay on the hero district; the hazed ground beyond is backdrop, not a destination.
   const districtMin=new T.Vector3(DISTRICT.minX,0,DISTRICT.minZ),districtMax=new T.Vector3(DISTRICT.maxX,160,DISTRICT.maxZ),panBack=new T.Vector3();
-  controls.minDistance=ringReview?.8:streetReview?30:150;controls.maxDistance=1000;controls.minPolarAngle=ringReview?0:.35;controls.maxPolarAngle=ringReview?Math.PI-.05:1.42;controls.screenSpacePanning=false;controls.update();
+  controls.minDistance=ringReview?.8:streetReview?30:150;controls.maxDistance=1000;controls.minPolarAngle=ringReview?0:.35;controls.maxPolarAngle=ringReview?Math.PI-.05:1.42;controls.screenSpacePanning=false;
+  // Showcase: close-ups to whole-bay views and any angle down to just above the horizon; the district pan clamp is off (render loop).
+  if(showcaseCamera){controls.minDistance=5;controls.maxDistance=4000;controls.minPolarAngle=0;controls.maxPolarAngle=Math.PI/2-.02;}
+  controls.update();
   // MSAA target: the composer's default target has no samples, so edges were aliased once post-processing ran.
   const composer=new EffectComposer(renderer,new T.WebGLRenderTarget(innerWidth,innerHeight,{type:T.HalfFloatType,samples:quality.msaaSamples}));composer.setSize(innerWidth,innerHeight);composer.addPass(new RenderPass(scene,camera));
   // Night water reflections: copy the lit scene (water masked out by its zero alpha) at quarter resolution; the bay samples it next frame.
@@ -264,6 +272,14 @@ try {
       model.name = SNOW_CLOUD;
     }).catch(error => console.error('Snow-cloud fountain could not load', error));
   }
+  // DEV `?showcase`: the unplaced Q10-A and Q11-C drafts on the west bay (src/devShowcase.ts), outside the rotation.
+  let showcaseFrame:((now:number)=>void)|undefined,showcaseFly:(()=>boolean)|undefined;
+  // `?showcase` and the `?rotation` モデルシーン · DEV panel: WASD / QE fly the camera (devShowcase showcaseKeys).
+  if(showcaseCamera||localRotation)void import('./devShowcase').then(({showcaseKeys})=>{showcaseFly=showcaseKeys(camera,controls.target);});
+  if(import.meta.env.DEV&&params.has('showcase'))void odaibaReady.then(async ready=>{
+    if(!ready)return;
+    const {startShowcase}=await import('./devShowcase');showcaseFrame=startShowcase(scene);
+  });
   // DEV E3 city composition: a separate design comparison, never derived from environment Meter bands.
   let devFrame:((now:number,darkness:number)=>void)|undefined;
   if(import.meta.env.DEV&&energyReview)
@@ -293,7 +309,10 @@ try {
     // Optional `fov` (degrees) for resident-scene surveys; the camera keeps it until reload.
     cityPose:(position:[number,number,number],target:[number,number,number],fov?:number)=>{
       if(fov!==undefined&&camera.fov!==fov){camera.fov=fov;camera.updateProjectionMatrix();}
-      headlineCamera?.cancel();devShot={position,target};controls.enabled=false;
+      headlineCamera?.cancel();
+      // Showcase keeps the camera free: the pose is a starting point, not a pin.
+      if(showcaseCamera){devShot=null;camera.position.set(...position);controls.target.set(...target);controls.enabled=true;controls.update();return;}
+      devShot={position,target};controls.enabled=false;
     },
     // `cityElevatorNear(true)` / `?elevatorNear`: the R1 mid-distance elevator model instead of the far R6 silhouette.
     cityElevatorNear:(on:boolean)=>elevatorNear.setActive(on)});
@@ -452,13 +471,16 @@ try {
     scene.environmentIntensity=light.environment;renderer.toneMappingExposure=light.exposure*(1+.16*day);
     waterLights.night.value=nightSky;
     bloom.strength=light.bloom+pulse*.04;vignette.uniforms.offset.value=light.vignette;
-    controls.update();if(!ringReview){panBack.copy(controls.target).clamp(districtMin,districtMax).sub(controls.target);controls.target.add(panBack);camera.position.add(panBack);}
+    // A rotation-panel fly step frees a pinned close-up (`&shot=`, 即時) or a playing headline camera.
+    // The orbit floor drops to the close-up's distance, or OrbitControls would snap the camera back out to the hero minimum.
+    if(showcaseFly?.()&&localRotation){if(devShot){devShot=null;controls.enabled=true;}if(headlineCamera?.active)headlineCamera.cancel();controls.minDistance=Math.min(controls.minDistance,camera.position.distanceTo(controls.target));}
+    controls.update();if(!ringReview&&!showcaseCamera){panBack.copy(controls.target).clamp(districtMin,districtMax).sub(controls.target);controls.target.add(panBack);camera.position.add(panBack);}
     if(headlineCamera?.active&&cameraMotion.matches)headlineCamera.cancel();else headlineCamera?.update(now);
     narration?.update(now,cameraMotion.matches);explore?.update(now,cameraMotion.matches);
     attract?.update(now,!!headlineCamera?.active||!!explore?.active||devShot!==null,cameraMotion.matches,voices);
     if(headlineCamera?.active)voiceLabel?.update(camera,now);else voiceLabel?.hide();
     if(import.meta.env.DEV&&devShot){camera.position.set(...devShot.position);controls.target.set(...devShot.target);camera.lookAt(controls.target);}
-    cityChanges?.update(now,dark);lots?.update(now,cameraMotion.matches);if(!cameraMotion.matches){reverseAcMotion?.(now);breathingLeafMotion?.(now);snowCloudMotion?.(now,dark);}concept?.update(now);journey?.update(now,dark);devFrame?.(now,dark);elevatorNear.update(now,dark);ring.update(dark);holo.update(now,dark);rig.update(s,now,dark,cityChanges?.automationLevel,hour);updateOdaiba(dark);updateFloaters(now,dark);updateHoverBeds(now);updateOverlay(hour,dark>.5);renderer.info.reset();
+    cityChanges?.update(now,dark);lots?.update(now,cameraMotion.matches);if(!cameraMotion.matches){reverseAcMotion?.(now);breathingLeafMotion?.(now);snowCloudMotion?.(now,dark);showcaseFrame?.(now);}concept?.update(now);journey?.update(now,dark);devFrame?.(now,dark);elevatorNear.update(now,dark);ring.update(dark);holo.update(now,dark);rig.update(s,now,dark,cityChanges?.automationLevel,hour);updateOdaiba(dark);updateFloaters(now,dark);updateHoverBeds(now);updateOverlay(hour,dark>.5);renderer.info.reset();
     // Wall-clock rate, so held review times still redraw shadows as models load and Meter sites change.
     if(performance.now()-shadowDrawn>=1000/quality.shadowHz){renderer.shadowMap.needsUpdate=true;shadowDrawn=performance.now();}
     composer.render();

@@ -135,6 +135,17 @@
 
 - 合併 main（2026-11-20，owner「suggest how to merge main」後選 A）：`claude/project-thread-je3092` merge `origin/main` `81c6d4b1`。南岸 SW：main 的南岸接駁（`southShoreSpur`、`SOUTH_SHORE`、北庭園移到 (−100, 245)）與本分支 Q08-C 棚前接駁重疊，按 owner 選擇保留本分支（`eventShelfAccess`、`EVENT_SHELF_NEIGHBOR_COURT`），`streetKit`／`coastalCanopy`／`districtMeters` 取本分支，`layout` 刪 `SOUTH_SHORE`，`odaibaScene` 不再把支路傳入植樹；`tests/odaiba.test.ts` 取本分支再套 main 四個道路修正（`10ef00dc`、`8b487e63`、`ba2d6840`、`716edace`）。`main.ts`、`voteJourney.ts` 兩邊保留（待機循環、声の灯回放＋地塊、構想地、輪換旅程；`playRotation` 及 `setRotationLanterns` 亦結束回放）。change-review：本分支已刪的 version4 截圖保持刪除，`index.html` 以 `scripts/changeSheet.ts` 重新生成（Q03／Q06 空置換空置卡改為構想地句）。文件：SPEC、PLAN、本交接取本分支，VALIDATION 兩邊保留並註明南岸檢查已被取代。驗證：root 及 `survey/` `npm test`、`npm run build`，`git diff --check` 通過；`tests/rotationFullFlow.browser.mjs` 一次通過（page error 0，證據 `~/city2127-evidence/question-rotation/main-merge/full-flow/`）；`npm run capture` SW 近鏡日夜、俯視（`main-merge/sw-sheet.jpg`、`sw-plan.png`）只有一條支路接棚前平台。已知缺口：main 的「声の灯」待機回放按 version4 四軸票數畫燈籠，輪換 run 的票數為中性，回放會全是零票燈籠，待跟進。
 
+- 抽題規則比較（2026-11-27，owner 問「9 題模型全部上線後，無變化會否大增」；只做模擬，不改規則）：以 scratch 腳本（已刪，不入 Git）呼叫正式 `rotationStep`／`addTallies`，條件同 `rotationSim.ts`（9 題、每選項都有模型、400 run × 120 假訪客、A／B 交錯）。比較三種抽題：現行「最久未變」、「最可能變」（按 tally 算街上選項的得票佔比，最低 4 題先抽，未達 10 票當 0，平手按最久未變）、混合（1 題最久未變＋3 題最可能變）。
+
+  | 分佈 | 現行無變化 | 最可能變 | 混合 |
+  | --- | --- | --- | --- |
+  | 原設定＋四成傾向 | 1.6%（393/400 全出場） | 1.4%（62/400） | 1.2%（391/400） |
+  | 70/20/10＋四成傾向 | 2.6%（391/400） | 2.5%（30/400） | 1.7%（375/400） |
+  | 70/20/10，無傾向 | 6.0%（306/400） | 5.9%（5/400） | 4.6%（274/400，最長等 50 位） |
+  | 85/10/5，無傾向 | 23.0%（187/400） | 22.5%（0/400） | 22.1%（117/400） |
+
+  結論：無變化率由答案一致程度決定，抽題規則改不了。粗算每題命中街上選項 ≈ Σp²，4 題全中 ≈ (Σp²)⁴（平均分佈 (1/3)⁴ ≈ 1.2%；85/10/5 約 29%）。85/10/5 下平均只有 1.3／9 個地塊顯示非多數選項；少數選項換上後很快被換回，所以沒有足夠「易變」的題可抽。「最可能變」大幅減少模型出場，混合只在中等偏向時少約 1 個百分點，代價是出場率及最長等待，不採用。前提亦相反：模型愈齊，可見變化愈多（現時真題組只記錄約 30%，全建成後原設定無變化約 1.6%）。可做的是：開展後用真人答案檢查每題分佈，一面倒（約 > 70%）的題重寫選項；保底探訪維持本番質素。
+
 ## Known issues and blockers
 
 - 已決（owner 2026-11-19）：住宅 U 自城市撤走，蛋艙塔放其舊址，位置及近鏡接受；Q06 A／C 空置為塔淡出留草地，A↔C 留 hero；version4 中塔為固定背景（因此 version4 外觀改變：住宅 U 不見、多了蛋艙塔，屬 owner 決定）。Q06 三句文案暫定（待 5.2）；旅程用環境色為自定；淡出中段暖色樓板較亮（共用 `fadeFinishes`），owner 2026-11-19 看過日夜實拍（`q06-pod/sheet-*.jpg`，含中段發光）後「Accept」。A、C 新模型由 owner 日後另做，屆時在 `setQ06` 加各自模型的 LotFade（同一地塊），`q06Tower` 及 `Q06_RESULTS` 改為模型文案。後續已接道路 ③ 支路及北、東入口平台。塔淡出時樓身位置仍為草地，固定道路與平台保留。

@@ -1,0 +1,88 @@
+{
+ "structure": {
+  "shell_radius_min_max": [
+   15.0,
+   15.0
+  ],
+  "cradle_nearest_to_centre_m": 14.96,
+  "cradle_verts_within_glass_contact_band": 1440,
+  "columns_lowest_z": 0.74,
+  "bases_highest_z": 0.87,
+  "bases_lowest_z": -1.27,
+  "bases_min_abs_x_near_bridge_m": 7.87
+ },
+ "glb": "q10a-solar-furnace-nocrown.glb",
+ "glb_bytes": 5889880,
+ "objects": 86,
+ "meshes": 79,
+ "unique_meshes": 34,
+ "triangles": 237008,
+ "materials": 39,
+ "new_materials_on_import": 39,
+ "bounds_min": [
+  -76.0,
+  -76.0,
+  -1.8
+ ],
+ "bounds_max": [
+  76.0,
+  76.0,
+  69.45
+ ],
+ "stage_nodes": {
+  "FEED_CHAIRS_315": true,
+  "FURNACE_SHARDS": true,
+  "FURNACE_SPARKS": true,
+  "POWER_LINES": true,
+  "FURNACE_CORE": true,
+  "FURNACE_SHELL": true,
+  "FEED_TUBE_315": true
+ },
+ "people_nodes": [],
+ "transparent_materials": {
+  "q10a_core_halo.001": {
+   "alpha": 0.14,
+   "method": "BLENDED"
+  },
+  "q10a_core_halo_outer.001": {
+   "alpha": 0.05,
+   "method": "BLENDED"
+  },
+  "q10a_mist.001": {
+   "alpha": 0.09,
+   "method": "BLENDED"
+  },
+  "q10a_ripple.001": {
+   "alpha": 0.38,
+   "method": "BLENDED"
+  },
+  "q10a_shell_glass.001": {
+   "alpha": 0.21,
+   "method": "BLENDED"
+  },
+  "q10a_station_glass.001": {
+   "alpha": 0.22,
+   "method": "BLENDED"
+  },
+  "q10a_tube_glass.001": {
+   "alpha": 0.28,
+   "method": "BLENDED"
+  },
+  "q10a_warm_water.001": {
+   "alpha": 0.5,
+   "method": "BLENDED"
+  }
+ },
+ "chair_through_tube_poolside": {
+  "rays_on_target": 39,
+  "through_glass": 38
+ },
+ "core_through_shell_main": {
+  "rays_on_target": 32,
+  "through_glass": 32
+ },
+ "core_through_shell_furnace": {
+  "rays_on_target": 192,
+  "through_glass": 192
+ }
+}

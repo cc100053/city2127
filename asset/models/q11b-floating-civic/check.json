@@ -1,0 +1,244 @@
+{
+ "glb": "q11b-floating-civic.glb",
+ "glb_bytes": 8180388,
+ "objects": 139,
+ "meshes": 133,
+ "unique_meshes": 25,
+ "triangles": 358114,
+ "materials": 64,
+ "bounds_min": [
+  -115.0,
+  -115.0,
+  -5.6
+ ],
+ "bounds_max": [
+  115.0,
+  115.0,
+  39.0
+ ],
+ "roots": [
+  "Q11B_FloatingCivic"
+ ],
+ "nodes": {
+  "SITE": true,
+  "PILLARS": true,
+  "WATER": true,
+  "FLOAT": true,
+  "BRIDGE": true,
+  "SITE_GROUND": true,
+  "WATER_SURFACE": true,
+  "FLOAT_HULL": true,
+  "FLOAT_ROOF": true,
+  "FLOAT_PORCH": true,
+  "FLOAT_SLIDERS": true,
+  "FLOAT_ATRIUM": true,
+  "BRIDGE_SEG_1": true,
+  "BRIDGE_SEG_2": true,
+  "BRIDGE_SEG_3": true,
+  "FLOAT_STOREY_1": true,
+  "FLOAT_STOREY_2": true,
+  "FLOAT_STOREY_3": true,
+  "FLOAT_STOREY_4": true,
+  "FLOAT_STOREY_5": true,
+  "PILLAR_NE": true,
+  "PILLAR_NW": true,
+  "PILLAR_SW": true,
+  "PILLAR_SE": true
+ },
+ "bridge": {
+  "shore_end": [
+   0.0,
+   -82.0,
+   4.0
+  ],
+  "float_end": [
+   0.0,
+   -40.0,
+   7.0
+  ],
+  "shore_gap_m": 0.0,
+  "seat_gap_m": 0.0,
+  "length_m": 42.107,
+  "pitch_deg": 4.09
+ },
+ "float": {
+  "node_z": 3.0,
+  "top_z": 7.0,
+  "bottom_z": 0.0,
+  "freeboard_m": 4.0,
+  "radius_m": 40.03
+ },
+ "water": {
+  "z": 3.0,
+  "alpha": 0.36,
+  "method": "BLENDED",
+  "inner_r": 40.03,
+  "outer_r": 115.0
+ },
+ "pillars": {
+  "PILLAR_NE": {
+   "centre": [
+    29.66,
+    29.66
+   ],
+   "r": 41.95,
+   "top_z": 39.0,
+   "bottom_z": -5.0,
+   "carriage_z": [
+    0.2,
+    7.9
+   ],
+   "carriage_wraps_pillar": true
+  },
+  "PILLAR_NW": {
+   "centre": [
+    -29.66,
+    29.66
+   ],
+   "r": 41.95,
+   "top_z": 39.0,
+   "bottom_z": -5.0,
+   "carriage_z": [
+    0.2,
+    7.9
+   ],
+   "carriage_wraps_pillar": true
+  },
+  "PILLAR_SW": {
+   "centre": [
+    -29.66,
+    -29.66
+   ],
+   "r": 41.95,
+   "top_z": 39.0,
+   "bottom_z": -5.0,
+   "carriage_z": [
+    0.2,
+    7.9
+   ],
+   "carriage_wraps_pillar": true
+  },
+  "PILLAR_SE": {
+   "centre": [
+    29.66,
+    -29.66
+   ],
+   "r": 41.95,
+   "top_z": 39.0,
+   "bottom_z": -5.0,
+   "carriage_z": [
+    0.2,
+    7.9
+   ],
+   "carriage_wraps_pillar": true
+  }
+ },
+ "storeys": {
+  "1": {
+   "z": [
+    7.0,
+    12.34
+   ],
+   "outer_r": 37.6
+  },
+  "2": {
+   "z": [
+    10.7,
+    14.95
+   ],
+   "outer_r": 35.42
+  },
+  "3": {
+   "z": [
+    14.9,
+    19.16
+   ],
+   "outer_r": 31.39
+  },
+  "4": {
+   "z": [
+    19.1,
+    23.35
+   ],
+   "outer_r": 27.27
+  },
+  "5": {
+   "z": [
+    23.3,
+    27.56
+   ],
+   "outer_r": 23.07
+  }
+ },
+ "roof_z": 30.65,
+ "plaza": [
+  {
+   "r": 69.0,
+   "ground_z": 0.5,
+   "under_water": true,
+   "hits": [
+    [
+     "q11b_water",
+     3.0
+    ],
+    [
+     "q11b_plaza_landing",
+     0.5
+    ]
+   ]
+  },
+  {
+   "r": 74.0,
+   "ground_z": 1.5,
+   "under_water": true,
+   "hits": [
+    [
+     "q11b_water",
+     3.0
+    ],
+    [
+     "q11b_plaza_landing",
+     1.5
+    ]
+   ]
+  },
+  {
+   "r": 79.0,
+   "ground_z": 2.5,
+   "under_water": true,
+   "hits": [
+    [
+     "q11b_water",
+     3.0
+    ],
+    [
+     "q11b_plaza_landing",
+     2.5
+    ]
+   ]
+  },
+  {
+   "r": 84.0,
+   "ground_z": 3.5,
+   "under_water": false,
+   "hits": [
+    [
+     "q11b_plaza_landing",
+     3.5
+    ]
+   ]
+  },
+  {
+   "r": 92.0,
+   "ground_z": 4.5,
+   "under_water": false,
+   "hits": [
+    [
+     "q11b_shore_paving",
+     4.5
+    ]
+   ]
+  }
+ ],
+ "people_nodes": []
+}

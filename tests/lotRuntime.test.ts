@@ -231,7 +231,8 @@ assert.deepEqual(q05set.options.map((o: { modelId: string | null }) => o.modelId
   // without depth writes, and the breath only ever changing emissive intensity (the dashes climb a → b → c).
   const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
   const { Box3 } = await import('three');
-  const { BREATHING_LEAF_MATTE, BREATHING_LEAF_MOVING, BREATHING_LEAF_STEM, breathingLeafBakes, breathingLeafGlow, prepareBreathingLeaf } =
+  const { BREATHING_LEAF_MATTE, BREATHING_LEAF_MOVING, BREATHING_LEAF_STEM, breathingLeafBakes, breathingLeafGlow, breathingLeafMistAlpha, breathingLeafMistEnvelope,
+    prepareBreathingLeaf } =
     await import('../src/breathingLeaf.ts');
   const bytes = readFileSync(new URL('../asset/models/q05b-breathing-leaf-2127/q05b-breathing-leaf-2127.glb', import.meta.url));
   const model = (await new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength), '')).scene;
@@ -247,7 +248,13 @@ assert.deepEqual(q05set.options.map((o: { modelId: string | null }) => o.modelId
   for (const name of [BREATHING_LEAF_MOVING.mistA, BREATHING_LEAF_MOVING.mistB]) {
     const m = part(name).material as MeshStandardMaterial;
     assert.ok(m.transparent && !m.depthWrite && m.opacity < .5, `${name} is a translucent curtain`);
+    assert.ok(m.alphaMap && part(name).geometry.getAttribute('uv'), `${name} frays through the soft mist alpha map (B-R5)`);
+    const colour = part(name).geometry.getAttribute('color');
+    assert.ok(m.vertexColors && colour?.itemSize === 4 && m.alphaMap.channel === 1 && part(name).geometry.getAttribute('uv1'),
+      `${name} keeps its envelope in vertex alpha and reads the falling threads through its metre UV (B-R6)`);
   }
+  assert.ok(breathingLeafMistEnvelope(.5, .3, Math.cos(-2.22), Math.sin(-2.22)) > .8 && breathingLeafMistEnvelope(.5, .3, -Math.sin(-2.22), Math.cos(-2.22)) === 0
+    && breathingLeafMistEnvelope(0, .3, 1, 0) === 0 && breathingLeafMistEnvelope(.5, 1, 1, 0) === 0, 'the envelope fades at the sides, the ground and edge-on');
   for (const [name, dim] of Object.entries(BREATHING_LEAF_MATTE)) {                  // B-R2: deep-green leaves and crowns stay matte
     assert.equal((part(name).material as MeshStandardMaterial).envMapIntensity, dim, `${name} sky reflection dimmed`);
   }
@@ -255,6 +262,8 @@ assert.deepEqual(q05set.options.map((o: { modelId: string | null }) => o.modelId
   assert.ok(stemMat.transparent && stemMat.opacity < .7 && !breathingLeafBakes(stem) && stem.renderOrder === 1, 'stems are clear glass, drawn before the mist');
   const before = (part(BREATHING_LEAF_MOVING.mistA).material as MeshStandardMaterial).opacity;
   motion!(1.25); assert.equal((part(BREATHING_LEAF_MOVING.mistA).material as MeshStandardMaterial).opacity, before, 'the breath leaves opacity to the lot fade');
+  const fallen = breathingLeafMistAlpha().offset.y; motion!(1.75);
+  assert.ok(breathingLeafMistAlpha().offset.y < fallen, 'the mist threads fall (the thread map scrolls down the veils, B-R6)');
   const lit = (t: number) => { const g = breathingLeafGlow(t); return [g.pulseA, g.pulseB, g.pulseC].indexOf(Math.max(g.pulseA, g.pulseB, g.pulseC)); };
   assert.deepEqual([0, .4, .8].map(lit), [0, 1, 2], 'water dashes climb a → b → c');
   const g = breathingLeafGlow(1.25); assert.ok(Math.abs(g.mistA + g.mistB - 2) < 1e-9, 'mist sets breathe in antiphase');

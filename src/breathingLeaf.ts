@@ -1,10 +1,11 @@
 // Q05-B breathing giant leaf (asset/models/q05b-breathing-leaf-2127, owner-accepted target 2026-11-26): the GLB's runtime finish and
 // motion. It stands on the NE PARK lot hidden until a rotation run shows Q05-B (src/lotRuntime.ts fades it in place of the NE park).
 // Nothing turns or moves: the plant breathes in light. Three sets of water dashes up the stems light in turn, so the bay water
-// reads as climbing; the leaf veins swell and ease; the mist curtains on the leaf rims (alpha-blended) brighten in antiphase.
-// Only emissive intensity changes, read from each mesh's current material every frame, so the lot fade (which owns opacity and
+// reads as climbing; the leaf veins swell and ease; the mist veils on the leaf rims (alpha-blended through a soft thread map) brighten in antiphase,
+// and their threads fall (B-R6: the shared thread map scrolls down; the veil envelope is a fixed vertex alpha).
+// Only emissive intensity and the thread map's offset change, read from each mesh's current material every frame, so the lot fade (which owns opacity and
 // clones the materials) keeps working.
-import { Mesh, MeshStandardMaterial, type Material, type Object3D } from 'three';
+import { BufferAttribute, DataTexture, LinearFilter, Mesh, MeshStandardMaterial, RGBAFormat, RepeatWrapping, type Material, type Object3D } from 'three';
 
 export const BREATHING_LEAF = 'q05b-breathing-leaf-2127';
 /** Mesh names in the GLB (build_breathing_leaf.py, one mesh per role). */
@@ -21,6 +22,55 @@ export const BREATHING_LEAF_MATTE = {
 /** The translucent glass-green stems (alpha from the GLB), drawn after the opaque plant and before the mist. */
 export const BREATHING_LEAF_STEM = 'q05b_stem';
 const moving = new Set<string>(Object.values(BREATHING_LEAF_MOVING));
+
+/** B-R5 (owner «霧…似一條條光，唔似霧水») / B-R6 («加飄落效果，霧再白啲密啲»): the mist veils' falling thread map, read through
+ *  the veils' second UV (u across a veil, v down it in MIST_TILE metres, build_breathing_leaf.py). Fine threads of varied strength
+ *  broken into streaks of varied length, tiling in both directions so the runtime can scroll it down (texture offset); the veil's
+ *  own soft envelope (rim, sides, ground, edge-on) is a vertex alpha (`breathingLeafMistEnvelope`), so the fade stays put while
+ *  only the threads fall. Built once, deterministic; a DataTexture so it also runs in Node. */
+export const BREATHING_LEAF_MIST = { tile: 6, speed: 1.5, cam: -2.22 } as const;   // metres per repeat, m/s, close-up azimuth (model frame, build CAM)
+let mistAlpha: DataTexture | undefined;
+const smooth = (a: number, b: number, t: number) => { const k = Math.min(1, Math.max(0, (t - a) / (b - a))); return k * k * (3 - 2 * k); };
+export function breathingLeafMistAlpha() {
+  if (mistAlpha) return mistAlpha;
+  const W = 256, H = 256, data = new Uint8Array(W * H * 4);
+  let seed = 2127;
+  const rand = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const raw = Array.from({ length: W }, rand);
+  const thread = raw.map((_, x) => (raw[(x + W - 1) % W] + 2 * raw[x] + raw[(x + 1) % W]) / 4);   // threads two texels wide
+  // Streaks down each pair of columns: three per pair, each its own start and length, soft at both ends; wrapping in v.
+  const streaks = Array.from({ length: W / 2 }, () => Array.from({ length: 3 }, () => [rand(), .25 + .45 * rand()]));
+  for (let x = 0; x < W; x++) {
+    const strength = .4 + .6 * thread[x] ** 2;
+    for (let y = 0; y < H; y++) {
+      const v = y / H;
+      let streak = 0;
+      for (const [start, length] of streaks[x >> 1]) {
+        const d = (v - start + 1) % 1;
+        if (d < length) streak = Math.max(streak, smooth(0, .12, d) * (1 - smooth(length - .15, length, d)));
+      }
+      const a = Math.round(255 * Math.min(1, strength * (.35 + .65 * streak) * 1.8));
+      data.set([a, a, a, 255], (y * W + x) * 4);
+    }
+  }
+  mistAlpha = new DataTexture(data, W, H, RGBAFormat);
+  mistAlpha.magFilter = mistAlpha.minFilter = LinearFilter;
+  mistAlpha.wrapS = mistAlpha.wrapT = RepeatWrapping;
+  mistAlpha.channel = 1;
+  mistAlpha.needsUpdate = true;
+  return mistAlpha;
+}
+
+/** A veil's fixed soft envelope at (u across, v down, both 0 → 1, the first UV) with horizontal normal (nx, nz): soft at the rim,
+ *  faded at the sides and thinning to nothing toward the ground, and faded where the veil turns edge-on to the close-up camera
+ *  (B-R5: the back veils outlined a cylinder against the bright sky). Exported for the unit test. */
+export function breathingLeafMistEnvelope(u: number, v: number, nx: number, nz: number) {
+  const len = Math.hypot(nx, nz) || 1, facing = Math.abs(nx * Math.cos(BREATHING_LEAF_MIST.cam) + nz * Math.sin(BREATHING_LEAF_MIST.cam)) / len;
+  return Math.sin(Math.PI * u) ** 1.3 * smooth(0, .1, v) * (1 - smooth(.4, 1, v)) * smooth(.08, .4, facing);
+}
+
+/** The thread map's downward scroll at `now` (texture offset v): the mist falls BREATHING_LEAF_MIST.speed m/s down every veil. */
+export const breathingLeafMistFall = (now: number) => -((now * BREATHING_LEAF_MIST.speed / BREATHING_LEAF_MIST.tile) % 1);
 
 /** Whether `bake` may merge this mesh: static, opaque, and none of the glowing parts. */
 export const breathingLeafBakes = (mesh: Mesh) => !Array.isArray(mesh.material) && !mesh.material.transparent && !moving.has(mesh.name);
@@ -45,7 +95,16 @@ export function prepareBreathingLeaf(model: Object3D) {
     const material = part.material as MeshStandardMaterial;
     base.set(key, material.emissiveIntensity);
     if (!MIST.has(part.name)) continue;
-    for (const m of ([] as Material[]).concat(part.material)) { m.transparent = true; m.depthWrite = false; m.needsUpdate = true; }
+    const uv = part.geometry.getAttribute('uv'), normal = part.geometry.getAttribute('normal');
+    if (uv && normal && !part.geometry.getAttribute('color')) {   // the envelope as vertex alpha (white rgb)
+      const colour = new Float32Array(uv.count * 4);
+      for (let i = 0; i < uv.count; i++) colour.set([1, 1, 1, breathingLeafMistEnvelope(uv.getX(i), uv.getY(i), normal.getX(i), normal.getZ(i))], i * 4);
+      part.geometry.setAttribute('color', new BufferAttribute(colour, 4));
+    }
+    for (const m of ([] as Material[]).concat(part.material)) {
+      m.transparent = true; m.depthWrite = false; m.vertexColors = true; m.needsUpdate = true;
+      if (m instanceof MeshStandardMaterial) m.alphaMap = breathingLeafMistAlpha();
+    }
     part.renderOrder = 2;
   }
   model.traverse(object => {
@@ -58,6 +117,7 @@ export function prepareBreathingLeaf(model: Object3D) {
   if (Object.values(parts).some(part => !(part instanceof Mesh))) return undefined;
   return (now: number) => {
     const glow = breathingLeafGlow(now);
+    breathingLeafMistAlpha().offset.y = breathingLeafMistFall(now);   // the threads fall; the envelope and opacity stay put
     for (const key of Object.keys(glow) as (keyof typeof glow)[]) {
       const material = (parts[key] as Mesh).material;
       if (material instanceof MeshStandardMaterial) material.emissiveIntensity = base.get(key)! * glow[key];
