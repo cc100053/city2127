@@ -1,0 +1,177 @@
+{
+ "glb": "C:\\Users\\User\\OneDrive\\\u6587\u4ef6\\GitHub\\city2127-q09a\\asset\\models\\q09a-wing-wellness\\q09a-wing-wellness.glb",
+ "glb_bytes": 4541064,
+ "objects": 22,
+ "meshes": 16,
+ "roots": [
+  "Q09A_WingWellness"
+ ],
+ "root_location": [
+  0.0,
+  0.0,
+  0.0
+ ],
+ "preview_or_figure_nodes": [],
+ "bbox_min_m": [
+  -26.03,
+  -14.0,
+  -0.3
+ ],
+ "bbox_max_m": [
+  26.03,
+  26.0,
+  17.052
+ ],
+ "building_size_m": [
+  31.76,
+  18.5,
+  17.05
+ ],
+ "triangles": 111038,
+ "triangles_by_object": {
+  "GYM_EQUIPMENT": 6236,
+  "ROOMS_CORE": 264,
+  "YOGA_ROOM": 3832,
+  "SITE_PAVING": 15472,
+  "TIER_1": 11320,
+  "TIER_2": 10646,
+  "TIER_3": 9920,
+  "GARDENS": 13084,
+  "READING": 19108,
+  "RIDGE": 180,
+  "WING_1": 3496,
+  "WING_2": 3496,
+  "WING_3": 3496,
+  "WING_4": 3496,
+  "WING_5": 3496,
+  "WING_6": 3496
+ },
+ "materials": 67,
+ "empty_slots": 0,
+ "see_through": {
+  "q09a_wing_film_aqua": 0.5,
+  "q09a_glass": 0.12,
+  "q09a_guard_glass": 0.2,
+  "q09a_wing_film_lilac": 0.5,
+  "q09a_wing_film_rose": 0.5
+ },
+ "iridescent_thin_film_nm": {
+  "q09a_wing_film_aqua": 400.0,
+  "q09a_wing_film_lilac": 400.0,
+  "q09a_wing_film_rose": 400.0
+ },
+ "entrances": [
+  {
+   "door": "gym",
+   "clear_width_m": 1.8,
+   "approach_band_m": 1.8,
+   "approach_from_y": -9.0,
+   "approach_blocked": [],
+   "clear_3m_inside_door": true,
+   "first_hit_inside": null
+  },
+  {
+   "door": "yoga",
+   "clear_width_m": 1.8,
+   "approach_band_m": 1.8,
+   "approach_from_y": -9.0,
+   "approach_blocked": [],
+   "clear_3m_inside_door": true,
+   "first_hit_inside": null
+  }
+ ],
+ "visibility_through_glass": {
+  "GYM_EQUIPMENT_from_main": {
+   "samples": 160,
+   "visible": 120,
+   "share": 0.75,
+   "glass_layers_crossed": [
+    0,
+    2,
+    4
+   ]
+  },
+  "GYM_EQUIPMENT_from_gym": {
+   "samples": 160,
+   "visible": 126,
+   "share": 0.79,
+   "glass_layers_crossed": [
+    0,
+    2,
+    4
+   ]
+  },
+  "GYM_EQUIPMENT_from_yoga": {
+   "samples": 160,
+   "visible": 39,
+   "share": 0.24,
+   "glass_layers_crossed": [
+    0,
+    2,
+    4
+   ]
+  },
+  "YOGA_ROOM_from_main": {
+   "samples": 72,
+   "visible": 51,
+   "share": 0.71,
+   "glass_layers_crossed": [
+    0,
+    2,
+    4
+   ]
+  },
+  "YOGA_ROOM_from_gym": {
+   "samples": 72,
+   "visible": 21,
+   "share": 0.29,
+   "glass_layers_crossed": [
+    0,
+    2
+   ]
+  },
+  "YOGA_ROOM_from_yoga": {
+   "samples": 72,
+   "visible": 60,
+   "share": 0.83,
+   "glass_layers_crossed": [
+    0,
+    2,
+    4
+   ]
+  }
+ },
+ "wings": [
+  {
+   "wing": "WING_1",
+   "top_z": 14.93,
+   "min_clear_below_m": 1.98
+  },
+  {
+   "wing": "WING_2",
+   "top_z": 15.81,
+   "min_clear_below_m": 0.95
+  },
+  {
+   "wing": "WING_3",
+   "top_z": 16.68,
+   "min_clear_below_m": 1.14
+  },
+  {
+   "wing": "WING_4",
+   "top_z": 17.05,
+   "min_clear_below_m": 1.67
+  },
+  {
+   "wing": "WING_5",
+   "top_z": 15.03,
+   "min_clear_below_m": 0.76
+  },
+  {
+   "wing": "WING_6",
+   "top_z": 16.1,
+   "min_clear_below_m": 0.83
+  }
+ ],
+ "wing_tip_max_z": 17.05
+}
